@@ -107,6 +107,33 @@ def retrieve(
     if filters is None:
         filters = RetrievalFilter()
 
+    # Expand product queries using corp-os-meta taxonomy
+    if filters.products:
+        try:
+            from corp_os_meta.products import expand_product_query
+
+            expanded: list[str] = []
+            for p in filters.products:
+                expanded.extend(expand_product_query(p))
+            # Deduplicate while preserving order
+            seen: set[str] = set()
+            unique: list[str] = []
+            for item in expanded:
+                if item not in seen:
+                    seen.add(item)
+                    unique.append(item)
+            filters = RetrievalFilter(
+                client=filters.client,
+                project_id=filters.project_id,
+                products=unique,
+                domains=filters.domains,
+                topics=filters.topics,
+                source_type=filters.source_type,
+                type=filters.type,
+            )
+        except ImportError:
+            logger.debug("corp-os-meta not available, skipping product expansion")
+
     conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
 

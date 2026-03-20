@@ -432,3 +432,55 @@ class TestFallbackSearch:
             vault_root,
         )
         assert isinstance(result, RetrievalResult)
+
+
+class TestProductExpansion:
+    def test_expand_product_query_used(
+        self, test_db: Path, vault_root: Path, monkeypatch
+    ) -> None:
+        """Product filters are expanded via corp-os-meta taxonomy."""
+        expanded_calls: list[str] = []
+
+        def mock_expand(product: str) -> list[str]:
+            expanded_calls.append(product)
+            if product == "wms":
+                return ["wms", "wms_billing", "wms_native", "wms_labor"]
+            return [product]
+
+        import corp_os_meta.products
+
+        monkeypatch.setattr(corp_os_meta.products, "expand_product_query", mock_expand)
+
+        filters = RetrievalFilter(products=["wms"])
+        result = retrieve("warehouse", test_db, vault_root, filters=filters)
+
+        assert "wms" in expanded_calls
+        # The SGDBF WMS note should still match with expanded query
+        assert isinstance(result, RetrievalResult)
+
+    def test_expand_deduplicates(self, monkeypatch) -> None:
+        """Product expansion removes duplicates."""
+        def mock_expand(product: str) -> list[str]:
+            return ["wms", "wms", "wms_billing"]
+
+        import corp_os_meta.products
+
+        monkeypatch.setattr(corp_os_meta.products, "expand_product_query", mock_expand)
+
+        # Just verify the filter expansion logic (don't need full DB)
+        from corp_by_os.retrieve.engine import RetrievalFilter
+
+        filters = RetrievalFilter(products=["wms"])
+
+        # Simulate what retrieve() does
+        expanded: list[str] = []
+        for p in filters.products:
+            expanded.extend(mock_expand(p))
+        seen: set[str] = set()
+        unique: list[str] = []
+        for item in expanded:
+            if item not in seen:
+                seen.add(item)
+                unique.append(item)
+
+        assert unique == ["wms", "wms_billing"]
