@@ -95,23 +95,35 @@ CREATE TABLE IF NOT EXISTS notes (
     source_locator TEXT,
     routing_confidence REAL,
     confidence TEXT,
-    note_path TEXT NOT NULL
+    note_path TEXT NOT NULL,
+    extraction_version INTEGER,
+    depth TEXT,
+    doc_type TEXT,
+    source_path TEXT,
+    source_hash TEXT,
+    extracted_at TEXT
 );
 
 CREATE VIRTUAL TABLE IF NOT EXISTS notes_fts USING fts5(
-    title, topics, products, domains, client, project_id,
+    title, topics, products, domains, client, project_id, doc_type,
     content=notes, content_rowid=id
 );
 
 CREATE TRIGGER IF NOT EXISTS notes_ai AFTER INSERT ON notes BEGIN
-    INSERT INTO notes_fts(rowid, title, topics, products, domains, client, project_id)
-    VALUES (new.id, new.title, new.topics, new.products, new.domains, new.client, new.project_id);
+    INSERT INTO notes_fts(
+        rowid, title, topics, products, domains, client, project_id, doc_type)
+    VALUES (
+        new.id, new.title, new.topics, new.products, new.domains,
+        new.client, new.project_id, new.doc_type);
 END;
 
 CREATE TRIGGER IF NOT EXISTS notes_ad AFTER DELETE ON notes BEGIN
-    INSERT INTO notes_fts(notes_fts, rowid, title, topics, products, domains, client, project_id)
-    VALUES ('delete', old.id, old.title, old.topics, old.products,
-            old.domains, old.client, old.project_id);
+    INSERT INTO notes_fts(
+        notes_fts, rowid, title, topics, products, domains,
+        client, project_id, doc_type)
+    VALUES (
+        'delete', old.id, old.title, old.topics, old.products,
+        old.domains, old.client, old.project_id, old.doc_type);
 END;
 
 -- Triggers to keep FTS in sync with facts table
@@ -553,6 +565,10 @@ def _index_cke_notes(conn: sqlite3.Connection, vault_root: Path) -> int:
             def _join_list(val: object) -> str:
                 return ", ".join(val) if isinstance(val, list) else ""
 
+            source_path_raw = fm.get("source_path", "")
+            if source_path_raw:
+                source_path_raw = str(source_path_raw).replace("\\", "/")
+
             conn.execute(
                 """INSERT INTO notes
                    (project_id, client, title, type, source_type, layer,
@@ -560,8 +576,10 @@ def _index_cke_notes(conn: sqlite3.Connection, vault_root: Path) -> int:
                     confidentiality, quality, language, date, valid_to,
                     model, tokens_used,
                     content_origin, source_category, source_locator,
-                    routing_confidence, confidence, note_path)
-                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                    routing_confidence, confidence, note_path,
+                    extraction_version, depth, doc_type,
+                    source_path, source_hash, extracted_at)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (
                     project_id,
                     fm.get("client", ""),
@@ -587,6 +605,12 @@ def _index_cke_notes(conn: sqlite3.Connection, vault_root: Path) -> int:
                     fm.get("routing_confidence"),
                     fm.get("trust_level", "extracted"),
                     str(md_file).replace("\\", "/"),
+                    fm.get("extraction_version"),
+                    fm.get("depth", ""),
+                    fm.get("doc_type", ""),
+                    source_path_raw,
+                    fm.get("source_hash", ""),
+                    fm.get("extracted_at", ""),
                 ),
             )
             count += 1
