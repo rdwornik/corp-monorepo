@@ -2637,6 +2637,70 @@ def rfp_answer_cmd(
         console.print("Consider ingesting relevant documents first (corp ingest).")
 
 
+# --- Ingest Extractions ---
+
+
+@cli.command("ingest-extractions")
+@click.argument("cke_output_path", type=click.Path(exists=True, file_okay=False))
+@click.option("--dry-run", is_flag=True, help="Show what would be ingested")
+@click.option("--force", is_flag=True, help="Overwrite even verified notes")
+def ingest_extractions_cmd(cke_output_path: str, dry_run: bool, force: bool) -> None:
+    """Ingest CKE extraction output into the vault.
+
+    Reads CKE output packages, copies extracted notes and cover slides
+    to vault/knowledge/. Respects trust_level=verified protection.
+
+    Examples:
+
+        corp ingest-extractions /path/to/cke/output
+
+        corp ingest-extractions /path/to/cke/output --dry-run
+
+        corp ingest-extractions /path/to/cke/output --force
+    """
+    from corp_by_os.ingest.extractions import ingest_extractions
+
+    cfg = get_config()
+
+    try:
+        from corp_by_os.ops.database import OpsDB
+
+        ops = OpsDB()
+    except Exception:
+        ops = None
+
+    if dry_run:
+        console.print("[yellow]Dry run — no files will be written.[/yellow]")
+    if force:
+        console.print("[yellow]Force mode — verified notes will be overwritten.[/yellow]")
+
+    result = ingest_extractions(
+        cke_output_path=Path(cke_output_path).resolve(),
+        vault_root=cfg.vault_path,
+        dry_run=dry_run,
+        force=force,
+        ops_db=ops,
+    )
+
+    console.print(f"\n[bold]Notes ingested:[/bold] {result.notes_ingested}")
+    console.print(f"[bold]Skipped (verified):[/bold] {result.notes_skipped_verified}")
+    console.print(f"[bold]Cover slides copied:[/bold] {result.covers_copied}")
+
+    if result.errors:
+        console.print(f"\n[red]{len(result.errors)} error(s):[/red]")
+        for err in result.errors:
+            console.print(f"  {err}")
+
+    if result.notes_ingested > 0 and not dry_run:
+        console.print("\n[dim]Run `corp index rebuild` to update the search index.[/dim]")
+
+    if ops is not None:
+        try:
+            ops.close()
+        except Exception:
+            pass
+
+
 # --- Chat ---
 
 
