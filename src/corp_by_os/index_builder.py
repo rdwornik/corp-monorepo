@@ -231,7 +231,7 @@ def rebuild_index(db_path: Path | None = None) -> IndexStats:
             facts_indexed=facts_count,
             notes_indexed=notes_count,
             rebuild_duration=duration,
-            index_path=str(path),
+            index_path=str(path).replace("\\", "/"),
         )
     finally:
         conn.close()
@@ -304,7 +304,7 @@ def _collect_project_dirs(cfg) -> dict[str, dict]:
                 projects[pid] = {
                     "client": client,
                     "status": "unknown",
-                    "onedrive_path": str(folder),
+                    "onedrive_path": str(folder).replace("\\", "/"),
                     "vault_path": None,
                     "products": [],
                     "topics": [],
@@ -332,7 +332,7 @@ def _collect_project_dirs(cfg) -> dict[str, dict]:
                         "client": folder.name.split("_")[0],
                         "status": "unknown",
                         "onedrive_path": None,
-                        "vault_path": str(folder),
+                        "vault_path": str(folder).replace("\\", "/"),
                         "products": [],
                         "topics": [],
                         "domains": [],
@@ -344,7 +344,7 @@ def _collect_project_dirs(cfg) -> dict[str, dict]:
                         "last_extracted": None,
                     }
                 else:
-                    projects[pid]["vault_path"] = str(folder)
+                    projects[pid]["vault_path"] = str(folder).replace("\\", "/")
 
                 # Enrich from vault project-info.yaml (overrides OneDrive)
                 _enrich_from_vault(projects[pid], folder)
@@ -586,7 +586,7 @@ def _index_cke_notes(conn: sqlite3.Connection, vault_root: Path) -> int:
                     fm.get("source_locator", ""),
                     fm.get("routing_confidence"),
                     fm.get("trust_level", "extracted"),
-                    str(md_file),
+                    str(md_file).replace("\\", "/"),
                 ),
             )
             count += 1
