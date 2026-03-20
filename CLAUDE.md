@@ -147,6 +147,25 @@ Check: `keys list` | Update: `keys set KEY value` | Reload: `keys reload`
 
 This repo uses: `GEMINI_API_KEY` (audit, cleanup classifier, LLM router, overnight preflight/CKE client)
 
+## Integration points
+
+corp-by-os is the root orchestrator and SOLE vault writer.
+
+- **corp-os-meta**: imports `validate_frontmatter()`, `normalize_frontmatter()` (pyproject.toml dependency)
+- **corp-knowledge-extractor (CKE)**: invoked via subprocess `cke process-manifest` in ingest/router.py
+- **corp-project-extractor (CPE)**: invoked via subprocess `cpe scan` in extraction pipeline
+- **corp-opportunity-manager (COM)**: invoked via subprocess `com new` in workflows
+- **corp-rfp-agent**: provides data via `corp retrieve --format json`
+
+## Related repos
+
+- [ECOSYSTEM.md](../ECOSYSTEM.md) — full ecosystem overview
+- [corp-os-meta](../corp-os-meta/) — shared schema (dependency root)
+- [corp-knowledge-extractor](../corp-knowledge-extractor/) — extraction engine
+- [corp-project-extractor](../corp-project-extractor/) — project folder classifier
+- [corp-rfp-agent](../corp-rfp-agent/) — RFP answering (consumes `corp retrieve`)
+- [corp-opportunity-manager](../corp-opportunity-manager/) — opportunity lifecycle
+
 ## Known issues
 
 - **No test coverage** for: `config.py`, `cli.py`, `models.py`, `__main__.py`, `overnight/cke_client.py`, `extraction/vault_writer.py`
