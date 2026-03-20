@@ -11,7 +11,27 @@ import logging
 import shutil
 from pathlib import Path
 
+import yaml
+
 log = logging.getLogger(__name__)
+
+
+def _read_trust_level(path: Path) -> str | None:
+    """Read trust_level from a markdown note's frontmatter."""
+    try:
+        text = path.read_text(encoding="utf-8")
+    except Exception:
+        return None
+    if not text.startswith("---"):
+        return None
+    end = text.find("---", 3)
+    if end == -1:
+        return None
+    try:
+        fm = yaml.safe_load(text[3:end])
+        return fm.get("trust_level") if isinstance(fm, dict) else None
+    except Exception:
+        return None
 
 
 def _file_hash(path: Path) -> str:
@@ -58,6 +78,18 @@ def move_to_vault(
                 if dst_file.exists() and _file_hash(src_file) == _file_hash(dst_file):
                     log.debug(
                         "Skipping identical: %s",
+                        str(rel).replace("\\", "/"),
+                    )
+                    continue
+
+                # Protect verified notes from overwrite
+                if (
+                    dst_file.exists()
+                    and dst_file.suffix == ".md"
+                    and _read_trust_level(dst_file) == "verified"
+                ):
+                    log.warning(
+                        "SKIP: %s has trust_level=verified",
                         str(rel).replace("\\", "/"),
                     )
                     continue

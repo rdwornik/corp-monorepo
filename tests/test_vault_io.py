@@ -14,6 +14,7 @@ from corp_by_os.vault_io import (
     _write_with_retry,
     copy_to_vault,
     list_projects,
+    read_frontmatter,
     read_note,
     read_project_info,
     resolve_vault_path,
@@ -96,6 +97,49 @@ class TestReadWriteNote:
         path = tmp_vault / "01_projects" / "nonexistent" / "note.md"
         with pytest.raises(FileNotFoundError):
             write_note(path, {"title": "Nope"}, "Body\n", mode="update")
+
+    def test_verified_note_not_overwritten(self, app_config, tmp_path):
+        """trust_level=verified notes must not be overwritten without force."""
+        path = tmp_path / "verified_note.md"
+        fm = {"title": "Original", "trust_level": "verified"}
+        write_note(path, fm, "Original body.\n", mode="create")
+
+        result = write_note(path, {"title": "Replaced"}, "New body.\n")
+        assert result is False
+        # Content unchanged
+        fm2, body2 = read_note(path)
+        assert fm2["title"] == "Original"
+        assert fm2["trust_level"] == "verified"
+
+    def test_verified_note_overwritten_with_force(self, app_config, tmp_path):
+        """force=True allows overwriting verified notes."""
+        path = tmp_path / "verified_note.md"
+        write_note(path, {"title": "Original", "trust_level": "verified"}, "Old.\n", mode="create")
+
+        result = write_note(path, {"title": "Replaced"}, "New.\n", force=True)
+        assert result is True
+        fm2, _ = read_note(path)
+        assert fm2["title"] == "Replaced"
+
+    def test_non_verified_note_overwritten_normally(self, app_config, tmp_path):
+        """Notes without trust_level=verified can be overwritten."""
+        path = tmp_path / "normal_note.md"
+        write_note(path, {"title": "Original", "trust_level": "extracted"}, "Old.\n", mode="create")
+
+        result = write_note(path, {"title": "Updated"}, "New.\n")
+        assert result is True
+        fm2, _ = read_note(path)
+        assert fm2["title"] == "Updated"
+
+    def test_read_frontmatter_helper(self, tmp_path):
+        path = tmp_path / "note.md"
+        path.write_text("---\ntitle: Test\ntrust_level: verified\n---\nBody.\n", encoding="utf-8")
+        fm = read_frontmatter(path)
+        assert fm["trust_level"] == "verified"
+
+    def test_read_frontmatter_missing_file(self, tmp_path):
+        fm = read_frontmatter(tmp_path / "nonexistent.md")
+        assert fm == {}
 
 
 class TestWriteWithRetry:

@@ -131,11 +131,21 @@ def read_note(path: Path) -> tuple[dict[str, Any], str]:
     return _parse_frontmatter(content)
 
 
+def read_frontmatter(path: Path) -> dict[str, Any]:
+    """Read only the frontmatter dict from an existing note."""
+    if not path.exists():
+        return {}
+    content = path.read_text(encoding="utf-8")
+    fm, _ = _parse_frontmatter(content)
+    return fm
+
+
 def write_note(
     path: Path,
     frontmatter: dict[str, Any],
     body: str,
     mode: str = "upsert",
+    force: bool = False,
 ) -> bool:
     """Write a note to the vault.
 
@@ -145,9 +155,10 @@ def write_note(
         body: Note body text.
         mode: "create" (fail if exists), "update" (fail if missing),
               "upsert" (create or update).
+        force: If True, overwrite even trust_level=verified notes.
 
     Returns:
-        True if written successfully.
+        True if written successfully, False if skipped (verified protection).
 
     Raises:
         FileExistsError: If mode="create" and file exists.
@@ -157,6 +168,13 @@ def write_note(
         raise FileExistsError(f"Note already exists: {path}")
     if mode == "update" and not path.exists():
         raise FileNotFoundError(f"Note not found: {path}")
+
+    # Protect verified notes from accidental overwrite
+    if path.exists() and not force:
+        existing_fm = read_frontmatter(path)
+        if existing_fm.get("trust_level") == "verified":
+            logger.warning("SKIP: %s has trust_level=verified. Use force=True to overwrite.", path)
+            return False
 
     content = _render_note(frontmatter, body)
     return _write_with_retry(path, content)

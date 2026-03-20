@@ -101,3 +101,21 @@ def test_move_to_vault_empty_staging(tmp_path):
     vault = tmp_path / "vault"
     count = move_to_vault(staging, vault, "target")
     assert count == 0
+
+
+def test_move_to_vault_skips_verified(tmp_path):
+    """Files with trust_level=verified in vault must not be overwritten."""
+    vault = tmp_path / "vault"
+    dest = vault / "target" / "pkg-001" / "extract"
+    dest.mkdir(parents=True)
+    (dest / "note.md").write_text(
+        "---\ntitle: Verified Note\ntrust_level: verified\n---\nOriginal.\n",
+        encoding="utf-8",
+    )
+
+    staging = tmp_path / "staging"
+    _make_package(staging, "pkg-001", {"extract/note.md": b"---\ntitle: New\n---\nReplaced.\n"})
+
+    count = move_to_vault(staging, vault, "target")
+    assert count == 0
+    assert "Original" in (dest / "note.md").read_text(encoding="utf-8")
