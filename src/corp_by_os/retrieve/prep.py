@@ -110,7 +110,7 @@ def generate_prep(
     db_path: Path,
     vault_root: Path,
     output_dir: Path | None = None,
-    model: str = "gemini-2.0-flash",
+    model: str = "gemini-3-flash-preview",
 ) -> PrepBriefing:
     """Generate a client preparation briefing.
 

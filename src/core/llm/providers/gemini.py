@@ -15,7 +15,7 @@ class GeminiProvider(BaseLLMProvider):
     def __init__(
         self,
         api_key: str,
-        model_fast: str = "gemini-2.0-flash-exp",
+        model_fast: str = "gemini-3-flash-preview",
         model_quality: str = "gemini-1.5-pro",
     ):
         self.api_key = api_key

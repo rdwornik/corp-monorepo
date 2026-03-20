@@ -57,7 +57,14 @@ def get_config() -> AppConfig:
     Reads from .env file in repo root, falls back to environment variables.
     """
     repo_path = Path(__file__).resolve().parent.parent.parent
-    load_dotenv(repo_path / ".env")
+
+    # Global API keys (Documents/.secrets/.env)
+    _global_env = Path.home() / "Documents" / ".secrets" / ".env"
+    if _global_env.exists():
+        load_dotenv(_global_env, override=False)
+
+    # Local .env (project-specific vars only)
+    load_dotenv(repo_path / ".env", override=False)
 
     vault_path = os.environ.get(
         "VAULT_PATH",

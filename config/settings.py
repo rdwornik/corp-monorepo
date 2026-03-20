@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     # API Keys (from .env)
     anthropic_api_key: Optional[str] = Field(default=None, alias="ANTHROPIC_API_KEY")
     deepseek_api_key: Optional[str] = Field(default=None, alias="DEEPSEEK_API_KEY")
-    google_api_key: Optional[str] = Field(default=None, alias="GOOGLE_API_KEY")
+    gemini_api_key: Optional[str] = Field(default=None, alias="GEMINI_API_KEY")
     graph_access_token: Optional[str] = Field(default=None, alias="GRAPH_ACCESS_TOKEN")
     
     # ===================
@@ -231,5 +231,5 @@ if __name__ == "__main__":
     print(f"  Ollama:     {s.ollama_base_url}")
     print(f"  Cloud:      {s.default_cloud_provider}")
     print(f"  Claude:     {'✓' if s.anthropic_api_key else '✗'}")
-    print(f"  Gemini:     {'✓' if s.google_api_key else '✗'}")
+    print(f"  Gemini:     {'✓' if s.gemini_api_key else '✗'}")
     print(f"  Graph:      {'✓' if s.graph_access_token else '✗'}")

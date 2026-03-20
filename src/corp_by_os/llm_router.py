@@ -156,7 +156,7 @@ def classify_intent(
             response_text="Limit LLM na dziś wyczerpany. Użyj `corp run <workflow>` bezpośrednio.",
         )
 
-    # Use GEMINI_API_KEY only — ignore GOOGLE_API_KEY to avoid SDK confusion
+    # Use GEMINI_API_KEY only (consolidated from GOOGLE_API_KEY)
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         logger.debug("GEMINI_API_KEY not set, skipping LLM routing")

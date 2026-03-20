@@ -114,7 +114,7 @@ def classify_file_llm(
     current_folder: str,
     parent_folder: str | None,
     registry_destinations: list[str],
-    model: str = "gemini-2.0-flash",
+    model: str = "gemini-3-flash-preview",
 ) -> LLMClassification:
     """Classify a single file using Gemini Flash.
 
@@ -168,7 +168,7 @@ def classify_quarantined_batch(
     ops: OpsDB,  # noqa: F821
     registry: ContentRegistry,  # noqa: F821
     mywork_root: Path,
-    model: str = "gemini-2.0-flash",
+    model: str = "gemini-3-flash-preview",
     budget: float = 0.50,
     dry_run: bool = False,
 ) -> list[dict]:

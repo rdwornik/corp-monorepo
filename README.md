@@ -59,7 +59,7 @@ corp analytics                       # Cross-project patterns
 
 ```bash
 corp prep "Saint-Gobain"             # Generate client briefing
-corp prep "Alfa Laval" --model gemini-2.0-flash
+corp prep "Alfa Laval" --model gemini-3-flash-preview
 corp rfp answer "How does BY handle demand sensing?" --product "Luminate Planning"
 corp rfp answer "Describe your SaaS deployment model" --client Lenzing
 ```

@@ -2210,7 +2210,7 @@ def finalize_command(approve_all: bool) -> None:
 
 
 @cli.command("classify")
-@click.option("--model", default="gemini-2.0-flash", help="Gemini model for classification")
+@click.option("--model", default="gemini-3-flash-preview", help="Gemini model for classification")
 @click.option("--budget", default=0.50, type=float, help="Maximum API spend ($)")
 @click.option("--dry-run", is_flag=True, help="Classify without moving files")
 def classify_command(model: str, budget: float, dry_run: bool) -> None:
@@ -2417,7 +2417,7 @@ def retrieve_cmd(
 
 @cli.command("prep")
 @click.argument("client")
-@click.option("--model", default="gemini-2.0-flash", help="LLM model for synthesis")
+@click.option("--model", default="gemini-3-flash-preview", help="LLM model for synthesis")
 @click.option(
     "--output", default=None, help="Output directory (default: project folder or 90_System)"
 )
