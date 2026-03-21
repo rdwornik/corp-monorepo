@@ -15,7 +15,7 @@ class ClaudeProvider(BaseLLMProvider):
     def __init__(
         self,
         api_key: str,
-        model_fast: str = "claude-3-5-haiku-20241022",
+        model_fast: str = "claude-haiku-4-5-20251001",
         model_quality: str = "claude-sonnet-4-20250514",
     ):
         self.api_key = api_key
