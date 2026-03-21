@@ -27,7 +27,7 @@ from corp_by_os.task_manager import (
 @pytest.fixture()
 def task_env(app_config, tmp_vault: Path):
     """Set up task environment with vault."""
-    tasks_dir = tmp_vault / "00_dashboards" / "tasks"
+    tasks_dir = tmp_vault / "dashboards" / "tasks"
     tasks_dir.mkdir(parents=True, exist_ok=True)
     return tasks_dir
 
@@ -246,4 +246,4 @@ class TestDashboard:
         md = task_dashboard_md()
         assert "Tasks Dashboard" in md
         assert "dataview" in md
-        assert "00_dashboards/tasks" in md
+        assert "dashboards/tasks" in md

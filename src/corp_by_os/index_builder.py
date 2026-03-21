@@ -537,13 +537,16 @@ def _parse_frontmatter(filepath: Path) -> dict | None:
 
 
 def _index_cke_notes(conn: sqlite3.Connection, vault_root: Path) -> int:
-    """Scan vault for CKE-generated notes and index into notes table.
+    """Scan vault for knowledge notes and index into notes table.
 
-    Scans 02_sources/ and 04_evergreen/_generated/ for markdown files
-    with YAML frontmatter containing at least a 'title' field.
+    Scans knowledge/ (new flat structure) and legacy 02_sources/,
+    04_evergreen/_generated/ for markdown files with YAML frontmatter
+    containing at least a 'title' field.
     """
     count = 0
     scan_dirs = [
+        vault_root / "knowledge",
+        # Legacy paths (pre-restructure)
         vault_root / "02_sources",
         vault_root / "04_evergreen" / "_generated",
     ]

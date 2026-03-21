@@ -11,14 +11,19 @@ from pathlib import Path
 
 
 class VaultZone(StrEnum):
-    """Obsidian vault top-level folders."""
+    """Obsidian vault top-level folders (semantic, flat)."""
 
-    DASHBOARDS = "00_dashboards"
-    PROJECTS = "01_projects"
+    KNOWLEDGE = "knowledge"
+    PROJECTS = "projects"
+    GUIDES = "guides"
+    DASHBOARDS = "dashboards"
+    TEMPLATES = "templates"
+    SYSTEM = "system"
+
+    # Legacy aliases (pre-2026-03-21 numbered structure)
     SOURCES = "02_sources"
-    PLAYBOOKS = "03_playbooks"
     EVERGREEN = "04_evergreen"
-    TEMPLATES = "05_templates"
+    PLAYBOOKS = "03_playbooks"
 
 
 class Mutability(StrEnum):
@@ -31,12 +36,16 @@ class Mutability(StrEnum):
 
 
 ZONE_MUTABILITY: dict[VaultZone, Mutability] = {
-    VaultZone.DASHBOARDS: Mutability.REGENERABLE,
+    VaultZone.KNOWLEDGE: Mutability.REGENERABLE,
     VaultZone.PROJECTS: Mutability.REGENERABLE,
-    VaultZone.SOURCES: Mutability.IMMUTABLE,
-    VaultZone.PLAYBOOKS: Mutability.PROTECTED,
-    VaultZone.EVERGREEN: Mutability.REGENERABLE,
+    VaultZone.GUIDES: Mutability.PROTECTED,
+    VaultZone.DASHBOARDS: Mutability.REGENERABLE,
     VaultZone.TEMPLATES: Mutability.PROTECTED,
+    VaultZone.SYSTEM: Mutability.PROTECTED,
+    # Legacy
+    VaultZone.SOURCES: Mutability.IMMUTABLE,
+    VaultZone.EVERGREEN: Mutability.REGENERABLE,
+    VaultZone.PLAYBOOKS: Mutability.PROTECTED,
 }
 
 

@@ -14,12 +14,13 @@ from corp_by_os.config import get_config
 def tmp_vault(tmp_path: Path) -> Path:
     """Create a temporary vault structure mimicking Obsidian."""
     vault = tmp_path / "vault"
-    # Create zone directories
-    for zone in ["00_dashboards", "01_projects", "02_sources", "03_playbooks"]:
+    # Create zone directories (new semantic structure + legacy for compat)
+    for zone in ["knowledge", "projects", "guides", "dashboards", "templates", "system",
+                  "02_sources", "04_evergreen"]:
         (vault / zone).mkdir(parents=True)
 
     # Create a sample project
-    proj_dir = vault / "01_projects" / "lenzing_planning"
+    proj_dir = vault / "projects" / "lenzing_planning"
     proj_dir.mkdir(parents=True)
 
     info = {

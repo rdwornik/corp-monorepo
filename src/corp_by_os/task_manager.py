@@ -1,6 +1,6 @@
 """Task management via Obsidian vault notes.
 
-Tasks are markdown files in 00_dashboards/tasks/ with YAML frontmatter.
+Tasks are markdown files in dashboards/tasks/ with YAML frontmatter.
 """
 
 from __future__ import annotations
@@ -257,7 +257,7 @@ def task_dashboard_md() -> str:
         "",
         "```dataview",
         "TABLE priority, deadline, project, status",
-        'FROM "00_dashboards/tasks"',
+        'FROM "dashboards/tasks"',
         'WHERE status = "todo" OR status = "in_progress"',
         "SORT priority ASC, deadline ASC",
         "```",

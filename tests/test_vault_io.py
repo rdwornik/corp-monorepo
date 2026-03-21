@@ -50,7 +50,7 @@ class TestResolveVaultPath:
     def test_zone_only(self, app_config):
         vp = resolve_vault_path(VaultZone.PROJECTS)
         assert vp.zone == VaultZone.PROJECTS
-        assert vp.absolute.name == "01_projects"
+        assert vp.absolute.name == "projects"
 
     def test_zone_project_file(self, app_config):
         vp = resolve_vault_path(VaultZone.PROJECTS, "lenzing_planning", "project-info.yaml")
@@ -58,13 +58,13 @@ class TestResolveVaultPath:
         assert vp.absolute.name == "project-info.yaml"
 
     def test_string_zone(self, app_config):
-        vp = resolve_vault_path("01_projects", "lenzing_planning")
+        vp = resolve_vault_path("projects", "lenzing_planning")
         assert vp.zone == VaultZone.PROJECTS
 
 
 class TestReadWriteNote:
     def test_write_read_roundtrip(self, app_config, tmp_vault):
-        path = tmp_vault / "01_projects" / "test_project" / "note.md"
+        path = tmp_vault / "projects" / "test_project" / "note.md"
         path.parent.mkdir(parents=True, exist_ok=True)
 
         fm = {"title": "Test Note", "document_type": "meeting"}
@@ -78,23 +78,23 @@ class TestReadWriteNote:
         assert "Meeting Notes" in body2
 
     def test_upsert_creates(self, app_config, tmp_vault):
-        path = tmp_vault / "01_projects" / "new_project" / "note.md"
+        path = tmp_vault / "projects" / "new_project" / "note.md"
         write_note(path, {"title": "New"}, "Content\n", mode="upsert")
         assert path.exists()
 
     def test_upsert_updates(self, app_config, tmp_vault):
-        path = tmp_vault / "01_projects" / "lenzing_planning" / "index.md"
+        path = tmp_vault / "projects" / "lenzing_planning" / "index.md"
         write_note(path, {"title": "Updated"}, "New content\n", mode="upsert")
         fm, body = read_note(path)
         assert fm["title"] == "Updated"
 
     def test_create_fails_if_exists(self, app_config, tmp_vault):
-        path = tmp_vault / "01_projects" / "lenzing_planning" / "index.md"
+        path = tmp_vault / "projects" / "lenzing_planning" / "index.md"
         with pytest.raises(FileExistsError):
             write_note(path, {"title": "Nope"}, "Body\n", mode="create")
 
     def test_update_fails_if_missing(self, app_config, tmp_vault):
-        path = tmp_vault / "01_projects" / "nonexistent" / "note.md"
+        path = tmp_vault / "projects" / "nonexistent" / "note.md"
         with pytest.raises(FileNotFoundError):
             write_note(path, {"title": "Nope"}, "Body\n", mode="update")
 
