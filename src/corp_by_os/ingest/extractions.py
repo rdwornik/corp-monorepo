@@ -1,10 +1,12 @@
 """Ingest CKE extraction output into the vault.
 
-Reads output_v2 structure and routes notes to vault folders:
-  source_library/*/extract/*.md  -> vault 01_knowledge/
-  templates/*/extract/*.md       -> vault 01_knowledge/
-  rfp/*/extract/*.md             -> vault 01_knowledge/
-  projects/{client}/*/extract/*.md -> vault 02_projects/{client}/
+Reads output_v2 structure and routes ALL notes to vault 01_Knowledge/ (flat).
+Client dimension is handled by tags (client/sgdbf), not by folder.
+
+  source_library/*/extract/*.md    -> vault 01_Knowledge/
+  templates/*/extract/*.md         -> vault 01_Knowledge/
+  rfp/*/extract/*.md               -> vault 01_Knowledge/
+  projects/{client}/*/extract/*.md -> vault 01_Knowledge/
 
 Skip: synthesis.md, index.md, *.json, *_transcript.md, _meta.yaml
 Cover slides -> vault _assets/
@@ -35,8 +37,6 @@ _SKIP_PATTERNS = [
 
 _SKIP_DIRS = {"source", "frames", "docs", "video"}
 
-# output_v2 scopes that route to 01_knowledge/
-_KNOWLEDGE_SCOPES = {"source_library", "templates", "rfp"}
 
 
 @dataclass
@@ -101,14 +101,11 @@ def _resolve_dest(
     md_file: Path,
     vault_root: Path,
 ) -> Path:
-    """Resolve vault destination based on scope and client.
+    """Resolve vault destination — ALL notes go to 01_Knowledge/ (flat).
 
-    Projects -> 02_projects/{client}/{filename}
-    Everything else -> 01_knowledge/{filename}
+    Per Council Decision #7, client dimension is handled by tags, not folders.
     """
-    if scope == "projects" and client:
-        return vault_root / "02_projects" / client / md_file.name
-    return vault_root / "01_knowledge" / md_file.name
+    return vault_root / "01_Knowledge" / md_file.name
 
 
 def _collect_packages(cke_output_path: Path) -> list[tuple[str, str | None, Path]]:
@@ -157,9 +154,7 @@ def ingest_extractions(
 ) -> IngestResult:
     """Ingest CKE extraction output into the vault.
 
-    Routes based on output_v2 scope:
-      source_library, templates, rfp -> 01_knowledge/
-      projects/{client}              -> 02_projects/{client}/
+    All notes route to 01_Knowledge/ (flat). Client dimension via tags.
 
     Args:
         cke_output_path: Path to CKE output_v2 directory.

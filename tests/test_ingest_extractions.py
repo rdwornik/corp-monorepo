@@ -136,7 +136,7 @@ class TestRouting:
         result = ingest_extractions(out, vault)
 
         assert result.notes_ingested == 1
-        assert (vault / "01_knowledge" / "platform.md").exists()
+        assert (vault / "01_Knowledge" / "platform.md").exists()
 
     def test_templates_to_knowledge(self, tmp_path):
         out = tmp_path / "output_v2"
@@ -145,7 +145,7 @@ class TestRouting:
 
         result = ingest_extractions(out, vault)
 
-        assert (vault / "01_knowledge" / "deck.md").exists()
+        assert (vault / "01_Knowledge" / "deck.md").exists()
 
     def test_rfp_to_knowledge(self, tmp_path):
         out = tmp_path / "output_v2"
@@ -154,19 +154,21 @@ class TestRouting:
 
         result = ingest_extractions(out, vault)
 
-        assert (vault / "01_knowledge" / "rfp_q1.md").exists()
+        assert (vault / "01_Knowledge" / "rfp_q1.md").exists()
 
-    def test_projects_to_client_folder(self, tmp_path):
+    def test_projects_to_knowledge_flat(self, tmp_path):
+        """Council Decision #7: project notes go to 01_Knowledge/ (flat), not 02_projects/."""
         out = tmp_path / "output_v2"
         vault = tmp_path / "vault"
         _make_output_v2(out, "projects", "Lenzing", {"discovery.md": "x"})
 
         result = ingest_extractions(out, vault)
 
-        assert (vault / "02_projects" / "Lenzing" / "discovery.md").exists()
-        assert not (vault / "01_knowledge" / "discovery.md").exists()
+        assert (vault / "01_Knowledge" / "discovery.md").exists()
+        assert not (vault / "02_projects").exists()
 
-    def test_multiple_clients(self, tmp_path):
+    def test_multiple_clients_flat(self, tmp_path):
+        """All client notes land in same 01_Knowledge/ folder."""
         out = tmp_path / "output_v2"
         vault = tmp_path / "vault"
         _make_output_v2(out, "projects", "Lenzing", {"note_l.md": "x"})
@@ -174,8 +176,8 @@ class TestRouting:
 
         result = ingest_extractions(out, vault)
 
-        assert (vault / "02_projects" / "Lenzing" / "note_l.md").exists()
-        assert (vault / "02_projects" / "SGDBF" / "note_s.md").exists()
+        assert (vault / "01_Knowledge" / "note_l.md").exists()
+        assert (vault / "01_Knowledge" / "note_s.md").exists()
 
 
 class TestProtection:
@@ -184,7 +186,7 @@ class TestProtection:
         vault = tmp_path / "vault"
 
         _make_note(
-            vault / "01_knowledge" / "platform.md",
+            vault / "01_Knowledge" / "platform.md",
             title="Original",
             trust_level="verified",
         )
@@ -194,7 +196,7 @@ class TestProtection:
 
         assert result.notes_skipped_verified == 1
         assert result.notes_ingested == 0
-        content = (vault / "01_knowledge" / "platform.md").read_text(encoding="utf-8")
+        content = (vault / "01_Knowledge" / "platform.md").read_text(encoding="utf-8")
         assert "Original" in content
 
     def test_force_overwrites_verified(self, tmp_path):
@@ -202,7 +204,7 @@ class TestProtection:
         vault = tmp_path / "vault"
 
         _make_note(
-            vault / "01_knowledge" / "platform.md",
+            vault / "01_Knowledge" / "platform.md",
             title="Original",
             trust_level="verified",
         )
@@ -234,7 +236,7 @@ class TestDryRun:
         result = ingest_extractions(out, vault, dry_run=True)
 
         assert result.notes_ingested == 1
-        assert not (vault / "01_knowledge").exists()
+        assert not (vault / "01_Knowledge").exists()
 
     def test_dry_run_tracks_destinations(self, tmp_path):
         out = tmp_path / "output_v2"
@@ -245,7 +247,9 @@ class TestDryRun:
         result = ingest_extractions(out, vault, dry_run=True)
 
         assert result.notes_ingested == 3
-        assert len(result.by_dest) == 2
+        # All notes go to 01_Knowledge/ now (flat)
+        assert len(result.by_dest) == 1
+        assert "01_Knowledge" in result.by_dest
 
 
 class TestEdgeCases:

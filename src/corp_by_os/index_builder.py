@@ -545,8 +545,9 @@ def _index_cke_notes(conn: sqlite3.Connection, vault_root: Path) -> int:
     """
     count = 0
     scan_dirs = [
-        vault_root / "knowledge",
+        vault_root / "01_Knowledge",
         # Legacy paths (pre-restructure)
+        vault_root / "knowledge",
         vault_root / "02_sources",
         vault_root / "04_evergreen" / "_generated",
     ]
