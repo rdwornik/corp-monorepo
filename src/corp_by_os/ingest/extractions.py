@@ -1,20 +1,13 @@
 """Ingest CKE extraction output into the vault.
 
-Reads CKE output packages, copies extracted notes and cover slides
-to the vault knowledge folder, and logs actions to ops.db.
+Reads output_v2 structure and routes notes to vault folders:
+  source_library/*/extract/*.md  -> vault 01_knowledge/
+  templates/*/extract/*.md       -> vault 01_knowledge/
+  rfp/*/extract/*.md             -> vault 01_knowledge/
+  projects/{client}/*/extract/*.md -> vault 02_projects/{client}/
 
-What gets copied:
-- extract/{filename}.md -> vault/knowledge/{filename}.md
-- session_*.md -> vault/knowledge/session_{id}.md
-- Cover slide (from _meta.yaml or fallback slide_001.png)
-  -> vault/knowledge/assets/{filename}_cover.png
-
-What stays in CKE output (NOT copied):
-- extract/{filename}.json (sidecar metadata)
-- Non-cover slide PNGs
-- source/frames/, source/docs/, source/video/
-- *_transcript.md
-- synthesis.md, index.md, _meta.yaml
+Skip: synthesis.md, index.md, *.json, *_transcript.md, _meta.yaml
+Cover slides -> vault _assets/
 """
 
 from __future__ import annotations
@@ -42,6 +35,9 @@ _SKIP_PATTERNS = [
 
 _SKIP_DIRS = {"source", "frames", "docs", "video"}
 
+# output_v2 scopes that route to 01_knowledge/
+_KNOWLEDGE_SCOPES = {"source_library", "templates", "rfp"}
+
 
 @dataclass
 class IngestResult:
@@ -51,6 +47,7 @@ class IngestResult:
     notes_skipped_verified: int = 0
     covers_copied: int = 0
     errors: list[str] = field(default_factory=list)
+    by_dest: dict[str, int] = field(default_factory=dict)
 
 
 def _read_meta(pkg_dir: Path) -> dict:
@@ -98,21 +95,57 @@ def _should_copy(rel_path: Path) -> bool:
     return rel_path.suffix == ".md"
 
 
-def _match_by_source_path(
-    source_path: str,
-    vault_knowledge: Path,
-) -> Path | None:
-    """Find existing vault note with matching source_path in frontmatter."""
-    if not source_path or not vault_knowledge.exists():
-        return None
+def _resolve_dest(
+    scope: str,
+    client: str | None,
+    md_file: Path,
+    vault_root: Path,
+) -> Path:
+    """Resolve vault destination based on scope and client.
 
-    normalized = source_path.replace("\\", "/")
-    for md_file in vault_knowledge.glob("*.md"):
-        fm = read_frontmatter(md_file)
-        existing_sp = fm.get("source_path", "")
-        if existing_sp and str(existing_sp).replace("\\", "/") == normalized:
-            return md_file
-    return None
+    Projects -> 02_projects/{client}/{filename}
+    Everything else -> 01_knowledge/{filename}
+    """
+    if scope == "projects" and client:
+        return vault_root / "02_projects" / client / md_file.name
+    return vault_root / "01_knowledge" / md_file.name
+
+
+def _collect_packages(cke_output_path: Path) -> list[tuple[str, str | None, Path]]:
+    """Walk output_v2 and yield (scope, client_or_none, pkg_dir) tuples.
+
+    output_v2 structure:
+      source_library/{series}/{series}/extract/*.md
+      templates/{series}/{series}/extract/*.md
+      rfp/{series}/{series}/extract/*.md
+      projects/{client}/{client}/extract/*.md
+    """
+    packages: list[tuple[str, str | None, Path]] = []
+
+    for scope_dir in sorted(cke_output_path.iterdir()):
+        if not scope_dir.is_dir():
+            continue
+        scope = scope_dir.name
+
+        for client_or_series in sorted(scope_dir.iterdir()):
+            if not client_or_series.is_dir():
+                continue
+
+            client = client_or_series.name if scope == "projects" else None
+
+            # The actual package dir may be nested one more level
+            # (e.g., projects/Lenzing_Planning/Lenzing_Planning/extract/)
+            # or directly contain extract/
+            extract_dir = client_or_series / "extract"
+            if extract_dir.exists():
+                packages.append((scope, client, client_or_series))
+            else:
+                # Check one level deeper
+                for pkg_dir in sorted(client_or_series.iterdir()):
+                    if pkg_dir.is_dir():
+                        packages.append((scope, client, pkg_dir))
+
+    return packages
 
 
 def ingest_extractions(
@@ -122,10 +155,14 @@ def ingest_extractions(
     force: bool = False,
     ops_db: object | None = None,
 ) -> IngestResult:
-    """Ingest CKE extraction output into vault/knowledge/.
+    """Ingest CKE extraction output into the vault.
+
+    Routes based on output_v2 scope:
+      source_library, templates, rfp -> 01_knowledge/
+      projects/{client}              -> 02_projects/{client}/
 
     Args:
-        cke_output_path: Path to CKE output directory (contains package dirs).
+        cke_output_path: Path to CKE output_v2 directory.
         vault_root: Path to vault root.
         dry_run: If True, report what would happen without writing.
         force: If True, overwrite even trust_level=verified notes.
@@ -135,25 +172,21 @@ def ingest_extractions(
         IngestResult with counts of actions taken.
     """
     result = IngestResult()
-    vault_knowledge = vault_root / "knowledge"
-    vault_assets = vault_knowledge / "assets"
+    vault_assets = vault_root / "_assets"
 
     if not cke_output_path.is_dir():
         result.errors.append(f"Not a directory: {cke_output_path}")
         return result
 
-    # Process each package directory
-    for pkg_dir in sorted(cke_output_path.iterdir()):
-        if not pkg_dir.is_dir():
-            continue
+    packages = _collect_packages(cke_output_path)
+    logger.info("Found %d packages in %s", len(packages), cke_output_path)
 
+    for scope, client, pkg_dir in packages:
         meta = _read_meta(pkg_dir)
 
-        # Find and copy extractable .md files
+        # Find extractable .md files
         extract_dir = pkg_dir / "extract"
         md_files = list(extract_dir.glob("*.md")) if extract_dir.exists() else []
-
-        # Also check for session_*.md at package level
         md_files.extend(pkg_dir.glob("session_*.md"))
 
         for md_file in md_files:
@@ -161,16 +194,7 @@ def ingest_extractions(
             if not _should_copy(rel):
                 continue
 
-            # Read frontmatter to check source_path for matching
-            fm = read_frontmatter(md_file) if md_file.exists() else {}
-            source_path = fm.get("source_path", "")
-
-            # Determine destination: match by source_path or use filename
-            existing = _match_by_source_path(source_path, vault_knowledge)
-            if existing:
-                dest = existing
-            else:
-                dest = vault_knowledge / md_file.name
+            dest = _resolve_dest(scope, client, md_file, vault_root)
 
             # Check trust_level protection
             if dest.exists() and not force:
@@ -182,14 +206,15 @@ def ingest_extractions(
 
             if dry_run:
                 action = "would replace" if dest.exists() else "would create"
-                logger.info("%s: %s", action, dest.name)
+                logger.info("%s: %s -> %s", action, md_file.name, dest)
                 result.notes_ingested += 1
+                dest_folder = str(dest.parent.relative_to(vault_root))
+                result.by_dest[dest_folder] = result.by_dest.get(dest_folder, 0) + 1
                 continue
 
             # Read source content and write to vault
             try:
                 content = md_file.read_text(encoding="utf-8")
-                # Parse frontmatter and body
                 if content.startswith("---"):
                     end = content.find("---", 3)
                     if end != -1:
@@ -205,7 +230,9 @@ def ingest_extractions(
                 write_note(dest, note_fm, body, mode="upsert", force=force)
                 result.notes_ingested += 1
 
-                # Log to ops.db
+                dest_folder = str(dest.parent.relative_to(vault_root)).replace("\\", "/")
+                result.by_dest[dest_folder] = result.by_dest.get(dest_folder, 0) + 1
+
                 if ops_db is not None:
                     _log_ingest_event(
                         ops_db,
@@ -217,7 +244,7 @@ def ingest_extractions(
             except Exception as e:
                 result.errors.append(f"{md_file.name}: {e}")
 
-        # Copy cover slide
+        # Copy cover slide to _assets/
         cover = _find_cover_slide(pkg_dir, meta)
         if cover:
             stem = pkg_dir.name
@@ -231,44 +258,10 @@ def ingest_extractions(
                     cover_dest.parent.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(str(cover), str(cover_dest))
                     result.covers_copied += 1
-
-                    # Rewrite image paths in ingested notes for this package
-                    _rewrite_cover_paths(
-                        vault_knowledge, stem, cover_dest, vault_knowledge,
-                    )
                 except Exception as e:
                     result.errors.append(f"cover {cover.name}: {e}")
 
     return result
-
-
-def _rewrite_cover_paths(
-    vault_knowledge: Path,
-    pkg_stem: str,
-    cover_dest: Path,
-    vault_base: Path,
-) -> None:
-    """Rewrite image paths in notes to point to vault-relative asset path."""
-    vault_rel = cover_dest.relative_to(vault_base)
-    vault_rel_str = str(vault_rel).replace("\\", "/")
-
-    for md_file in vault_knowledge.glob("*.md"):
-        try:
-            content = md_file.read_text(encoding="utf-8")
-            # Replace references to source slide paths
-            patterns = [
-                "source/slides/slide_001.png",
-                "slides/slide_001.png",
-            ]
-            changed = False
-            for pat in patterns:
-                if pat in content:
-                    content = content.replace(pat, vault_rel_str)
-                    changed = True
-            if changed:
-                md_file.write_text(content, encoding="utf-8")
-        except Exception:
-            pass
 
 
 def _log_ingest_event(

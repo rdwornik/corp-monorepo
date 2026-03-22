@@ -1,4 +1,4 @@
-"""Tests for ingest/extractions.py — CKE output ingestion."""
+"""Tests for ingest/extractions.py — CKE output_v2 ingestion."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ import yaml
 
 from corp_by_os.ingest.extractions import (
     IngestResult,
+    _collect_packages,
     _find_cover_slide,
     _should_copy,
     ingest_extractions,
@@ -22,15 +23,15 @@ def _make_note(path: Path, title: str = "Test", trust_level: str = "extracted") 
     path.write_text(f"---\n{fm_str}---\nBody of {title}.\n", encoding="utf-8")
 
 
-def _make_cke_package(
-    output_dir: Path,
-    pkg_name: str,
+def _make_output_v2(
+    root: Path,
+    scope: str,
+    series_or_client: str,
     notes: dict[str, str] | None = None,
     cover: bool = False,
-    meta: dict | None = None,
 ) -> Path:
-    """Create a fake CKE output package."""
-    pkg = output_dir / pkg_name
+    """Create a fake output_v2 package: {scope}/{series}/{series}/extract/*.md."""
+    pkg = root / scope / series_or_client / series_or_client
     extract = pkg / "extract"
     extract.mkdir(parents=True, exist_ok=True)
 
@@ -42,10 +43,6 @@ def _make_cke_package(
         slides = pkg / "source" / "slides"
         slides.mkdir(parents=True, exist_ok=True)
         (slides / "slide_001.png").write_bytes(b"fake png")
-
-    if meta:
-        with open(pkg / "_meta.yaml", "w", encoding="utf-8") as f:
-            yaml.dump(meta, f)
 
     return pkg
 
@@ -100,84 +97,166 @@ class TestFindCoverSlide:
         assert result is None
 
 
-class TestIngestExtractions:
-    def test_ingests_notes(self, tmp_path):
-        output = tmp_path / "cke_output"
-        vault = tmp_path / "vault"
-        _make_cke_package(output, "pkg-001", notes={"platform_overview.md": "content"})
+class TestCollectPackages:
+    def test_finds_all_scopes(self, tmp_path):
+        out = tmp_path / "output_v2"
+        _make_output_v2(out, "source_library", "Product_Docs", {"note.md": "x"})
+        _make_output_v2(out, "templates", "Decks", {"note.md": "x"})
+        _make_output_v2(out, "rfp", "RFP_Set", {"note.md": "x"})
+        _make_output_v2(out, "projects", "Lenzing", {"note.md": "x"})
 
-        result = ingest_extractions(output, vault)
+        pkgs = _collect_packages(out)
+        scopes = [s for s, _, _ in pkgs]
+        assert set(scopes) == {"source_library", "templates", "rfp", "projects"}
+
+    def test_projects_have_client(self, tmp_path):
+        out = tmp_path / "output_v2"
+        _make_output_v2(out, "projects", "Lenzing", {"note.md": "x"})
+        _make_output_v2(out, "projects", "SGDBF", {"note.md": "x"})
+
+        pkgs = _collect_packages(out)
+        clients = [c for _, c, _ in pkgs]
+        assert "Lenzing" in clients
+        assert "SGDBF" in clients
+
+    def test_knowledge_scopes_have_no_client(self, tmp_path):
+        out = tmp_path / "output_v2"
+        _make_output_v2(out, "source_library", "Docs", {"note.md": "x"})
+
+        pkgs = _collect_packages(out)
+        assert pkgs[0][1] is None  # client is None
+
+
+class TestRouting:
+    def test_source_library_to_knowledge(self, tmp_path):
+        out = tmp_path / "output_v2"
+        vault = tmp_path / "vault"
+        _make_output_v2(out, "source_library", "Docs", {"platform.md": "x"})
+
+        result = ingest_extractions(out, vault)
 
         assert result.notes_ingested == 1
-        assert (vault / "knowledge" / "platform_overview.md").exists()
+        assert (vault / "01_knowledge" / "platform.md").exists()
 
+    def test_templates_to_knowledge(self, tmp_path):
+        out = tmp_path / "output_v2"
+        vault = tmp_path / "vault"
+        _make_output_v2(out, "templates", "Decks", {"deck.md": "x"})
+
+        result = ingest_extractions(out, vault)
+
+        assert (vault / "01_knowledge" / "deck.md").exists()
+
+    def test_rfp_to_knowledge(self, tmp_path):
+        out = tmp_path / "output_v2"
+        vault = tmp_path / "vault"
+        _make_output_v2(out, "rfp", "RFP_Set", {"rfp_q1.md": "x"})
+
+        result = ingest_extractions(out, vault)
+
+        assert (vault / "01_knowledge" / "rfp_q1.md").exists()
+
+    def test_projects_to_client_folder(self, tmp_path):
+        out = tmp_path / "output_v2"
+        vault = tmp_path / "vault"
+        _make_output_v2(out, "projects", "Lenzing", {"discovery.md": "x"})
+
+        result = ingest_extractions(out, vault)
+
+        assert (vault / "02_projects" / "Lenzing" / "discovery.md").exists()
+        assert not (vault / "01_knowledge" / "discovery.md").exists()
+
+    def test_multiple_clients(self, tmp_path):
+        out = tmp_path / "output_v2"
+        vault = tmp_path / "vault"
+        _make_output_v2(out, "projects", "Lenzing", {"note_l.md": "x"})
+        _make_output_v2(out, "projects", "SGDBF", {"note_s.md": "x"})
+
+        result = ingest_extractions(out, vault)
+
+        assert (vault / "02_projects" / "Lenzing" / "note_l.md").exists()
+        assert (vault / "02_projects" / "SGDBF" / "note_s.md").exists()
+
+
+class TestProtection:
     def test_skips_verified_notes(self, tmp_path):
-        output = tmp_path / "cke_output"
+        out = tmp_path / "output_v2"
         vault = tmp_path / "vault"
 
-        # Pre-create a verified note in vault
         _make_note(
-            vault / "knowledge" / "platform_overview.md",
+            vault / "01_knowledge" / "platform.md",
             title="Original",
             trust_level="verified",
         )
+        _make_output_v2(out, "source_library", "Docs", {"platform.md": "new"})
 
-        _make_cke_package(output, "pkg-001", notes={"platform_overview.md": "new content"})
-
-        result = ingest_extractions(output, vault)
+        result = ingest_extractions(out, vault)
 
         assert result.notes_skipped_verified == 1
         assert result.notes_ingested == 0
-        # Content unchanged
-        content = (vault / "knowledge" / "platform_overview.md").read_text(encoding="utf-8")
+        content = (vault / "01_knowledge" / "platform.md").read_text(encoding="utf-8")
         assert "Original" in content
 
     def test_force_overwrites_verified(self, tmp_path):
-        output = tmp_path / "cke_output"
+        out = tmp_path / "output_v2"
         vault = tmp_path / "vault"
 
         _make_note(
-            vault / "knowledge" / "platform_overview.md",
+            vault / "01_knowledge" / "platform.md",
             title="Original",
             trust_level="verified",
         )
+        _make_output_v2(out, "source_library", "Docs", {"platform.md": "replaced"})
 
-        _make_cke_package(output, "pkg-001", notes={"platform_overview.md": "replaced"})
-
-        result = ingest_extractions(output, vault, force=True)
+        result = ingest_extractions(out, vault, force=True)
 
         assert result.notes_ingested == 1
-        assert result.notes_skipped_verified == 0
 
-    def test_copies_cover_slide(self, tmp_path):
-        output = tmp_path / "cke_output"
+
+class TestCoverSlides:
+    def test_cover_to_assets(self, tmp_path):
+        out = tmp_path / "output_v2"
         vault = tmp_path / "vault"
-        _make_cke_package(output, "pkg-001", notes={"note.md": "body"}, cover=True)
+        _make_output_v2(out, "source_library", "Docs", {"note.md": "x"}, cover=True)
 
-        result = ingest_extractions(output, vault)
+        result = ingest_extractions(out, vault)
 
         assert result.covers_copied == 1
-        assert (vault / "knowledge" / "assets" / "pkg-001_cover.png").exists()
+        assert (vault / "_assets" / "Docs_cover.png").exists()
 
+
+class TestDryRun:
     def test_dry_run_no_writes(self, tmp_path):
-        output = tmp_path / "cke_output"
+        out = tmp_path / "output_v2"
         vault = tmp_path / "vault"
-        _make_cke_package(output, "pkg-001", notes={"note.md": "body"})
+        _make_output_v2(out, "source_library", "Docs", {"note.md": "x"})
 
-        result = ingest_extractions(output, vault, dry_run=True)
+        result = ingest_extractions(out, vault, dry_run=True)
 
         assert result.notes_ingested == 1
-        assert not (vault / "knowledge").exists()
+        assert not (vault / "01_knowledge").exists()
 
+    def test_dry_run_tracks_destinations(self, tmp_path):
+        out = tmp_path / "output_v2"
+        vault = tmp_path / "vault"
+        _make_output_v2(out, "source_library", "Docs", {"a.md": "x", "b.md": "x"})
+        _make_output_v2(out, "projects", "Lenzing", {"c.md": "x"})
+
+        result = ingest_extractions(out, vault, dry_run=True)
+
+        assert result.notes_ingested == 3
+        assert len(result.by_dest) == 2
+
+
+class TestEdgeCases:
     def test_empty_output(self, tmp_path):
-        output = tmp_path / "cke_output"
-        output.mkdir()
+        out = tmp_path / "output_v2"
+        out.mkdir()
         vault = tmp_path / "vault"
 
-        result = ingest_extractions(output, vault)
+        result = ingest_extractions(out, vault)
 
         assert result.notes_ingested == 0
-        assert result.covers_copied == 0
 
     def test_not_a_directory(self, tmp_path):
         fake = tmp_path / "not_a_dir.txt"
@@ -187,13 +266,3 @@ class TestIngestExtractions:
         result = ingest_extractions(fake, vault)
 
         assert len(result.errors) == 1
-
-    def test_multiple_packages(self, tmp_path):
-        output = tmp_path / "cke_output"
-        vault = tmp_path / "vault"
-        _make_cke_package(output, "pkg-001", notes={"note_a.md": "a"})
-        _make_cke_package(output, "pkg-002", notes={"note_b.md": "b", "note_c.md": "c"})
-
-        result = ingest_extractions(output, vault)
-
-        assert result.notes_ingested == 3
