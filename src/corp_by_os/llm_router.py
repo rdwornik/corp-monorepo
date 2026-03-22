@@ -165,7 +165,7 @@ def classify_intent(
             response_text="Brak GEMINI_API_KEY. Ustaw w .env lub użyj `corp chat --no-llm`.",
         )
 
-    model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+    model = os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview")
 
     # Build prompt
     system_prompt = _SYSTEM_PROMPT.format(

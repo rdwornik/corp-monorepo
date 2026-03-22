@@ -1837,7 +1837,7 @@ def cleanup_cmd(scope: str, execute: bool) -> None:
 )
 @click.option(
     "--model",
-    default="gemini-2.5-flash",
+    default="gemini-3-flash-preview",
     type=str,
     help="Gemini model for analysis",
 )
@@ -2457,9 +2457,9 @@ def prep_cmd(client: str, model: str, output: str | None) -> None:
             else []
         )
         if matching:
-            output_dir = matching[0]
+            output_dir = matching[0] / "_corp_prep"
         else:
-            output_dir = cfg.mywork_root / "90_System"
+            output_dir = cfg.mywork_root / "90_System" / "_corp_prep"
 
     console.print(f"[bold]Preparing briefing for: {client}[/bold]")
     console.print("Retrieving knowledge...")
@@ -2647,8 +2647,8 @@ def rfp_answer_cmd(
 def ingest_extractions_cmd(cke_output_path: str, dry_run: bool, force: bool) -> None:
     """Ingest CKE extraction output into the vault.
 
-    Reads CKE output packages, copies extracted notes and cover slides
-    to vault/knowledge/. Respects trust_level=verified protection.
+    Reads CKE output packages, copies ALL extracted notes to vault/01_Knowledge/ (flat).
+    Cover slides go to _assets/. Respects trust_level=verified protection.
 
     Examples:
 

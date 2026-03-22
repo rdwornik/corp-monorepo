@@ -95,7 +95,7 @@ def _parse_response(text: str) -> dict[str, Any]:
 def classify_file(
     file_info: FileInfo,
     client: Any | None = None,
-    model: str = "gemini-2.5-flash",
+    model: str = "gemini-3-flash-preview",
 ) -> Classification:
     """Classify a single file using Gemini.
 
@@ -147,7 +147,7 @@ def classify_file(
 
 def classify_batch(
     files: list[FileInfo],
-    model: str = "gemini-2.5-flash",
+    model: str = "gemini-3-flash-preview",
 ) -> list[Classification]:
     """Classify multiple files sequentially.
 

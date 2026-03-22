@@ -277,7 +277,7 @@ def analyze_folder(
     folder_name: str,
     files: list[dict[str, Any]],
     client: Any,
-    model: str = "gemini-2.5-flash",
+    model: str = "gemini-3-flash-preview",
 ) -> dict[str, Any]:
     """Send folder file listing to Gemini for analysis.
 
@@ -334,7 +334,7 @@ def analyze_folder(
 
 def analyze_all_folders(
     all_files: list[dict[str, Any]],
-    model: str = "gemini-2.5-flash",
+    model: str = "gemini-3-flash-preview",
 ) -> list[dict[str, Any]]:
     """Run Gemini analysis on each L1 folder."""
     client = _get_gemini_client()
