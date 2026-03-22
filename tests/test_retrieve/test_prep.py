@@ -279,6 +279,38 @@ class TestGeneratePrep:
         assert "manually" in briefing.briefing_text.lower()
         assert briefing.cost == 0.0
 
+    def test_saves_to_corp_prep_subfolder(self, prep_db: tuple[Path, Path]) -> None:
+        """Briefing saves into _corp_prep/ subfolder (matches CLI output_dir)."""
+        db_path, vault = prep_db
+        project_dir = vault.parent / "project_root"
+        project_dir.mkdir()
+        output_dir = project_dir / "_corp_prep"
+
+        with (
+            patch("corp_by_os.retrieve.prep.genai") as mock_genai,
+            patch("corp_by_os.retrieve.prep.genai_types") as mock_types,
+        ):
+            mock_response = MagicMock()
+            mock_response.text = "Briefing content"
+            mock_client = MagicMock()
+            mock_client.models.generate_content.return_value = mock_response
+            mock_genai.Client.return_value = mock_client
+            mock_types.GenerateContentConfig = MagicMock()
+
+            generate_prep(
+                "Lenzing",
+                db_path,
+                vault,
+                output_dir=output_dir,
+            )
+
+        assert output_dir.exists()
+        saved = list(output_dir.glob("prep_Lenzing_*.md"))
+        assert len(saved) == 1
+        # Verify file is inside _corp_prep, not project root
+        assert saved[0].parent.name == "_corp_prep"
+        assert not list(project_dir.glob("prep_*.md"))
+
     def test_no_genai_sdk(self, prep_db: tuple[Path, Path]) -> None:
         """Missing genai SDK returns unavailable message."""
         db_path, vault = prep_db
