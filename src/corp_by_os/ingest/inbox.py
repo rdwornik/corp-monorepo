@@ -294,12 +294,14 @@ def _check_dedup(
     *,
     auto: bool = False,
 ) -> str | None:
-    """Check if file is already known and extracted. Call BEFORE move.
+    """Check if file is already known in the registry. Call BEFORE move.
+
+    Dedup is about file IDENTITY (content hash), not extraction status.
+    If the same hash is in the registry, it's a duplicate.
 
     Returns:
         None       — proceed with route + extract
         "skip"     — file already handled, skip entirely
-        "no_extract" — route the file but skip extraction (re-extract declined)
     """
     from corp_by_os.ops.file_registry import FileRegistry
 
@@ -311,35 +313,60 @@ def _check_dedup(
         return None  # New file, proceed normally
 
     latest = registry.latest_extraction(file_record.file_id)
-    if latest is None:
-        return None  # Known file but never extracted, proceed
 
-    # File is known AND extracted
-    if auto:
+    if latest:
+        # Known + extracted
+        if auto:
+            console.print(
+                f"  [dim]Already extracted, skipping: "
+                f"{latest.vault_note_path}[/dim]"
+            )
+            return "skip"
+
         console.print(
-            f"  [dim]Already extracted, skipping: {latest.vault_note_path}[/dim]"
+            f"  [yellow]Already extracted:[/yellow] {latest.vault_note_path}"
         )
-        return "skip"
+        console.print(
+            f"  [dim]Model: {latest.model} | "
+            f"Date: {latest.extracted_at}[/dim]"
+        )
+        console.print("  [bold][s][/bold]kip  [bold][r][/bold]e-extract")
+        answer = Prompt.ask(">", choices=["s", "r"], default="s")
 
-    # Interactive: show what exists
-    console.print(
-        f"  [yellow]Already extracted:[/yellow] {latest.vault_note_path}"
-    )
-    console.print(
-        f"  [dim]Model: {latest.model} | Date: {latest.extracted_at}[/dim]"
-    )
-    console.print("  [bold][s][/bold]kip  [bold][r][/bold]e-extract")
-    answer = Prompt.ask(">", choices=["s", "r"], default="s")
+        if answer == "s":
+            console.print("  [dim]Skipped — existing note kept.[/dim]")
+            return "skip"
 
-    if answer == "s":
-        console.print("  [dim]Skipped — existing note kept.[/dim]")
-        return "skip"
+        # User chose re-extract: remove old vault package
+        if latest.vault_note_path:
+            console.print("  [dim]Removing old extraction...[/dim]")
+            _remove_vault_package(latest.vault_note_path)
+        return None  # Proceed with route + extract
 
-    # User chose re-extract: remove old vault package
-    if latest.vault_note_path:
-        console.print("  [dim]Removing old extraction...[/dim]")
-        _remove_vault_package(latest.vault_note_path)
-    return None  # Proceed with route + extract
+    else:
+        # Known + NOT extracted (routed with --skip-extract previously)
+        dest = file_record.current_path or "unknown"
+        if auto:
+            console.print(
+                f"  [dim]File already routed to {dest}, skipping.[/dim]"
+            )
+            return "skip"
+
+        console.print(
+            f"  [yellow]File already routed:[/yellow] {dest}"
+        )
+        console.print(
+            "  [bold][s][/bold]kip  [bold][e][/bold]xtract now"
+        )
+        answer = Prompt.ask(">", choices=["s", "e"], default="s")
+
+        if answer == "s":
+            console.print("  [dim]Skipped.[/dim]")
+            return "skip"
+
+        # User wants to extract — proceed (file will be re-registered
+        # at its new location after move)
+        return None
 
 
 def _register_file(file_path: Path, ops: OpsDB) -> None:

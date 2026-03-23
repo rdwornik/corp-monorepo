@@ -446,10 +446,10 @@ class TestListEvents:
         """--list shows ingest-inbox events."""
         inbox = mywork / "00_Inbox"
 
-        # Create 2 events via auto mode
-        for name in ["Cognitive_Friday_S4.pptx", "Cognitive_Friday_S5.pptx"]:
+        # Create 2 events via auto mode (unique content per file)
+        for i, name in enumerate(["Cognitive_Friday_S4.pptx", "Cognitive_Friday_S5.pptx"]):
             f = inbox / name
-            f.write_bytes(b"x" * 100)
+            f.write_bytes(f"content_{i}".encode())
             process_file(f, mywork, registry, ops, auto=True, skip_extract=True)
 
         # List should show 2 events (captured via Rich console)
@@ -490,7 +490,7 @@ class TestListEvents:
         inbox = mywork / "00_Inbox"
         for i in range(5):
             f = inbox / f"Cognitive_Friday_S{i}.pptx"
-            f.write_bytes(b"x" * 100)
+            f.write_bytes(f"unique_content_{i}".encode())
             process_file(f, mywork, registry, ops, auto=True, skip_extract=True)
 
         rows = ops.conn.execute(
@@ -663,26 +663,48 @@ class TestRegistrationAtRouteTime:
         count = ops.conn.execute("SELECT COUNT(*) FROM files").fetchone()[0]
         assert count == 1, f"Expected 1 file in registry, got {count}"
 
-    def test_second_ingest_fires_dedup(
+    def test_second_ingest_fires_dedup_no_extraction(
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
-        """Same file ingested twice → second time dedup fires."""
+        """Same file --skip-extract twice → second time dedup fires."""
         inbox = mywork / "00_Inbox"
         content = b"x" * 100
 
-        # First ingest: route + register (skip extract)
+        # First ingest: route + register, NO extraction
+        f1 = inbox / "Cognitive_Friday_S4.pptx"
+        f1.write_bytes(content)
+        action1 = process_file(
+            f1, mywork, registry, ops, auto=True, skip_extract=True,
+        )
+        assert action1 == "routed"
+
+        # Second ingest: same content → dedup fires even without extraction
+        f2 = inbox / "Cognitive_Friday_S4_copy.pptx"
+        f2.write_bytes(content)
+        action2 = process_file(
+            f2, mywork, registry, ops, auto=True, skip_extract=True,
+        )
+        assert action2 == "skipped"
+        assert f2.exists(), "Dedup-skipped file should stay in Inbox"
+
+    def test_second_ingest_fires_dedup_with_extraction(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Same file with extraction record → dedup shows model info."""
+        inbox = mywork / "00_Inbox"
+        content = b"x" * 100
+
+        # First ingest + fake extraction
         f1 = inbox / "Cognitive_Friday_S4.pptx"
         f1.write_bytes(content)
         process_file(f1, mywork, registry, ops, auto=True, skip_extract=True)
-
-        # Record a fake extraction so dedup has something to match
         fr = FileRegistry(ops.conn)
         file_rec = ops.conn.execute("SELECT file_id FROM files").fetchone()
         fr.record_extraction(file_rec[0], "test-model", "01_Knowledge/test")
 
-        # Second ingest: same content, dedup should fire (auto → skip)
+        # Second ingest: dedup fires (auto → skip)
         f2 = inbox / "Cognitive_Friday_S4_copy.pptx"
-        f2.write_bytes(content)  # Same hash
+        f2.write_bytes(content)
         action = process_file(
             f2, mywork, registry, ops, auto=True, skip_extract=True,
         )
