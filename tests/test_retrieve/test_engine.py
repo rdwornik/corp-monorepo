@@ -48,7 +48,8 @@ CREATE TABLE IF NOT EXISTS notes (
     source_locator TEXT,
     routing_confidence REAL,
     confidence TEXT,
-    note_path TEXT NOT NULL
+    note_path TEXT NOT NULL,
+    rfp_visible INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE VIRTUAL TABLE IF NOT EXISTS notes_fts USING fts5(
@@ -484,3 +485,83 @@ class TestProductExpansion:
                 unique.append(item)
 
         assert unique == ["wms", "wms_billing"]
+
+
+# --- Test: RFP-only filter ---
+
+
+class TestRfpOnlyFilter:
+    """Verify --rfp-only filters notes by rfp_visible column."""
+
+    @pytest.fixture()
+    def rfp_db(self, tmp_path: Path) -> Path:
+        """Create index.db with notes having different rfp_visible values."""
+        db_path = tmp_path / "index.db"
+        conn = sqlite3.connect(str(db_path))
+        conn.executescript(_TEST_SCHEMA)
+
+        vault = tmp_path / "vault"
+        vault.mkdir()
+
+        # Note 1: rfp_visible=1 (product doc)
+        conn.execute(
+            """INSERT INTO notes
+               (project_id, client, title, type, source_type,
+                topics, products, domains, note_path, rfp_visible)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            ("gen", "", "Platform Architecture Guide", "doc", "documentation",
+             json.dumps(["Architecture"]), json.dumps(["Platform"]),
+             json.dumps(["Platform"]),
+             str(vault / "platform_arch.md"), 1),
+        )
+
+        # Note 2: rfp_visible=0 (meeting notes)
+        conn.execute(
+            """INSERT INTO notes
+               (project_id, client, title, type, source_type,
+                topics, products, domains, note_path, rfp_visible)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            ("lenzing", "Lenzing", "Lenzing Architecture Workshop", "meeting",
+             "meeting",
+             json.dumps(["Architecture"]), json.dumps(["Platform"]),
+             json.dumps(["Planning"]),
+             str(vault / "lenzing_meeting.md"), 0),
+        )
+
+        conn.commit()
+        conn.close()
+
+        # Write note files
+        (vault / "platform_arch.md").write_text(
+            "---\ntitle: Platform Architecture Guide\n---\n\n"
+            "Platform architecture details for deployment.",
+            encoding="utf-8",
+        )
+        (vault / "lenzing_meeting.md").write_text(
+            "---\ntitle: Lenzing Architecture Workshop\n---\n\n"
+            "Internal meeting about architecture decisions.",
+            encoding="utf-8",
+        )
+
+        return db_path
+
+    def test_rfp_only_filters_non_visible(
+        self, rfp_db: Path, tmp_path: Path
+    ) -> None:
+        """--rfp-only returns only rfp_visible=1 notes."""
+        vault = tmp_path / "vault"
+        filters = RetrievalFilter(rfp_only=True)
+        result = retrieve("Architecture", rfp_db, vault, filters=filters)
+        assert result.total_found >= 1
+        titles = [n.title for n in result.notes]
+        assert "Platform Architecture Guide" in titles
+        assert "Lenzing Architecture Workshop" not in titles
+
+    def test_without_rfp_only_returns_all(
+        self, rfp_db: Path, tmp_path: Path
+    ) -> None:
+        """Without --rfp-only, both notes are returned."""
+        vault = tmp_path / "vault"
+        filters = RetrievalFilter(rfp_only=False)
+        result = retrieve("Architecture", rfp_db, vault, filters=filters)
+        assert result.total_found >= 2

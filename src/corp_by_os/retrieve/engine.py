@@ -31,6 +31,7 @@ class RetrievalFilter:
     topics: list[str] | None = None
     source_type: str | None = None
     type: str | None = None
+    rfp_only: bool = False
 
 
 @dataclass
@@ -180,6 +181,9 @@ def retrieve(
         if filters.type:
             where_clauses.append("n.type = ?")
             params.append(filters.type)
+
+        if filters.rfp_only:
+            where_clauses.append("n.rfp_visible = 1")
 
         where_sql = " AND " + " AND ".join(where_clauses) if where_clauses else ""
 

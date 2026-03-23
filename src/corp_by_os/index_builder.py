@@ -101,7 +101,8 @@ CREATE TABLE IF NOT EXISTS notes (
     doc_type TEXT,
     source_path TEXT,
     source_hash TEXT,
-    extracted_at TEXT
+    extracted_at TEXT,
+    rfp_visible INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE VIRTUAL TABLE IF NOT EXISTS notes_fts USING fts5(
@@ -168,12 +169,21 @@ def rebuild_index(db_path: Path | None = None) -> IndexStats:
     conn = _connect(db_path)
 
     try:
-        _ensure_schema(conn)
+        # Drop all content tables so schema changes (e.g. new columns)
+        # are picked up cleanly.  The meta table is preserved across rebuilds.
+        conn.executescript("""\
+            DROP TABLE IF EXISTS notes_fts;
+            DROP TRIGGER IF EXISTS notes_ai;
+            DROP TRIGGER IF EXISTS notes_ad;
+            DROP TABLE IF EXISTS notes;
+            DROP TABLE IF EXISTS facts_fts;
+            DROP TRIGGER IF EXISTS facts_ai;
+            DROP TRIGGER IF EXISTS facts_ad;
+            DROP TABLE IF EXISTS facts;
+            DROP TABLE IF EXISTS projects;
+        """)
 
-        # Clear existing data
-        conn.execute("DELETE FROM facts")
-        conn.execute("DELETE FROM notes")
-        conn.execute("DELETE FROM projects")
+        _ensure_schema(conn)
 
         projects_count = 0
         facts_count = 0
@@ -198,6 +208,19 @@ def rebuild_index(db_path: Path | None = None) -> IndexStats:
 
         # Index CKE-generated notes from vault
         notes_count = _index_cke_notes(conn, cfg.vault_path)
+
+        # Index extra roots (e.g. rfp_kb)
+        for extra_root in cfg.index_extra_roots:
+            if extra_root.exists():
+                extra_count = _index_cke_notes(conn, extra_root)
+                notes_count += extra_count
+                logger.info("Indexed %d extra notes from %s", extra_count, extra_root)
+            else:
+                logger.warning("Extra index root not found: %s", extra_root)
+
+        # Dedup notes by content hash (after all roots indexed)
+        deduped = _dedup_notes_by_hash(conn)
+        notes_count -= deduped
 
         # Rebuild FTS for both facts and notes
         conn.execute("INSERT INTO facts_fts(facts_fts) VALUES('rebuild')")
@@ -536,15 +559,50 @@ def _parse_frontmatter(filepath: Path) -> dict | None:
         return None
 
 
+_RFP_VISIBLE_SOURCE_TYPES = {"documentation", "rfp"}
+_RFP_VISIBLE_DOC_TYPES = {
+    "product_doc", "architecture", "rfp_response", "security_questionnaire",
+}
+
+
+def _compute_rfp_visible(fm: dict) -> bool:
+    """Determine if a note should be visible to the RFP agent.
+
+    Rules (in priority order):
+    1. confidential/restricted → never
+    2. draft trust_level → never
+    3. verified trust_level → always (rfp_kb entries)
+    4. documentation/rfp source_type → yes
+    5. product_doc/architecture/rfp_response/security_questionnaire doc_type → yes
+    6. Everything else → no
+    """
+    conf = fm.get("confidentiality", "")
+    if conf in ("confidential", "restricted"):
+        return False
+
+    trust = fm.get("trust_level", fm.get("confidence", "extracted"))
+    if trust == "draft":
+        return False
+    if trust == "verified":
+        return True
+
+    if fm.get("source_type", "") in _RFP_VISIBLE_SOURCE_TYPES:
+        return True
+    if fm.get("doc_type", "") in _RFP_VISIBLE_DOC_TYPES:
+        return True
+
+    return False
+
+
 def _index_cke_notes(conn: sqlite3.Connection, vault_root: Path) -> int:
     """Scan vault for knowledge notes and index into notes table.
 
-    Scans knowledge/ (new flat structure) and legacy 02_sources/,
-    04_evergreen/_generated/ for markdown files with YAML frontmatter
-    containing at least a 'title' field.
+    Scans known subdirectories first (01_Knowledge, legacy paths).
+    If none of the known subdirs exist, scans vault_root itself — this
+    supports extra roots like rfp_kb that contain markdown directly.
     """
     count = 0
-    scan_dirs = [
+    known_subdirs = [
         vault_root / "01_Knowledge",
         # Legacy paths (pre-restructure)
         vault_root / "knowledge",
@@ -552,13 +610,25 @@ def _index_cke_notes(conn: sqlite3.Connection, vault_root: Path) -> int:
         vault_root / "04_evergreen" / "_generated",
     ]
 
+    scan_dirs = [d for d in known_subdirs if d.exists()]
+
+    # If none of the known subdirs exist, scan root directly (extra roots)
+    if not scan_dirs and vault_root.exists():
+        scan_dirs = [vault_root]
+
     for scan_dir in scan_dirs:
         if not scan_dir.exists():
             continue
         for md_file in scan_dir.rglob("*.md"):
             fm = _parse_frontmatter(md_file)
-            if not fm or "title" not in fm:
+            if not fm:
                 continue
+            # rfp_kb entries have "id" but no "title" — synthesize title
+            if "title" not in fm:
+                if "id" in fm:
+                    fm["title"] = fm["id"].replace("-", " ").replace("_", " ").title()
+                else:
+                    continue
 
             project_id = fm.get("project", "")
             if not project_id and "04_evergreen" in str(md_file):
@@ -582,8 +652,9 @@ def _index_cke_notes(conn: sqlite3.Connection, vault_root: Path) -> int:
                     content_origin, source_category, source_locator,
                     routing_confidence, confidence, note_path,
                     extraction_version, depth, doc_type,
-                    source_path, source_hash, extracted_at)
-                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                    source_path, source_hash, extracted_at,
+                    rfp_visible)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (
                     project_id,
                     fm.get("client", ""),
@@ -615,6 +686,7 @@ def _index_cke_notes(conn: sqlite3.Connection, vault_root: Path) -> int:
                     source_path_raw,
                     fm.get("source_hash", ""),
                     fm.get("extracted_at", ""),
+                    1 if _compute_rfp_visible(fm) else 0,
                 ),
             )
             count += 1
@@ -622,3 +694,25 @@ def _index_cke_notes(conn: sqlite3.Connection, vault_root: Path) -> int:
     conn.commit()
     logger.info("Indexed %d CKE notes from vault", count)
     return count
+
+
+def _dedup_notes_by_hash(conn: sqlite3.Connection) -> int:
+    """Remove duplicate notes with the same source_hash, keeping the latest.
+
+    File identity = content hash (SHA256). Paths change when folders
+    restructure. This runs AFTER all roots are indexed so cross-root
+    duplicates are caught too.
+
+    Returns number of duplicates removed.
+    """
+    dupes = conn.execute(
+        """DELETE FROM notes
+           WHERE id NOT IN (
+               SELECT MAX(id) FROM notes GROUP BY source_hash
+           )
+           AND source_hash != ''
+           AND source_hash IS NOT NULL"""
+    ).rowcount
+    if dupes:
+        logger.info("Deduped %d notes with identical source_hash", dupes)
+    return dupes

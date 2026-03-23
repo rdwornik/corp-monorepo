@@ -655,10 +655,10 @@ def _run_package_extraction(
     if done == 0:
         return cost
 
-    # Move to vault
+    # Move to vault — Council Decision #7: all extractions go to flat 01_Knowledge/
     from corp_by_os.extraction.vault_writer import move_to_vault
 
-    vault_target = "70_Extracts/Ingest"
+    vault_target = "01_Knowledge"
     move_to_vault(staging_dir, cfg.vault_path, vault_target)
 
     return cost
@@ -671,6 +671,7 @@ def _run_extraction(
     asset_id: int | None,
     content_hash: str,
     mtime_str: str,
+    user_context: str | None = None,
 ) -> tuple[str | None, float]:
     """Invoke CKE extraction on a single file.
 
@@ -701,23 +702,25 @@ def _run_extraction(
     staging_dir = cfg.app_data_path / "staging" / "ingest" / entry_id
     staging_dir.mkdir(parents=True, exist_ok=True)
 
+    file_entry: dict = {
+        "id": entry_id,
+        "path": str(file_path),
+        "doc_type": _resolve_doc_type(file_path.suffix),
+        "name": file_path.stem,
+        "content_origin": "mywork_ingest",
+        "source_category": "ingest",
+        "source_locator": str(file_path.relative_to(mywork_root.resolve())).replace(
+            "\\", "/"
+        ),
+    }
+    if user_context:
+        file_entry["user_context"] = user_context
+
     manifest = {
         "schema_version": 1,
         "project": "ingest",
         "output_dir": str(staging_dir),
-        "files": [
-            {
-                "id": entry_id,
-                "path": str(file_path),
-                "doc_type": _resolve_doc_type(file_path.suffix),
-                "name": file_path.stem,
-                "content_origin": "mywork_ingest",
-                "source_category": "ingest",
-                "source_locator": str(file_path.relative_to(mywork_root.resolve())).replace(
-                    "\\", "/"
-                ),
-            }
-        ],
+        "files": [file_entry],
     }
 
     manifest_path = staging_dir / "manifest.json"
@@ -732,11 +735,10 @@ def _run_extraction(
     if done == 0:
         return None, cost
 
-    # Move to vault
+    # Move to vault — Council Decision #7: all extractions go to flat 01_Knowledge/
     from corp_by_os.extraction.vault_writer import move_to_vault
 
-    # Determine vault target from the file's destination
-    vault_target = "70_Extracts/Ingest"  # default
+    vault_target = "01_Knowledge"
     moved = move_to_vault(staging_dir, cfg.vault_path, vault_target)
 
     vault_note_path = f"{vault_target}/{entry_id}" if moved > 0 else None

@@ -27,6 +27,7 @@ class AppConfig:
     app_data_path: Path
     repo_path: Path
     agents: dict[str, Any] = field(default_factory=dict)
+    index_extra_roots: tuple[Path, ...] = ()
 
 
 def _expand_path(raw: str) -> Path:
@@ -91,6 +92,14 @@ def get_config() -> AppConfig:
         r"C:\Users\1028120\Documents\MyWork",
     )
 
+    # Extra index roots (e.g. rfp_kb) — semicolon-separated paths
+    extra_roots_raw = os.environ.get("INDEX_EXTRA_ROOTS", "")
+    extra_roots = tuple(
+        _expand_path(p.strip())
+        for p in extra_roots_raw.split(";")
+        if p.strip()
+    )
+
     return AppConfig(
         vault_path=_expand_path(vault_path),
         mywork_root=_expand_path(mywork_root),
@@ -100,4 +109,5 @@ def get_config() -> AppConfig:
         app_data_path=_expand_path(app_data_path),
         repo_path=repo_path,
         agents=_load_agents(repo_path),
+        index_extra_roots=extra_roots,
     )

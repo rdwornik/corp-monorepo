@@ -8,7 +8,9 @@ import pytest
 import yaml
 
 from corp_by_os.index_builder import (
+    _compute_rfp_visible,
     _connect,
+    _dedup_notes_by_hash,
     _ensure_schema,
     _index_cke_notes,
     _parse_frontmatter,
@@ -160,6 +162,31 @@ class TestRebuild:
         stats2 = rebuild_index(db_path)
         assert stats1.projects_indexed == stats2.projects_indexed
         assert stats1.facts_indexed == stats2.facts_indexed
+
+    def test_rebuild_survives_old_schema(self, index_env, db_path: Path) -> None:
+        """Rebuild on a DB with an outdated notes schema (missing columns) must not crash."""
+        import sqlite3
+
+        # Create old-schema DB without the confidence column
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+        conn = sqlite3.connect(str(db_path))
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.executescript("""\
+            CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
+            CREATE TABLE IF NOT EXISTS projects (project_id TEXT PRIMARY KEY, client TEXT);
+            CREATE TABLE IF NOT EXISTS facts (id INTEGER PRIMARY KEY, project_id TEXT, fact TEXT);
+            CREATE TABLE IF NOT EXISTS notes (
+                id INTEGER PRIMARY KEY, project_id TEXT, title TEXT, note_path TEXT
+            );
+        """)
+        conn.execute("INSERT INTO notes VALUES (1, 'old', 'Old Note', '/old.md')")
+        conn.commit()
+        conn.close()
+
+        # Rebuild must succeed despite the old schema
+        stats = rebuild_index(db_path)
+        assert stats.projects_indexed >= 0
+        assert stats.notes_indexed >= 0
 
     def test_vault_project_merged(self, index_env, db_path: Path, tmp_vault: Path) -> None:
         """Vault project (lenzing_planning in 01_projects) should merge with OneDrive."""
@@ -415,3 +442,374 @@ class TestNotesIndexing:
     def test_parse_frontmatter_missing_file(self, tmp_path: Path) -> None:
         """_parse_frontmatter returns None for missing files."""
         assert _parse_frontmatter(tmp_path / "nonexistent.md") is None
+
+
+# --- Test: Extra index roots (rfp_kb) ---
+
+
+class TestExtraIndexRoots:
+    """Verify INDEX_EXTRA_ROOTS adds notes from external directories."""
+
+    def test_extra_root_indexed(
+        self, notes_env, db_path: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Notes from extra roots are indexed alongside vault notes."""
+        # Create an rfp_kb-like directory with markdown
+        rfp_kb = tmp_path / "rfp_kb"
+        rfp_kb.mkdir()
+
+        kb_note = """\
+---
+title: High Availability SLA Details
+id: kb-rfp-planning-0001
+doc_type: rfp_response
+trust_level: verified
+products:
+  - Blue Yonder Demand Planning
+topics:
+  - High Availability
+  - SLA
+category: technical
+---
+## Question
+How does Blue Yonder ensure high availability?
+## Answer
+Blue Yonder provides 99.97% SLA with multi-region deployment.
+"""
+        (rfp_kb / "ha-sla.md").write_text(kb_note, encoding="utf-8")
+
+        monkeypatch.setenv("INDEX_EXTRA_ROOTS", str(rfp_kb))
+        from corp_by_os.config import get_config
+
+        get_config.cache_clear()
+
+        try:
+            stats = rebuild_index(db_path)
+            # Should include vault notes (3 from notes_env) + 1 from rfp_kb
+            assert stats.notes_indexed >= 4, (
+                f"Expected >= 4 notes (3 vault + 1 rfp_kb), got {stats.notes_indexed}"
+            )
+
+            # Verify rfp_kb note is searchable
+            conn = _connect(db_path)
+            rows = conn.execute(
+                "SELECT title FROM notes_fts WHERE notes_fts MATCH '\"Availability\"'",
+            ).fetchall()
+            conn.close()
+            assert len(rows) >= 1, "rfp_kb note not found in FTS"
+        finally:
+            get_config.cache_clear()
+
+    def test_rfp_kb_frontmatter_parsed(
+        self, app_config, db_path: Path, tmp_path: Path
+    ) -> None:
+        """rfp_kb markdown with trust_level maps to confidence column."""
+        rfp_kb = tmp_path / "rfp_kb"
+        rfp_kb.mkdir()
+
+        kb_note = """\
+---
+title: WMS Integration Guide
+id: kb-wms-001
+trust_level: verified
+products:
+  - Blue Yonder WMS
+topics:
+  - WMS
+  - Integration
+---
+Content about WMS integration.
+"""
+        (rfp_kb / "wms-integration.md").write_text(kb_note, encoding="utf-8")
+
+        conn = _connect(db_path)
+        _ensure_schema(conn)
+        count = _index_cke_notes(conn, rfp_kb)
+        assert count == 1
+
+        row = conn.execute(
+            "SELECT confidence, products, topics FROM notes WHERE title = ?",
+            ("WMS Integration Guide",),
+        ).fetchone()
+        conn.close()
+        assert row is not None
+        assert row[0] == "verified"  # trust_level -> confidence
+        assert "Blue Yonder WMS" in row[1]
+        assert "WMS" in row[2]
+
+    def test_id_only_frontmatter_indexed(
+        self, app_config, db_path: Path, tmp_path: Path
+    ) -> None:
+        """rfp_kb entries with 'id' but no 'title' get title synthesised from id."""
+        rfp_kb = tmp_path / "rfp_kb"
+        rfp_kb.mkdir()
+
+        kb_note = """\
+---
+id: kb-rfp-planning-0042
+doc_type: rfp_response
+trust_level: verified
+products:
+  - Blue Yonder Demand Planning
+topics:
+  - High Availability
+  - SLA
+---
+## Question
+How does Blue Yonder ensure high availability?
+## Answer
+Blue Yonder provides 99.97% SLA.
+"""
+        (rfp_kb / "ha-sla.md").write_text(kb_note, encoding="utf-8")
+
+        conn = _connect(db_path)
+        _ensure_schema(conn)
+        count = _index_cke_notes(conn, rfp_kb)
+        assert count == 1
+
+        row = conn.execute(
+            "SELECT title, confidence, topics FROM notes",
+        ).fetchone()
+        conn.close()
+        assert row is not None
+        # Title synthesised from id: "kb-rfp-planning-0042" -> "Kb Rfp Planning 0042"
+        assert "Kb Rfp Planning 0042" in row[0]
+        assert row[1] == "verified"
+        assert "High Availability" in row[2]
+
+    def test_no_title_no_id_skipped(
+        self, app_config, db_path: Path, tmp_path: Path
+    ) -> None:
+        """Markdown with neither title nor id is skipped."""
+        rfp_kb = tmp_path / "rfp_kb"
+        rfp_kb.mkdir()
+
+        no_id_note = """\
+---
+doc_type: unknown
+---
+Some content without title or id.
+"""
+        (rfp_kb / "orphan.md").write_text(no_id_note, encoding="utf-8")
+
+        conn = _connect(db_path)
+        _ensure_schema(conn)
+        count = _index_cke_notes(conn, rfp_kb)
+        conn.close()
+        assert count == 0
+
+    def test_missing_extra_root_skipped(
+        self, notes_env, db_path: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Non-existent extra root is skipped with warning, not crash."""
+        monkeypatch.setenv("INDEX_EXTRA_ROOTS", str(tmp_path / "nonexistent_kb"))
+        from corp_by_os.config import get_config
+
+        get_config.cache_clear()
+
+        try:
+            stats = rebuild_index(db_path)
+            # Should still index vault notes successfully
+            assert stats.notes_indexed >= 3
+        finally:
+            get_config.cache_clear()
+
+
+# --- Test: RFP visibility ---
+
+
+class TestRfpVisible:
+    """Verify _compute_rfp_visible classification rules."""
+
+    def test_product_doc_visible(self) -> None:
+        fm = {"source_type": "documentation", "doc_type": "product_doc"}
+        assert _compute_rfp_visible(fm) is True
+
+    def test_rfp_response_visible(self) -> None:
+        fm = {"doc_type": "rfp_response"}
+        assert _compute_rfp_visible(fm) is True
+
+    def test_architecture_doc_visible(self) -> None:
+        fm = {"doc_type": "architecture"}
+        assert _compute_rfp_visible(fm) is True
+
+    def test_security_questionnaire_visible(self) -> None:
+        fm = {"doc_type": "security_questionnaire"}
+        assert _compute_rfp_visible(fm) is True
+
+    def test_verified_always_visible(self) -> None:
+        fm = {"trust_level": "verified"}
+        assert _compute_rfp_visible(fm) is True
+
+    def test_rfp_source_type_visible(self) -> None:
+        fm = {"source_type": "rfp"}
+        assert _compute_rfp_visible(fm) is True
+
+    def test_meeting_notes_not_visible(self) -> None:
+        fm = {"source_type": "meeting", "doc_type": "meeting"}
+        assert _compute_rfp_visible(fm) is False
+
+    def test_training_not_visible(self) -> None:
+        fm = {"source_type": "training"}
+        assert _compute_rfp_visible(fm) is False
+
+    def test_competitive_not_visible(self) -> None:
+        fm = {"source_type": "competitive"}
+        assert _compute_rfp_visible(fm) is False
+
+    def test_confidential_never_visible(self) -> None:
+        fm = {"source_type": "documentation", "confidentiality": "confidential"}
+        assert _compute_rfp_visible(fm) is False
+
+    def test_restricted_never_visible(self) -> None:
+        fm = {"source_type": "documentation", "confidentiality": "restricted"}
+        assert _compute_rfp_visible(fm) is False
+
+    def test_draft_never_visible(self) -> None:
+        fm = {"trust_level": "draft", "source_type": "documentation"}
+        assert _compute_rfp_visible(fm) is False
+
+    def test_empty_frontmatter_not_visible(self) -> None:
+        assert _compute_rfp_visible({}) is False
+
+    def test_confidential_overrides_verified(self) -> None:
+        """Confidentiality check runs before trust_level."""
+        fm = {"trust_level": "verified", "confidentiality": "confidential"}
+        assert _compute_rfp_visible(fm) is False
+
+    def test_rfp_visible_column_in_rebuild(
+        self, notes_env, db_path: Path
+    ) -> None:
+        """rebuild_index populates rfp_visible column."""
+        rebuild_index(db_path)
+        conn = _connect(db_path)
+        rows = conn.execute(
+            "SELECT title, rfp_visible FROM notes"
+        ).fetchall()
+        conn.close()
+        assert len(rows) >= 3
+        # All test notes have source_type=internal or no source_type,
+        # so rfp_visible should be 0 for most
+        rfp_values = {r[0]: r[1] for r in rows}
+        assert all(isinstance(v, int) for v in rfp_values.values())
+
+
+# --- Test: Index-level dedup ---
+
+
+class TestIndexDedup:
+    """Index-level dedup uses source_hash (content identity), not path."""
+
+    def test_dedup_by_source_hash(
+        self, app_config, db_path: Path, tmp_path: Path
+    ) -> None:
+        """Notes with same source_hash are deduped — only latest kept."""
+        vault = tmp_path / "dedup_vault"
+        vault.mkdir()
+
+        # Two notes with the same source_hash but different paths
+        note1 = """\
+---
+title: First Version
+source_hash: deadbeef1234
+source_path: C:/MyWork/old/file.pptx
+extracted_at: "2026-03-01"
+---
+First extraction.
+"""
+        note2 = """\
+---
+title: Second Version
+source_hash: deadbeef1234
+source_path: C:/MyWork/new/file.pptx
+extracted_at: "2026-03-20"
+---
+Second extraction (newer, same content hash).
+"""
+        (vault / "note_v1.md").write_text(note1, encoding="utf-8")
+        (vault / "note_v2.md").write_text(note2, encoding="utf-8")
+
+        conn = _connect(db_path)
+        _ensure_schema(conn)
+        count = _index_cke_notes(conn, vault)
+
+        # _index_cke_notes inserts both; dedup happens in rebuild_index
+        # Call dedup manually here
+        from corp_by_os.index_builder import _dedup_notes_by_hash
+
+        dupes = _dedup_notes_by_hash(conn)
+        count -= dupes
+
+        assert count == 1, f"Expected 1 after dedup, got {count}"
+
+        rows = conn.execute("SELECT title FROM notes").fetchall()
+        conn.close()
+        assert len(rows) == 1
+        assert rows[0][0] == "Second Version"
+
+    def test_different_hash_kept(
+        self, app_config, db_path: Path, tmp_path: Path
+    ) -> None:
+        """Notes with different source_hash are both kept."""
+        vault = tmp_path / "diff_hash_vault"
+        vault.mkdir()
+
+        note1 = """\
+---
+title: File A
+source_hash: hash_aaa
+---
+Content A.
+"""
+        note2 = """\
+---
+title: File B
+source_hash: hash_bbb
+---
+Content B.
+"""
+        (vault / "a.md").write_text(note1, encoding="utf-8")
+        (vault / "b.md").write_text(note2, encoding="utf-8")
+
+        conn = _connect(db_path)
+        _ensure_schema(conn)
+        count = _index_cke_notes(conn, vault)
+
+        from corp_by_os.index_builder import _dedup_notes_by_hash
+
+        dupes = _dedup_notes_by_hash(conn)
+        count -= dupes
+
+        assert count == 2
+
+        rows = conn.execute("SELECT title FROM notes").fetchall()
+        conn.close()
+        assert len(rows) == 2
+
+    def test_no_dedup_for_empty_hash(
+        self, app_config, db_path: Path, tmp_path: Path
+    ) -> None:
+        """Notes without source_hash are NOT deduped."""
+        vault = tmp_path / "no_dedup_vault"
+        vault.mkdir()
+
+        for i in range(3):
+            note = f"""\
+---
+title: Note {i}
+---
+Content {i}.
+"""
+            (vault / f"note_{i}.md").write_text(note, encoding="utf-8")
+
+        conn = _connect(db_path)
+        _ensure_schema(conn)
+        count = _index_cke_notes(conn, vault)
+
+        from corp_by_os.index_builder import _dedup_notes_by_hash
+
+        dupes = _dedup_notes_by_hash(conn)
+        count -= dupes
+        conn.close()
+
+        assert count == 3

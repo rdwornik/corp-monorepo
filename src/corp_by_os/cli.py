@@ -2154,6 +2154,110 @@ def ingest_command(
     ops.close()
 
 
+# --- Ingest Inbox (interactive) ---
+
+
+@cli.command("ingest-inbox")
+@click.option("--path", type=click.Path(exists=True), default=None,
+              help="Process a specific file instead of scanning Inbox.")
+@click.option("--dry-run", is_flag=True, help="Show what would happen without moving files.")
+@click.option("--auto", is_flag=True, help="Auto-accept high-confidence matches (>=0.90).")
+@click.option("--undo", type=int, default=None, help="Undo a previous ingest by event ID.")
+@click.option("--full", is_flag=True,
+              help="With --undo: also remove vault package and rebuild index.")
+@click.option("--skip-extract", is_flag=True, help="Route file but skip CKE extraction.")
+@click.option("--list", "list_events", is_flag=True, help="Show ingest history.")
+@click.option("--list-all", is_flag=True, help="Show all ingest history (no limit).")
+def ingest_inbox_command(
+    path: str | None,
+    dry_run: bool,
+    auto: bool,
+    undo: int | None,
+    full: bool,
+    skip_extract: bool,
+    list_events: bool,
+    list_all: bool,
+) -> None:
+    """Interactively route files from 00_Inbox to their canonical locations.
+
+    Processes one file at a time with Rich UI: classify, confirm
+    destination, rename, move, then trigger CKE extraction.
+    """
+    from corp_by_os.ingest.inbox import (
+        _list_events,
+        _scan_inbox_files,
+        _undo_event,
+        process_file,
+    )
+    from corp_by_os.ops.database import OpsDB
+    from corp_by_os.ops.registry import ContentRegistry, get_content_registry_path
+
+    cfg = get_config()
+    ops = OpsDB()
+
+    # List mode
+    if list_events or list_all:
+        _list_events(ops, limit=999999 if list_all else 20)
+        ops.close()
+        return
+
+    # Undo mode
+    if undo is not None:
+        _undo_event(undo, ops, cfg.mywork_root, full=full)
+        ops.close()
+        return
+
+    registry = ContentRegistry(get_content_registry_path())
+
+    if dry_run:
+        console.print("[yellow]Dry run — no files will be moved or extracted.[/yellow]\n")
+
+    # Determine files to process
+    if path:
+        files = [Path(path).resolve()]
+    else:
+        inbox = cfg.mywork_root / "00_Inbox"
+        files = _scan_inbox_files(inbox)
+
+    if not files:
+        console.print("[yellow]No files to process in 00_Inbox/.[/yellow]")
+        ops.close()
+        return
+
+    console.print(f"[bold]Found {len(files)} file(s) to process.[/bold]\n")
+
+    # Process each file
+    stats: dict[str, int] = {"routed": 0, "skipped": 0}
+
+    for i, file_path in enumerate(files, 1):
+        console.print(f"[dim]── File {i}/{len(files)} ──[/dim]")
+        action = process_file(
+            file_path,
+            cfg.mywork_root,
+            registry,
+            ops,
+            dry_run=dry_run,
+            auto=auto,
+            skip_extract=skip_extract,
+        )
+
+        if action == "quit":
+            console.print("\n[yellow]Quit. Remaining files not processed.[/yellow]")
+            break
+
+        stats[action] = stats.get(action, 0) + 1
+        console.print()
+
+    # Summary
+    parts = [f"Processed {sum(stats.values())}/{len(files)}"]
+    for action_name, count in sorted(stats.items()):
+        if count > 0:
+            parts.append(f"{action_name}: {count}")
+    console.print(f"\n[bold]{' | '.join(parts)}[/bold]")
+
+    ops.close()
+
+
 @cli.command("finalize")
 @click.option("--approve-all", is_flag=True, help="Move all staged files to final destinations")
 def finalize_command(approve_all: bool) -> None:
@@ -2305,12 +2409,14 @@ def classify_command(model: str, budget: float, dry_run: bool) -> None:
     default="table",
     help="Output format (json for machine consumption)",
 )
+@click.option("--rfp-only", is_flag=True, help="Only return RFP-safe notes.")
 def retrieve_cmd(
     query: str,
     client: str | None,
     product: str | None,
     top: int,
     output_format: str,
+    rfp_only: bool,
 ) -> None:
     """Search the knowledge base.
 
@@ -2331,6 +2437,7 @@ def retrieve_cmd(
     filters = RetrievalFilter(
         client=client,
         products=[product] if product else None,
+        rfp_only=rfp_only,
     )
 
     # Suppress logging for clean JSON stdout

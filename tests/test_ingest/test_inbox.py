@@ -1,0 +1,746 @@
+"""Tests for interactive inbox ingestion command."""
+
+from __future__ import annotations
+
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+import pytest
+import yaml
+
+from corp_by_os.ingest.inbox import (
+    _check_already_extracted,
+    _full_revert,
+    _list_events,
+    _log_ingest_event,
+    _move_file,
+    _scan_inbox_files,
+    _undo_event,
+    _update_source_path_in_index,
+    process_file,
+)
+from corp_by_os.ops.database import OpsDB
+from corp_by_os.ops.registry import ContentRegistry
+
+
+@pytest.fixture()
+def registry_path(tmp_path: Path) -> Path:
+    """Create a test content_registry.yaml."""
+    data = {
+        "version": "1.0",
+        "series": {
+            "cognitive_friday": {
+                "display_name": "Cognitive Friday",
+                "destination": "60_Source_Library/02_Training_Enablement/Cognitive_Friday",
+                "naming_patterns": ["Cognitive_Friday*", "CF_S[0-9]*"],
+                "expected_extensions": [".mp4", ".pptx"],
+                "default_metadata": {
+                    "source_category": "training",
+                    "topics": ["Cognitive Planning"],
+                },
+            },
+        },
+        "destination_rules": [
+            {
+                "name": "RFP databases",
+                "match": {
+                    "filename_contains": ["RFP_Database"],
+                    "extensions": [".xlsx"],
+                },
+                "destination": "50_RFP/_databases",
+                "metadata": {"source_category": "rfp"},
+            },
+        ],
+        "client_patterns": [
+            {"pattern": "Lenzing", "project": "Lenzing_Planning"},
+        ],
+        "fallback": {
+            "unknown_destination": "00_Inbox/_Unmatched",
+            "confidence_threshold": 0.75,
+        },
+    }
+    path = tmp_path / "content_registry.yaml"
+    path.write_text(yaml.dump(data, default_flow_style=False), encoding="utf-8")
+    return path
+
+
+@pytest.fixture()
+def registry(registry_path: Path) -> ContentRegistry:
+    return ContentRegistry(registry_path)
+
+
+@pytest.fixture()
+def ops(tmp_path: Path) -> OpsDB:
+    db = OpsDB(tmp_path / "test_ops.db")
+    yield db
+    db.close()
+
+
+@pytest.fixture()
+def mywork(tmp_path: Path) -> Path:
+    """Create a minimal MyWork structure."""
+    root = tmp_path / "MyWork"
+    inbox = root / "00_Inbox"
+    inbox.mkdir(parents=True)
+    return root
+
+
+class TestScanInboxFiles:
+    def test_finds_files(self, mywork: Path) -> None:
+        inbox = mywork / "00_Inbox"
+        (inbox / "test.pptx").write_bytes(b"x" * 100)
+        (inbox / "test2.xlsx").write_bytes(b"x" * 100)
+        files = _scan_inbox_files(inbox)
+        assert len(files) == 2
+
+    def test_skips_gitkeep(self, mywork: Path) -> None:
+        inbox = mywork / "00_Inbox"
+        (inbox / ".gitkeep").write_bytes(b"")
+        (inbox / "test.pptx").write_bytes(b"x" * 100)
+        files = _scan_inbox_files(inbox)
+        assert len(files) == 1
+        assert files[0].name == "test.pptx"
+
+    def test_skips_hidden_files(self, mywork: Path) -> None:
+        inbox = mywork / "00_Inbox"
+        (inbox / ".DS_Store").write_bytes(b"")
+        files = _scan_inbox_files(inbox)
+        assert len(files) == 0
+
+    def test_skips_temp_extensions(self, mywork: Path) -> None:
+        inbox = mywork / "00_Inbox"
+        (inbox / "download.crdownload").write_bytes(b"x" * 100)
+        files = _scan_inbox_files(inbox)
+        assert len(files) == 0
+
+    def test_skips_directories(self, mywork: Path) -> None:
+        inbox = mywork / "00_Inbox"
+        (inbox / "subfolder").mkdir()
+        (inbox / "test.pptx").write_bytes(b"x" * 100)
+        files = _scan_inbox_files(inbox)
+        assert len(files) == 1
+
+    def test_empty_inbox(self, mywork: Path) -> None:
+        inbox = mywork / "00_Inbox"
+        files = _scan_inbox_files(inbox)
+        assert len(files) == 0
+
+    def test_nonexistent_inbox(self, tmp_path: Path) -> None:
+        files = _scan_inbox_files(tmp_path / "no_such_dir")
+        assert len(files) == 0
+
+    def test_skips_infrastructure_names(self, mywork: Path) -> None:
+        inbox = mywork / "00_Inbox"
+        (inbox / "desktop.ini").write_bytes(b"")
+        (inbox / "Thumbs.db").write_bytes(b"")
+        (inbox / "real_file.pdf").write_bytes(b"x" * 100)
+        files = _scan_inbox_files(inbox)
+        assert len(files) == 1
+
+
+class TestMoveFile:
+    def test_moves_file(self, mywork: Path) -> None:
+        inbox = mywork / "00_Inbox"
+        f = inbox / "test.pptx"
+        f.write_bytes(b"x" * 100)
+
+        dest = _move_file(f, "60_Source_Library/Training", "renamed.pptx", mywork)
+        assert dest.exists()
+        assert dest.name == "renamed.pptx"
+        assert not f.exists()
+
+    def test_creates_destination_dir(self, mywork: Path) -> None:
+        inbox = mywork / "00_Inbox"
+        f = inbox / "test.pptx"
+        f.write_bytes(b"x" * 100)
+
+        dest = _move_file(f, "60_Source_Library/New_Folder", "test.pptx", mywork)
+        assert dest.parent.exists()
+
+    def test_handles_collision(self, mywork: Path) -> None:
+        inbox = mywork / "00_Inbox"
+        f = inbox / "test.pptx"
+        f.write_bytes(b"x" * 100)
+
+        # Pre-create collision
+        dest_dir = mywork / "60_Source_Library"
+        dest_dir.mkdir(parents=True)
+        (dest_dir / "test.pptx").write_bytes(b"y" * 100)
+
+        dest = _move_file(f, "60_Source_Library", "test.pptx", mywork)
+        assert dest.exists()
+        assert dest.name == "test_1.pptx"
+
+
+class TestLogIngestEvent:
+    def test_logs_event(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        inbox = mywork / "00_Inbox"
+        f = inbox / "Cognitive_Friday_S4.pptx"
+        f.write_bytes(b"x" * 100)
+
+        from corp_by_os.ingest.classifier import classify
+
+        classification = classify(f, registry)
+
+        # Move file first (log needs dest_file)
+        dest_dir = mywork / "60_Source_Library" / "Training"
+        dest_dir.mkdir(parents=True)
+        dest_file = dest_dir / "renamed.pptx"
+        import shutil
+
+        shutil.copy2(str(f), str(dest_file))
+
+        event_id = _log_ingest_event(
+            ops, f, dest_file, mywork,
+            classification, f.name, "renamed.pptx",
+            "test context", True,
+        )
+        assert event_id > 0
+
+        # Verify event in database
+        events = ops.get_recent_events(10)
+        # Should have at least the route event
+        route_events = [e for e in events if e["action"] == "ingest_inbox_route"]
+        assert len(route_events) >= 1
+
+
+class TestProcessFile:
+    def test_auto_mode_high_confidence(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Auto mode accepts high-confidence matches without prompting."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "Cognitive_Friday_S4_Test.pptx"
+        f.write_bytes(b"x" * 100)
+
+        action = process_file(
+            f, mywork, registry, ops,
+            auto=True, skip_extract=True,
+        )
+        assert action == "routed"
+        assert not f.exists()  # file moved
+
+    def test_auto_mode_low_confidence_not_auto_accepted(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Auto mode doesn't auto-accept low-confidence matches."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "random_file.txt"
+        f.write_bytes(b"x" * 100)
+
+        # Mock the interactive prompt to return 's' (skip)
+        with patch("corp_by_os.ingest.inbox._prompt_action", return_value="s"):
+            action = process_file(
+                f, mywork, registry, ops,
+                auto=True, skip_extract=True,
+            )
+        assert action == "skipped"
+
+    def test_dry_run_no_move(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Dry run doesn't move files."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "Cognitive_Friday_S4_Test.pptx"
+        f.write_bytes(b"x" * 100)
+
+        action = process_file(
+            f, mywork, registry, ops,
+            auto=True, dry_run=True, skip_extract=True,
+        )
+        assert action == "routed"
+        assert f.exists()  # file NOT moved in dry run
+
+    def test_interactive_accept(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Interactive mode: user accepts suggestion."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "RFP_Database_WMS.xlsx"
+        f.write_bytes(b"x" * 100)
+
+        with patch("corp_by_os.ingest.inbox._prompt_action", return_value="a"):
+            action = process_file(
+                f, mywork, registry, ops,
+                skip_extract=True,
+            )
+        assert action == "routed"
+        assert not f.exists()
+
+    def test_interactive_skip(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Interactive mode: user skips file."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "test.pdf"
+        f.write_bytes(b"x" * 100)
+
+        with patch("corp_by_os.ingest.inbox._prompt_action", return_value="s"):
+            action = process_file(
+                f, mywork, registry, ops,
+                skip_extract=True,
+            )
+        assert action == "skipped"
+        assert f.exists()
+
+    def test_interactive_quit(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Interactive mode: user quits."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "test.pdf"
+        f.write_bytes(b"x" * 100)
+
+        with patch("corp_by_os.ingest.inbox._prompt_action", return_value="q"):
+            action = process_file(
+                f, mywork, registry, ops,
+                skip_extract=True,
+            )
+        assert action == "quit"
+
+
+class TestUndoEvent:
+    def test_undo_moves_file_back(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Undo moves file back to Inbox."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "Cognitive_Friday_S4.pptx"
+        f.write_bytes(b"x" * 100)
+
+        # Route the file via auto mode
+        action = process_file(
+            f, mywork, registry, ops,
+            auto=True, skip_extract=True,
+        )
+        assert action == "routed"
+        assert not f.exists()
+
+        # Find the event
+        events = ops.get_recent_events(10)
+        route_events = [e for e in events if e["action"] == "ingest_inbox_route"]
+        assert len(route_events) >= 1
+        event_id = route_events[0]["id"]
+
+        # Undo
+        success = _undo_event(event_id, ops, mywork)
+        assert success is True
+
+        # File should be back in inbox
+        inbox_files = list(inbox.iterdir())
+        restored = [f for f in inbox_files if f.suffix == ".pptx"]
+        assert len(restored) == 1
+
+    def test_undo_nonexistent_event(self, mywork: Path, ops: OpsDB) -> None:
+        """Undo of nonexistent event returns False."""
+        result = _undo_event(99999, ops, mywork)
+        assert result is False
+
+    def test_undo_already_reverted(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Undo of already-reverted event returns False."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "Cognitive_Friday_S4.pptx"
+        f.write_bytes(b"x" * 100)
+
+        process_file(f, mywork, registry, ops, auto=True, skip_extract=True)
+
+        events = ops.get_recent_events(10)
+        route_events = [e for e in events if e["action"] == "ingest_inbox_route"]
+        event_id = route_events[0]["id"]
+
+        # First undo succeeds
+        _undo_event(event_id, ops, mywork)
+        # Second undo fails
+        result = _undo_event(event_id, ops, mywork)
+        assert result is False
+
+
+class TestUserContext:
+    def test_user_context_reaches_manifest(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Verify user_context is included in the CKE manifest when passed."""
+        import json
+
+        inbox = mywork / "00_Inbox"
+        f = inbox / "Cognitive_Friday_S4.pptx"
+        f.write_bytes(b"x" * 100)
+
+        captured_context: list[str | None] = []
+
+        original_run_extraction = None
+
+        def mock_run_extraction(
+            file_path, mywork_root, ops_db, asset_id, content_hash, mtime_str,
+            user_context=None,
+        ):
+            captured_context.append(user_context)
+            return None, 0.0
+
+        with patch(
+            "corp_by_os.ingest.router._run_extraction",
+            side_effect=mock_run_extraction,
+        ):
+            from corp_by_os.ingest.inbox import _trigger_extraction
+
+            # Route the file first so it has a destination
+            dest_dir = mywork / "60_Source_Library" / "Training"
+            dest_dir.mkdir(parents=True)
+            import shutil
+
+            dest_file = dest_dir / "test.pptx"
+            shutil.copy2(str(f), str(dest_file))
+
+            _trigger_extraction(
+                dest_file, mywork, ops,
+                user_context="Cognitive Friday S4E1, tag changes in platform",
+            )
+
+        assert len(captured_context) == 1
+        assert captured_context[0] == "Cognitive Friday S4E1, tag changes in platform"
+
+    def test_user_context_none_when_not_provided(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """user_context is None when not provided by user."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "test.pptx"
+        f.write_bytes(b"x" * 100)
+
+        captured_context: list[str | None] = []
+
+        def mock_run_extraction(
+            file_path, mywork_root, ops_db, asset_id, content_hash, mtime_str,
+            user_context=None,
+        ):
+            captured_context.append(user_context)
+            return None, 0.0
+
+        with patch(
+            "corp_by_os.ingest.router._run_extraction",
+            side_effect=mock_run_extraction,
+        ):
+            from corp_by_os.ingest.inbox import _trigger_extraction
+
+            dest_dir = mywork / "60_Source_Library"
+            dest_dir.mkdir(parents=True)
+            import shutil
+
+            dest_file = dest_dir / "test.pptx"
+            shutil.copy2(str(f), str(dest_file))
+
+            _trigger_extraction(dest_file, mywork, ops, user_context=None)
+
+        assert captured_context[0] is None
+
+
+class TestListEvents:
+    def test_list_shows_recent_events(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """--list shows ingest-inbox events."""
+        inbox = mywork / "00_Inbox"
+
+        # Create 2 events via auto mode
+        for name in ["Cognitive_Friday_S4.pptx", "Cognitive_Friday_S5.pptx"]:
+            f = inbox / name
+            f.write_bytes(b"x" * 100)
+            process_file(f, mywork, registry, ops, auto=True, skip_extract=True)
+
+        # List should show 2 events (captured via Rich console)
+        events = ops.conn.execute(
+            "SELECT * FROM ingest_events WHERE action = 'ingest_inbox_route'"
+        ).fetchall()
+        assert len(events) >= 2
+
+    def test_list_shows_undone_status(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Undone events have reverted=1 in the database."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "Cognitive_Friday_S4.pptx"
+        f.write_bytes(b"x" * 100)
+        process_file(f, mywork, registry, ops, auto=True, skip_extract=True)
+
+        events = ops.get_recent_events(10)
+        route_events = [e for e in events if e["action"] == "ingest_inbox_route"]
+        event_id = route_events[0]["id"]
+
+        _undo_event(event_id, ops, mywork)
+
+        row = ops.conn.execute(
+            "SELECT reverted FROM ingest_events WHERE id = ?", (event_id,)
+        ).fetchone()
+        assert row["reverted"] == 1
+
+    def test_list_empty(self, ops: OpsDB) -> None:
+        """--list with no events prints message without crashing."""
+        # Should not raise — just prints "No ingest-inbox events found."
+        _list_events(ops)
+
+    def test_list_respects_limit(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """--list with limit returns at most N events."""
+        inbox = mywork / "00_Inbox"
+        for i in range(5):
+            f = inbox / f"Cognitive_Friday_S{i}.pptx"
+            f.write_bytes(b"x" * 100)
+            process_file(f, mywork, registry, ops, auto=True, skip_extract=True)
+
+        rows = ops.conn.execute(
+            """SELECT * FROM ingest_events
+               WHERE action = 'ingest_inbox_route'
+               ORDER BY id DESC LIMIT 3"""
+        ).fetchall()
+        assert len(rows) == 3
+
+
+class TestFullUndo:
+    def test_full_undo_removes_vault_package(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB, tmp_path: Path
+    ) -> None:
+        """--full undo removes vault package when vault_note_path is recorded."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "Cognitive_Friday_S4.pptx"
+        f.write_bytes(b"x" * 100)
+
+        process_file(f, mywork, registry, ops, auto=True, skip_extract=True)
+
+        events = ops.get_recent_events(10)
+        route_events = [e for e in events if e["action"] == "ingest_inbox_route"]
+        event_id = route_events[0]["id"]
+
+        # Simulate extraction by creating a vault package and recording its path
+        vault_dir = tmp_path / "vault"
+        vault_pkg = vault_dir / "01_Knowledge" / "test_package"
+        vault_pkg.mkdir(parents=True)
+        (vault_pkg / "note.md").write_text("# Test", encoding="utf-8")
+
+        ops.conn.execute(
+            "UPDATE ingest_events SET vault_note_path = ? WHERE id = ?",
+            ("01_Knowledge/test_package", event_id),
+        )
+        ops.conn.commit()
+
+        with patch("corp_by_os.index_builder.rebuild_index") as mock_rebuild:
+            mock_rebuild.return_value = MagicMock(notes_indexed=0)
+            _undo_event(
+                event_id, ops, mywork, full=True,
+                vault_path=vault_dir, app_data_path=tmp_path / "appdata",
+            )
+
+        assert not vault_pkg.exists(), "Vault package should be removed"
+
+    def test_full_undo_rebuilds_index(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB, tmp_path: Path
+    ) -> None:
+        """--full undo triggers index rebuild."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "Cognitive_Friday_S4.pptx"
+        f.write_bytes(b"x" * 100)
+
+        process_file(f, mywork, registry, ops, auto=True, skip_extract=True)
+
+        events = ops.get_recent_events(10)
+        route_events = [e for e in events if e["action"] == "ingest_inbox_route"]
+        event_id = route_events[0]["id"]
+
+        with patch("corp_by_os.index_builder.rebuild_index") as mock_rebuild:
+            mock_rebuild.return_value = MagicMock(notes_indexed=42)
+            _undo_event(
+                event_id, ops, mywork, full=True,
+                vault_path=tmp_path / "vault",
+                app_data_path=tmp_path / "appdata",
+            )
+
+        mock_rebuild.assert_called_once()
+
+    def test_full_undo_without_vault_package(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB, tmp_path: Path
+    ) -> None:
+        """--full undo handles missing vault_note_path gracefully."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "Cognitive_Friday_S4.pptx"
+        f.write_bytes(b"x" * 100)
+
+        process_file(f, mywork, registry, ops, auto=True, skip_extract=True)
+
+        events = ops.get_recent_events(10)
+        route_events = [e for e in events if e["action"] == "ingest_inbox_route"]
+        event_id = route_events[0]["id"]
+
+        # vault_note_path is NULL — should not crash
+        with patch("corp_by_os.index_builder.rebuild_index") as mock_rebuild:
+            mock_rebuild.return_value = MagicMock(notes_indexed=0)
+            result = _undo_event(
+                event_id, ops, mywork, full=True,
+                vault_path=tmp_path / "vault",
+                app_data_path=tmp_path / "appdata",
+            )
+
+        assert result is True
+
+    def test_normal_undo_does_not_rebuild(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Normal (non-full) undo does NOT rebuild index."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "Cognitive_Friday_S4.pptx"
+        f.write_bytes(b"x" * 100)
+
+        process_file(f, mywork, registry, ops, auto=True, skip_extract=True)
+
+        events = ops.get_recent_events(10)
+        route_events = [e for e in events if e["action"] == "ingest_inbox_route"]
+        event_id = route_events[0]["id"]
+
+        # full=False — _full_revert never called, no rebuild
+        _undo_event(event_id, ops, mywork, full=False)
+
+
+class TestVaultNotePathStored:
+    def test_vault_note_path_column_exists(self, ops: OpsDB) -> None:
+        """ingest_events table has vault_note_path column."""
+        row = ops.conn.execute(
+            "PRAGMA table_info(ingest_events)"
+        ).fetchall()
+        col_names = [r[1] for r in row]
+        assert "vault_note_path" in col_names
+
+    def test_log_event_stores_vault_note_path(self, ops: OpsDB) -> None:
+        """log_event with vault_note_path stores it in the database."""
+        event_id = ops.log_event(
+            action="ingest_inbox_route",
+            source_path="00_Inbox/test.pptx",
+            destination_path="30_Reference/test.pptx",
+            vault_note_path="01_Knowledge/test_pkg",
+        )
+
+        row = ops.conn.execute(
+            "SELECT vault_note_path FROM ingest_events WHERE id = ?",
+            (event_id,),
+        ).fetchone()
+        assert row["vault_note_path"] == "01_Knowledge/test_pkg"
+
+    def test_vault_note_path_default_null(self, ops: OpsDB) -> None:
+        """vault_note_path defaults to NULL when not provided."""
+        event_id = ops.log_event(
+            action="ingest_inbox_route",
+            source_path="00_Inbox/test.pptx",
+        )
+
+        row = ops.conn.execute(
+            "SELECT vault_note_path FROM ingest_events WHERE id = ?",
+            (event_id,),
+        ).fetchone()
+        assert row["vault_note_path"] is None
+
+
+class TestDedupBeforeExtraction:
+    """Dedup uses content hash (SHA256), not path. Files move often."""
+
+    def test_check_no_index(self, tmp_path: Path) -> None:
+        """Returns None when index.db doesn't exist."""
+        result = _check_already_extracted(
+            "abc123", index_path=tmp_path / "nonexistent" / "index.db"
+        )
+        assert result is None
+
+    def test_check_found_by_hash(self, tmp_path: Path) -> None:
+        """Returns extraction info when source_hash matches."""
+        import sqlite3
+
+        db_path = tmp_path / "index.db"
+        conn = sqlite3.connect(str(db_path))
+        conn.execute(
+            "CREATE TABLE notes (id INTEGER PRIMARY KEY, source_hash TEXT, "
+            "source_path TEXT, note_path TEXT, model TEXT, "
+            "title TEXT NOT NULL, project_id TEXT NOT NULL)"
+        )
+        conn.execute(
+            "INSERT INTO notes (source_hash, source_path, note_path, model, "
+            "title, project_id) VALUES (?, ?, ?, ?, ?, ?)",
+            ("deadbeef", "C:/old/path.pptx", "01_Knowledge/pkg",
+             "gemini-3-flash", "Test", "test"),
+        )
+        conn.commit()
+        conn.close()
+
+        result = _check_already_extracted("deadbeef", index_path=db_path)
+        assert result is not None
+        assert result.note_path == "01_Knowledge/pkg"
+        assert result.source_path == "C:/old/path.pptx"
+        assert result.model == "gemini-3-flash"
+
+    def test_check_not_found(self, tmp_path: Path) -> None:
+        """Returns None when no matching hash."""
+        import sqlite3
+
+        db_path = tmp_path / "index.db"
+        conn = sqlite3.connect(str(db_path))
+        conn.execute(
+            "CREATE TABLE notes (id INTEGER PRIMARY KEY, source_hash TEXT, "
+            "note_path TEXT, source_path TEXT, model TEXT, "
+            "title TEXT NOT NULL, project_id TEXT NOT NULL)"
+        )
+        conn.commit()
+        conn.close()
+
+        result = _check_already_extracted("no_match", index_path=db_path)
+        assert result is None
+
+    def test_check_different_hash_not_matched(self, tmp_path: Path) -> None:
+        """Different hash = different file, even if path is same."""
+        import sqlite3
+
+        db_path = tmp_path / "index.db"
+        conn = sqlite3.connect(str(db_path))
+        conn.execute(
+            "CREATE TABLE notes (id INTEGER PRIMARY KEY, source_hash TEXT, "
+            "source_path TEXT, note_path TEXT, model TEXT, "
+            "title TEXT NOT NULL, project_id TEXT NOT NULL)"
+        )
+        conn.execute(
+            "INSERT INTO notes (source_hash, source_path, note_path, "
+            "title, project_id) VALUES (?, ?, ?, ?, ?)",
+            ("hash_v1", "C:/same/path.pptx", "01_Knowledge/old", "V1", "t"),
+        )
+        conn.commit()
+        conn.close()
+
+        # New hash (content changed) — should NOT match
+        result = _check_already_extracted("hash_v2", index_path=db_path)
+        assert result is None
+
+    def test_update_source_path(self, tmp_path: Path) -> None:
+        """Path update writes new source_path for matching hash."""
+        import sqlite3
+
+        db_path = tmp_path / "index.db"
+        conn = sqlite3.connect(str(db_path))
+        conn.execute(
+            "CREATE TABLE notes (id INTEGER PRIMARY KEY, source_hash TEXT, "
+            "source_path TEXT, note_path TEXT, "
+            "title TEXT NOT NULL, project_id TEXT NOT NULL)"
+        )
+        conn.execute(
+            "INSERT INTO notes (source_hash, source_path, note_path, "
+            "title, project_id) VALUES (?, ?, ?, ?, ?)",
+            ("abc", "C:/old/path.pptx", "01_Knowledge/pkg", "T", "t"),
+        )
+        conn.commit()
+        conn.close()
+
+        _update_source_path_in_index("abc", "C:/new/path.pptx", index_path=db_path)
+
+        conn = sqlite3.connect(str(db_path))
+        row = conn.execute(
+            "SELECT source_path FROM notes WHERE source_hash = 'abc'"
+        ).fetchone()
+        conn.close()
+        assert row[0] == "C:/new/path.pptx"

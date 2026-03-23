@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS ingest_events (
     timestamp TEXT NOT NULL,
     reversible INTEGER NOT NULL DEFAULT 1,
     reverted INTEGER NOT NULL DEFAULT 0,
+    vault_note_path TEXT,
     FOREIGN KEY (asset_id) REFERENCES assets(id),
     FOREIGN KEY (package_id) REFERENCES packages(id)
 );
@@ -128,6 +129,16 @@ class OpsDB:
     def _init_schema(self) -> None:
         """Create tables if they don't exist."""
         self.conn.executescript(_SCHEMA)
+        # Migrate: add vault_note_path if missing (pre-existing DBs)
+        try:
+            self.conn.execute(
+                "SELECT vault_note_path FROM ingest_events LIMIT 0"
+            )
+        except Exception:
+            self.conn.execute(
+                "ALTER TABLE ingest_events ADD COLUMN vault_note_path TEXT"
+            )
+            self.conn.commit()
 
     def close(self) -> None:
         if self._conn is not None:
@@ -378,6 +389,7 @@ class OpsDB:
         reasoning: str | None = None,
         cost: float = 0.0,
         reversible: bool = True,
+        vault_note_path: str | None = None,
     ) -> int:
         """Log an ingest event. Returns event ID.
 
@@ -388,12 +400,15 @@ class OpsDB:
             source_path = source_path.replace("\\", "/")
         if destination_path:
             destination_path = destination_path.replace("\\", "/")
+        if vault_note_path:
+            vault_note_path = vault_note_path.replace("\\", "/")
 
         cur = self.conn.execute(
             """INSERT INTO ingest_events
                (asset_id, package_id, action, source_path, destination_path,
-                method, confidence, reasoning, cost, timestamp, reversible)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                method, confidence, reasoning, cost, timestamp, reversible,
+                vault_note_path)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 asset_id,
                 package_id,
@@ -406,6 +421,7 @@ class OpsDB:
                 cost,
                 self._now(),
                 1 if reversible else 0,
+                vault_note_path,
             ),
         )
         self.conn.commit()
