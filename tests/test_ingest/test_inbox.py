@@ -773,3 +773,65 @@ class TestRegistrationAtRouteTime:
             )
         assert action == "skipped"
 
+
+class TestContextBehavior:
+    def test_context_does_not_change_filename(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Adding context preserves original proposed name."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "RFP_Database_WMS.xlsx"
+        f.write_bytes(b"unique_rfp_content")
+
+        # Simulate: [c] adds context, then [a] accepts
+        call_count = [0]
+
+        def mock_prompt_action(needs_human):
+            call_count[0] += 1
+            if call_count[0] == 1:
+                return "c"  # First: add context
+            return "a"  # Second: accept
+
+        with patch("corp_by_os.ingest.inbox._prompt_action", side_effect=mock_prompt_action):
+            with patch("corp_by_os.ingest.inbox._get_user_context", return_value="This is an RFI from the client"):
+                action = process_file(
+                    f, mywork, registry, ops, skip_extract=True,
+                )
+
+        assert action == "routed"
+        assert not f.exists()  # File was moved
+
+        # Verify filename does NOT contain context text
+        events = ops.get_recent_events(5)
+        route_events = [e for e in events if e["action"] == "ingest_inbox_route"]
+        assert len(route_events) >= 1
+        dest = route_events[0]["destination_path"]
+        assert "RFI" not in dest
+        assert "client" not in dest
+
+    def test_context_does_not_loop(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """After [c], returns to prompt. [a] proceeds normally."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "RFP_Database_WMS.xlsx"
+        f.write_bytes(b"unique_context_test")
+
+        calls = []
+
+        def mock_prompt_action(needs_human):
+            calls.append("prompt")
+            if len(calls) == 1:
+                return "c"
+            return "a"
+
+        with patch("corp_by_os.ingest.inbox._prompt_action", side_effect=mock_prompt_action):
+            with patch("corp_by_os.ingest.inbox._get_user_context", return_value="test context"):
+                action = process_file(
+                    f, mywork, registry, ops, skip_extract=True,
+                )
+
+        assert action == "routed"
+        # Prompt was called exactly twice: once for [c], once for [a]
+        assert len(calls) == 2
+

@@ -750,10 +750,7 @@ def process_file(
 
         if choice == "c":
             user_context = _get_user_context()
-            # Re-propose name with context
-            rename = propose_name(file_path, classification, user_context)
-            current_name = rename.proposed_name
-            _present_file(classification, rename)
+            # Context stored for extraction, does NOT change filename
             continue
 
         if choice == "e":
