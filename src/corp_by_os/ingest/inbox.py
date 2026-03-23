@@ -99,28 +99,42 @@ def _present_file(
     console.print(Panel("\n".join(lines), border_style="blue"))
 
 
-def _prompt_action(needs_human: bool) -> str:
-    """Show action menu and get user choice."""
+def _prompt_action(needs_human: bool, has_destination: bool = True) -> str:
+    """Show action menu and get user choice.
+
+    When needs_human=True and has_destination=False (no match, no override),
+    [a]ccept is hidden — user must set destination first via [d].
+    """
+    if needs_human and not has_destination:
+        console.print(
+            "[yellow]No match — set a destination with [d] or add [c]ontext.[/yellow]"
+        )
+        console.print(
+            "  [bold][d][/bold]estination  "
+            "[bold][c][/bold]ontext  "
+            "[bold][s][/bold]kip  "
+            "[bold][q][/bold]uit"
+        )
+        return Prompt.ask(">", choices=["d", "c", "s", "q"], default="d")
+
     if needs_human:
         console.print(
             "[yellow]Low confidence — please confirm or override.[/yellow]"
         )
 
     console.print(
-        "[bold][a][/bold] Accept  "
-        "[bold][e][/bold] Edit name  "
-        "[bold][d][/bold] Different destination  "
-        "[bold][c][/bold] Add context  "
-        "[bold][s][/bold] Skip  "
-        "[bold][q][/bold] Quit"
+        "  [bold][a][/bold]ccept  "
+        "[bold][e][/bold]dit name  "
+        "[bold][d][/bold]estination  "
+        "[bold][c][/bold]ontext  "
+        "[bold][s][/bold]kip  "
+        "[bold][q][/bold]uit"
     )
-
-    choice = Prompt.ask(
+    return Prompt.ask(
         ">",
         choices=["a", "e", "d", "c", "s", "q"],
-        default="a" if not needs_human else "c",
+        default="a" if not needs_human else "d",
     )
-    return choice
 
 
 def _get_user_context() -> str:
@@ -763,7 +777,10 @@ def process_file(
     current_name = rename.proposed_name
 
     while True:
-        choice = _prompt_action(classification.needs_human)
+        choice = _prompt_action(
+            classification.needs_human,
+            has_destination=current_dest is not None,
+        )
 
         if choice == "q":
             return "quit"

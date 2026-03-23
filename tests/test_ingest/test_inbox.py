@@ -15,6 +15,7 @@ from corp_by_os.ingest.inbox import (
     _list_events,
     _log_ingest_event,
     _move_file,
+    _prompt_action,
     _register_file,
     _scan_inbox_files,
     _undo_event,
@@ -787,7 +788,7 @@ class TestContextBehavior:
         # Simulate: [c] adds context, then [a] accepts
         call_count = [0]
 
-        def mock_prompt_action(needs_human):
+        def mock_prompt_action(needs_human, has_destination=True):
             call_count[0] += 1
             if call_count[0] == 1:
                 return "c"  # First: add context
@@ -820,7 +821,7 @@ class TestContextBehavior:
 
         calls = []
 
-        def mock_prompt_action(needs_human):
+        def mock_prompt_action(needs_human, has_destination=True):
             calls.append("prompt")
             if len(calls) == 1:
                 return "c"
@@ -877,4 +878,37 @@ class TestCustomDestination:
             result = _get_custom_destination(mywork)
 
         assert result is None
+
+
+class TestPromptAction:
+    def test_low_confidence_no_dest_hides_accept(self) -> None:
+        """Unclassified files with no destination don't show [a]ccept."""
+        with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
+            mock_prompt.ask.return_value = "d"
+            result = _prompt_action(needs_human=True, has_destination=False)
+        assert result == "d"
+        # Verify [a] was NOT in the choices
+        call_args = mock_prompt.ask.call_args
+        assert "a" not in call_args.kwargs.get("choices", call_args[1].get("choices", []))
+
+    def test_low_confidence_with_dest_shows_accept(self) -> None:
+        """After destination is set, [a]ccept is available."""
+        with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
+            mock_prompt.ask.return_value = "a"
+            result = _prompt_action(needs_human=True, has_destination=True)
+        assert result == "a"
+        call_args = mock_prompt.ask.call_args
+        assert "a" in call_args.kwargs.get("choices", call_args[1].get("choices", []))
+
+    def test_high_confidence_shows_all_options(self) -> None:
+        """Normal files show all options including [a]ccept."""
+        with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
+            mock_prompt.ask.return_value = "a"
+            result = _prompt_action(needs_human=False, has_destination=True)
+        assert result == "a"
+        call_args = mock_prompt.ask.call_args
+        choices = call_args.kwargs.get("choices", call_args[1].get("choices", []))
+        assert "a" in choices
+        assert "e" in choices
+        assert "d" in choices
 
