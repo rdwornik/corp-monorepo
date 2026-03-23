@@ -121,7 +121,7 @@ class FileRegistry:
         """Get all extractions for a file, newest first."""
         rows = self.conn.execute(
             "SELECT * FROM extractions WHERE file_id = ? "
-            "ORDER BY extracted_at DESC",
+            "ORDER BY extraction_id DESC",
             (file_id,),
         ).fetchall()
         return [self._row_to_extraction(r) for r in rows]
@@ -130,7 +130,7 @@ class FileRegistry:
         """Get most recent extraction for a file."""
         row = self.conn.execute(
             "SELECT * FROM extractions WHERE file_id = ? "
-            "ORDER BY extracted_at DESC LIMIT 1",
+            "ORDER BY extraction_id DESC LIMIT 1",
             (file_id,),
         ).fetchone()
         if row is None:
