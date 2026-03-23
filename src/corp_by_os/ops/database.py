@@ -83,6 +83,32 @@ CREATE TABLE IF NOT EXISTS ingest_events (
 CREATE INDEX IF NOT EXISTS idx_events_asset ON ingest_events(asset_id);
 CREATE INDEX IF NOT EXISTS idx_events_timestamp ON ingest_events(timestamp);
 
+-- File registry: content-hash-based file identity (survives path changes)
+CREATE TABLE IF NOT EXISTS files (
+    file_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    content_hash  TEXT NOT NULL UNIQUE,
+    original_name TEXT NOT NULL,
+    current_path  TEXT,
+    size_bytes    INTEGER,
+    first_seen_at TEXT NOT NULL,
+    last_seen_at  TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_files_hash ON files(content_hash);
+CREATE INDEX IF NOT EXISTS idx_files_path ON files(current_path);
+
+-- Extraction history: tracks which models extracted which files
+CREATE TABLE IF NOT EXISTS extractions (
+    extraction_id  INTEGER PRIMARY KEY AUTOINCREMENT,
+    file_id        INTEGER NOT NULL REFERENCES files(file_id),
+    model          TEXT NOT NULL,
+    extracted_at   TEXT NOT NULL,
+    vault_note_path TEXT,
+    cost_cents     INTEGER
+);
+
+CREATE INDEX IF NOT EXISTS idx_extractions_file ON extractions(file_id);
+
 -- Registry suggestions: auto-discovered patterns from scans
 CREATE TABLE IF NOT EXISTS registry_suggestions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
