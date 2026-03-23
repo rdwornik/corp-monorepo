@@ -2258,6 +2258,43 @@ def ingest_inbox_command(
     ops.close()
 
 
+@cli.command("files-stats")
+def files_stats_command() -> None:
+    """Show file registry statistics."""
+    from corp_by_os.ops.database import OpsDB
+
+    ops = OpsDB()
+    conn = ops.conn
+
+    total_files = conn.execute("SELECT COUNT(*) FROM files").fetchone()[0]
+    total_extractions = conn.execute(
+        "SELECT COUNT(*) FROM extractions"
+    ).fetchone()[0]
+    extracted = conn.execute(
+        "SELECT COUNT(DISTINCT file_id) FROM extractions"
+    ).fetchone()[0]
+    never_extracted = total_files - extracted
+    total_cost = conn.execute(
+        "SELECT COALESCE(SUM(cost_cents), 0) FROM extractions"
+    ).fetchone()[0]
+
+    table = Table(title="File Registry")
+    table.add_column("Metric", style="bold")
+    table.add_column("Value", justify="right")
+
+    table.add_row("Files known", str(total_files))
+    table.add_row("Extracted", str(extracted))
+    table.add_row("Never extracted", str(never_extracted))
+    table.add_row(
+        "Total extractions",
+        f"{total_extractions}  [dim](including re-extractions)[/dim]",
+    )
+    table.add_row("Total cost", f"${total_cost / 100:.2f}")
+
+    console.print(table)
+    ops.close()
+
+
 @cli.command("finalize")
 @click.option("--approve-all", is_flag=True, help="Move all staged files to final destinations")
 def finalize_command(approve_all: bool) -> None:
