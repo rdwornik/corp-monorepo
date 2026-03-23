@@ -11,6 +11,7 @@ import yaml
 from corp_by_os.ingest.inbox import (
     _check_dedup,
     _full_revert,
+    _get_custom_destination,
     _list_events,
     _log_ingest_event,
     _move_file,
@@ -834,4 +835,46 @@ class TestContextBehavior:
         assert action == "routed"
         # Prompt was called exactly twice: once for [c], once for [a]
         assert len(calls) == 2
+
+
+class TestCustomDestination:
+    def test_destination_override_sets_path(self, mywork: Path) -> None:
+        """[d] with valid path returns the path."""
+        dest_dir = mywork / "10_Projects" / "TestProject"
+        dest_dir.mkdir(parents=True)
+
+        with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
+            mock_prompt.ask.return_value = "10_Projects/TestProject"
+            result = _get_custom_destination(mywork)
+
+        assert result == "10_Projects/TestProject"
+
+    def test_destination_creates_folder(self, mywork: Path) -> None:
+        """[d] with new path and [y] creates the folder."""
+        with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
+            # First ask: path input. Second ask: create confirmation.
+            mock_prompt.ask.side_effect = [
+                "10_Projects/NewProject",
+                "y",
+            ]
+            result = _get_custom_destination(mywork)
+
+        assert result == "10_Projects/NewProject"
+        assert (mywork / "10_Projects" / "NewProject").exists()
+
+    def test_destination_create_declined(self, mywork: Path) -> None:
+        """[d] with new path and [n] cancels."""
+        with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
+            mock_prompt.ask.side_effect = ["10_Projects/Nope", "n"]
+            result = _get_custom_destination(mywork)
+
+        assert result is None
+
+    def test_destination_empty_cancels(self, mywork: Path) -> None:
+        """[d] with empty input returns None."""
+        with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
+            mock_prompt.ask.return_value = ""
+            result = _get_custom_destination(mywork)
+
+        assert result is None
 

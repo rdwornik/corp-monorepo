@@ -133,13 +133,37 @@ def _get_user_context() -> str:
     return context
 
 
-def _get_custom_destination() -> str:
-    """Prompt for a custom destination path."""
+def _get_custom_destination(mywork_root: Path | None = None) -> str | None:
+    """Prompt for a custom destination path.
+
+    Validates path exists or offers to create it.
+    Returns the destination string, or None if cancelled.
+    """
     console.print(
-        "\n[bold]Destination path[/bold] (relative to MyWork root, e.g. 30_Reference/Training/):"
+        "\n[bold]Destination path[/bold] (relative to MyWork, "
+        "e.g. 10_Projects/Jaguar_Land_Rover_TMS_WMS_OMS):"
     )
-    dest = Prompt.ask(">")
-    return dest.strip().rstrip("/")
+    dest = Prompt.ask(">").strip().rstrip("/")
+    if not dest:
+        console.print("  [dim]Cancelled.[/dim]")
+        return None
+
+    if mywork_root:
+        full_path = mywork_root / dest
+        if not full_path.exists():
+            create = Prompt.ask(
+                f"  [yellow]{dest}[/yellow] doesn't exist. Create?",
+                choices=["y", "n"],
+                default="y",
+            )
+            if create == "y":
+                full_path.mkdir(parents=True, exist_ok=True)
+                console.print(f"  [green]Created: {dest}[/green]")
+            else:
+                console.print("  [dim]Cancelled.[/dim]")
+                return None
+
+    return dest
 
 
 def _get_custom_name(current: str) -> str:
@@ -758,7 +782,9 @@ def process_file(
             continue
 
         if choice == "d":
-            current_dest = _get_custom_destination()
+            new_dest = _get_custom_destination(mywork_root)
+            if new_dest is not None:
+                current_dest = new_dest
             continue
 
         if choice == "a":
