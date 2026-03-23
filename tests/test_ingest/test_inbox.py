@@ -9,14 +9,12 @@ import pytest
 import yaml
 
 from corp_by_os.ingest.inbox import (
-    _check_already_extracted,
     _full_revert,
     _list_events,
     _log_ingest_event,
     _move_file,
     _scan_inbox_files,
     _undo_event,
-    _update_source_path_in_index,
     process_file,
 )
 from corp_by_os.ops.database import OpsDB
@@ -641,106 +639,3 @@ class TestVaultNotePathStored:
         assert row["vault_note_path"] is None
 
 
-class TestDedupBeforeExtraction:
-    """Dedup uses content hash (SHA256), not path. Files move often."""
-
-    def test_check_no_index(self, tmp_path: Path) -> None:
-        """Returns None when index.db doesn't exist."""
-        result = _check_already_extracted(
-            "abc123", index_path=tmp_path / "nonexistent" / "index.db"
-        )
-        assert result is None
-
-    def test_check_found_by_hash(self, tmp_path: Path) -> None:
-        """Returns extraction info when source_hash matches."""
-        import sqlite3
-
-        db_path = tmp_path / "index.db"
-        conn = sqlite3.connect(str(db_path))
-        conn.execute(
-            "CREATE TABLE notes (id INTEGER PRIMARY KEY, source_hash TEXT, "
-            "source_path TEXT, note_path TEXT, model TEXT, "
-            "title TEXT NOT NULL, project_id TEXT NOT NULL)"
-        )
-        conn.execute(
-            "INSERT INTO notes (source_hash, source_path, note_path, model, "
-            "title, project_id) VALUES (?, ?, ?, ?, ?, ?)",
-            ("deadbeef", "C:/old/path.pptx", "01_Knowledge/pkg",
-             "gemini-3-flash", "Test", "test"),
-        )
-        conn.commit()
-        conn.close()
-
-        result = _check_already_extracted("deadbeef", index_path=db_path)
-        assert result is not None
-        assert result.note_path == "01_Knowledge/pkg"
-        assert result.source_path == "C:/old/path.pptx"
-        assert result.model == "gemini-3-flash"
-
-    def test_check_not_found(self, tmp_path: Path) -> None:
-        """Returns None when no matching hash."""
-        import sqlite3
-
-        db_path = tmp_path / "index.db"
-        conn = sqlite3.connect(str(db_path))
-        conn.execute(
-            "CREATE TABLE notes (id INTEGER PRIMARY KEY, source_hash TEXT, "
-            "note_path TEXT, source_path TEXT, model TEXT, "
-            "title TEXT NOT NULL, project_id TEXT NOT NULL)"
-        )
-        conn.commit()
-        conn.close()
-
-        result = _check_already_extracted("no_match", index_path=db_path)
-        assert result is None
-
-    def test_check_different_hash_not_matched(self, tmp_path: Path) -> None:
-        """Different hash = different file, even if path is same."""
-        import sqlite3
-
-        db_path = tmp_path / "index.db"
-        conn = sqlite3.connect(str(db_path))
-        conn.execute(
-            "CREATE TABLE notes (id INTEGER PRIMARY KEY, source_hash TEXT, "
-            "source_path TEXT, note_path TEXT, model TEXT, "
-            "title TEXT NOT NULL, project_id TEXT NOT NULL)"
-        )
-        conn.execute(
-            "INSERT INTO notes (source_hash, source_path, note_path, "
-            "title, project_id) VALUES (?, ?, ?, ?, ?)",
-            ("hash_v1", "C:/same/path.pptx", "01_Knowledge/old", "V1", "t"),
-        )
-        conn.commit()
-        conn.close()
-
-        # New hash (content changed) — should NOT match
-        result = _check_already_extracted("hash_v2", index_path=db_path)
-        assert result is None
-
-    def test_update_source_path(self, tmp_path: Path) -> None:
-        """Path update writes new source_path for matching hash."""
-        import sqlite3
-
-        db_path = tmp_path / "index.db"
-        conn = sqlite3.connect(str(db_path))
-        conn.execute(
-            "CREATE TABLE notes (id INTEGER PRIMARY KEY, source_hash TEXT, "
-            "source_path TEXT, note_path TEXT, "
-            "title TEXT NOT NULL, project_id TEXT NOT NULL)"
-        )
-        conn.execute(
-            "INSERT INTO notes (source_hash, source_path, note_path, "
-            "title, project_id) VALUES (?, ?, ?, ?, ?)",
-            ("abc", "C:/old/path.pptx", "01_Knowledge/pkg", "T", "t"),
-        )
-        conn.commit()
-        conn.close()
-
-        _update_source_path_in_index("abc", "C:/new/path.pptx", index_path=db_path)
-
-        conn = sqlite3.connect(str(db_path))
-        row = conn.execute(
-            "SELECT source_path FROM notes WHERE source_hash = 'abc'"
-        ).fetchone()
-        conn.close()
-        assert row[0] == "C:/new/path.pptx"

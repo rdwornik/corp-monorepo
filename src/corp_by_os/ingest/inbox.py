@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import logging
 import shutil
-from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
@@ -247,79 +246,6 @@ def _log_ingest_event(
     return event_id
 
 
-@dataclass
-class _ExistingExtraction:
-    """Info about an existing extraction found by hash lookup."""
-
-    note_path: str
-    source_path: str | None
-    model: str | None
-
-
-def _check_already_extracted(
-    content_hash: str,
-    index_path: Path | None = None,
-) -> _ExistingExtraction | None:
-    """Check if a note already exists in the index for this content hash.
-
-    File identity = content hash (SHA256). Path is metadata that can change.
-    Returns extraction info if found, None otherwise.
-    """
-    import sqlite3
-
-    if index_path is None:
-        from corp_by_os.index_builder import get_index_path
-
-        index_path = get_index_path()
-
-    if not index_path.exists():
-        return None
-
-    try:
-        conn = sqlite3.connect(str(index_path))
-        row = conn.execute(
-            "SELECT note_path, source_path, model FROM notes "
-            "WHERE source_hash = ? LIMIT 1",
-            (content_hash,),
-        ).fetchone()
-        conn.close()
-        if row:
-            return _ExistingExtraction(
-                note_path=row[0],
-                source_path=row[1],
-                model=row[2],
-            )
-    except Exception:
-        pass
-
-    return None
-
-
-def _update_source_path_in_index(
-    content_hash: str,
-    new_path: str,
-    index_path: Path | None = None,
-) -> None:
-    """Update source_path in index when file has moved."""
-    import sqlite3
-
-    if index_path is None:
-        from corp_by_os.index_builder import get_index_path
-
-        index_path = get_index_path()
-
-    try:
-        conn = sqlite3.connect(str(index_path))
-        conn.execute(
-            "UPDATE notes SET source_path = ? WHERE source_hash = ?",
-            (new_path, content_hash),
-        )
-        conn.commit()
-        conn.close()
-    except Exception:
-        pass
-
-
 def _remove_vault_package(vault_note_path: str) -> None:
     """Remove existing vault package to make way for re-extraction."""
     from corp_by_os.config import get_config
@@ -335,6 +261,33 @@ def _remove_vault_package(vault_note_path: str) -> None:
         console.print(f"  [yellow]Removed: {vault_note_path}[/yellow]")
 
 
+def _read_model_from_vault_note(
+    vault_note_path: str,
+    vault_root: Path,
+) -> str | None:
+    """Read model field from vault note frontmatter."""
+    import yaml
+
+    note_dir = vault_root / vault_note_path.replace("/", "\\")
+    # CKE output may be a directory with extract/*.md or a direct .md file
+    search_dirs = [note_dir / "extract", note_dir]
+    for search in search_dirs:
+        if not search.exists():
+            continue
+        for md_file in search.glob("*.md"):
+            try:
+                text = md_file.read_text(encoding="utf-8", errors="replace")
+                if text.startswith("---"):
+                    end = text.find("---", 3)
+                    if end > 0:
+                        fm = yaml.safe_load(text[3:end])
+                        if fm and "model" in fm:
+                            return fm["model"]
+            except Exception:
+                continue
+    return None
+
+
 def _trigger_extraction(
     file_path: Path,
     mywork_root: Path,
@@ -346,69 +299,70 @@ def _trigger_extraction(
 ) -> bool:
     """Trigger CKE extraction on the routed file. Returns True if successful.
 
-    If event_id is provided and extraction succeeds, the vault_note_path
-    is stored on the event for full undo support.
-
-    Dedup: checks by content hash (SHA256), not path. Files move often.
+    Uses FileRegistry (ops.db) for dedup by content hash.
+    Records extraction with model and cost after success.
+    Auto mode NEVER re-extracts — that's a conscious human decision.
     """
+    from corp_by_os.ops.file_registry import FileRegistry
+
     try:
         from corp_by_os.ingest.router import _run_extraction
 
         content_hash = compute_file_hash(file_path)
+        source_path = str(file_path.resolve()).replace("\\", "/")
 
-        # Dedup check by content hash
-        existing = _check_already_extracted(content_hash)
-        if existing:
-            current_path = str(file_path.resolve()).replace("\\", "/")
-            path_changed = current_path != (existing.source_path or "")
+        # 1. Register file in registry (upsert by hash)
+        registry = FileRegistry(ops.conn)
+        file_record = registry.register_file(
+            content_hash=content_hash,
+            filename=file_path.name,
+            path=source_path,
+            size_bytes=file_path.stat().st_size,
+        )
 
+        # 2. Check for existing extractions
+        latest = registry.latest_extraction(file_record.file_id)
+
+        if latest:
             if auto:
-                # Auto mode: never re-extract, just update path if moved
-                if path_changed:
-                    _update_source_path_in_index(content_hash, current_path)
-                    console.print(f"  [dim]AUTO: Path updated in index.[/dim]")
-                else:
-                    console.print(
-                        f"  [dim]Already extracted, skipping: {existing.note_path}[/dim]"
-                    )
+                console.print(
+                    f"  [dim]Already extracted, skipping: "
+                    f"{latest.vault_note_path}[/dim]"
+                )
                 return True
 
-            # Interactive mode: show existing info + choices
+            # Interactive: show existing info + choices
             console.print(
-                f"  [yellow]Already extracted:[/yellow] {existing.note_path}"
+                f"  [yellow]Already extracted:[/yellow] "
+                f"{latest.vault_note_path}"
             )
-            if existing.model:
-                console.print(f"  [dim]Model: {existing.model}[/dim]")
-            if path_changed:
-                console.print(
-                    f"  [dim]Path changed: {existing.source_path} → {current_path}[/dim]"
-                )
+            console.print(
+                f"  [dim]Model: {latest.model} | "
+                f"Date: {latest.extracted_at}[/dim]"
+            )
 
-            choices = ["s", "r"]
-            help_text = "  [bold][s][/bold]kip  [bold][r][/bold]e-extract"
-            if path_changed:
-                choices.append("u")
-                help_text += "  [bold][u][/bold]pdate path"
-
-            console.print(help_text)
-            answer = Prompt.ask(">", choices=choices, default="s")
+            console.print(
+                "  [bold][s][/bold]kip  [bold][r][/bold]e-extract"
+            )
+            answer = Prompt.ask(">", choices=["s", "r"], default="s")
 
             if answer == "s":
                 console.print("  [dim]Skipped — existing note kept.[/dim]")
                 return True
-            elif answer == "u":
-                _update_source_path_in_index(content_hash, current_path)
-                console.print("  [dim]Path updated in index.[/dim]")
-                return True
             elif answer == "r":
-                console.print("  [dim]Removing old extraction...[/dim]")
-                _remove_vault_package(existing.note_path)
+                if latest.vault_note_path:
+                    console.print("  [dim]Removing old extraction...[/dim]")
+                    _remove_vault_package(latest.vault_note_path)
+                # Fall through to extraction below
+
+        # 3. Run extraction
         mtime_str = datetime.fromtimestamp(
             file_path.stat().st_mtime
         ).isoformat(timespec="seconds")
 
-        # Get asset_id for the file at its new location
-        rel_path = str(file_path.relative_to(mywork_root.resolve())).replace("\\", "/")
+        rel_path = str(
+            file_path.relative_to(mywork_root.resolve())
+        ).replace("\\", "/")
         asset = ops.get_asset(rel_path)
         asset_id = asset["id"] if asset else None
 
@@ -419,6 +373,23 @@ def _trigger_extraction(
 
         if vault_note:
             console.print(f"  [green]Extracted → {vault_note}[/green]")
+
+            # 4. Record extraction in registry
+            from corp_by_os.config import get_config
+
+            cfg = get_config()
+            model = (
+                _read_model_from_vault_note(vault_note, cfg.vault_path)
+                or "unknown"
+            )
+            cost_cents = int(cost * 100) if cost else None
+            registry.record_extraction(
+                file_id=file_record.file_id,
+                model=model,
+                vault_note_path=vault_note,
+                cost_cents=cost_cents,
+            )
+
             # Store vault path on the event for full undo
             if event_id is not None:
                 ops.conn.execute(
