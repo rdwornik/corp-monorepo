@@ -139,22 +139,25 @@ class TestInferTopic:
         c = classify(f, registry)
         assert _infer_topic(c) == "PLATFORM"
 
-    def test_topic_from_user_context(
+    def test_user_context_ignored_for_topic(
         self, tmp_path: Path, registry: ContentRegistry
     ) -> None:
+        """user_context is extraction hint, not naming source."""
         f = tmp_path / "some_file.pdf"
         f.write_bytes(b"x" * 100)
         c = classify(f, registry)
-        assert _infer_topic(c, "This is about WMS warehouse management") == "WMS"
+        # Context mentions WMS but should NOT influence topic code
+        assert _infer_topic(c, "This is about WMS warehouse management") == "GEN"
 
-    def test_user_context_overrides_metadata(
+    def test_metadata_determines_topic(
         self, tmp_path: Path, registry: ContentRegistry
     ) -> None:
+        """Topic comes from classification metadata, not user context."""
         f = tmp_path / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"x" * 100)
         c = classify(f, registry)
-        # User context says WMS, metadata says Cognitive Planning -> user wins
-        assert _infer_topic(c, "WMS implementation details") == "WMS"
+        # Metadata says Cognitive Planning → PLATFORM, context is ignored
+        assert _infer_topic(c, "WMS implementation details") == "PLATFORM"
 
     def test_gen_fallback(
         self, tmp_path: Path, registry: ContentRegistry
@@ -211,15 +214,17 @@ class TestProposeName:
         result = propose_name(f, c)
         assert "LENZING" in result.proposed_name
 
-    def test_rename_with_user_context(
+    def test_rename_ignores_user_context(
         self, tmp_path: Path, registry: ContentRegistry
     ) -> None:
-        """User context used for description."""
+        """Proposed name uses original filename, not user context."""
         f = tmp_path / "slide_deck.pptx"
         f.write_bytes(b"x" * 100)
         c = classify(f, registry)
         result = propose_name(f, c, user_context="WMS warehouse architecture overview")
-        assert "WMS" in result.proposed_name
+        # Context should NOT appear in the filename
+        assert "warehouse" not in result.proposed_name.lower()
+        assert "slide_deck" in result.proposed_name
 
     def test_long_name_truncated(
         self, tmp_path: Path, registry: ContentRegistry

@@ -99,14 +99,11 @@ def _infer_type(classification: Classification) -> str:
 
 
 def _infer_topic(classification: Classification, user_context: str | None = None) -> str:
-    """Infer topic code from classification or user context."""
-    # Check user context first (most specific)
-    if user_context:
-        context_lower = user_context.lower()
-        for keyword, code in _TOPIC_MAP.items():
-            if keyword in context_lower:
-                return code
+    """Infer topic code from classification metadata.
 
+    user_context is accepted for API compat but ignored — context is an
+    extraction hint, not a naming source. Topic comes from classification.
+    """
     # Check metadata topics
     if classification.best_match:
         meta = classification.best_match.metadata
@@ -142,16 +139,12 @@ def _extract_description(
     series_id: str | None,
     user_context: str | None,
 ) -> str:
-    """Extract a description from the original filename or user context."""
-    # Strip extension
+    """Extract a description from the original filename.
+
+    user_context is an extraction hint, NOT a rename source.
+    The filename always comes from the original file.
+    """
     stem = Path(filename).stem
-
-    # If user provided context, use first few words
-    if user_context:
-        words = user_context.split()[:6]
-        return _sanitize("_".join(words))
-
-    # Use the original stem, sanitized
     return _sanitize(stem)
 
 
