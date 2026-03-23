@@ -288,20 +288,85 @@ def _read_model_from_vault_note(
     return None
 
 
+def _check_dedup(
+    file_path: Path,
+    ops: OpsDB,
+    *,
+    auto: bool = False,
+) -> str | None:
+    """Check if file is already known and extracted. Call BEFORE move.
+
+    Returns:
+        None       — proceed with route + extract
+        "skip"     — file already handled, skip entirely
+        "no_extract" — route the file but skip extraction (re-extract declined)
+    """
+    from corp_by_os.ops.file_registry import FileRegistry
+
+    content_hash = compute_file_hash(file_path)
+    registry = FileRegistry(ops.conn)
+    file_record = registry.get_by_hash(content_hash)
+
+    if file_record is None:
+        return None  # New file, proceed normally
+
+    latest = registry.latest_extraction(file_record.file_id)
+    if latest is None:
+        return None  # Known file but never extracted, proceed
+
+    # File is known AND extracted
+    if auto:
+        console.print(
+            f"  [dim]Already extracted, skipping: {latest.vault_note_path}[/dim]"
+        )
+        return "skip"
+
+    # Interactive: show what exists
+    console.print(
+        f"  [yellow]Already extracted:[/yellow] {latest.vault_note_path}"
+    )
+    console.print(
+        f"  [dim]Model: {latest.model} | Date: {latest.extracted_at}[/dim]"
+    )
+    console.print("  [bold][s][/bold]kip  [bold][r][/bold]e-extract")
+    answer = Prompt.ask(">", choices=["s", "r"], default="s")
+
+    if answer == "s":
+        console.print("  [dim]Skipped — existing note kept.[/dim]")
+        return "skip"
+
+    # User chose re-extract: remove old vault package
+    if latest.vault_note_path:
+        console.print("  [dim]Removing old extraction...[/dim]")
+        _remove_vault_package(latest.vault_note_path)
+    return None  # Proceed with route + extract
+
+
+def _register_file(file_path: Path, ops: OpsDB) -> None:
+    """Register a routed file in the FileRegistry. Call AFTER move."""
+    from corp_by_os.ops.file_registry import FileRegistry
+
+    content_hash = compute_file_hash(file_path)
+    source_path = str(file_path.resolve()).replace("\\", "/")
+    registry = FileRegistry(ops.conn)
+    registry.register_file(
+        content_hash=content_hash,
+        filename=file_path.name,
+        path=source_path,
+        size_bytes=file_path.stat().st_size,
+    )
+
+
 def _trigger_extraction(
     file_path: Path,
     mywork_root: Path,
     ops: OpsDB,
     user_context: str | None,
     event_id: int | None = None,
-    *,
-    auto: bool = False,
 ) -> bool:
-    """Trigger CKE extraction on the routed file. Returns True if successful.
+    """Run CKE extraction and record result in FileRegistry.
 
-    Uses FileRegistry (ops.db) for dedup by content hash.
-    Records extraction with model and cost after success.
-    Auto mode NEVER re-extracts — that's a conscious human decision.
+    Assumes file is already registered and dedup was checked earlier.
     """
     from corp_by_os.ops.file_registry import FileRegistry
 
@@ -309,53 +374,6 @@ def _trigger_extraction(
         from corp_by_os.ingest.router import _run_extraction
 
         content_hash = compute_file_hash(file_path)
-        source_path = str(file_path.resolve()).replace("\\", "/")
-
-        # 1. Register file in registry (upsert by hash)
-        registry = FileRegistry(ops.conn)
-        file_record = registry.register_file(
-            content_hash=content_hash,
-            filename=file_path.name,
-            path=source_path,
-            size_bytes=file_path.stat().st_size,
-        )
-
-        # 2. Check for existing extractions
-        latest = registry.latest_extraction(file_record.file_id)
-
-        if latest:
-            if auto:
-                console.print(
-                    f"  [dim]Already extracted, skipping: "
-                    f"{latest.vault_note_path}[/dim]"
-                )
-                return True
-
-            # Interactive: show existing info + choices
-            console.print(
-                f"  [yellow]Already extracted:[/yellow] "
-                f"{latest.vault_note_path}"
-            )
-            console.print(
-                f"  [dim]Model: {latest.model} | "
-                f"Date: {latest.extracted_at}[/dim]"
-            )
-
-            console.print(
-                "  [bold][s][/bold]kip  [bold][r][/bold]e-extract"
-            )
-            answer = Prompt.ask(">", choices=["s", "r"], default="s")
-
-            if answer == "s":
-                console.print("  [dim]Skipped — existing note kept.[/dim]")
-                return True
-            elif answer == "r":
-                if latest.vault_note_path:
-                    console.print("  [dim]Removing old extraction...[/dim]")
-                    _remove_vault_package(latest.vault_note_path)
-                # Fall through to extraction below
-
-        # 3. Run extraction
         mtime_str = datetime.fromtimestamp(
             file_path.stat().st_mtime
         ).isoformat(timespec="seconds")
@@ -374,7 +392,7 @@ def _trigger_extraction(
         if vault_note:
             console.print(f"  [green]Extracted → {vault_note}[/green]")
 
-            # 4. Record extraction in registry
+            # Record extraction in registry
             from corp_by_os.config import get_config
 
             cfg = get_config()
@@ -383,12 +401,15 @@ def _trigger_extraction(
                 or "unknown"
             )
             cost_cents = int(cost * 100) if cost else None
-            registry.record_extraction(
-                file_id=file_record.file_id,
-                model=model,
-                vault_note_path=vault_note,
-                cost_cents=cost_cents,
-            )
+            registry = FileRegistry(ops.conn)
+            file_record = registry.get_by_hash(content_hash)
+            if file_record:
+                registry.record_extraction(
+                    file_id=file_record.file_id,
+                    model=model,
+                    vault_note_path=vault_note,
+                    cost_cents=cost_cents,
+                )
 
             # Store vault path on the event for full undo
             if event_id is not None:
@@ -637,6 +658,12 @@ def process_file(
 
     Actions: 'routed', 'skipped', 'quit'
     """
+    # Step 0: Dedup check BEFORE classify/move (by content hash)
+    dedup = _check_dedup(file_path, ops, auto=auto)
+    if dedup == "skip":
+        return "skipped"
+    # dedup == None means proceed; dedup is never "no_extract" from _check_dedup
+
     # Step 1-2: Detect + Classify
     fallback = registry.get_fallback_config()
     threshold = fallback.get("confidence_threshold", 0.75)
@@ -657,6 +684,7 @@ def process_file(
 
         dest = classification.best_match.destination
         final_path = _move_file(file_path, dest, rename.proposed_name, mywork_root)
+        _register_file(final_path, ops)
         event_id = _log_ingest_event(
             ops, file_path, final_path, mywork_root,
             classification, file_path.name, rename.proposed_name,
@@ -667,7 +695,7 @@ def process_file(
         )
         if not skip_extract:
             _trigger_extraction(
-                final_path, mywork_root, ops, None, event_id=event_id, auto=True
+                final_path, mywork_root, ops, None, event_id=event_id
             )
         return "routed"
 
@@ -721,7 +749,7 @@ def process_file(
                 )
                 return "routed"
 
-            # Execute: move + log + extract
+            # Execute: move + register + log + extract
             try:
                 final_path = _move_file(
                     file_path, current_dest, current_name, mywork_root
@@ -729,6 +757,8 @@ def process_file(
             except OSError as exc:
                 console.print(f"[red]Move failed: {exc}[/red]")
                 continue
+
+            _register_file(final_path, ops)
 
             event_id = _log_ingest_event(
                 ops, file_path, final_path, mywork_root,

@@ -9,15 +9,18 @@ import pytest
 import yaml
 
 from corp_by_os.ingest.inbox import (
+    _check_dedup,
     _full_revert,
     _list_events,
     _log_ingest_event,
     _move_file,
+    _register_file,
     _scan_inbox_files,
     _undo_event,
     process_file,
 )
 from corp_by_os.ops.database import OpsDB
+from corp_by_os.ops.file_registry import FileRegistry
 from corp_by_os.ops.registry import ContentRegistry
 
 
@@ -638,4 +641,113 @@ class TestVaultNotePathStored:
         ).fetchone()
         assert row["vault_note_path"] is None
 
+
+class TestRegistrationAtRouteTime:
+    """Files must be registered in FileRegistry at route time, not extraction."""
+
+    def test_skip_extract_still_registers(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """--skip-extract routes file AND registers it in files table."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "Cognitive_Friday_S4.pptx"
+        f.write_bytes(b"x" * 100)
+
+        action = process_file(
+            f, mywork, registry, ops, auto=True, skip_extract=True,
+        )
+        assert action == "routed"
+
+        # File should be in files table
+        fr = FileRegistry(ops.conn)
+        count = ops.conn.execute("SELECT COUNT(*) FROM files").fetchone()[0]
+        assert count == 1, f"Expected 1 file in registry, got {count}"
+
+    def test_second_ingest_fires_dedup(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Same file ingested twice → second time dedup fires."""
+        inbox = mywork / "00_Inbox"
+        content = b"x" * 100
+
+        # First ingest: route + register (skip extract)
+        f1 = inbox / "Cognitive_Friday_S4.pptx"
+        f1.write_bytes(content)
+        process_file(f1, mywork, registry, ops, auto=True, skip_extract=True)
+
+        # Record a fake extraction so dedup has something to match
+        fr = FileRegistry(ops.conn)
+        file_rec = ops.conn.execute("SELECT file_id FROM files").fetchone()
+        fr.record_extraction(file_rec[0], "test-model", "01_Knowledge/test")
+
+        # Second ingest: same content, dedup should fire (auto → skip)
+        f2 = inbox / "Cognitive_Friday_S4_copy.pptx"
+        f2.write_bytes(content)  # Same hash
+        action = process_file(
+            f2, mywork, registry, ops, auto=True, skip_extract=True,
+        )
+        assert action == "skipped"
+
+    def test_dedup_check_before_move(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Dedup skip leaves file in Inbox (not moved)."""
+        inbox = mywork / "00_Inbox"
+        content = b"unique_content_123"
+
+        # Register + fake-extract a file (use auto-matched name)
+        f1 = inbox / "Cognitive_Friday_S10.pptx"
+        f1.write_bytes(content)
+        process_file(f1, mywork, registry, ops, auto=True, skip_extract=True)
+
+        fr = FileRegistry(ops.conn)
+        file_rec = ops.conn.execute("SELECT file_id FROM files").fetchone()
+        fr.record_extraction(file_rec[0], "model-a", "01_Knowledge/pkg")
+
+        # Second file with same content
+        f2 = inbox / "Cognitive_Friday_S10_copy.pptx"
+        f2.write_bytes(content)
+        process_file(f2, mywork, registry, ops, auto=True, skip_extract=True)
+
+        # f2 should still exist in Inbox (wasn't moved)
+        assert f2.exists(), "Dedup-skipped file should stay in Inbox"
+
+    def test_new_file_not_blocked_by_dedup(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Different content → no dedup, routes normally."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "Cognitive_Friday_S4.pptx"
+        f.write_bytes(b"brand_new_content")
+
+        action = process_file(
+            f, mywork, registry, ops, auto=True, skip_extract=True,
+        )
+        assert action == "routed"
+        assert not f.exists()  # File was moved
+
+    def test_interactive_dedup_skip(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Interactive mode: user picks [s]kip on dedup → skipped."""
+        inbox = mywork / "00_Inbox"
+        content = b"dupe_content"
+
+        # First: register + fake extract (auto mode)
+        f1 = inbox / "Cognitive_Friday_S4.pptx"
+        f1.write_bytes(content)
+        process_file(f1, mywork, registry, ops, auto=True, skip_extract=True)
+        fr = FileRegistry(ops.conn)
+        file_rec = ops.conn.execute("SELECT file_id FROM files").fetchone()
+        fr.record_extraction(file_rec[0], "model-a", "01_Knowledge/pkg")
+
+        # Second: interactive, dedup prompt returns "s"
+        f2 = inbox / "Cognitive_Friday_S4_v2.pptx"
+        f2.write_bytes(content)
+        with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
+            mock_prompt.ask.return_value = "s"
+            action = process_file(
+                f2, mywork, registry, ops, skip_extract=True,
+            )
+        assert action == "skipped"
 
