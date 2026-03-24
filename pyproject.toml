@@ -36,8 +36,8 @@ ecosystem = ["corp-os-meta"]
 cke = "scripts.run:cli"
 
 [tool.setuptools.packages.find]
-where = ["src"]
-include = ["corp_knowledge_extractor*"]
+where = ["src", "."]
+include = ["corp_knowledge_extractor*", "scripts", "config"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "*.yml", "*.txt", "*.md", "*.j2"]
