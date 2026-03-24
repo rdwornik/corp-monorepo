@@ -1,0 +1,20 @@
+# Central path configuration for Corporate OS ecosystem
+# Environment variables override ALL values below
+# Format: ENV_VAR > paths.toml > defaults
+
+[paths]
+vault = "C:/Users/1028120/Documents/ObsidianVault"
+mywork = "C:/Users/1028120/Documents/MyWork"
+scripts = "C:/Users/1028120/Documents/Scripts"
+secrets = "C:/Users/1028120/Documents/.secrets/.env"
+rfp_kb = "C:/Users/1028120/Documents/corp_data/rfp_kb"
+
+[paths.databases]
+ops_db = "%LOCALAPPDATA%/corp-by-os/ops.db"
+index_db = "%LOCALAPPDATA%/corp-by-os/index.db"
+
+[safety]
+# NEVER let cleanup operations touch these paths
+excluded_paths = [
+    "OneDrive - Blue Yonder",
+]

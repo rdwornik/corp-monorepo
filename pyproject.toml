@@ -1,0 +1,25 @@
+[project]
+name = "corp-monorepo"
+version = "0.1.0"
+description = "Corporate OS — Unified knowledge management ecosystem"
+requires-python = ">=3.11"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+# Each package is installed separately via pip install -e packages/<name>
+# This root pyproject.toml is for workspace-level tooling only
+
+[tool.pytest.ini_options]
+testpaths = [
+    "packages/corp-os-meta",
+    "packages/corp-knowledge-extractor",
+    "packages/corp-by-os",
+    "packages/corp-project-extractor",
+    "tests/integration",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
