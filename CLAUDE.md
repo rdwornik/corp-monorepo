@@ -53,26 +53,27 @@ Input (file, folder, or JSON manifest)
 | File | Purpose |
 |------|---------|
 | `scripts/run.py` | Click CLI entry point (process, process-manifest, scan, reextract, info) |
-| `src/inventory.py` | Scan + classify input files |
-| `src/tier_router.py` | Route files to cheapest tier |
-| `src/text_extract.py` | Local text extraction (PDF, DOCX, PPTX, XLSX) + source_date |
-| `src/extract.py` | Gemini API extraction (Tier 2 + Tier 3) + fact enrichment |
-| `src/post_process.py` | Normalize via corp_os_meta |
-| `src/batch.py` | Manifest-driven sequential batch processor with resume |
-| `src/batch_api.py` | Gemini Batch API integration (async, 50% cheaper) |
-| `src/scan.py` | Local metadata scanner (cke scan command) |
-| `src/polarity.py` | Deterministic polarity detection for facts (regex, no LLM) |
-| `src/correlate.py` | Group related files into FileGroups |
-| `src/synthesize.py` | Build output package (Jinja2 templates) |
-| `src/manifest.py` | Manifest schema for process-manifest |
-| `src/utils.py` | Robust LLM JSON parser (4-strategy) |
-| `src/taxonomy_prompt.py` | Inject canonical taxonomy into Gemini prompts |
-| `src/deep_prompt.py` | Deep extraction prompt builder |
-| `src/doc_type_classifier.py` | Document type classification |
-| `src/freshness.py` | Freshness scoring for extracted content |
-| `src/providers/` | Multi-provider AI abstraction (Gemini, Anthropic) |
-| `src/slides/renderer.py` | PPTX slide rendering to PNG (COM/LibreOffice) |
-| `src/frames/` | Video frame sampling, extraction, tagging |
+| `src/corp_knowledge_extractor/_paths.py` | Centralized path resolution (config, templates, prompts) |
+| `src/corp_knowledge_extractor/inventory.py` | Scan + classify input files |
+| `src/corp_knowledge_extractor/tier_router.py` | Route files to cheapest tier |
+| `src/corp_knowledge_extractor/text_extract.py` | Local text extraction (PDF, DOCX, PPTX, XLSX) + source_date |
+| `src/corp_knowledge_extractor/extract.py` | Gemini API extraction (Tier 2 + Tier 3) + fact enrichment |
+| `src/corp_knowledge_extractor/post_process.py` | Normalize via corp_os_meta |
+| `src/corp_knowledge_extractor/batch.py` | Manifest-driven sequential batch processor with resume |
+| `src/corp_knowledge_extractor/batch_api.py` | Gemini Batch API integration (async, 50% cheaper) |
+| `src/corp_knowledge_extractor/scan.py` | Local metadata scanner (cke scan command) |
+| `src/corp_knowledge_extractor/polarity.py` | Deterministic polarity detection for facts (regex, no LLM) |
+| `src/corp_knowledge_extractor/correlate.py` | Group related files into FileGroups |
+| `src/corp_knowledge_extractor/synthesize.py` | Build output package (Jinja2 templates) |
+| `src/corp_knowledge_extractor/manifest.py` | Manifest schema for process-manifest |
+| `src/corp_knowledge_extractor/utils.py` | Robust LLM JSON parser (4-strategy) |
+| `src/corp_knowledge_extractor/taxonomy_prompt.py` | Inject canonical taxonomy into Gemini prompts |
+| `src/corp_knowledge_extractor/deep_prompt.py` | Deep extraction prompt builder |
+| `src/corp_knowledge_extractor/doc_type_classifier.py` | Document type classification |
+| `src/corp_knowledge_extractor/freshness.py` | Freshness scoring for extracted content |
+| `src/corp_knowledge_extractor/providers/` | Multi-provider AI abstraction (Gemini, Anthropic) |
+| `src/corp_knowledge_extractor/slides/renderer.py` | PPTX slide rendering to PNG (COM/LibreOffice) |
+| `src/corp_knowledge_extractor/frames/` | Video frame sampling, extraction, tagging |
 | `config/settings.yaml` | Main config: model, prompts, file types, compression |
 | `config/taxonomy_review.yaml` | Pending unknown terms for review |
 | `config/prompts/` | Custom extraction prompts |
@@ -120,9 +121,9 @@ cke info <package_path>                # show package info
 ## Test suite
 
 ```bash
-python -m pytest                       # 324 pass, 4 skip
+python -m pytest                       # 670 pass, 4 skip
 python -m pytest --tb=short -q         # quick summary
-python -m ruff check src/              # lint check
+python -m ruff check src/corp_knowledge_extractor/  # lint check
 ```
 
 **Tests exist for:** batch_api, comparison, config, correlate, deep_prompt, doc_type_classifier, freshness, inventory, locator, manifest, polarity, post_process, providers, quality, scan, slides, source_date, text_extract, tier_router
