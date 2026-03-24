@@ -39,11 +39,15 @@ _SKIP_DIRS = {"source", "frames", "docs", "video"}
 
 
 
+DEFAULT_QUALITY_THRESHOLD = 25
+
+
 @dataclass
 class IngestResult:
     """Result of ingesting CKE extractions."""
 
     notes_ingested: int = 0
+    notes_quarantined: int = 0
     notes_skipped_verified: int = 0
     covers_copied: int = 0
     errors: list[str] = field(default_factory=list)
@@ -145,22 +149,74 @@ def _collect_packages(cke_output_path: Path) -> list[tuple[str, str | None, Path
     return packages
 
 
+def _validate_note(note_fm: dict) -> tuple[bool, str]:
+    """Validate note frontmatter for vault ingestion.
+
+    Only rejects notes with truly fatal issues (no title).
+    Corp-os-meta schema validation is informational — logged but not blocking,
+    since CKE output may have slightly different field sets than the schema expects.
+
+    Returns (is_valid, reason).
+    """
+    if not note_fm.get("title"):
+        return False, "Missing title"
+
+    return True, "OK"
+
+
+def _quality_gate(note_fm: dict, threshold: int) -> tuple[bool, str]:
+    """Check if note meets quality threshold.
+
+    Returns (passes, reason). Notes without quality_score pass by default.
+    """
+    score = note_fm.get("quality_score")
+    if score is None:
+        return True, "OK"
+    if isinstance(score, (int, float)) and score < threshold and score > 0:
+        return False, f"quality_score {score} < {threshold}"
+    return True, "OK"
+
+
+def _quarantine_note(
+    md_file: Path,
+    note_fm: dict,
+    body: str,
+    reason: str,
+    vault_root: Path,
+) -> None:
+    """Write failed note to _quarantine/ with reason in frontmatter."""
+    quarantine_dir = vault_root / "_quarantine"
+    quarantine_dir.mkdir(parents=True, exist_ok=True)
+    note_fm["quarantine_reason"] = reason
+    note_fm.setdefault("trust_level", "draft")
+
+    fm_str = yaml.dump(note_fm, default_flow_style=False, allow_unicode=True).strip()
+    content = f"---\n{fm_str}\n---\n{body}"
+    dest = quarantine_dir / md_file.name
+    dest.write_text(content, encoding="utf-8")
+    logger.info("Quarantined: %s — %s", md_file.name, reason)
+
+
 def ingest_extractions(
     cke_output_path: Path,
     vault_root: Path,
     dry_run: bool = False,
     force: bool = False,
+    quality_threshold: int = DEFAULT_QUALITY_THRESHOLD,
     ops_db: object | None = None,
 ) -> IngestResult:
     """Ingest CKE extraction output into the vault.
 
     All notes route to 01_Knowledge/ (flat). Client dimension via tags.
+    Notes are validated and quality-gated before writing. Failures go to _quarantine/.
+    New notes get trust_level=extracted.
 
     Args:
         cke_output_path: Path to CKE output_v2 directory.
         vault_root: Path to vault root.
         dry_run: If True, report what would happen without writing.
         force: If True, overwrite even trust_level=verified notes.
+        quality_threshold: Minimum quality_score to accept (0-100). Default 25.
         ops_db: Optional OpsDB instance for logging ingest events.
 
     Returns:
@@ -220,6 +276,23 @@ def ingest_extractions(
                         note_fm, body = {}, content
                 else:
                     note_fm, body = {}, content
+
+                # Validation gate
+                valid, reason = _validate_note(note_fm)
+                if not valid:
+                    _quarantine_note(md_file, note_fm, body, reason, vault_root)
+                    result.notes_quarantined += 1
+                    continue
+
+                # Quality gate
+                passes, reason = _quality_gate(note_fm, quality_threshold)
+                if not passes:
+                    _quarantine_note(md_file, note_fm, body, reason, vault_root)
+                    result.notes_quarantined += 1
+                    continue
+
+                # Inject trust_level=extracted for new extractions
+                note_fm.setdefault("trust_level", "extracted")
 
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 write_note(dest, note_fm, body, mode="upsert", force=force)

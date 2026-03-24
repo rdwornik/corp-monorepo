@@ -2856,11 +2856,20 @@ def rfp_answer_cmd(
 @click.argument("cke_output_path", type=click.Path(exists=True, file_okay=False))
 @click.option("--dry-run", is_flag=True, help="Show what would be ingested")
 @click.option("--force", is_flag=True, help="Overwrite even verified notes")
-def ingest_extractions_cmd(cke_output_path: str, dry_run: bool, force: bool) -> None:
+@click.option("--quality-threshold", default=25, type=int, help="Min quality_score to accept (0-100)")
+@click.option("--rebuild-index", is_flag=True, help="Rebuild FTS5 search index after ingest")
+def ingest_extractions_cmd(
+    cke_output_path: str,
+    dry_run: bool,
+    force: bool,
+    quality_threshold: int,
+    rebuild_index: bool,
+) -> None:
     """Ingest CKE extraction output into the vault.
 
-    Reads CKE output packages, copies ALL extracted notes to vault/01_Knowledge/ (flat).
-    Cover slides go to _assets/. Respects trust_level=verified protection.
+    Reads CKE output packages, validates frontmatter, applies quality gate,
+    and copies accepted notes to vault/01_Knowledge/ (flat). Cover slides go
+    to _assets/. Failed notes go to _quarantine/. Respects trust_level=verified.
 
     Examples:
 
@@ -2868,7 +2877,9 @@ def ingest_extractions_cmd(cke_output_path: str, dry_run: bool, force: bool) -> 
 
         corp ingest-extractions /path/to/cke/output --dry-run
 
-        corp ingest-extractions /path/to/cke/output --force
+        corp ingest-extractions /path/to/cke/output --rebuild-index
+
+        corp ingest-extractions /path/to/cke/output --quality-threshold 50
     """
     from corp_by_os.ingest.extractions import ingest_extractions
 
@@ -2891,19 +2902,43 @@ def ingest_extractions_cmd(cke_output_path: str, dry_run: bool, force: bool) -> 
         vault_root=cfg.vault_path,
         dry_run=dry_run,
         force=force,
+        quality_threshold=quality_threshold,
         ops_db=ops,
     )
 
-    console.print(f"\n[bold]Notes ingested:[/bold] {result.notes_ingested}")
-    console.print(f"[bold]Skipped (verified):[/bold] {result.notes_skipped_verified}")
-    console.print(f"[bold]Cover slides copied:[/bold] {result.covers_copied}")
+    table = Table(title="Ingest Results", show_edge=False)
+    table.add_column("Metric", style="cyan")
+    table.add_column("Count", justify="right")
+    table.add_row("Notes ingested", str(result.notes_ingested))
+    table.add_row("Quarantined", str(result.notes_quarantined))
+    table.add_row("Skipped (verified)", str(result.notes_skipped_verified))
+    table.add_row("Cover slides", str(result.covers_copied))
+    if result.errors:
+        table.add_row("[red]Errors[/red]", f"[red]{len(result.errors)}[/red]")
+    console.print(table)
+
+    if result.by_dest:
+        console.print("\n[bold]Destinations:[/bold]")
+        for dest, count in sorted(result.by_dest.items()):
+            console.print(f"  {dest}: {count}")
 
     if result.errors:
-        console.print(f"\n[red]{len(result.errors)} error(s):[/red]")
+        console.print(f"\n[red]Errors:[/red]")
         for err in result.errors:
             console.print(f"  {err}")
 
-    if result.notes_ingested > 0 and not dry_run:
+    if result.notes_quarantined > 0:
+        console.print(f"\n[yellow]{result.notes_quarantined} note(s) quarantined to _quarantine/[/yellow]")
+
+    if result.notes_ingested > 0 and not dry_run and rebuild_index:
+        console.print("\n[dim]Rebuilding search index...[/dim]")
+        try:
+            from corp_by_os.index_builder import rebuild_index as do_rebuild
+            stats = do_rebuild()
+            console.print(f"[green]Index rebuilt: {stats.total_facts} facts indexed.[/green]")
+        except Exception as e:
+            console.print(f"[red]Index rebuild failed: {e}[/red]")
+    elif result.notes_ingested > 0 and not dry_run:
         console.print("\n[dim]Run `corp index rebuild` to update the search index.[/dim]")
 
     if ops is not None:

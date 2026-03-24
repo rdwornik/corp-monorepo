@@ -7,18 +7,29 @@ from pathlib import Path
 import yaml
 
 from corp_by_os.ingest.extractions import (
+    DEFAULT_QUALITY_THRESHOLD,
     IngestResult,
     _collect_packages,
     _find_cover_slide,
+    _quality_gate,
+    _quarantine_note,
     _should_copy,
+    _validate_note,
     ingest_extractions,
 )
 
 
-def _make_note(path: Path, title: str = "Test", trust_level: str = "extracted") -> None:
+def _make_note(
+    path: Path,
+    title: str = "Test",
+    trust_level: str = "extracted",
+    quality_score: int | None = None,
+) -> None:
     """Helper: write a minimal markdown note with frontmatter."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    fm = {"title": title, "trust_level": trust_level}
+    fm: dict = {"title": title, "trust_level": trust_level}
+    if quality_score is not None:
+        fm["quality_score"] = quality_score
     fm_str = yaml.dump(fm, default_flow_style=False)
     path.write_text(f"---\n{fm_str}---\nBody of {title}.\n", encoding="utf-8")
 
@@ -29,6 +40,7 @@ def _make_output_v2(
     series_or_client: str,
     notes: dict[str, str] | None = None,
     cover: bool = False,
+    quality_score: int | None = None,
 ) -> Path:
     """Create a fake output_v2 package: {scope}/{series}/{series}/extract/*.md."""
     pkg = root / scope / series_or_client / series_or_client
@@ -37,7 +49,11 @@ def _make_output_v2(
 
     if notes:
         for filename, body in notes.items():
-            _make_note(extract / filename, title=filename.replace(".md", ""))
+            _make_note(
+                extract / filename,
+                title=filename.replace(".md", ""),
+                quality_score=quality_score,
+            )
 
     if cover:
         slides = pkg / "source" / "slides"
@@ -270,3 +286,162 @@ class TestEdgeCases:
         result = ingest_extractions(fake, vault)
 
         assert len(result.errors) == 1
+
+
+# ---------------------------------------------------------------------------
+# Quality gate
+# ---------------------------------------------------------------------------
+
+
+class TestQualityGate:
+    def test_quality_gate_accepts_above_threshold(self):
+        ok, _ = _quality_gate({"quality_score": 50}, threshold=25)
+        assert ok
+
+    def test_quality_gate_rejects_below_threshold(self):
+        ok, reason = _quality_gate({"quality_score": 10}, threshold=25)
+        assert not ok
+        assert "10 < 25" in reason
+
+    def test_quality_gate_accepts_missing_score(self):
+        """Notes without quality_score pass by default."""
+        ok, _ = _quality_gate({}, threshold=25)
+        assert ok
+
+    def test_quality_gate_accepts_zero_score(self):
+        """Zero score passes (0 means 'not computed', not 'bad')."""
+        ok, _ = _quality_gate({"quality_score": 0}, threshold=25)
+        assert ok
+
+    def test_quality_gate_quarantines_low_note(self, tmp_path):
+        """Full pipeline: low quality note goes to _quarantine/."""
+        out = tmp_path / "output_v2"
+        vault = tmp_path / "vault"
+        _make_output_v2(
+            out, "source_library", "Docs", {"low.md": "x"}, quality_score=10
+        )
+
+        result = ingest_extractions(out, vault, quality_threshold=25)
+
+        assert result.notes_quarantined == 1
+        assert result.notes_ingested == 0
+        assert (vault / "_quarantine" / "low.md").exists()
+
+    def test_quality_gate_accepts_high_note(self, tmp_path):
+        """High quality note passes gate."""
+        out = tmp_path / "output_v2"
+        vault = tmp_path / "vault"
+        _make_output_v2(
+            out, "source_library", "Docs", {"good.md": "x"}, quality_score=50
+        )
+
+        result = ingest_extractions(out, vault, quality_threshold=25)
+
+        assert result.notes_ingested == 1
+        assert result.notes_quarantined == 0
+
+
+# ---------------------------------------------------------------------------
+# Validation
+# ---------------------------------------------------------------------------
+
+
+class TestValidation:
+    def test_validate_note_missing_title(self):
+        ok, reason = _validate_note({})
+        assert not ok
+        assert "Missing title" in reason
+
+    def test_validate_note_with_title(self):
+        ok, _ = _validate_note({"title": "Test"})
+        assert ok
+
+    def test_quarantine_on_missing_title(self, tmp_path):
+        """Note without title in frontmatter gets quarantined."""
+        out = tmp_path / "output_v2"
+        vault = tmp_path / "vault"
+
+        # Create note with empty frontmatter (no title)
+        pkg = out / "source_library" / "Docs" / "Docs"
+        extract = pkg / "extract"
+        extract.mkdir(parents=True, exist_ok=True)
+        (extract / "bad.md").write_text("---\nquality_score: 50\n---\nNo title.\n", encoding="utf-8")
+
+        result = ingest_extractions(out, vault)
+
+        assert result.notes_quarantined == 1
+        assert (vault / "_quarantine" / "bad.md").exists()
+        # Quarantine note has reason in frontmatter
+        content = (vault / "_quarantine" / "bad.md").read_text(encoding="utf-8")
+        assert "quarantine_reason" in content
+
+
+# ---------------------------------------------------------------------------
+# Trust level injection
+# ---------------------------------------------------------------------------
+
+
+class TestTrustLevelInjection:
+    def test_trust_level_set_to_extracted(self, tmp_path):
+        """New ingested notes get trust_level=extracted."""
+        out = tmp_path / "output_v2"
+        vault = tmp_path / "vault"
+        _make_output_v2(out, "source_library", "Docs", {"note.md": "x"})
+
+        ingest_extractions(out, vault)
+
+        content = (vault / "01_Knowledge" / "note.md").read_text(encoding="utf-8")
+        assert "trust_level" in content
+        # Parse frontmatter to verify
+        end = content.find("---", 3)
+        fm = yaml.safe_load(content[3:end])
+        assert fm.get("trust_level") == "extracted"
+
+    def test_existing_trust_level_preserved(self, tmp_path):
+        """If note already has trust_level, don't overwrite it."""
+        out = tmp_path / "output_v2"
+        vault = tmp_path / "vault"
+
+        # Create note with trust_level=draft
+        pkg = out / "source_library" / "Docs" / "Docs"
+        extract = pkg / "extract"
+        extract.mkdir(parents=True, exist_ok=True)
+        fm = {"title": "Draft Note", "trust_level": "draft"}
+        fm_str = yaml.dump(fm, default_flow_style=False)
+        (extract / "draft.md").write_text(f"---\n{fm_str}---\nBody.\n", encoding="utf-8")
+
+        ingest_extractions(out, vault)
+
+        content = (vault / "01_Knowledge" / "draft.md").read_text(encoding="utf-8")
+        end = content.find("---", 3)
+        fm_out = yaml.safe_load(content[3:end])
+        assert fm_out.get("trust_level") == "draft"
+
+
+# ---------------------------------------------------------------------------
+# Quarantine
+# ---------------------------------------------------------------------------
+
+
+class TestQuarantine:
+    def test_quarantine_note_written(self, tmp_path):
+        vault = tmp_path / "vault"
+        md_file = tmp_path / "note.md"
+        md_file.write_text("test")
+
+        _quarantine_note(md_file, {"title": "Bad"}, "Body.\n", "test reason", vault)
+
+        q_file = vault / "_quarantine" / "note.md"
+        assert q_file.exists()
+        content = q_file.read_text(encoding="utf-8")
+        assert "quarantine_reason: test reason" in content
+
+    def test_quarantine_has_draft_trust_level(self, tmp_path):
+        vault = tmp_path / "vault"
+        md_file = tmp_path / "note.md"
+        md_file.write_text("test")
+
+        _quarantine_note(md_file, {"title": "Bad"}, "Body.\n", "test reason", vault)
+
+        content = (vault / "_quarantine" / "note.md").read_text(encoding="utf-8")
+        assert "trust_level: draft" in content
