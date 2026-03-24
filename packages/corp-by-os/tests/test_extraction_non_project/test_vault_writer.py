@@ -119,3 +119,27 @@ def test_move_to_vault_skips_verified(tmp_path):
     count = move_to_vault(staging, vault, "target")
     assert count == 0
     assert "Original" in (dest / "note.md").read_text(encoding="utf-8")
+
+
+def test_move_to_vault_creates_conflict_for_verified(tmp_path):
+    """Verified notes get a _conflict_ file instead of overwrite."""
+    vault = tmp_path / "vault"
+    dest = vault / "target" / "pkg-001" / "extract"
+    dest.mkdir(parents=True)
+    (dest / "note.md").write_text(
+        "---\ntitle: Verified\ntrust_level: verified\n---\nOriginal.\n",
+        encoding="utf-8",
+    )
+
+    staging = tmp_path / "staging"
+    _make_package(staging, "pkg-001", {"extract/note.md": b"---\ntitle: New\n---\nReplaced.\n"})
+
+    move_to_vault(staging, vault, "target")
+
+    # Original unchanged
+    assert "Original" in (dest / "note.md").read_text(encoding="utf-8")
+
+    # Conflict file created
+    conflicts = list(dest.glob("*_conflict_*.md"))
+    assert len(conflicts) == 1
+    assert "New" in conflicts[0].read_text(encoding="utf-8")

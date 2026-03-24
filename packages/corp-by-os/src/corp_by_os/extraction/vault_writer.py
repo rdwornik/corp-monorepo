@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import logging
 import shutil
+from datetime import datetime
 from pathlib import Path
 
 import yaml
@@ -82,15 +83,19 @@ def move_to_vault(
                     )
                     continue
 
-                # Protect verified notes from overwrite
+                # Protect verified notes from overwrite — save as conflict
                 if (
                     dst_file.exists()
                     and dst_file.suffix == ".md"
                     and _read_trust_level(dst_file) == "verified"
                 ):
+                    date_str = datetime.now().strftime("%Y%m%d")
+                    conflict = dst_file.with_stem(f"{dst_file.stem}_conflict_{date_str}")
+                    shutil.move(str(src_file), str(conflict))
                     log.warning(
-                        "SKIP: %s has trust_level=verified",
+                        "CONFLICT: %s is verified. New extraction saved as %s",
                         str(rel).replace("\\", "/"),
+                        conflict.name,
                     )
                     continue
 

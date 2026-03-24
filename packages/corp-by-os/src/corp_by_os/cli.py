@@ -330,6 +330,70 @@ def doctor() -> None:
         console.print("[red]  Issues found -- see above.[/red]")
 
 
+@cli.command("trust-status")
+def trust_status() -> None:
+    """Show trust_level distribution across vault notes."""
+    cfg = get_config()
+    vault = cfg.vault_path
+
+    if not vault.exists():
+        console.print(f"[red]Vault not found: {vault}[/red]")
+        return
+
+    counts: dict[str, int] = {}
+    total = 0
+    conflicts = 0
+
+    for md_file in vault.rglob("*.md"):
+        if md_file.name.startswith("."):
+            continue
+        total += 1
+        if "_conflict_" in md_file.name:
+            conflicts += 1
+            continue
+        try:
+            text = md_file.read_text(encoding="utf-8")
+            if text.startswith("---"):
+                end = text.find("---", 3)
+                if end != -1:
+                    import yaml as _yaml
+
+                    fm = _yaml.safe_load(text[3:end])
+                    level = fm.get("trust_level", "none") if isinstance(fm, dict) else "none"
+                    counts[level] = counts.get(level, 0) + 1
+                    continue
+        except Exception:
+            pass
+        counts["none"] = counts.get("none", 0) + 1
+
+    table = Table(title="Vault Trust Level Distribution")
+    table.add_column("Trust Level", style="cyan", width=15)
+    table.add_column("Count", justify="right", width=8)
+    table.add_column("", width=20)
+
+    level_styles = {
+        "verified": "[green]protected[/green]",
+        "extracted": "[yellow]overwritable[/yellow]",
+        "generated": "[yellow]overwritable[/yellow]",
+        "draft": "[yellow]overwritable[/yellow]",
+        "none": "[dim]legacy (no field)[/dim]",
+    }
+
+    for level in ("verified", "extracted", "generated", "draft", "none"):
+        if level in counts:
+            table.add_row(level, str(counts[level]), level_styles.get(level, ""))
+
+    # Any unexpected values
+    for level, count in sorted(counts.items()):
+        if level not in ("verified", "extracted", "generated", "draft", "none"):
+            table.add_row(level, str(count), "[red]unknown[/red]")
+
+    console.print(table)
+    console.print(f"\n  Total notes: {total}")
+    if conflicts:
+        console.print(f"  [yellow]Pending conflicts: {conflicts}[/yellow]")
+
+
 # --- Workflow commands ---
 
 

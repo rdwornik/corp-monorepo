@@ -16,6 +16,7 @@ from __future__ import annotations
 import logging
 import shutil
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -122,6 +123,12 @@ def _write_with_retry(path: Path, content: str, max_retries: int = 5) -> bool:
     return False  # unreachable, but satisfies type checker
 
 
+def _conflict_path(original: Path) -> Path:
+    """Generate a conflict file path with date suffix."""
+    date_str = datetime.now().strftime("%Y%m%d")
+    return original.with_stem(f"{original.stem}_conflict_{date_str}")
+
+
 # --- Core operations ---
 
 
@@ -173,7 +180,15 @@ def write_note(
     if path.exists() and not force:
         existing_fm = read_frontmatter(path)
         if existing_fm.get("trust_level") == "verified":
-            logger.warning("SKIP: %s has trust_level=verified. Use force=True to overwrite.", path)
+            # Save new extraction as conflict file for manual merge
+            conflict_path = _conflict_path(path)
+            content = _render_note(frontmatter, body)
+            _write_with_retry(conflict_path, content)
+            logger.warning(
+                "CONFLICT: %s has trust_level=verified. New extraction saved as %s",
+                path.name,
+                conflict_path.name,
+            )
             return False
 
     content = _render_note(frontmatter, body)

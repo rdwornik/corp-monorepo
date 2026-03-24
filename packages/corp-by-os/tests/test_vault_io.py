@@ -131,6 +131,53 @@ class TestReadWriteNote:
         fm2, _ = read_note(path)
         assert fm2["title"] == "Updated"
 
+    def test_verified_note_creates_conflict_file(self, app_config, tmp_path):
+        """When verified note is skipped, a _conflict_ file is created."""
+        path = tmp_path / "verified_note.md"
+        write_note(path, {"title": "Original", "trust_level": "verified"}, "Original body.\n", mode="create")
+
+        result = write_note(path, {"title": "Replaced"}, "New body.\n")
+        assert result is False
+
+        # Conflict file should exist
+        conflicts = list(tmp_path.glob("*_conflict_*.md"))
+        assert len(conflicts) == 1
+        assert "_conflict_" in conflicts[0].name
+
+        # Conflict file has the new content
+        content = conflicts[0].read_text(encoding="utf-8")
+        assert "Replaced" in content
+
+    def test_conflict_file_has_date_suffix(self, app_config, tmp_path):
+        """Conflict file named with _conflict_YYYYMMDD."""
+        from datetime import datetime
+
+        path = tmp_path / "note.md"
+        write_note(path, {"title": "Original", "trust_level": "verified"}, "Body.\n", mode="create")
+        write_note(path, {"title": "New"}, "New.\n")
+
+        conflicts = list(tmp_path.glob("*_conflict_*.md"))
+        assert len(conflicts) == 1
+        today = datetime.now().strftime("%Y%m%d")
+        assert today in conflicts[0].name
+
+    def test_no_conflict_for_extracted_notes(self, app_config, tmp_path):
+        """Extracted notes get overwritten, no conflict file."""
+        path = tmp_path / "note.md"
+        write_note(path, {"title": "Original", "trust_level": "extracted"}, "Body.\n", mode="create")
+        write_note(path, {"title": "Updated"}, "New.\n")
+
+        conflicts = list(tmp_path.glob("*_conflict_*.md"))
+        assert len(conflicts) == 0
+
+    def test_no_conflict_for_new_notes(self, app_config, tmp_path):
+        """New notes don't create conflict files."""
+        path = tmp_path / "new_note.md"
+        write_note(path, {"title": "New"}, "Body.\n")
+
+        conflicts = list(tmp_path.glob("*_conflict_*.md"))
+        assert len(conflicts) == 0
+
     def test_read_frontmatter_helper(self, tmp_path):
         path = tmp_path / "note.md"
         path.write_text("---\ntitle: Test\ntrust_level: verified\n---\nBody.\n", encoding="utf-8")
@@ -140,6 +187,16 @@ class TestReadWriteNote:
     def test_read_frontmatter_missing_file(self, tmp_path):
         fm = read_frontmatter(tmp_path / "nonexistent.md")
         assert fm == {}
+
+    def test_missing_trust_level_defaults_to_overwritable(self, app_config, tmp_path):
+        """Notes without trust_level field can be overwritten."""
+        path = tmp_path / "legacy_note.md"
+        write_note(path, {"title": "Legacy"}, "Old content.\n", mode="create")
+
+        result = write_note(path, {"title": "Updated"}, "New content.\n")
+        assert result is True
+        fm, _ = read_note(path)
+        assert fm["title"] == "Updated"
 
 
 class TestWriteWithRetry:
