@@ -1,0 +1,297 @@
+"""Data models for corp-by-os.
+
+Dataclasses (not Pydantic) — lightweight, typed, frozen where appropriate.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from enum import StrEnum
+from pathlib import Path
+
+
+class VaultZone(StrEnum):
+    """Obsidian vault top-level folders (semantic, flat)."""
+
+    KNOWLEDGE = "01_Knowledge"
+    NAVIGATE = "02_Navigate"
+    PROJECTS = "projects"
+    GUIDES = "guides"
+    DASHBOARDS = "dashboards"
+    TEMPLATES = "templates"
+    SYSTEM = "99_System"
+
+    # Legacy aliases (pre-2026-03-21 numbered structure)
+    SOURCES = "02_sources"
+    EVERGREEN = "04_evergreen"
+    PLAYBOOKS = "03_playbooks"
+
+
+class Mutability(StrEnum):
+    """Folder mutability rules per INTEGRATION_SPEC."""
+
+    IMMUTABLE = "immutable"
+    REGENERABLE = "regenerable"
+    PROTECTED = "protected"
+    APPEND_ONLY = "append_only"
+
+
+ZONE_MUTABILITY: dict[VaultZone, Mutability] = {
+    VaultZone.KNOWLEDGE: Mutability.REGENERABLE,
+    VaultZone.NAVIGATE: Mutability.REGENERABLE,
+    VaultZone.PROJECTS: Mutability.REGENERABLE,
+    VaultZone.GUIDES: Mutability.PROTECTED,
+    VaultZone.DASHBOARDS: Mutability.REGENERABLE,
+    VaultZone.TEMPLATES: Mutability.PROTECTED,
+    VaultZone.SYSTEM: Mutability.PROTECTED,
+    # Legacy
+    VaultZone.SOURCES: Mutability.IMMUTABLE,
+    VaultZone.EVERGREEN: Mutability.REGENERABLE,
+    VaultZone.PLAYBOOKS: Mutability.PROTECTED,
+}
+
+
+@dataclass(frozen=True)
+class VaultPath:
+    """Resolved path within the Obsidian vault."""
+
+    zone: VaultZone
+    project_id: str | None
+    filename: str | None
+    absolute: Path
+
+
+@dataclass
+class ProjectInfo:
+    """Mirrors project-info.yaml schema."""
+
+    project_id: str
+    client: str
+    status: str  # active | rfp | proposal | won | lost | archived
+    products: list[str] = field(default_factory=list)
+    topics: list[str] = field(default_factory=list)
+    domains: list[str] = field(default_factory=list)
+    files_processed: int = 0
+    facts_count: int = 0
+    last_extracted: str | None = None
+    # Optional fields
+    people: list[str] = field(default_factory=list)
+    stage: str | None = None
+    opportunity_id: str | None = None
+    region: str | None = None
+    industry: str | None = None
+
+
+@dataclass
+class ProjectSummary:
+    """Lightweight project overview for list displays."""
+
+    project_id: str
+    client: str
+    status: str
+    has_vault: bool
+    has_onedrive: bool
+    facts_count: int = 0
+    onedrive_path: Path | None = None
+    vault_path: Path | None = None
+
+
+@dataclass(frozen=True)
+class ResolvedProject:
+    """Result of fuzzy project resolution."""
+
+    project_id: str
+    folder_name: str  # original folder name (mixed case)
+    onedrive_path: Path | None
+    vault_path: Path | None
+    score: float  # match quality 0.0-1.0
+
+
+@dataclass
+class ValidationIssue:
+    """Single validation problem."""
+
+    path: Path
+    level: str  # error | warning
+    message: str
+
+
+@dataclass
+class ValidationReport:
+    """Result of vault validation."""
+
+    project_id: str | None
+    issues: list[ValidationIssue] = field(default_factory=list)
+    notes_checked: int = 0
+    notes_valid: int = 0
+
+    @property
+    def is_valid(self) -> bool:
+        return not any(i.level == "error" for i in self.issues)
+
+
+# --- Workflow models ---
+
+
+@dataclass(frozen=True)
+class WorkflowStep:
+    """Single step within a workflow."""
+
+    type: str  # "agent" | "vault" | "python"
+    description: str
+    agent: str | None = None  # agent name from agents.yaml
+    command: list[str] | None = None  # CLI args
+    conditional_args: dict[str, list[str]] | None = None  # param -> extra CLI args
+    action: str | None = None  # python function name
+    params: dict = field(default_factory=dict)  # step-specific parameters
+
+
+@dataclass(frozen=True)
+class WorkflowParam:
+    """Parameter definition for a workflow."""
+
+    type: str  # "string" | "path"
+    required: bool = True
+    default: str | None = None
+
+
+@dataclass(frozen=True)
+class Workflow:
+    """Complete workflow definition loaded from workflows.yaml."""
+
+    id: str
+    description: str
+    trigger_phrases: list[str] = field(default_factory=list)
+    parameters: dict[str, WorkflowParam] = field(default_factory=dict)
+    steps: list[WorkflowStep] = field(default_factory=list)
+    confirmation: bool = False
+    cost_estimate: str | None = None
+
+
+@dataclass
+class StepResult:
+    """Outcome of executing one workflow step."""
+
+    step_index: int
+    description: str
+    success: bool
+    output: str = ""
+    error: str | None = None
+    duration_seconds: float = 0.0
+
+
+@dataclass
+class WorkflowResult:
+    """Outcome of executing a complete workflow."""
+
+    workflow_id: str
+    success: bool
+    steps: list[StepResult] = field(default_factory=list)
+    duration_seconds: float = 0.0
+
+
+# --- Task models ---
+
+
+class TaskStatus(StrEnum):
+    """Task lifecycle states."""
+
+    TODO = "todo"
+    IN_PROGRESS = "in_progress"
+    DONE = "done"
+    CANCELLED = "cancelled"
+
+
+class TaskPriority(StrEnum):
+    """Task priority levels."""
+
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+
+
+@dataclass
+class Task:
+    """A task stored as a vault note in 00_dashboards/tasks/."""
+
+    title: str
+    status: TaskStatus = TaskStatus.TODO
+    project: str | None = None
+    deadline: str | None = None
+    priority: TaskPriority = TaskPriority.MEDIUM
+    created: str = ""
+    completed: str | None = None
+    file_path: Path | None = None
+
+
+# --- Template models ---
+
+
+@dataclass(frozen=True)
+class TemplateInfo:
+    """A registered template file from 30_Templates/."""
+
+    id: str
+    name: str
+    file: str  # filename only
+    path: str  # relative to MyWork root (e.g. "30_Templates/...")
+    size_mb: float
+    type: str  # presentation | questionnaire | document | demo_script | data
+    use_cases: list[str] = field(default_factory=list)
+    domains: list[str] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
+    language: str = "en"
+
+
+# --- Index models ---
+
+
+@dataclass
+class IndexStats:
+    """Result of an index rebuild."""
+
+    projects_indexed: int
+    facts_indexed: int
+    notes_indexed: int
+    rebuild_duration: float
+    index_path: str
+
+
+@dataclass(frozen=True)
+class FactResult:
+    """A single fact returned from search."""
+
+    project_id: str
+    client: str
+    fact: str
+    source_title: str = ""
+    topics: list[str] = field(default_factory=list)
+    relevance_score: float = 0.0
+
+
+@dataclass(frozen=True)
+class ProjectResult:
+    """A project returned from structured search."""
+
+    project_id: str
+    client: str
+    status: str = ""
+    products: list[str] = field(default_factory=list)
+    topics: list[str] = field(default_factory=list)
+    facts_count: int = 0
+
+
+@dataclass
+class AnalyticsReport:
+    """Cross-project analytics from the index."""
+
+    total_projects: int
+    total_facts: int
+    top_topics: list[tuple[str, int]] = field(default_factory=list)
+    top_products: list[tuple[str, int]] = field(default_factory=list)
+    top_domains: list[tuple[str, int]] = field(default_factory=list)
+    product_bundles: list[tuple[str, int]] = field(default_factory=list)
+    projects_by_status: dict[str, int] = field(default_factory=dict)
+    projects_by_region: dict[str, int] = field(default_factory=dict)
+    avg_facts_per_project: float = 0.0
+    stale_projects: list[str] = field(default_factory=list)
