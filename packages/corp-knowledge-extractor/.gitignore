@@ -38,10 +38,12 @@ MANIFEST
 Thumbs.db
 desktop.ini
 
-# Data & Media
+# Data & Media (runtime data, not package data)
 data/
 data/frames/
 data/cost_log.jsonl
+# Package data files (YAML configs) are tracked
+!src/corp_knowledge_extractor/data/
 *.db
 
 *.mp4

@@ -4,6 +4,7 @@ Delegates to corp_os_meta for normalization, validation, and link generation.
 Adds CKE-specific logic: unknown term logging to local file.
 """
 
+import functools
 import logging
 import re
 import yaml
@@ -22,6 +23,56 @@ from corp_knowledge_extractor.utils import normalize_string_list
 
 logger = logging.getLogger(__name__)
 
+
+# ---------------------------------------------------------------------------
+# Data file loading (cached)
+# ---------------------------------------------------------------------------
+
+def _data_dir() -> Path:
+    """Data files live alongside the package source code."""
+    return Path(__file__).parent / "data"
+
+
+@functools.lru_cache(maxsize=1)
+def _load_product_exclusions() -> set[str]:
+    """Load product exclusion list (competitors, infrastructure, generic)."""
+    path = _data_dir() / "product_exclusions.yaml"
+    if not path.exists():
+        return set()
+    with open(path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f) or {}
+    excluded = set()
+    for category in data.values():
+        if isinstance(category, list):
+            excluded.update(name.lower() for name in category)
+    return excluded
+
+
+@functools.lru_cache(maxsize=1)
+def _load_product_aliases() -> dict[str, str]:
+    """Load product alias mapping (case-insensitive lookup)."""
+    path = _data_dir() / "product_aliases.yaml"
+    if not path.exists():
+        return {}
+    with open(path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f) or {}
+    return {k.lower(): v for k, v in data.get("aliases", {}).items()}
+
+
+@functools.lru_cache(maxsize=1)
+def _load_client_aliases() -> dict[str, str]:
+    """Load client alias mapping (case-insensitive lookup)."""
+    path = _data_dir() / "client_aliases.yaml"
+    if not path.exists():
+        return {}
+    with open(path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f) or {}
+    return {k.lower(): v for k, v in data.get("aliases", {}).items()}
+
+
+# ---------------------------------------------------------------------------
+# Type enforcement
+# ---------------------------------------------------------------------------
 
 def enforce_type_from_extension(result: dict, source_path: str) -> dict:
     """Override content type based on file extension.
@@ -55,15 +106,40 @@ def normalize_company_names(text: str) -> str:
     return text
 
 
-# Short product names → canonical Blue Yonder forms
-PRODUCT_ALIASES = {
-    "Demand Planning": "Blue Yonder Demand Planning",
-    "Supply Planning": "Blue Yonder Supply Planning",
-    "Control Tower": "Blue Yonder Control Tower",
-    "WMS": "Blue Yonder WMS",
-    "TMS": "Blue Yonder TMS",
-    "OMS": "Blue Yonder OMS",
-    "Platform": "Blue Yonder Platform",
+# ---------------------------------------------------------------------------
+# Fix 1: Product exclusion (competitors, infrastructure, generic)
+# ---------------------------------------------------------------------------
+
+def filter_products(products: list[str]) -> tuple[list[str], list[str]]:
+    """Split products into real BY products and excluded entities.
+
+    Returns (real_products, excluded_entities). Excluded items are
+    reclassified to entities_mentioned, not lost.
+    """
+    exclusions = _load_product_exclusions()
+    real_products = []
+    entities = []
+    for p in products:
+        if p.lower().strip() in exclusions:
+            entities.append(p)
+        else:
+            real_products.append(p)
+    return real_products, entities
+
+
+# ---------------------------------------------------------------------------
+# Fix 2: Product name normalization (alias mapping from YAML)
+# ---------------------------------------------------------------------------
+
+# Inline fallback for when YAML file is missing (tests, standalone)
+_BUILTIN_PRODUCT_ALIASES = {
+    "demand planning": "Blue Yonder Demand Planning",
+    "supply planning": "Blue Yonder Supply Planning",
+    "control tower": "Blue Yonder Control Tower",
+    "wms": "Blue Yonder WMS",
+    "tms": "Blue Yonder TMS",
+    "oms": "Blue Yonder OMS",
+    "platform": "Blue Yonder Platform",
 }
 
 
@@ -73,12 +149,92 @@ def normalize_product_names(products: list[str]) -> list[str]:
     Applied after corp-os-meta normalization to catch remaining short forms.
     Deduplicates: ["Demand Planning", "Blue Yonder Demand Planning"] → ["Blue Yonder Demand Planning"]
     """
+    alias_map = _load_product_aliases() or _BUILTIN_PRODUCT_ALIASES
     result = []
+    seen: set[str] = set()
     for p in products:
-        canonical = PRODUCT_ALIASES.get(p.strip(), p)
-        if canonical not in result:
+        canonical = alias_map.get(p.strip().lower(), p)
+        if canonical.lower() not in seen:
             result.append(canonical)
+            seen.add(canonical.lower())
     return result
+
+
+# ---------------------------------------------------------------------------
+# Fix 3: People field cleanup (filter roles and organizations)
+# ---------------------------------------------------------------------------
+
+ROLE_PATTERNS = [
+    re.compile(r"(?i)^(technical |senior |chief |lead |head of |director |manager |vp |vice president)"),
+    re.compile(r"(?i)(manager|director|officer|engineer|architect|consultant|analyst|specialist|coordinator|executive|administrator)$"),
+    re.compile(r"(?i)^(customer |project |account |solution |support |sales )"),
+]
+
+ORG_PATTERNS = [
+    re.compile(r"(?i)(inc\.|corp\.|ltd\.|gmbh|ag$|sa$|plc$|llc$|group$|company$)"),
+    re.compile(r"(?i)^(blue yonder|lenzing|pepsico|jaguar|jlr|michelin|sap|oracle)$"),
+]
+
+# Words that look like names but are actually role/modifier words
+_ROLE_WORDS = {
+    "technical", "senior", "chief", "lead", "head", "director", "manager",
+    "vice", "president", "customer", "project", "account", "solution",
+    "support", "sales", "supply", "chain", "global", "regional", "general",
+}
+
+# Short uppercase tokens that are org suffixes, not name parts
+_ORG_SUFFIXES = {"ag", "sa", "plc", "llc", "inc", "ltd", "gmbh", "corp"}
+
+
+def _has_person_name(text: str) -> bool:
+    """Check if text contains a likely real person name.
+
+    Requires at least two capitalized words where at least one is NOT
+    a common role/modifier word or org suffix.
+    """
+    words = text.split()
+    cap_words = [w for w in words if w[0:1].isupper() and len(w) > 1]
+    if len(cap_words) < 2:
+        return False
+    non_role = [
+        w for w in cap_words
+        if w.lower() not in _ROLE_WORDS and w.lower().rstrip(".") not in _ORG_SUFFIXES
+    ]
+    return len(non_role) >= 2
+
+
+def filter_people(people: list[str]) -> tuple[list[str], list[str]]:
+    """Separate real people from roles and organizations.
+
+    Returns (real_people, filtered_out).
+    """
+    real_people = []
+    filtered = []
+    for person in people:
+        clean = person.split("(")[0].strip()
+        is_role = any(p.search(clean) for p in ROLE_PATTERNS)
+        is_org = any(p.search(clean) for p in ORG_PATTERNS)
+        has_name = _has_person_name(clean)
+
+        if is_org and not has_name:
+            filtered.append(person)
+        elif is_role and not has_name:
+            filtered.append(person)
+        else:
+            real_people.append(person)
+    return real_people, filtered
+
+
+# ---------------------------------------------------------------------------
+# Fix 4: Client alias normalization
+# ---------------------------------------------------------------------------
+
+def normalize_client(client: str) -> str:
+    """Normalize client name using alias mapping."""
+    if not client:
+        return client
+    aliases = _load_client_aliases()
+    return aliases.get(client.lower().strip(), client)
 
 
 @dataclass
@@ -165,6 +321,26 @@ def post_process_extraction(
     if "products" in normalized_data and isinstance(normalized_data["products"], list):
         normalized_data["products"] = normalize_product_names(normalized_data["products"])
 
+    # Filter out competitors, infrastructure, and generic terms from products
+    if "products" in normalized_data and isinstance(normalized_data["products"], list):
+        real_products, excluded = filter_products(normalized_data["products"])
+        normalized_data["products"] = real_products
+        if excluded:
+            existing = normalized_data.get("entities_mentioned", [])
+            normalized_data["entities_mentioned"] = existing + excluded
+            logger.info("Moved non-BY products to entities_mentioned: %s", excluded)
+
+    # Filter roles and organizations from people
+    if "people" in normalized_data and isinstance(normalized_data["people"], list):
+        real_people, filtered_out = filter_people(normalized_data["people"])
+        normalized_data["people"] = real_people
+        if filtered_out:
+            logger.info("Filtered non-person entries from people: %s", filtered_out)
+
+    # Normalize client aliases
+    if normalized_data.get("client"):
+        normalized_data["client"] = normalize_client(normalized_data["client"])
+
     if changes:
         logger.info("Normalized: %s", ", ".join(changes))
     if unknown:
@@ -217,9 +393,21 @@ def _normalize_tag(value: str) -> str:
     return tag
 
 
-def generate_tags(frontmatter: dict) -> list[str]:
-    """Generate hierarchical tags from frontmatter fields."""
+MAX_TAGS = 12
+
+
+def generate_tags(frontmatter: dict, max_tags: int = MAX_TAGS) -> list[str]:
+    """Generate hierarchical tags from frontmatter fields.
+
+    Tags are priority-ordered: client > product > topic > domain > type > source.
+    Capped at max_tags (default 12) to reduce noise.
+    """
     tags = []
+
+    # Client first (highest priority — scoping context)
+    client = frontmatter.get("client")
+    if client:
+        tags.append(f"client/{_normalize_tag(client)}")
 
     for product in (frontmatter.get("products") or []):
         tags.append(f"product/{_normalize_tag(product)}")
@@ -230,10 +418,6 @@ def generate_tags(frontmatter: dict) -> list[str]:
     for domain in (frontmatter.get("domains") or []):
         tags.append(f"domain/{_normalize_tag(domain)}")
 
-    client = frontmatter.get("client")
-    if client:
-        tags.append(f"client/{_normalize_tag(client)}")
-
     doc_type = frontmatter.get("doc_type")
     if doc_type:
         tags.append(f"type/{_normalize_tag(doc_type)}")
@@ -243,8 +427,18 @@ def generate_tags(frontmatter: dict) -> list[str]:
         tags.append(f"source/{_normalize_tag(source_type)}")
 
     # Deduplicate preserving order
-    seen = set()
-    return [t for t in tags if not (t in seen or seen.add(t))]
+    seen: set[str] = set()
+    deduped = [t for t in tags if not (t in seen or seen.add(t))]
+
+    return cap_tags(deduped, max_tags)
+
+
+def cap_tags(tags: list[str], max_tags: int = MAX_TAGS) -> list[str]:
+    """Keep most informative tags, cap at max_tags.
+
+    Tags are already in priority order from generate_tags().
+    """
+    return tags[:max_tags]
 
 
 def validate_tags(tags: list[str]) -> list[dict]:

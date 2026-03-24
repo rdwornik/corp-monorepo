@@ -1,0 +1,24 @@
+# Normalize product names to canonical Blue Yonder forms
+# Key = alias (what LLM generates), Value = canonical name
+
+aliases:
+  "Demand Planning": "Blue Yonder Demand Planning"
+  "Supply Planning": "Blue Yonder Supply Planning"
+  "Control Tower": "Blue Yonder Control Tower"
+  "WMS": "Blue Yonder WMS"
+  "TMS": "Blue Yonder TMS"
+  "OMS": "Blue Yonder OMS"
+  "Workforce Management": "Blue Yonder Workforce Management"
+  "Network Design": "Blue Yonder Network Design"
+  "Inventory Optimization": "Blue Yonder Inventory Optimization"
+  "Platform": "Blue Yonder Platform"
+  "Blue Yonder Platform": "Blue Yonder Platform"
+  "DSP": "Blue Yonder Demand & Supply Planning"
+  "Demand & Supply Planning": "Blue Yonder Demand & Supply Planning"
+  "SCPO": "Blue Yonder Supply Chain Planning"
+  "ESP": "Blue Yonder Executive Supply Planning"
+  "IBP": "Blue Yonder Integrated Business Planning"
+  "Luminate": "Blue Yonder Luminate"
+  "Luminate Warehouse Tasking": "Blue Yonder Luminate Warehouse Tasking"
+  "Transportation Modeling": "Blue Yonder Transportation Modeling"
+  "Logistics Emissions Calculator": "Blue Yonder Logistics Emissions Calculator"

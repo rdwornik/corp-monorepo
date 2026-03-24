@@ -1,0 +1,14 @@
+# Normalize client names to canonical forms
+# Key = alias, Value = canonical name
+
+aliases:
+  "lenzing-ag": "lenzing"
+  "lenzing-group": "lenzing"
+  "Lenzing AG": "Lenzing"
+  "Lenzing Group": "Lenzing"
+  "jaguar-land-rover": "jlr"
+  "Jaguar Land Rover": "JLR"
+  "pepsico-europe": "pepsico"
+  "PepsiCo Europe": "PepsiCo"
+  "saint-gobain": "sgdbf"
+  "Saint-Gobain": "SGDBF"

@@ -389,7 +389,7 @@ def test_client_from_manifest_overrides_gemini():
         source_file="test.md",
         client="Lenzing AG",
     )
-    assert result.data["client"] == "Lenzing AG"
+    assert result.data["client"] == "Lenzing"  # alias normalized
 
 
 def test_project_from_manifest():
@@ -696,3 +696,218 @@ def test_normalize_products_in_post_process():
     # Short forms should not survive
     assert "Demand Planning" not in result.data["products"]
     assert "Supply Planning" not in result.data["products"]
+
+
+# ---------------------------------------------------------------------------
+# Fix 1: Product exclusion list (competitors, infrastructure, generic)
+# ---------------------------------------------------------------------------
+
+from corp_knowledge_extractor.post_process import filter_products
+
+
+def test_sap_excluded_from_products():
+    """SAP should be entity, not product."""
+    real, excluded = filter_products(["SAP", "Blue Yonder WMS"])
+    assert "SAP" not in real
+    assert "SAP" in excluded
+    assert "Blue Yonder WMS" in real
+
+
+def test_azure_excluded_from_products():
+    """Azure should be entity, not product."""
+    real, excluded = filter_products(["Azure", "Blue Yonder Platform"])
+    assert "Azure" not in real
+    assert "Azure" in excluded
+    assert "Blue Yonder Platform" in real
+
+
+def test_blue_yonder_products_kept():
+    """Blue Yonder WMS should remain a product."""
+    real, excluded = filter_products(["Blue Yonder WMS", "Blue Yonder TMS"])
+    assert real == ["Blue Yonder WMS", "Blue Yonder TMS"]
+    assert excluded == []
+
+
+def test_exclusion_case_insensitive():
+    """Exclusion matching is case-insensitive."""
+    real, excluded = filter_products(["sap", "kubernetes"])
+    assert real == []
+    assert len(excluded) == 2
+
+
+def test_excluded_products_go_to_entities_in_post_process():
+    """Excluded products move to entities_mentioned during post-processing."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test",
+            "date": "2026-03-01",
+            "type": "document",
+            "topics": ["Supply Chain"],
+            "products": ["SAP APO", "Blue Yonder WMS"],
+            "summary": "Test.",
+        },
+        source_file="test.md",
+    )
+    assert "SAP APO" not in result.data["products"]
+    assert "Blue Yonder WMS" in result.data["products"]
+    assert "SAP APO" in result.data.get("entities_mentioned", [])
+
+
+# ---------------------------------------------------------------------------
+# Fix 2: Product name normalization (expanded aliases from YAML)
+# ---------------------------------------------------------------------------
+
+
+def test_normalize_dsp_alias():
+    """DSP → Blue Yonder Demand & Supply Planning."""
+    assert normalize_product_names(["DSP"]) == ["Blue Yonder Demand & Supply Planning"]
+
+
+def test_normalize_case_insensitive():
+    """Alias lookup is case-insensitive."""
+    assert normalize_product_names(["wms"]) == ["Blue Yonder WMS"]
+
+
+def test_normalize_duplicate_after_alias():
+    """Alias + canonical should deduplicate."""
+    result = normalize_product_names(["WMS", "Blue Yonder WMS"])
+    assert result == ["Blue Yonder WMS"]
+
+
+def test_normalize_unknown_product_passes_through():
+    """Unknown products not in alias map pass through unchanged."""
+    assert normalize_product_names(["Custom Product X"]) == ["Custom Product X"]
+
+
+# ---------------------------------------------------------------------------
+# Fix 3: People field cleanup
+# ---------------------------------------------------------------------------
+
+from corp_knowledge_extractor.post_process import filter_people
+
+
+def test_role_filtered():
+    """Pure role title should be filtered."""
+    people, filtered = filter_people(["Technical Account Manager"])
+    assert people == []
+    assert "Technical Account Manager" in filtered
+
+
+def test_org_filtered():
+    """Organization name should be filtered."""
+    people, filtered = filter_people(["Lenzing AG"])
+    assert people == []
+    assert "Lenzing AG" in filtered
+
+
+def test_real_person_kept():
+    """Real person with parenthetical role should be kept."""
+    people, _ = filter_people(["Amy Wilkes (Supply Chain Degree Apprentice)"])
+    assert len(people) == 1
+    assert "Amy Wilkes" in people[0]
+
+
+def test_named_role_kept():
+    """Person with name + role title should be kept."""
+    people, _ = filter_people(["Satish Kalpathy (VP, PMG Head Platform)"])
+    assert len(people) == 1
+
+
+def test_generic_role_filtered():
+    """Generic roles without names should be filtered."""
+    people, filtered = filter_people(["Project Manager", "Solution Architect"])
+    assert people == []
+    assert len(filtered) == 2
+
+
+def test_people_filter_in_post_process():
+    """People filtering runs during post_process_extraction."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test",
+            "date": "2026-03-01",
+            "type": "document",
+            "topics": ["Supply Chain"],
+            "products": [],
+            "people": ["John Smith (VP)", "Technical Account Manager", "Lenzing AG"],
+            "summary": "Test.",
+        },
+        source_file="test.md",
+    )
+    assert "John Smith (VP)" in result.data["people"]
+    assert "Technical Account Manager" not in result.data["people"]
+    assert "Lenzing AG" not in result.data["people"]
+
+
+# ---------------------------------------------------------------------------
+# Fix 4: Client alias normalization
+# ---------------------------------------------------------------------------
+
+from corp_knowledge_extractor.post_process import normalize_client
+
+
+def test_client_alias_lenzing_ag():
+    """Lenzing AG → Lenzing."""
+    assert normalize_client("Lenzing AG") == "Lenzing"
+
+
+def test_client_alias_jlr():
+    """Jaguar Land Rover → JLR."""
+    assert normalize_client("Jaguar Land Rover") == "JLR"
+
+
+def test_client_alias_unknown_passthrough():
+    """Unknown client passes through unchanged."""
+    assert normalize_client("Acme Corp") == "Acme Corp"
+
+
+def test_client_alias_empty():
+    """Empty string returns empty."""
+    assert normalize_client("") == ""
+
+
+# ---------------------------------------------------------------------------
+# Fix 5: Tag ceiling
+# ---------------------------------------------------------------------------
+
+from corp_knowledge_extractor.post_process import cap_tags, generate_tags
+
+
+def test_cap_tags_under_limit():
+    """Tags under limit pass through unchanged."""
+    tags = ["product/wms", "topic/supply-chain"]
+    assert cap_tags(tags) == tags
+
+
+def test_cap_tags_at_limit():
+    """Exactly 12 tags pass through."""
+    tags = [f"topic/t{i}" for i in range(12)]
+    assert cap_tags(tags) == tags
+
+
+def test_cap_tags_over_limit():
+    """Tags over 12 get truncated."""
+    tags = [f"topic/t{i}" for i in range(20)]
+    assert len(cap_tags(tags)) == 12
+
+
+def test_generate_tags_respects_cap():
+    """generate_tags caps at MAX_TAGS."""
+    fm = {
+        "products": [f"Product{i}" for i in range(5)],
+        "topics": [f"Topic{i}" for i in range(8)],
+        "domains": ["Domain1", "Domain2"],
+    }
+    tags = generate_tags(fm)
+    assert len(tags) <= 12
+
+
+def test_generate_tags_priority_order():
+    """Client tags come before product/topic tags."""
+    fm = {
+        "client": "SGDBF",
+        "products": ["WMS"],
+        "topics": ["Supply Chain"],
+    }
+    tags = generate_tags(fm)
+    assert tags[0] == "client/sgdbf"

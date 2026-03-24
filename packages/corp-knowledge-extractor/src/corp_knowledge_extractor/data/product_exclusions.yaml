@@ -1,0 +1,35 @@
+# Products that should NOT appear in the products field
+# These are competitors, infrastructure, or generic terms
+# Excluded items go to entities_mentioned (reclassified, not lost)
+
+competitors:
+  - SAP
+  - SAP ECC6
+  - SAP ECC
+  - SAP S/4HANA
+  - SAP APO
+  - SAP IBP
+  - Oracle
+  - Manhattan Associates
+  - Infor
+  - Kinaxis
+  - o9 Solutions
+  - RELEX
+
+infrastructure:
+  - Azure
+  - AWS
+  - Snowflake
+  - Databricks
+  - Kubernetes
+  - Docker
+  - PostgreSQL
+  - Redis
+
+generic_terms:
+  - API
+  - SaaS
+  - Cloud
+  - Machine Learning
+  - AI
+  - GenAI
