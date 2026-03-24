@@ -99,21 +99,26 @@ def _present_file(
     console.print(Panel("\n".join(lines), border_style="blue"))
 
 
-def _prompt_action(needs_human: bool, has_destination: bool = True) -> str:
+def _prompt_action(
+    needs_human: bool,
+    has_destination: bool = True,
+    dest_was_set: bool = False,
+) -> str:
     """Show action menu and get user choice.
 
     When needs_human=True and has_destination=False (no match, no override),
     [a]ccept is hidden — user must set destination first via [d].
+    After [d] sets a destination, default flips to [a].
     """
     if needs_human and not has_destination:
         console.print(
             "[yellow]No match — set a destination with [d] or add [c]ontext.[/yellow]"
         )
         console.print(
-            "  [bold][d][/bold]estination  "
-            "[bold][c][/bold]ontext  "
-            "[bold][s][/bold]kip  "
-            "[bold][q][/bold]uit"
+            "  [green]\\[d][/green]estination  "
+            "[blue]\\[c][/blue]ontext  "
+            "[red]\\[s][/red]kip  "
+            "[red]\\[q][/red]uit"
         )
         return Prompt.ask(">", choices=["d", "c", "s", "q"], default="d")
 
@@ -123,17 +128,24 @@ def _prompt_action(needs_human: bool, has_destination: bool = True) -> str:
         )
 
     console.print(
-        "  [bold][a][/bold]ccept  "
-        "[bold][e][/bold]dit name  "
-        "[bold][d][/bold]estination  "
-        "[bold][c][/bold]ontext  "
-        "[bold][s][/bold]kip  "
-        "[bold][q][/bold]uit"
+        "  [green]\\[a][/green]ccept  "
+        "[yellow]\\[e][/yellow]dit name  "
+        "[cyan]\\[d][/cyan]estination  "
+        "[blue]\\[c][/blue]ontext  "
+        "[red]\\[s][/red]kip  "
+        "[red]\\[q][/red]uit"
     )
+
+    # Default: [a] if high confidence or destination was just set
+    if not needs_human or dest_was_set:
+        default = "a"
+    else:
+        default = "d"
+
     return Prompt.ask(
         ">",
         choices=["a", "e", "d", "c", "s", "q"],
-        default="a" if not needs_human else "d",
+        default=default,
     )
 
 
@@ -775,11 +787,13 @@ def process_file(
         else None
     )
     current_name = rename.proposed_name
+    dest_was_set = False  # Tracks if user explicitly set destination via [d]
 
     while True:
         choice = _prompt_action(
             classification.needs_human,
             has_destination=current_dest is not None,
+            dest_was_set=dest_was_set,
         )
 
         if choice == "q":
@@ -802,6 +816,7 @@ def process_file(
             new_dest = _get_custom_destination(mywork_root)
             if new_dest is not None:
                 current_dest = new_dest
+                dest_was_set = True
             continue
 
         if choice == "a":

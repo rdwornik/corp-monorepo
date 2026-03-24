@@ -788,7 +788,7 @@ class TestContextBehavior:
         # Simulate: [c] adds context, then [a] accepts
         call_count = [0]
 
-        def mock_prompt_action(needs_human, has_destination=True):
+        def mock_prompt_action(needs_human, has_destination=True, dest_was_set=False):
             call_count[0] += 1
             if call_count[0] == 1:
                 return "c"  # First: add context
@@ -821,7 +821,7 @@ class TestContextBehavior:
 
         calls = []
 
-        def mock_prompt_action(needs_human, has_destination=True):
+        def mock_prompt_action(needs_human, has_destination=True, dest_was_set=False):
             calls.append("prompt")
             if len(calls) == 1:
                 return "c"
