@@ -2168,6 +2168,8 @@ def ingest_command(
 @click.option("--skip-extract", is_flag=True, help="Route file but skip CKE extraction.")
 @click.option("--list", "list_events", is_flag=True, help="Show ingest history.")
 @click.option("--list-all", is_flag=True, help="Show all ingest history (no limit).")
+@click.option("--destination", type=str, default=None,
+              help="Default destination for all files (e.g. 10_Projects/JLR).")
 def ingest_inbox_command(
     path: str | None,
     dry_run: bool,
@@ -2177,6 +2179,7 @@ def ingest_inbox_command(
     skip_extract: bool,
     list_events: bool,
     list_all: bool,
+    destination: str | None,
 ) -> None:
     """Interactively route files from 00_Inbox to their canonical locations.
 
@@ -2239,6 +2242,7 @@ def ingest_inbox_command(
             dry_run=dry_run,
             auto=auto,
             skip_extract=skip_extract,
+            default_destination=destination,
         )
 
         if action == "quit":

@@ -730,16 +730,19 @@ def process_file(
     dry_run: bool = False,
     auto: bool = False,
     skip_extract: bool = False,
+    default_destination: str | None = None,
 ) -> str:
     """Process a single file interactively. Returns action taken.
 
     Actions: 'routed', 'skipped', 'quit'
+
+    default_destination: pre-set destination for all files (--destination flag).
+    Classifier still runs for metadata, but destination is overridden.
     """
     # Step 0: Dedup check BEFORE classify/move (by content hash)
     dedup = _check_dedup(file_path, ops, auto=auto)
     if dedup == "skip":
         return "skipped"
-    # dedup == None means proceed; dedup is never "no_extract" from _check_dedup
 
     # Step 1-2: Detect + Classify
     fallback = registry.get_fallback_config()
@@ -749,17 +752,25 @@ def process_file(
     # Step 3: Propose name
     rename = propose_name(file_path, classification)
 
-    # Auto mode: accept high-confidence matches silently
-    if auto and classification.best_match and classification.best_match.confidence >= 0.90:
+    # Determine destination: --destination flag > classifier
+    override_dest = default_destination
+
+    # Auto mode: accept high-confidence matches or --destination override
+    auto_dest = override_dest or (
+        classification.best_match.destination
+        if classification.best_match and classification.best_match.confidence >= 0.90
+        else None
+    )
+    if auto and auto_dest:
         if dry_run:
             console.print(
                 f"[dim]AUTO [dry-run]: {file_path.name} → "
-                f"{classification.best_match.destination}/ "
+                f"{auto_dest}/ "
                 f"as {rename.proposed_name}[/dim]"
             )
             return "routed"
 
-        dest = classification.best_match.destination
+        dest = auto_dest
         final_path = _move_file(file_path, dest, rename.proposed_name, mywork_root)
         _register_file(final_path, ops)
         event_id = _log_ingest_event(
@@ -781,7 +792,7 @@ def process_file(
 
     # Interactive loop
     user_context: str | None = None
-    current_dest = (
+    current_dest = override_dest or (
         classification.best_match.destination
         if classification.best_match and classification.best_match.matched
         else None

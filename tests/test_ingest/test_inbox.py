@@ -912,3 +912,82 @@ class TestPromptAction:
         assert "e" in choices
         assert "d" in choices
 
+
+class TestDefaultDestination:
+    def test_auto_uses_default_destination(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """--destination overrides classifier in auto mode."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "random_unclassified_file.docx"
+        f.write_bytes(b"unique_dest_test")
+
+        dest_dir = mywork / "10_Projects" / "JLR"
+        dest_dir.mkdir(parents=True)
+
+        action = process_file(
+            f, mywork, registry, ops,
+            auto=True, skip_extract=True,
+            default_destination="10_Projects/JLR",
+        )
+        assert action == "routed"
+        assert not f.exists()
+
+        # Verify it went to the specified destination
+        events = ops.get_recent_events(5)
+        route = [e for e in events if e["action"] == "ingest_inbox_route"]
+        assert len(route) >= 1
+        assert "10_Projects/JLR" in route[0]["destination_path"]
+
+    def test_interactive_uses_default_destination(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """--destination pre-fills current_dest in interactive mode."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "unknown_file.pdf"
+        f.write_bytes(b"unique_interactive_dest")
+
+        dest_dir = mywork / "10_Projects" / "JLR"
+        dest_dir.mkdir(parents=True)
+
+        with patch("corp_by_os.ingest.inbox._prompt_action") as mock_prompt:
+            mock_prompt.return_value = "a"
+            action = process_file(
+                f, mywork, registry, ops,
+                skip_extract=True,
+                default_destination="10_Projects/JLR",
+            )
+
+        assert action == "routed"
+
+    def test_per_file_override_wins(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """[d] override takes priority over --destination."""
+        inbox = mywork / "00_Inbox"
+        f = inbox / "specific_file.xlsx"
+        f.write_bytes(b"unique_override_test")
+
+        (mywork / "10_Projects" / "JLR").mkdir(parents=True)
+        (mywork / "50_RFP").mkdir(parents=True)
+
+        call_count = [0]
+
+        def mock_prompt(needs_human, has_destination=True, dest_was_set=False):
+            call_count[0] += 1
+            if call_count[0] == 1:
+                return "d"  # Override destination
+            return "a"
+
+        with patch("corp_by_os.ingest.inbox._prompt_action", side_effect=mock_prompt):
+            with patch("corp_by_os.ingest.inbox._get_custom_destination", return_value="50_RFP"):
+                action = process_file(
+                    f, mywork, registry, ops,
+                    skip_extract=True,
+                    default_destination="10_Projects/JLR",
+                )
+
+        assert action == "routed"
+        events = ops.get_recent_events(5)
+        route = [e for e in events if e["action"] == "ingest_inbox_route"]
+        assert "50_RFP" in route[0]["destination_path"]
