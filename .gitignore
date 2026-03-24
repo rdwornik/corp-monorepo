@@ -10,6 +10,7 @@ dist/
 build/
 .venv/
 venv/
+env/
 
 # IDE
 .vscode/
@@ -19,11 +20,13 @@ venv/
 # Testing
 .coverage
 .pytest_cache/
+.mypy_cache/
 htmlcov/
 
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Local data
 *.db
