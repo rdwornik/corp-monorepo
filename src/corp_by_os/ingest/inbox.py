@@ -816,7 +816,23 @@ def process_file(
 
         if choice == "c":
             user_context = _get_user_context()
-            # Context stored for extraction, does NOT change filename
+            # Context stored for extraction, does NOT change filename.
+            # But if context mentions a known client, suggest that project.
+            if not current_dest or classification.needs_human:
+                client_match = registry._match_client(user_context)
+                if client_match.matched and client_match.destination:
+                    console.print(
+                        f"  [cyan]Suggested destination:[/cyan] "
+                        f"{client_match.destination}"
+                    )
+                    use_it = Prompt.ask(
+                        "  Use this destination?",
+                        choices=["y", "n"],
+                        default="y",
+                    )
+                    if use_it == "y":
+                        current_dest = client_match.destination
+                        dest_was_set = True
             continue
 
         if choice == "e":
