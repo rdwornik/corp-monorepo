@@ -58,8 +58,8 @@ def _ensure_cke_importable() -> None:
 
     # Verify import works
     try:
-        import batch_api  # noqa: F401
-        import manifest  # noqa: F401
+        import corp_knowledge_extractor.batch_api  # noqa: F401
+        import corp_knowledge_extractor.manifest  # noqa: F401
 
         _cke_imported = True
         logger.info("CKE direct import OK from %s", cke_src)
@@ -100,9 +100,9 @@ def estimate_cost(manifest_path: Path) -> dict[str, Any]:
     Returns: {total_cost, tier_breakdown: {1: n, 2: n, 3: n}, file_count}
     """
     _ensure_cke_importable()
-    from inventory import FileType, SourceFile  # type: ignore[import-untyped]
-    from manifest import Manifest  # type: ignore[import-untyped]
-    from tier_router import estimate_batch_cost  # type: ignore[import-untyped]
+    from corp_knowledge_extractor.inventory import FileType, SourceFile  # type: ignore[import-untyped]
+    from corp_knowledge_extractor.manifest import Manifest  # type: ignore[import-untyped]
+    from corp_knowledge_extractor.tier_router import estimate_batch_cost  # type: ignore[import-untyped]
 
     m = Manifest.from_file(manifest_path)
     source_files = []
@@ -143,8 +143,8 @@ def extract_batch(
     Returns: {total, done, error, skipped, cost, tiers}
     """
     _ensure_cke_importable()
-    from batch_api import BatchJobRunner  # type: ignore[import-untyped]
-    from manifest import Manifest  # type: ignore[import-untyped]
+    from corp_knowledge_extractor.batch_api import BatchJobRunner  # type: ignore[import-untyped]
+    from corp_knowledge_extractor.manifest import Manifest  # type: ignore[import-untyped]
 
     config = load_cke_config()
     if model:
@@ -183,8 +183,8 @@ def extract_sync(
     Returns: {total, done, error, skipped, cost, tiers}
     """
     _ensure_cke_importable()
-    from batch import BatchProcessor  # type: ignore[import-untyped]
-    from manifest import Manifest  # type: ignore[import-untyped]
+    from corp_knowledge_extractor.batch import BatchProcessor  # type: ignore[import-untyped]
+    from corp_knowledge_extractor.manifest import Manifest  # type: ignore[import-untyped]
 
     config = load_cke_config()
     if model:
@@ -235,7 +235,7 @@ def scan_local(
     _ensure_cke_importable()
     from dataclasses import asdict
 
-    from scan import scan_path  # type: ignore[import-untyped]
+    from corp_knowledge_extractor.scan import scan_path  # type: ignore[import-untyped]
 
     results = scan_path(path, recursive=recursive, exclude=exclude)
     return [asdict(r) for r in results]

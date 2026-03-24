@@ -1,6 +1,6 @@
 """Builds CKE-compatible manifest with v2.1 provenance fields.
 
-CKE Manifest Schema (from corp-knowledge-extractor/src/manifest.py):
+CKE Manifest Schema (from corp-knowledge-extractor/src/corp_knowledge_extractor/manifest.py):
 
     Format: JSON
     Schema version: 1
