@@ -16,7 +16,7 @@ agents:
 
   corp-project-extractor:
     cli: cpe
-    path: "C:\\Users\\1028120\\Documents\\Scripts\\corp-project-extractor"
+    path: "C:\\Users\\1028120\\Documents\\Scripts\\corp-monorepo\\packages\\corp-project-extractor"
     commands:
       scan: {description: "Classify files in project folder", args: [project_path]}
       extract-cke: {description: "Extract knowledge via CKE batch", args: [project_path]}
@@ -26,7 +26,7 @@ agents:
 
   corp-knowledge-extractor:
     cli: cke
-    path: "C:\\Users\\1028120\\Documents\\Scripts\\corp-knowledge-extractor"
+    path: "C:\\Users\\1028120\\Documents\\Scripts\\corp-monorepo\\packages\\corp-knowledge-extractor"
     commands:
       process: {description: "Process single file", args: [file_path]}
       process-manifest: {description: "Batch process from manifest", args: [manifest_path]}
@@ -35,7 +35,7 @@ agents:
 
   corp-os-meta:
     cli: corp-meta
-    path: "C:\\Users\\1028120\\Documents\\Scripts\\corp-os-meta"
+    path: "C:\\Users\\1028120\\Documents\\Scripts\\corp-monorepo\\packages\\corp-os-meta"
     commands:
       validate: {description: "Validate note frontmatter", args: [path]}
       normalize: {description: "Normalize taxonomy terms", args: [path]}

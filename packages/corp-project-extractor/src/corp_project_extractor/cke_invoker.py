@@ -6,13 +6,47 @@ Runs CKE as a subprocess -- maintains CLI boundary per orchestrator pattern.
 from __future__ import annotations
 
 import logging
+import os
+import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-# CKE location -- configurable via config, default for this workstation
-CKE_DIR = Path("C:/Users/1028120/Documents/Scripts/corp-knowledge-extractor")
+# CKE location -- env var > monorepo > standalone fallback
+CKE_DIR = Path(
+    os.environ.get(
+        "CKE_PATH",
+        "C:/Users/1028120/Documents/Scripts/corp-monorepo/packages/corp-knowledge-extractor",
+    )
+)
+
+
+def _resolve_cke_python(cke: Path) -> tuple[str, ...]:
+    """Resolve how to invoke CKE: venv python > installed cke CLI > sys.executable.
+
+    Returns:
+        Command prefix tuple (python, script) or (cke_cli,).
+    """
+    # 1. Per-package venv (standalone layout)
+    cke_python = cke / "venv" / "Scripts" / "python.exe"
+    run_script = cke / "scripts" / "run.py"
+    if cke_python.exists() and run_script.exists():
+        return (str(cke_python), str(run_script))
+
+    # 2. CKE installed as CLI entry point (monorepo / pip install -e)
+    cke_cli = shutil.which("cke")
+    if cke_cli:
+        return (cke_cli,)
+
+    # 3. Current Python with run.py
+    if run_script.exists():
+        return (sys.executable, str(run_script))
+
+    raise FileNotFoundError(
+        f"CKE not found. Checked: {cke_python}, PATH, {run_script}"
+    )
 
 
 def invoke_cke_batch(
@@ -33,21 +67,10 @@ def invoke_cke_batch(
         CompletedProcess with return code
     """
     cke = cke_dir or CKE_DIR
-
-    # CKE has its own venv -- use its Python
-    cke_python = cke / "venv" / "Scripts" / "python.exe"
-    if not cke_python.exists():
-        raise FileNotFoundError(
-            f"CKE Python not found at {cke_python}. Ensure corp-knowledge-extractor is installed at {cke}"
-        )
-
-    run_script = cke / "scripts" / "run.py"
-    if not run_script.exists():
-        raise FileNotFoundError(f"CKE run script not found at {run_script}")
+    prefix = _resolve_cke_python(cke)
 
     cmd = [
-        str(cke_python),
-        str(run_script),
+        *prefix,
         "process-manifest",
         str(manifest_path.resolve()),
         "--max-rpm",
