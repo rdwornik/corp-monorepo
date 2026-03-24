@@ -1,0 +1,445 @@
+# ======================
+# GEMINI API SETTINGS (new pipeline)
+# ======================
+
+gemini:
+  model: "gemini-3-flash-preview"
+  api_key_env: "GEMINI_API_KEY"
+  max_file_size_mb: 2000
+  upload_timeout_sec: 300
+  generation_timeout_sec: 120
+  polling_interval_sec: 5
+
+# ======================
+# FRAME SAMPLING (new pipeline)
+# ======================
+
+frame_sampling:
+  interval_sec: 10 # Extract 1 frame every N seconds
+  max_frames: 500 # Safety cap
+  format: "png" # Output format
+  cleanup_non_slides: true # Delete temp frames after Gemini selects unique slides
+
+# ======================
+# VIDEO COMPRESSION (new pipeline)
+# ======================
+
+compression:
+  enabled: true
+  resolution: "1280:720"
+  preset: "ultrafast"
+  crf: 28
+  audio_bitrate: "64k"
+  skip_if_under_mb: 50
+
+# ======================
+# SUPPORTED FILE TYPES (new pipeline)
+# ======================
+
+file_types:
+  video: [".mkv", ".mp4", ".webm", ".avi", ".mov", ".wmv"]
+  audio: [".mp3", ".wav", ".m4a", ".ogg", ".flac"]
+  document: [".pdf", ".docx"]
+  slides: [".pptx"]
+  spreadsheet: [".xlsx", ".csv"]
+  note: [".md", ".txt"]
+  transcript: [".srt", ".vtt"]
+
+# ======================
+# LLM PROMPTS (new pipeline)
+# ======================
+
+prompts:
+  extract: |
+    You are a critical-thinking knowledge analyst helping a fast-reading
+    technical professional learn from corporate recordings and documents.
+
+    RULES:
+    - Do NOT describe what is visible — the reader will see the file.
+    - FOCUS on what was EXPLAINED or DECIDED — specifically:
+      - Things specific to this company, not generic industry knowledge
+      - Concrete numbers, commitments, timelines, decisions
+      - Practical implications — "so what does this mean?"
+      - Surprising or counterintuitive claims
+    - SKIP corporate filler: "we're excited", "world-class", "committed to excellence"
+    - BE CRITICAL: note when the content is vague, makes unsupported claims, or dodges specifics
+    - Write as a teacher helping a smart colleague understand what actually matters
+    - Do NOT use [[Obsidian links]] anywhere in your text.
+
+    FORMATTING RULES:
+    - Start each insight paragraph with 2-3 bold words summarizing the point
+    - Keep paragraphs short (2-3 sentences max)
+
+    TOPIC/PEOPLE/PRODUCT NAMING:
+    - Use CANONICAL TERMS from the taxonomy list provided below when a concept matches.
+      If unsure, use the closest canonical term. Only create new terms for genuinely novel concepts.
+    - topics: maximum 8, ranked by importance
+    - products: maximum 4
+    - people: maximum 3, prioritize presenters/speakers
+
+    KNOWLEDGE DIMENSION RULES:
+    - domains: assign 1-3 from the KNOWLEDGE DOMAINS list provided below. Do NOT invent new domains.
+    - source_type: classify what kind of source this is (training video, RFP, meeting, etc.)
+    - layer: "operational" if about a specific customer/deal, "learning" if general knowledge,
+      "reference" if reusable template/playbook
+    - confidentiality: "confidential" if mentions specific client names/budgets/deals,
+      "internal" for general Blue Yonder content, "public" only if explicitly public-facing,
+      "restricted" for M&A, non-public pricing, security details
+    - authority: "authoritative" for official product docs and signed agreements,
+      "approved" for reviewed presentations and validated content,
+      "tribal" for meeting notes, informal discussions, inferences
+    - client: extract client/customer name if mentioned, null otherwise
+
+    FACT EXTRACTION RULES:
+    - The document text contains [PAGE N], [SLIDE N], or [SECTION N] markers.
+    - Extract concrete, atomic facts into the "facts" array below.
+    - Each fact MUST include the page/slide/section number where it was found.
+    - A fact is a single specific claim, number, decision, or capability statement.
+    - Aim for 5-20 facts per document (more for longer/richer documents).
+
+    REQUIRED OUTPUT FIELDS:
+    - key_facts: Extract at least 5 specific factual claims from this document.
+      Each fact must contain at least one number, date, metric, company name,
+      or product detail. If the document has fewer than 5 notable facts, extract
+      as many as possible.
+    - entities_mentioned: List all companies, products, people, and organizations
+      mentioned.
+
+    Respond ONLY with valid JSON (no markdown fences):
+    {
+      "title": "Descriptive title using full product/company names",
+      "summary": "2-3 sentences — what matters here and why, not what happened",
+      "key_points": ["insight 1", "insight 2"],
+      "key_facts": [
+        "Specific fact with number/date/metric (cite section if possible)",
+        "Another specific factual claim with concrete data"
+      ],
+      "entities_mentioned": ["Company A", "Product B", "Person C"],
+      "facts": [
+        {"fact": "Concrete atomic fact with specific detail", "page": 3},
+        {"fact": "Another specific fact or capability", "slide": 5}
+      ],
+      "topics": ["Topic Name", "Another Topic"],
+      "people": ["Full Name (Role if known)"],
+      "products": ["Full Product Name"],
+      "domains": ["Domain1", "Domain2"],
+      "source_type": "opportunity|rfp|meeting|training|documentation|release_note|research|internal_update",
+      "layer": "operational|learning|reference",
+      "confidentiality": "public|internal|confidential|restricted",
+      "authority": "authoritative|approved|tribal",
+      "client": "Client Name or null",
+      "content_type": "training|meeting|demo|presentation|discussion",
+      "language": "en",
+      "quality": "high|medium|low",
+      "duration_min": null,
+      "transcript_excerpt": "Most important ~500 words — decisions, specifics, not filler"
+    }
+
+  extract_with_slides: |
+    You are a critical-thinking knowledge analyst helping a fast-reading
+    technical professional learn from corporate video recordings.
+
+    You receive the video AND sampled frame images (slides).
+
+    RULES FOR SLIDE ANALYSIS:
+    - Do NOT describe what is visually on the slides. The reader sees the image.
+    - FOCUS on what the speaker SAID about each slide — specifically:
+      - Things specific to this company, not generic industry knowledge
+      - Concrete numbers, commitments, timelines, decisions
+      - Practical implications — "so what does this mean?"
+      - Surprising or counterintuitive claims
+    - SKIP corporate filler: "we're excited", "world-class", "committed to excellence"
+    - BE CRITICAL: note when speaker is vague, makes unsupported claims, or dodges specifics
+    - Write as a teacher helping a smart colleague understand what actually matters
+    - Do NOT use [[Obsidian links]] anywhere in your text. Links are handled separately.
+
+    FORMATTING RULES:
+    - Start each insight paragraph with 2-3 bold words summarizing the point
+    - Keep paragraphs short (2-3 sentences max)
+    - Mark critical observations or red flags with a "WARNING:" prefix
+
+    TOPIC/PEOPLE/PRODUCT NAMING:
+    - Use CANONICAL TERMS from the taxonomy list provided below when a concept matches.
+      If unsure, use the closest canonical term. Only create new terms for genuinely novel concepts.
+    - topics: maximum 8, ranked by importance
+    - products: maximum 4
+    - people: maximum 3, prioritize presenters/speakers
+
+    KNOWLEDGE DIMENSION RULES:
+    - domains: assign 1-3 from the KNOWLEDGE DOMAINS list provided below. Do NOT invent new domains.
+    - source_type: classify what kind of source this is (training video, RFP, meeting, etc.)
+    - layer: "operational" if about a specific customer/deal, "learning" if general knowledge,
+      "reference" if reusable template/playbook
+    - confidentiality: "confidential" if mentions specific client names/budgets/deals,
+      "internal" for general Blue Yonder content, "public" only if explicitly public-facing,
+      "restricted" for M&A, non-public pricing, security details
+    - authority: "authoritative" for official product docs and signed agreements,
+      "approved" for reviewed presentations and validated content,
+      "tribal" for meeting notes, informal discussions, inferences
+    - client: extract client/customer name if mentioned, null otherwise
+
+    Respond ONLY with valid JSON, no markdown fences:
+    {
+      "title": "descriptive title using full product/company names",
+      "summary": "2-3 sentences — what matters here and why, not what happened",
+      "key_points": ["insight 1", "insight 2"],
+      "topics": ["Topic Name", "Another Topic"],
+      "people": ["Full Name (Role if known)"],
+      "products": ["Full Product Name"],
+      "domains": ["Domain1", "Domain2"],
+      "source_type": "opportunity|rfp|meeting|training|documentation|release_note|research|internal_update",
+      "layer": "operational|learning|reference",
+      "confidentiality": "public|internal|confidential|restricted",
+      "authority": "authoritative|approved|tribal",
+      "client": "Client Name or null",
+      "type": "training|demo|meeting|workshop|presentation|lecture|tutorial",
+      "language": "en",
+      "quality": "full|partial|fragment",
+      "duration_min": 50,
+      "transcript_excerpt": "most important ~500 words — decisions, specifics, not filler",
+      "slides": [
+        {
+          "frame_index": 5,
+          "slide_number": 1,
+          "slide_title": "Short title",
+          "timestamp_approx": "07:00",
+          "speaker_insight": "What the speaker ACTUALLY SAID that matters. Bold first 2-3 words of each paragraph. Focus on specifics, commitments, implications. Skip anything that just reads the slide.",
+          "so_what": "Why this matters practically. One paragraph.",
+          "critical_notes": "Red flags, vague claims, things needing verification. Null if nothing to flag.",
+          "key_facts": ["Concrete fact 1 with number/date/name", "Concrete fact 2"]
+        }
+      ]
+    }
+
+    IMPORTANT:
+    - frame_index must match the sample_NNNN number (0-based) of the provided frame image
+    - speaker_insight must come from AUDIO, not from reading the slide
+    - If the video has no slides (audio-only meeting), return empty slides array
+    - NEVER use double-quote characters (") inside JSON string values — use single quotes or backticks instead
+
+  extract_pptx_slides: |
+    You are analyzing a PowerPoint presentation. Each image is a rendered slide.
+    Analyze EVERY slide and extract ALL factual content visible.
+
+    RULES:
+    - If a slide contains a diagram, describe what the diagram shows including all labels and connections
+    - If a slide contains a table, extract all rows and columns as structured data
+    - If a slide contains a chart, describe the trend and cite specific data points
+    - Do NOT summarize — capture EVERYTHING visible on the slide
+    - Every number, percentage, date, SLA, timeline, metric must appear in key_facts
+    - Title/divider slides: still include them but mark key_facts as empty
+    - Do NOT redact, censor, or replace any company names, product names, or brand names
+    - Do NOT use [[Obsidian links]] anywhere in your text
+
+    TOPIC/PEOPLE/PRODUCT NAMING:
+    - Use CANONICAL TERMS from the taxonomy list provided below when a concept matches.
+    - topics: maximum 8, ranked by importance
+    - products: maximum 4
+    - people: maximum 3
+
+    KNOWLEDGE DIMENSION RULES:
+    - domains: assign 1-3 from the KNOWLEDGE DOMAINS list provided below. Do NOT invent new domains.
+    - source_type: classify what kind of source this is
+    - layer: "operational" if about a specific customer/deal, "learning" if general knowledge,
+      "reference" if reusable template/playbook
+    - confidentiality: "confidential" if mentions specific client names/budgets/deals,
+      "internal" for general content, "public" only if explicitly public-facing
+    - authority: "authoritative" for official product docs, "approved" for reviewed content,
+      "tribal" for informal content
+    - client: extract client/customer name if mentioned, null otherwise
+
+    Respond ONLY with valid JSON (no markdown fences):
+    {
+      "title": "Descriptive presentation title",
+      "summary": "2-3 sentences — what this presentation covers and why it matters",
+      "key_points": ["insight 1", "insight 2"],
+      "topics": ["Topic Name"],
+      "people": ["Full Name (Role if known)"],
+      "products": ["Full Product Name"],
+      "domains": ["Domain1"],
+      "source_type": "documentation",
+      "layer": "reference",
+      "confidentiality": "internal",
+      "authority": "approved",
+      "client": null,
+      "content_type": "presentation",
+      "language": "en",
+      "quality": "full",
+      "slides": [
+        {
+          "slide_number": 1,
+          "slide_title": "Short title from the slide",
+          "speaker_insight": "What this slide communicates. Describe diagrams, tables, charts in detail. Bold first 2-3 words of each paragraph.",
+          "so_what": "Why this matters practically. One paragraph.",
+          "critical_notes": "Red flags, vague claims, missing sources. Null if nothing to flag.",
+          "key_facts": ["Specific fact with number/date", "Another concrete detail"]
+        }
+      ]
+    }
+
+    IMPORTANT:
+    - slide_number must match the order of images provided (1-based)
+    - Provide an entry for EVERY slide image
+    - NEVER use double-quote characters inside JSON string values — use single quotes instead
+
+  synthesize: |
+    You are synthesizing knowledge from multiple related files into a unified overview.
+    Review the extracted knowledge from each file and create a combined synthesis.
+
+    Respond with valid JSON only (no markdown fences):
+    {
+      "title": "Overall session/meeting title",
+      "executive_summary": "3-5 sentence executive summary",
+      "key_takeaways": ["takeaway 1", "takeaway 2", "..."],
+      "all_topics": ["comprehensive topic list"],
+      "all_people": ["all people mentioned"],
+      "all_products": ["all products/systems mentioned"],
+      "relationships": "How the files relate to each other",
+      "action_items": ["any action items mentioned"],
+      "open_questions": ["unresolved questions or topics needing follow-up"]
+    }
+
+# ======================
+# GENERAL SETTINGS
+# ======================
+
+# Input paths and file extensions
+input:
+  directory: "data/input"
+  video_extensions: [".mp4", ".mkv", ".avi", ".mov"]
+
+# Output directory
+output:
+  directory: "output"
+
+# Paths to external tools
+tools:
+  tesseract_path: "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
+
+# ======================
+# LLM SETTINGS
+# ======================
+
+llm:
+  # Primary model for synthesis
+  model: "gemini-3-flash-preview"
+
+  # Tagger model (can be different from synthesis model)
+  tagger_model: "gemini-3-flash-preview"
+
+  # Whisper model for transcription
+  whisper_model: "medium"
+
+  # Dynamic token budgets per extraction type
+  token_budgets:
+    standard: 8192
+    deep_base: 16384
+    deep_per_slide_over_20: 256
+    deep_max: 24576
+    multimodal_base: 8192
+    multimodal_per_minute_over_30: 128
+    multimodal_max: 16384
+    merge: 12288
+
+# ======================
+# TRANSCRIPTION SETTINGS
+# ======================
+
+transcription:
+  # Provider selection
+  # Options: "auto", "groq", "openai"
+  # "auto" = intelligent selection based on file duration and cost
+  provider: "auto"
+
+  # Auto-selection thresholds
+  auto_selection:
+    # Maximum duration for Groq free tier (seconds)
+    # Groq has 7200s/hour limit - use 6000s (1h 40min) as safe threshold
+    groq_max_duration_seconds: 6000
+
+    # Prefer free tier when possible
+    prefer_free: true
+
+    # Warn if file would require multiple Groq sessions
+    warn_multiple_sessions: true
+
+  # Groq settings (FREE TIER)
+  groq:
+    model: "whisper-large-v3"
+
+    # Rate limit: 7200 seconds per hour
+    rate_limit_seconds_per_hour: 7200
+
+    # Maximum file size before preprocessing (MB)
+    max_file_size_mb: 25
+
+  # OpenAI settings (PAID)
+  openai:
+    model: "whisper-1"
+
+    # Cost per minute of audio ($0.006/min as of 2025)
+    cost_per_minute: 0.006
+
+    # OpenAI also has 25MB limit - uses same chunking as Groq
+    max_file_size_mb: 25
+
+  # Retry settings for both providers
+  retry:
+    # Enable automatic retry on rate limit errors
+    enabled: true
+
+    # Maximum number of retries
+    max_retries: 3
+
+    # Backoff multiplier (wait time increases each retry)
+    backoff_multiplier: 1.5
+
+    # Initial retry delay (seconds)
+    initial_delay: 60
+
+  # Silence removal settings
+  silence_removal:
+    # Enable silence removal to reduce file size
+    enabled: true
+
+    # Silence threshold in dB (higher = more aggressive)
+    # -40dB is good for meetings (removes pauses, keeps speech)
+    # -30dB would be more aggressive, -50dB more conservative
+    threshold_db: -40
+
+    # Minimum silence duration to remove (seconds)
+    # 2.0s removes long pauses between topics
+    # 1.0s would remove shorter pauses
+    min_silence_duration: 2.0
+
+  # Audio chunking for large files (mainly for Groq)
+  chunking:
+    # Enable automatic chunking if file exceeds max_file_size_mb
+    enabled: true
+
+    # Maximum chunk size in MB (keep under 25MB for Groq)
+    max_chunk_size_mb: 24
+
+    # Overlap between chunks in seconds (preserves context at boundaries)
+    # 5s ensures words at chunk boundaries aren't lost
+    overlap_seconds: 5.0
+
+# ======================
+# CONTENT LIMITS
+# ======================
+
+limits:
+  # Maximum OCR text length per frame sent to LLM
+  ocr_text_max_chars: 500
+
+  # Default speech range for last frame (seconds)
+  speech_range_last_frame: 60
+
+  # Minimum text length to be considered valuable
+  min_valuable_text_length: 20
+
+  # Minimum explanation length for post-processing
+  min_explanation_length: 30
+
+  # Minimum technical details length
+  min_technical_details_length: 10
