@@ -991,3 +991,25 @@ class TestDefaultDestination:
         events = ops.get_recent_events(5)
         route = [e for e in events if e["action"] == "ingest_inbox_route"]
         assert "50_RFP" in route[0]["destination_path"]
+
+    def test_destination_overrides_classifier(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """--destination overrides even a high-confidence classifier match."""
+        inbox = mywork / "00_Inbox"
+        # Cognitive Friday has 0.95 confidence series match
+        f = inbox / "Cognitive_Friday_S4.pptx"
+        f.write_bytes(b"unique_override_classifier")
+
+        (mywork / "10_Projects" / "JLR").mkdir(parents=True)
+
+        action = process_file(
+            f, mywork, registry, ops,
+            auto=True, skip_extract=True,
+            default_destination="10_Projects/JLR",
+        )
+        assert action == "routed"
+        events = ops.get_recent_events(5)
+        route = [e for e in events if e["action"] == "ingest_inbox_route"]
+        # Should go to JLR, not Cognitive_Friday training folder
+        assert "10_Projects/JLR" in route[0]["destination_path"]
