@@ -1,0 +1,156 @@
+schema_version: "1.1"
+
+# Top-level aliases: RFP Agent shorthand -> canonical key
+aliases:
+  planning: demand_planning
+  logistics: tms
+  catman: category_management
+  commerce: oms
+  scp: supply_planning
+
+# Sub-products with parent relationships for query expansion
+sub_products:
+  # WMS family
+  wms_native: {parent: wms}
+  wms_billing: {parent: wms}
+  wms_labor: {parent: wms}
+  wms_robotics: {parent: wms}
+  wms_tasking: {parent: wms}
+
+  # Planning family
+  planning_ibp: {parent: demand_planning}
+  planning_pps: {parent: demand_planning}
+
+  # TMS/Logistics family
+  logistics_carrier: {parent: tms}
+  logistics_load: {parent: tms}
+  logistics_modeling: {parent: tms}
+  logistics_ba: {parent: tms}
+  logistics_fom: {parent: tms}
+  logistics_procurement: {parent: tms}
+  logistics_to_tr: {parent: tms}
+
+  # Retail family (under demand_planning)
+  retail_demand_edge: {parent: demand_planning}
+  retail_ap: {parent: demand_planning}
+  retail_ar: {parent: demand_planning}
+  retail_clearance: {parent: demand_planning}
+  retail_ia: {parent: demand_planning}
+  retail_markdown: {parent: demand_planning}
+  retail_mfp: {parent: demand_planning}
+
+  # Category Management family
+  catman_assortment: {parent: category_management}
+  catman_space: {parent: category_management}
+
+  # Commerce/OMS family
+  commerce_orders: {parent: oms}
+
+  # SCP family
+  scp_promo_mgmt: {parent: supply_planning}
+  scp_promo_opt: {parent: supply_planning}
+  scp_sequencing: {parent: supply_planning}
+
+  # Other
+  flexis_other: {parent: wms}
+  flexis_slotting: {parent: wms}
+  workforce_alf: {parent: platform}
+  doddle: {parent: oms}
+
+products:
+  - key: platform
+    display_names: ["Blue Yonder Platform", "Platform"]
+    vendor: "Blue Yonder"
+
+  - key: wms
+    display_names: ["Blue Yonder WMS", "Warehouse Management", "BY WMS", "WMS"]
+    vendor: "Blue Yonder"
+    variants:
+      - key: wms_classic
+        display_names: ["WMS Classic", "Blue Yonder WMS Classic"]
+      - key: wms_native
+        display_names: ["Platform Native Warehouse Management", "WMS Native"]
+
+  - key: tms
+    display_names: ["Blue Yonder TMS", "TM, TP, TMU, Archive", "Transportation Management"]
+    vendor: "Blue Yonder"
+
+  - key: oms
+    display_names: ["Blue Yonder OMS", "Order Management", "Inventory & Commits Service"]
+    vendor: "Blue Yonder"
+
+  - key: demand_planning
+    display_names: ["Blue Yonder Demand Planning", "Blue Yonder Cognitive Demand Planning"]
+    vendor: "Blue Yonder"
+
+  - key: supply_planning
+    display_names: ["Blue Yonder Supply Planning", "Blue Yonder Enterprise Supply Planning (ESP)"]
+    vendor: "Blue Yonder"
+
+  - key: ibp
+    display_names: ["Blue Yonder Integrated Business Planning"]
+    vendor: "Blue Yonder"
+
+  - key: control_tower
+    display_names: ["Blue Yonder Control Tower", "Control Tower Visibility", "Control Tower"]
+    vendor: "Blue Yonder"
+
+  - key: network
+    display_names: ["Blue Yonder Network Design", "Blue Yonder Network", "Command Center"]
+    vendor: "Blue Yonder"
+
+  - key: category_management
+    display_names: ["Blue Yonder Category Management", "Category Management Suite"]
+    vendor: "Blue Yonder"
+
+  - key: workforce
+    display_names: ["Workforce Management"]
+    vendor: "Blue Yonder"
+
+  - key: doddle
+    display_names: ["Returns Management"]
+    vendor: "Blue Yonder"
+
+  - key: flexis
+    display_names: ["Order Sequencing", "Order Slotting"]
+    vendor: "Blue Yonder"
+
+  - key: assortment
+    display_names: ["Blue Yonder Luminate Assortment", "Strategic Assortment", "Assortment Planning"]
+    vendor: "Blue Yonder"
+
+  - key: allocation_replenishment
+    display_names: ["Blue Yonder Allocation and Replenishment"]
+    vendor: "Blue Yonder"
+
+  - key: merchandise_planning
+    display_names: ["Blue Yonder Merchandise Financial Planning"]
+    vendor: "Blue Yonder"
+
+  - key: replenishment_retail
+    display_names: ["Blue Yonder Replenishment for Retail"]
+    vendor: "Blue Yonder"
+
+  - key: forecasting_retail
+    display_names: ["Blue Yonder Forecasting for Retail"]
+    vendor: "Blue Yonder"
+
+  - key: analytics
+    display_names: ["Analytics"]
+    is_platform_service: true
+
+  - key: bdm
+    display_names: ["Business Data Management"]
+    is_platform_service: true
+
+  - key: daas
+    display_names: ["Data as a Service"]
+    is_platform_service: true
+
+  - key: ml_studio
+    display_names: ["ML Studio"]
+    is_platform_service: true
+
+  - key: workflow_orchestration
+    display_names: ["Workflow Orchestration"]
+    is_platform_service: true

@@ -1,0 +1,48 @@
+schema_version: "1.0"
+reliability_tiers:
+  official_architecture_doc:
+    score: 1.0
+    description: "Official BY platform architecture documentation"
+    examples: ["BYPlatform-Architecture.pdf", "Platform v3.0 Service Description.pdf"]
+
+  official_product_doc:
+    score: 0.9
+    description: "Official product-specific documentation"
+    examples: ["WMS User Guide", "TMS API Reference"]
+
+  service_description:
+    score: 0.85
+    description: "Platform service descriptions and SLA documents"
+
+  implementation_guide:
+    score: 0.8
+    description: "Implementation guides, deployment manuals"
+
+  release_notes:
+    score: 0.75
+    description: "Release notes, changelog, migration guides"
+
+  training_material:
+    score: 0.7
+    description: "Training slides, enablement decks"
+
+  vendor_marketing:
+    score: 0.5
+    description: "Marketing materials, corporate presentations"
+    examples: ["Blue Yonder Pitch Deck", "Corporate Presentation"]
+
+  sales_deck:
+    score: 0.4
+    description: "Sales presentations, customer-specific decks"
+
+  historical_rfp:
+    score: 0.6
+    description: "Previous RFP responses (may be outdated)"
+
+  user_notes:
+    score: 0.3
+    description: "Personal notes, meeting summaries"
+
+  external_source:
+    score: 0.2
+    description: "Third-party content, analyst reports"
