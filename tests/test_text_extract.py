@@ -2,7 +2,7 @@
 
 import pytest
 from pathlib import Path
-from src.text_extract import extract_text, TextExtractionResult, _assess_quality
+from corp_knowledge_extractor.text_extract import extract_text, TextExtractionResult, _assess_quality
 
 
 def test_assess_quality_good():

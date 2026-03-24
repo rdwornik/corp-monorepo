@@ -3,7 +3,7 @@
 import logging
 import os
 
-from src.providers.base import ExtractionProvider, ExtractionRequest, ExtractionResponse
+from corp_knowledge_extractor.providers.base import ExtractionProvider, ExtractionRequest, ExtractionResponse
 
 log = logging.getLogger(__name__)
 

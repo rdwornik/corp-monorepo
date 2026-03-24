@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
-from src.synthesize import compute_quality_score
+from corp_knowledge_extractor.synthesize import compute_quality_score
 
 
 class TestComputeQualityScore:

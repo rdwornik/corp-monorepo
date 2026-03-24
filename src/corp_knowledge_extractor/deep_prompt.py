@@ -6,13 +6,14 @@ doc_types without overlay mappings.
 """
 
 import logging
-from pathlib import Path
 
 import yaml
 
+from corp_knowledge_extractor._paths import PROMPTS_DIR
+
 log = logging.getLogger(__name__)
 
-_PROMPTS_DIR = Path(__file__).parent.parent / "config" / "prompts"
+_PROMPTS_DIR = PROMPTS_DIR
 
 
 def _load_overlay_fields() -> dict[str, str]:

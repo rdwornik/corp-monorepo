@@ -1,7 +1,7 @@
 """Tests for deep prompt builder."""
 
 import pytest
-from src.deep_prompt import build_deep_prompt
+from corp_knowledge_extractor.deep_prompt import build_deep_prompt
 
 
 def test_build_deep_prompt_architecture():

@@ -5,7 +5,7 @@ Scans files and extracts structured metadata using local libraries only.
 Designed for corp-by-os `corp overnight --scope full-reshape` pre-scan.
 
 Usage:
-    from src.scan import scan_path, ScanResult
+    from corp_knowledge_extractor.scan import scan_path, ScanResult
 
     results = scan_path(Path("C:/Users/docs"), recursive=True)
     print(f"Scanned {len(results)} files")

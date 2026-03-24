@@ -1,7 +1,7 @@
 """Tests for the deterministic document type classifier."""
 
 import pytest
-from src.doc_type_classifier import (
+from corp_knowledge_extractor.doc_type_classifier import (
     classify_doc_type,
     classify_from_filename,
     should_extract_deep,

@@ -6,8 +6,8 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from src.frames.sampler import SampledFrame
-from src.frames.scene_detect import (
+from corp_knowledge_extractor.frames.sampler import SampledFrame
+from corp_knowledge_extractor.frames.scene_detect import (
     scene_detect,
     _run_ffmpeg_scene_detect,
     CIRCUIT_BREAKER_MAX,
@@ -42,10 +42,10 @@ class TestSceneDetectCreatesFrames:
         stderr = _make_ffmpeg_stderr(timestamps)
 
         with (
-            patch("src.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
-            patch("src.frames.scene_detect._get_video_duration", return_value=120.0),
-            patch("src.frames.scene_detect._extract_frame_at") as mock_extract,
-            patch("src.frames.scene_detect._histogram_correlation", return_value=0.5),
+            patch("corp_knowledge_extractor.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
+            patch("corp_knowledge_extractor.frames.scene_detect._get_video_duration", return_value=120.0),
+            patch("corp_knowledge_extractor.frames.scene_detect._extract_frame_at") as mock_extract,
+            patch("corp_knowledge_extractor.frames.scene_detect._histogram_correlation", return_value=0.5),
         ):
             # Make extract_frame_at create dummy files
             def fake_extract(vp, ts, out):
@@ -72,10 +72,10 @@ class TestSceneDetectFloor:
         timestamps = [10.0, 200.0, 400.0]  # Only 3 scenes
 
         with (
-            patch("src.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
-            patch("src.frames.scene_detect._get_video_duration", return_value=900.0),  # 15 min
-            patch("src.frames.scene_detect._extract_frame_at") as mock_extract,
-            patch("src.frames.scene_detect._histogram_correlation", return_value=0.3),
+            patch("corp_knowledge_extractor.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
+            patch("corp_knowledge_extractor.frames.scene_detect._get_video_duration", return_value=900.0),  # 15 min
+            patch("corp_knowledge_extractor.frames.scene_detect._extract_frame_at") as mock_extract,
+            patch("corp_knowledge_extractor.frames.scene_detect._histogram_correlation", return_value=0.3),
         ):
             def fake_extract(vp, ts, out):
                 out.parent.mkdir(parents=True, exist_ok=True)
@@ -98,10 +98,10 @@ class TestSceneDetectCircuitBreaker:
         timestamps = [float(i) for i in range(100)]
 
         with (
-            patch("src.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
-            patch("src.frames.scene_detect._get_video_duration", return_value=300.0),
-            patch("src.frames.scene_detect._extract_frame_at") as mock_extract,
-            patch("src.frames.scene_detect._histogram_correlation", return_value=0.3),
+            patch("corp_knowledge_extractor.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
+            patch("corp_knowledge_extractor.frames.scene_detect._get_video_duration", return_value=300.0),
+            patch("corp_knowledge_extractor.frames.scene_detect._extract_frame_at") as mock_extract,
+            patch("corp_knowledge_extractor.frames.scene_detect._histogram_correlation", return_value=0.3),
         ):
             def fake_extract(vp, ts, out):
                 out.parent.mkdir(parents=True, exist_ok=True)
@@ -133,10 +133,10 @@ class TestSceneDetectDedup:
             return 0.3  # different
 
         with (
-            patch("src.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
-            patch("src.frames.scene_detect._get_video_duration", return_value=60.0),
-            patch("src.frames.scene_detect._extract_frame_at") as mock_extract,
-            patch("src.frames.scene_detect._histogram_correlation", side_effect=fake_corr),
+            patch("corp_knowledge_extractor.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
+            patch("corp_knowledge_extractor.frames.scene_detect._get_video_duration", return_value=60.0),
+            patch("corp_knowledge_extractor.frames.scene_detect._extract_frame_at") as mock_extract,
+            patch("corp_knowledge_extractor.frames.scene_detect._histogram_correlation", side_effect=fake_corr),
         ):
             def fake_extract(vp, ts, out):
                 out.parent.mkdir(parents=True, exist_ok=True)
@@ -160,10 +160,10 @@ class TestSceneDetectDynamicCap:
         timestamps = [float(i * 10) for i in range(20)]
 
         with (
-            patch("src.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
-            patch("src.frames.scene_detect._get_video_duration", return_value=300.0),
-            patch("src.frames.scene_detect._extract_frame_at") as mock_extract,
-            patch("src.frames.scene_detect._histogram_correlation", return_value=0.3),
+            patch("corp_knowledge_extractor.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
+            patch("corp_knowledge_extractor.frames.scene_detect._get_video_duration", return_value=300.0),
+            patch("corp_knowledge_extractor.frames.scene_detect._extract_frame_at") as mock_extract,
+            patch("corp_knowledge_extractor.frames.scene_detect._histogram_correlation", return_value=0.3),
         ):
             def fake_extract(vp, ts, out):
                 out.parent.mkdir(parents=True, exist_ok=True)
@@ -187,8 +187,8 @@ class TestSceneDetectFallback:
         mock_frames = [SampledFrame(path=tmp_path / "f.png", index=0, timestamp_sec=0.0)]
 
         with (
-            patch("src.frames.scene_detect._run_ffmpeg_scene_detect", side_effect=FileNotFoundError("ffmpeg not found")),
-            patch("src.frames.sampler.sample_frames", return_value=mock_frames) as mock_sampler,
+            patch("corp_knowledge_extractor.frames.scene_detect._run_ffmpeg_scene_detect", side_effect=FileNotFoundError("ffmpeg not found")),
+            patch("corp_knowledge_extractor.frames.sampler.sample_frames", return_value=mock_frames) as mock_sampler,
         ):
             frames = scene_detect(video, out_dir, config)
 

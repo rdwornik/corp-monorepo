@@ -15,8 +15,10 @@ import subprocess
 import json
 from pathlib import Path
 
-# Add project root to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add project root and src/ to path
+_repo_root = Path(__file__).parent.parent
+sys.path.insert(0, str(_repo_root))
+sys.path.insert(0, str(_repo_root / "src"))
 
 from dotenv import load_dotenv
 
@@ -28,7 +30,7 @@ if _global_env.exists():
 load_dotenv(override=False)
 
 from config.config_loader import load_config
-from src.compress import compress_video, needs_compression
+from corp_knowledge_extractor.compress import compress_video, needs_compression
 
 
 def get_video_info(video_path: str) -> dict:

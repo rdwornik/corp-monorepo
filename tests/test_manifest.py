@@ -3,7 +3,7 @@
 import json
 import pytest
 from pathlib import Path
-from src.manifest import Manifest, ManifestEntry, FileStatus, load_status, save_status
+from corp_knowledge_extractor.manifest import Manifest, ManifestEntry, FileStatus, load_status, save_status
 
 
 def test_load_manifest(tmp_path):

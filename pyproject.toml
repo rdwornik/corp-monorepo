@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "corp-knowledge-extractor"
-version = "0.7.0"
+version = "0.8.0"
 description = "Corporate knowledge extraction engine — tiered Gemini pipeline"
 requires-python = ">=3.11"
 dependencies = [
@@ -36,7 +36,11 @@ ecosystem = ["corp-os-meta"]
 cke = "scripts.run:cli"
 
 [tool.setuptools.packages.find]
-include = ["src*", "scripts*", "config*", "templates*"]
+where = ["src"]
+include = ["corp_knowledge_extractor*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml", "*.yml", "*.txt", "*.md", "*.j2"]
 
 [tool.ruff]
 line-length = 120

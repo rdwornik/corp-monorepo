@@ -7,7 +7,7 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from src.text_extract import extract_source_date
+from corp_knowledge_extractor.text_extract import extract_source_date
 
 
 class TestSourceDateExtended:
@@ -44,7 +44,7 @@ class TestSourceDateExtended:
         mock_prs = MagicMock()
         mock_prs.core_properties.modified = datetime(2025, 6, 15)
 
-        with patch("src.text_extract.Presentation", return_value=mock_prs, create=True):
+        with patch("corp_knowledge_extractor.text_extract.Presentation", return_value=mock_prs, create=True):
             # Direct import won't work with mock, test the mtime fallback instead
             pass
 

@@ -4,7 +4,7 @@ import pytest
 import yaml
 from pathlib import Path
 from unittest.mock import patch
-from src.post_process import post_process_extraction, _log_unknown_terms
+from corp_knowledge_extractor.post_process import post_process_extraction, _log_unknown_terms
 from corp_os_meta import ValidationResult
 
 
@@ -157,13 +157,13 @@ def test_unknown_terms_logged(tmp_path):
     review_path = tmp_path / "config" / "taxonomy_review.yaml"
     (tmp_path / "config").mkdir()
 
-    with patch("src.post_process.Path") as MockPath:
+    with patch("corp_knowledge_extractor.post_process.Path") as MockPath:
         # Make Path(__file__).parent.parent / "config" / ... resolve to tmp_path
         MockPath.return_value.parent.parent.__truediv__ = lambda self, x: tmp_path / x
         # But keep real Path for everything else
         MockPath.side_effect = lambda *a, **k: Path(*a, **k) if a else MockPath.return_value
         # Directly patch the function to use our tmp path
-        import src.post_process as pp_mod
+        import corp_knowledge_extractor.post_process as pp_mod
 
         orig_fn = pp_mod._log_unknown_terms
 
@@ -208,7 +208,7 @@ def test_unknown_terms_not_duplicated(tmp_path):
     review_path = tmp_path / "config" / "taxonomy_review.yaml"
     (tmp_path / "config").mkdir()
 
-    import src.post_process as pp_mod
+    import corp_knowledge_extractor.post_process as pp_mod
 
     orig_fn = pp_mod._log_unknown_terms
 
@@ -475,7 +475,7 @@ def test_quality_passthrough_valid_value():
 def test_no_unicode_escape_in_frontmatter():
     """Domains with & should not be escaped to \\u0026 in tojson_raw."""
     import json
-    from src.synthesize import _tojson_raw
+    from corp_knowledge_extractor.synthesize import _tojson_raw
 
     result = _tojson_raw(["Platform & Architecture"])
     assert "&" in result
@@ -495,7 +495,7 @@ def test_backslash_normalized_in_source():
 # ---------------------------------------------------------------------------
 
 
-from src.post_process import normalize_company_names
+from corp_knowledge_extractor.post_process import normalize_company_names
 
 
 def test_normalize_blue_blue():
@@ -539,7 +539,7 @@ def test_normalize_no_false_positive():
 # Type enforcement from file extension (BUG 1: JLR pilot)
 # ---------------------------------------------------------------------------
 
-from src.post_process import enforce_type_from_extension, validate_tags
+from corp_knowledge_extractor.post_process import enforce_type_from_extension, validate_tags
 
 
 def test_docx_always_document():
@@ -630,7 +630,7 @@ def test_validate_tags_unknown_prefix():
 def test_validate_tags_no_taxonomy():
     """If taxonomy loading fails, all tags return unvalidated, no crash."""
     from unittest.mock import patch
-    with patch("src.post_process.load_taxonomy", side_effect=Exception("no taxonomy")):
+    with patch("corp_knowledge_extractor.post_process.load_taxonomy", side_effect=Exception("no taxonomy")):
         results = validate_tags(["product/test", "topic/test"])
     assert len(results) == 2
     assert all(r["valid"] for r in results)
@@ -648,7 +648,7 @@ def test_validate_tags_empty():
 # ---------------------------------------------------------------------------
 
 
-from src.post_process import normalize_product_names
+from corp_knowledge_extractor.post_process import normalize_product_names
 
 
 def test_normalize_short_product():

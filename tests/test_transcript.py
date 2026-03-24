@@ -5,13 +5,13 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from src.transcript import (
+from corp_knowledge_extractor.transcript import (
     TranscriptResult,
     generate_transcript,
     sanitize_transcript,
     MAX_RETRIES,
 )
-from src.synthesize import write_transcript_note
+from corp_knowledge_extractor.synthesize import write_transcript_note
 
 
 @pytest.fixture
@@ -35,7 +35,7 @@ class TestGenerateTranscript:
 
         with (
             patch.dict("os.environ", {"GEMINI_API_KEY": "fake-key"}),
-            patch("src.transcript.genai") as mock_genai,
+            patch("corp_knowledge_extractor.transcript.genai") as mock_genai,
         ):
             mock_client = MagicMock()
             mock_client.models.generate_content.return_value = mock_response
@@ -57,8 +57,8 @@ class TestGenerateTranscript:
 
         with (
             patch.dict("os.environ", {"GEMINI_API_KEY": "fake-key"}),
-            patch("src.transcript.genai") as mock_genai,
-            patch("src.transcript.time.sleep"),  # don't wait in tests
+            patch("corp_knowledge_extractor.transcript.genai") as mock_genai,
+            patch("corp_knowledge_extractor.transcript.time.sleep"),  # don't wait in tests
         ):
             mock_client = MagicMock()
             mock_client.models.generate_content.side_effect = [
@@ -79,8 +79,8 @@ class TestGenerateTranscript:
 
         with (
             patch.dict("os.environ", {"GEMINI_API_KEY": "fake-key"}),
-            patch("src.transcript.genai") as mock_genai,
-            patch("src.transcript.time.sleep"),
+            patch("corp_knowledge_extractor.transcript.genai") as mock_genai,
+            patch("corp_knowledge_extractor.transcript.time.sleep"),
         ):
             mock_client = MagicMock()
             mock_client.models.generate_content.side_effect = RuntimeError("Persistent error")

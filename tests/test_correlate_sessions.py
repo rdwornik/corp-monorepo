@@ -3,7 +3,7 @@
 import pytest
 from pathlib import Path
 
-from src.correlate_sessions import (
+from corp_knowledge_extractor.correlate_sessions import (
     CorrelationCandidate,
     normalize_stem,
     filename_similarity,

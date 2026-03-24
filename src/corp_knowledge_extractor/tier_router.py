@@ -18,7 +18,7 @@ Tier 3: Full multimodal AI — Gemini 2.5 Flash ($0.02-0.05/file)
     - Only formats whose MIME type Gemini accepts for upload
 
 Usage:
-    from src.tier_router import route_tier, Tier, TierDecision
+    from corp_knowledge_extractor.tier_router import route_tier, Tier, TierDecision
 
     decision = route_tier(source_file)
     print(f"Tier {decision.tier.value}: {decision.reason}")
@@ -29,8 +29,8 @@ import logging
 from dataclasses import dataclass
 from enum import IntEnum
 
-from src.inventory import SourceFile, FileType
-from src.text_extract import extract_text, TextExtractionResult
+from corp_knowledge_extractor.inventory import SourceFile, FileType
+from corp_knowledge_extractor.text_extract import extract_text, TextExtractionResult
 
 log = logging.getLogger(__name__)
 
@@ -104,7 +104,7 @@ def route_tier(
     if file.type == FileType.SLIDES and file.path.suffix.lower() == ".pptx":
         text_result = extract_text(file.path)
         try:
-            from src.slides.renderer import detect_image_heavy, can_render
+            from corp_knowledge_extractor.slides.renderer import detect_image_heavy, can_render
 
             if detect_image_heavy(file.path) and can_render():
                 return TierDecision(

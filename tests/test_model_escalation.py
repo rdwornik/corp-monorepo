@@ -4,8 +4,8 @@ import json
 import pytest
 from unittest.mock import patch, MagicMock
 
-from src.providers.base import ExtractionRequest, ExtractionResponse
-from src.providers.validator import validate_and_retry
+from corp_knowledge_extractor.providers.base import ExtractionRequest, ExtractionResponse
+from corp_knowledge_extractor.providers.validator import validate_and_retry
 
 
 class TestEscalationUpdatesModelUsed:
@@ -41,7 +41,7 @@ class TestEscalationUpdatesModelUsed:
         mock_provider = MagicMock()
         mock_provider.extract.return_value = sonnet_response
 
-        with patch("src.providers.router.get_provider", return_value=mock_provider):
+        with patch("corp_knowledge_extractor.providers.router.get_provider", return_value=mock_provider):
             result, was_escalated = validate_and_retry(haiku_response, ExtractionRequest(
                 system_prompt="",
                 user_prompt="Extract knowledge",

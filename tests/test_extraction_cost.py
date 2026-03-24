@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 from jinja2 import Environment, FileSystemLoader
 
-from src.extract import ExtractionResult, _estimate_gemini_cost
+from corp_knowledge_extractor.extract import ExtractionResult, _estimate_gemini_cost
 
 
 class TestEstimateGeminiCost:
@@ -19,7 +19,7 @@ class TestEstimateGeminiCost:
 
 class TestCostOnExtractionResult:
     def test_default_zero(self):
-        from src.inventory import SourceFile, FileType
+        from corp_knowledge_extractor.inventory import SourceFile, FileType
         result = ExtractionResult(
             source_file=SourceFile(path=Path("t.pdf"), type=FileType.DOCUMENT, size_bytes=100, name="t"),
             title="T", summary="S",
@@ -28,16 +28,16 @@ class TestCostOnExtractionResult:
 
 
 class TestCostInExtractFromText:
-    @patch("src.extract.get_taxonomy_for_prompt", return_value="TAX")
-    @patch("src.doc_type_classifier.classify_doc_type", return_value="general")
-    @patch("src.doc_type_classifier.should_extract_deep", return_value=False)
-    @patch("src.freshness.compute_freshness_fields", return_value={})
-    @patch("src.extract.extract_source_date", return_value=None)
-    @patch("src.extract._enrich_facts", return_value=[])
+    @patch("corp_knowledge_extractor.extract.get_taxonomy_for_prompt", return_value="TAX")
+    @patch("corp_knowledge_extractor.doc_type_classifier.classify_doc_type", return_value="general")
+    @patch("corp_knowledge_extractor.doc_type_classifier.should_extract_deep", return_value=False)
+    @patch("corp_knowledge_extractor.freshness.compute_freshness_fields", return_value={})
+    @patch("corp_knowledge_extractor.extract.extract_source_date", return_value=None)
+    @patch("corp_knowledge_extractor.extract._enrich_facts", return_value=[])
     def test_cost_from_provider(self, *mocks):
-        from src.inventory import SourceFile, FileType
-        from src.text_extract import TextExtractionResult
-        from src.providers.base import ExtractionResponse
+        from corp_knowledge_extractor.inventory import SourceFile, FileType
+        from corp_knowledge_extractor.text_extract import TextExtractionResult
+        from corp_knowledge_extractor.providers.base import ExtractionResponse
 
         class FakeProvider:
             def extract(self, request):
@@ -49,12 +49,12 @@ class TestCostInExtractFromText:
                 )
 
         with (
-            patch("src.providers.router.route_model", return_value=("gemini-3-flash-preview", "text_default")),
-            patch("src.providers.router.get_provider", return_value=FakeProvider()),
-            patch("src.providers.router.has_anthropic_key", return_value=False),
-            patch("src.providers.validator.validate_and_retry", side_effect=lambda r, req: (r, False)),
+            patch("corp_knowledge_extractor.providers.router.route_model", return_value=("gemini-3-flash-preview", "text_default")),
+            patch("corp_knowledge_extractor.providers.router.get_provider", return_value=FakeProvider()),
+            patch("corp_knowledge_extractor.providers.router.has_anthropic_key", return_value=False),
+            patch("corp_knowledge_extractor.providers.validator.validate_and_retry", side_effect=lambda r, req: (r, False)),
         ):
-            from src.extract import extract_from_text
+            from corp_knowledge_extractor.extract import extract_from_text
             source = SourceFile(path=Path("t.docx"), type=FileType.DOCUMENT, size_bytes=1000, name="t")
             text_result = TextExtractionResult(text="content", char_count=7, extractor="python-docx")
             result = extract_from_text(source, {"prompts": {"extract": "Extract."}}, text_result)

@@ -5,8 +5,8 @@ import pytest
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
-from src.manifest import Manifest, ManifestEntry, FileStatus, save_status
-from src.batch import BatchProcessor
+from corp_knowledge_extractor.manifest import Manifest, ManifestEntry, FileStatus, save_status
+from corp_knowledge_extractor.batch import BatchProcessor
 
 
 class TestBatchProcessorForce:
@@ -54,7 +54,7 @@ class TestBatchProcessorForce:
 
 class TestBatchJobRunnerForce:
     def test_runner_accepts_force(self):
-        from src.batch_api import BatchJobRunner
+        from corp_knowledge_extractor.batch_api import BatchJobRunner
         manifest = MagicMock()
         manifest.files = []
         manifest.output_dir = Path("/tmp/test")
@@ -62,7 +62,7 @@ class TestBatchJobRunnerForce:
         assert runner.force is True
 
     def test_runner_default_no_force(self):
-        from src.batch_api import BatchJobRunner
+        from corp_knowledge_extractor.batch_api import BatchJobRunner
         manifest = MagicMock()
         manifest.files = []
         manifest.output_dir = Path("/tmp/test")

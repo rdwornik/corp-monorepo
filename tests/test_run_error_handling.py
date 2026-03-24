@@ -3,14 +3,14 @@
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
-from src.extract import ExtractionError
+from corp_knowledge_extractor.extract import ExtractionError
 
 
 class TestUnexpectedErrorContinues:
     def test_unexpected_error_continues(self, tmp_path):
         """A TypeError in extraction should not crash the pipeline — file goes to failed list."""
-        from src.inventory import SourceFile, FileType
-        from src.tier_router import TierDecision, Tier
+        from corp_knowledge_extractor.inventory import SourceFile, FileType
+        from corp_knowledge_extractor.tier_router import TierDecision, Tier
 
         # Create two fake files
         file_a = SourceFile(path=tmp_path / "a.pdf", name="a.pdf", type=FileType.DOCUMENT, size_bytes=100)

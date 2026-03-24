@@ -3,7 +3,7 @@
 import pytest
 from pathlib import Path
 from unittest.mock import patch, MagicMock
-from src.text_extract import extract_source_date
+from corp_knowledge_extractor.text_extract import extract_source_date
 
 
 class TestPdfSourceDate:

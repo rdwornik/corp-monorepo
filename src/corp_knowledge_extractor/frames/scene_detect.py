@@ -14,7 +14,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from src.frames.sampler import SampledFrame
+from corp_knowledge_extractor.frames.sampler import SampledFrame
 
 log = logging.getLogger(__name__)
 
@@ -128,7 +128,7 @@ def scene_detect(
 
     Falls back to time-based sampler if ffmpeg fails.
     """
-    from src.frames.sampler import sample_frames
+    from corp_knowledge_extractor.frames.sampler import sample_frames
 
     output_dir.mkdir(parents=True, exist_ok=True)
 

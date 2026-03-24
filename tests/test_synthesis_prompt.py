@@ -7,9 +7,9 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from src.extract import ExtractionResult
-from src.inventory import SourceFile, FileType
-from src.synthesize import _run_synthesis
+from corp_knowledge_extractor.extract import ExtractionResult
+from corp_knowledge_extractor.inventory import SourceFile, FileType
+from corp_knowledge_extractor.synthesize import _run_synthesis
 
 
 def _make_result(

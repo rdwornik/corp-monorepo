@@ -7,8 +7,8 @@ from unittest.mock import patch, MagicMock, ANY
 import fitz
 import pytest
 
-from src.slides.pdf_converter import convert_pptx_to_pdf, _convert_via_com
-from src.extract import _render_pdf_to_slides
+from corp_knowledge_extractor.slides.pdf_converter import convert_pptx_to_pdf, _convert_via_com
+from corp_knowledge_extractor.extract import _render_pdf_to_slides
 
 
 class TestComScriptContent:
@@ -16,21 +16,21 @@ class TestComScriptContent:
 
     def test_com_script_has_with_window_false(self, tmp_path):
         """Inline script must open without window (PowerPoint rejects Visible=0)."""
-        from src.slides.pdf_converter import _convert_via_com
+        from corp_knowledge_extractor.slides.pdf_converter import _convert_via_com
         import inspect
         source = inspect.getsource(_convert_via_com)
         assert "WithWindow=False" in source
 
     def test_com_script_has_display_alerts_0(self, tmp_path):
         """Inline script must suppress dialogs."""
-        from src.slides.pdf_converter import _convert_via_com
+        from corp_knowledge_extractor.slides.pdf_converter import _convert_via_com
         import inspect
         source = inspect.getsource(_convert_via_com)
         assert "DisplayAlerts = 0" in source
 
     def test_com_script_has_quit(self, tmp_path):
         """Inline script must call ppt.Quit()."""
-        from src.slides.pdf_converter import _convert_via_com
+        from corp_knowledge_extractor.slides.pdf_converter import _convert_via_com
         import inspect
         source = inspect.getsource(_convert_via_com)
         assert "Quit()" in source
@@ -48,7 +48,7 @@ class TestConverterCascade:
             pdf_path.write_bytes(b"%PDF-1.4 fake")
             return pdf_path
 
-        with patch("src.slides.pdf_converter._convert_via_com", side_effect=fake_com):
+        with patch("corp_knowledge_extractor.slides.pdf_converter._convert_via_com", side_effect=fake_com):
             result = convert_pptx_to_pdf(pptx, out_dir)
 
         assert result is not None
@@ -68,8 +68,8 @@ class TestConverterCascade:
             return pdf
 
         with (
-            patch("src.slides.pdf_converter._convert_via_com", side_effect=subprocess.TimeoutExpired("cmd", 30)),
-            patch("src.slides.pdf_converter._convert_via_libreoffice", side_effect=fake_lo),
+            patch("corp_knowledge_extractor.slides.pdf_converter._convert_via_com", side_effect=subprocess.TimeoutExpired("cmd", 30)),
+            patch("corp_knowledge_extractor.slides.pdf_converter._convert_via_libreoffice", side_effect=fake_lo),
         ):
             result = convert_pptx_to_pdf(pptx, out_dir)
 
@@ -89,8 +89,8 @@ class TestConverterCascade:
             return pdf
 
         with (
-            patch("src.slides.pdf_converter._convert_via_com", side_effect=ImportError("No comtypes")),
-            patch("src.slides.pdf_converter._convert_via_libreoffice", side_effect=fake_lo),
+            patch("corp_knowledge_extractor.slides.pdf_converter._convert_via_com", side_effect=ImportError("No comtypes")),
+            patch("corp_knowledge_extractor.slides.pdf_converter._convert_via_libreoffice", side_effect=fake_lo),
         ):
             result = convert_pptx_to_pdf(pptx, out_dir)
 
@@ -103,8 +103,8 @@ class TestConverterCascade:
         out_dir = tmp_path / "pdf_out"
 
         with (
-            patch("src.slides.pdf_converter._convert_via_com", side_effect=ImportError("No comtypes")),
-            patch("src.slides.pdf_converter._convert_via_libreoffice", side_effect=FileNotFoundError("No LO")),
+            patch("corp_knowledge_extractor.slides.pdf_converter._convert_via_com", side_effect=ImportError("No comtypes")),
+            patch("corp_knowledge_extractor.slides.pdf_converter._convert_via_libreoffice", side_effect=FileNotFoundError("No LO")),
         ):
             result = convert_pptx_to_pdf(pptx, out_dir)
 
@@ -117,9 +117,9 @@ class TestPptxMultimodalRouting:
     def test_pptx_routes_multimodal_with_pdf(self, tmp_path):
         """PDF available → Tier 3 multimodal extraction used."""
         from unittest.mock import patch, MagicMock
-        from src.inventory import SourceFile, FileType
-        from src.text_extract import TextExtractionResult
-        from src.extract import ExtractionResult
+        from corp_knowledge_extractor.inventory import SourceFile, FileType
+        from corp_knowledge_extractor.text_extract import TextExtractionResult
+        from corp_knowledge_extractor.extract import ExtractionResult
 
         pptx = tmp_path / "deck.pptx"
         pptx.write_bytes(b"PK\x03\x04fake")
@@ -129,8 +129,8 @@ class TestPptxMultimodalRouting:
         fake_result = MagicMock(spec=ExtractionResult)
         fake_result.title = "Test Deck"
 
-        with patch("src.extract._try_pptx_pdf_multimodal", return_value=fake_result) as mock_multi:
-            from src.extract import extract_from_text
+        with patch("corp_knowledge_extractor.extract._try_pptx_pdf_multimodal", return_value=fake_result) as mock_multi:
+            from corp_knowledge_extractor.extract import extract_from_text
             result = extract_from_text(sf, {"gemini": {"model": "test"}}, text_result)
 
         mock_multi.assert_called_once()
@@ -139,8 +139,8 @@ class TestPptxMultimodalRouting:
     def test_pptx_falls_back_text_only(self, tmp_path):
         """No PDF → Tier 2 text-only with warning."""
         from unittest.mock import patch, MagicMock
-        from src.inventory import SourceFile, FileType
-        from src.text_extract import TextExtractionResult
+        from corp_knowledge_extractor.inventory import SourceFile, FileType
+        from corp_knowledge_extractor.text_extract import TextExtractionResult
 
         pptx = tmp_path / "deck.pptx"
         pptx.write_bytes(b"PK\x03\x04fake")
@@ -149,15 +149,15 @@ class TestPptxMultimodalRouting:
 
         # Make PDF multimodal return None (conversion failed)
         with (
-            patch("src.extract._try_pptx_pdf_multimodal", return_value=None),
-            patch("src.providers.router.route_model", return_value="gemini-3-flash-preview"),
-            patch("src.providers.router.get_provider") as mock_provider_fn,
-            patch("src.providers.validator.validate_and_retry") as mock_validate,
-            patch("src.freshness.compute_freshness_fields", return_value={}),
-            patch("src.extract.extract_source_date", return_value=None),
-            patch("src.doc_type_classifier.classify_doc_type", return_value="presentation"),
-            patch("src.doc_type_classifier.should_extract_deep", return_value=False),
-            patch("src.extract.post_process_extraction") as mock_pp,
+            patch("corp_knowledge_extractor.extract._try_pptx_pdf_multimodal", return_value=None),
+            patch("corp_knowledge_extractor.providers.router.route_model", return_value="gemini-3-flash-preview"),
+            patch("corp_knowledge_extractor.providers.router.get_provider") as mock_provider_fn,
+            patch("corp_knowledge_extractor.providers.validator.validate_and_retry") as mock_validate,
+            patch("corp_knowledge_extractor.freshness.compute_freshness_fields", return_value={}),
+            patch("corp_knowledge_extractor.extract.extract_source_date", return_value=None),
+            patch("corp_knowledge_extractor.doc_type_classifier.classify_doc_type", return_value="presentation"),
+            patch("corp_knowledge_extractor.doc_type_classifier.should_extract_deep", return_value=False),
+            patch("corp_knowledge_extractor.extract.post_process_extraction") as mock_pp,
         ):
             # Set up provider mock
             mock_response = MagicMock()
@@ -179,7 +179,7 @@ class TestPptxMultimodalRouting:
             mock_pp_result.changes = []
             mock_pp.return_value = mock_pp_result
 
-            from src.extract import extract_from_text
+            from corp_knowledge_extractor.extract import extract_from_text
             result = extract_from_text(sf, {"gemini": {"model": "test"}, "prompts": {"extract": "Extract knowledge"}}, text_result)
 
         # Should still produce a result via text-only path

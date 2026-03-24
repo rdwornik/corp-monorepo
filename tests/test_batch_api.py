@@ -5,17 +5,17 @@ import pytest
 from pathlib import Path
 from unittest.mock import MagicMock, patch, PropertyMock
 
-from src.batch_api import (
+from corp_knowledge_extractor.batch_api import (
     build_batch_jsonl,
     submit_batch_job,
     poll_batch_job,
     parse_batch_results,
     BatchJobRunner,
 )
-from src.manifest import Manifest, ManifestEntry
-from src.tier_router import Tier, TierDecision
-from src.text_extract import TextExtractionResult
-from src.extract import ExtractionError
+from corp_knowledge_extractor.manifest import Manifest, ManifestEntry
+from corp_knowledge_extractor.tier_router import Tier, TierDecision
+from corp_knowledge_extractor.text_extract import TextExtractionResult
+from corp_knowledge_extractor.extract import ExtractionError
 
 
 # ---------------------------------------------------------------------------
@@ -337,7 +337,7 @@ class TestParseBatchResults:
 class TestCostDiscount:
     def test_tier2_batch_cost_is_half(self):
         """Tier 2 batch cost should be 50% of synchronous."""
-        from src.tier_router import TIER_COSTS, Tier
+        from corp_knowledge_extractor.tier_router import TIER_COSTS, Tier
 
         sync_cost = TIER_COSTS[Tier.TEXT_AI]
         batch_cost = sync_cost * 0.5

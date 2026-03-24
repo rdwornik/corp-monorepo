@@ -4,13 +4,13 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from src.fact_validation import (
+from corp_knowledge_extractor.fact_validation import (
     normalize_number,
     extract_numbers_from_text,
     validate_fact_against_source,
     check_anomalies,
 )
-from src.extract import _enrich_facts
+from corp_knowledge_extractor.extract import _enrich_facts
 
 
 class TestNormalizeNumber:
@@ -162,8 +162,8 @@ class TestValidationWired:
 
     def test_validation_wired_pptx(self):
         """Enriched facts include verification_status when source text available."""
-        from src.inventory import SourceFile, FileType
-        from src.text_extract import TextExtractionResult
+        from corp_knowledge_extractor.inventory import SourceFile, FileType
+        from corp_knowledge_extractor.text_extract import TextExtractionResult
         from pathlib import Path
 
         sf = SourceFile(
@@ -189,8 +189,8 @@ class TestValidationWired:
 
     def test_flagged_fact_has_anomalies(self):
         """Magnitude error fact gets flagged_mismatch with anomalies."""
-        from src.inventory import SourceFile, FileType
-        from src.text_extract import TextExtractionResult
+        from corp_knowledge_extractor.inventory import SourceFile, FileType
+        from corp_knowledge_extractor.text_extract import TextExtractionResult
         from pathlib import Path
 
         sf = SourceFile(

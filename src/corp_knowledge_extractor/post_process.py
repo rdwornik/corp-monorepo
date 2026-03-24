@@ -18,7 +18,7 @@ from corp_os_meta import (
 )
 from corp_os_meta.models import NoteFrontmatter
 from corp_os_meta.normalize import load_taxonomy
-from src.utils import normalize_string_list
+from corp_knowledge_extractor.utils import normalize_string_list
 
 logger = logging.getLogger(__name__)
 
@@ -309,7 +309,8 @@ def _get_known_values(taxonomy: dict, prefix: str) -> set:
 
 def _log_unknown_terms(terms: list[str]):
     """Append unknown terms to local review file for batch approval."""
-    review_path = Path(__file__).parent.parent / "config" / "taxonomy_review.yaml"
+    from corp_knowledge_extractor._paths import CONFIG_DIR
+    review_path = CONFIG_DIR / "taxonomy_review.yaml"
     data = {"pending": []}
     if review_path.exists():
         with open(review_path, "r", encoding="utf-8") as f:

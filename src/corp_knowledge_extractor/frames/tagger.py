@@ -5,7 +5,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 from google import genai
 
-_project_root = str(Path(__file__).parent.parent.parent)
+from corp_knowledge_extractor._paths import REPO_ROOT
+
+_project_root = str(REPO_ROOT)
 if _project_root not in sys.path:
     sys.path.insert(0, _project_root)
 from config.config_loader import get  # noqa: E402

@@ -9,8 +9,8 @@ import pytest
 
 def _make_extraction_result(tmp_path, with_slides=True):
     """Create a mock ExtractionResult with optional slide_image_paths."""
-    from src.extract import ExtractionResult
-    from src.inventory import SourceFile, FileType
+    from corp_knowledge_extractor.extract import ExtractionResult
+    from corp_knowledge_extractor.inventory import SourceFile, FileType
 
     source_file = SourceFile(
         path=tmp_path / "test.pdf",

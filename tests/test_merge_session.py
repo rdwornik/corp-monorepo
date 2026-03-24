@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from src.merge_session import merge_correlated, _dedupe_list, deduplicate_facts, merge_training_overlays
+from corp_knowledge_extractor.merge_session import merge_correlated, _dedupe_list, deduplicate_facts, merge_training_overlays
 
 
 class TestMergeCorrelated:

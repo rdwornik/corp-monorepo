@@ -11,7 +11,7 @@ synchronous since it requires file uploads that can't be embedded
 in JSONL.
 
 Usage:
-    from src.batch_api import BatchJobRunner
+    from corp_knowledge_extractor.batch_api import BatchJobRunner
 
     runner = BatchJobRunner(manifest, config)
     summary = runner.run(poll_interval=60, timeout=86400)
@@ -23,8 +23,8 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-from src.manifest import Manifest, ManifestEntry, FileStatus, save_status
-from src.extract import (
+from corp_knowledge_extractor.manifest import Manifest, ManifestEntry, FileStatus, save_status
+from corp_knowledge_extractor.extract import (
     _get_client,
     _get_model,
     _get_prompt,
@@ -33,10 +33,10 @@ from src.extract import (
     ExtractionResult,
     ExtractionError,
 )
-from src.inventory import SourceFile, FileType
-from src.tier_router import route_tier, Tier, TierDecision, TIER_COSTS
-from src.post_process import post_process_extraction
-from src.utils import parse_llm_json
+from corp_knowledge_extractor.inventory import SourceFile, FileType
+from corp_knowledge_extractor.tier_router import route_tier, Tier, TierDecision, TIER_COSTS
+from corp_knowledge_extractor.post_process import post_process_extraction
+from corp_knowledge_extractor.utils import parse_llm_json
 
 logger = logging.getLogger(__name__)
 
@@ -326,12 +326,12 @@ class BatchJobRunner:
         Execute batch processing. Returns summary dict compatible with
         the synchronous BatchProcessor.process_all() output.
         """
-        from src.extract import extract_local, extract_knowledge
-        from src.manifest import load_status
-        from src.correlate import correlate_files
-        from src.synthesize import build_package
-        from src.frames.sampler import sample_frames
-        from src.compress import needs_compression, compress_video
+        from corp_knowledge_extractor.extract import extract_local, extract_knowledge
+        from corp_knowledge_extractor.manifest import load_status
+        from corp_knowledge_extractor.correlate import correlate_files
+        from corp_knowledge_extractor.synthesize import build_package
+        from corp_knowledge_extractor.frames.sampler import sample_frames
+        from corp_knowledge_extractor.compress import needs_compression, compress_video
         from scripts.run import keep_slide_frames
 
         output_dir = self.manifest.output_dir

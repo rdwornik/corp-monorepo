@@ -4,7 +4,7 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-from src.freshness import compute_source_hash, compute_freshness_fields
+from corp_knowledge_extractor.freshness import compute_source_hash, compute_freshness_fields
 
 
 def test_compute_source_hash_deterministic():

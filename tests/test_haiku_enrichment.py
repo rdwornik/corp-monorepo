@@ -6,10 +6,10 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from src.extract import _haiku_enrichment
-from src.inventory import SourceFile, FileType
-from src.text_extract import TextExtractionResult
-from src.providers.base import ExtractionResponse
+from corp_knowledge_extractor.extract import _haiku_enrichment
+from corp_knowledge_extractor.inventory import SourceFile, FileType
+from corp_knowledge_extractor.text_extract import TextExtractionResult
+from corp_knowledge_extractor.providers.base import ExtractionResponse
 
 
 def _make_source_file(name="test.pptx"):
@@ -42,7 +42,7 @@ class TestHaikuEnrichment:
         mock_provider = MagicMock()
         mock_provider.extract.return_value = mock_response
 
-        with patch("src.providers.router.get_provider", return_value=mock_provider):
+        with patch("corp_knowledge_extractor.providers.router.get_provider", return_value=mock_provider):
             result = _haiku_enrichment(
                 existing_facts=existing,
                 source_text=source_text,
@@ -60,7 +60,7 @@ class TestHaikuEnrichment:
         mock_provider = MagicMock()
         mock_provider.extract.return_value = mock_response
 
-        with patch("src.providers.router.get_provider", return_value=mock_provider):
+        with patch("corp_knowledge_extractor.providers.router.get_provider", return_value=mock_provider):
             result = _haiku_enrichment(
                 existing_facts=["Existing fact"],
                 source_text="Some source text",
@@ -76,7 +76,7 @@ class TestHaikuEnrichment:
         mock_provider = MagicMock()
         mock_provider.extract.side_effect = RuntimeError("API error")
 
-        with patch("src.providers.router.get_provider", return_value=mock_provider):
+        with patch("corp_knowledge_extractor.providers.router.get_provider", return_value=mock_provider):
             result = _haiku_enrichment(
                 existing_facts=["Existing fact"],
                 source_text="Some source text",
@@ -96,7 +96,7 @@ class TestHaikuEnrichment:
         mock_provider = MagicMock()
         mock_provider.extract.return_value = mock_response
 
-        with patch("src.providers.router.get_provider", return_value=mock_provider):
+        with patch("corp_knowledge_extractor.providers.router.get_provider", return_value=mock_provider):
             result = _haiku_enrichment(
                 existing_facts=["Existing fact"],
                 source_text=source_text,
@@ -117,7 +117,7 @@ class TestHaikuEnrichment:
         mock_provider = MagicMock()
         mock_provider.extract.return_value = mock_response
 
-        with patch("src.providers.router.get_provider", return_value=mock_provider):
+        with patch("corp_knowledge_extractor.providers.router.get_provider", return_value=mock_provider):
             result = _haiku_enrichment(
                 existing_facts=["Existing fact"],
                 source_text=source_text,

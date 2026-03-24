@@ -5,9 +5,11 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
+from corp_knowledge_extractor._paths import DATA_DIR
+
 log = logging.getLogger(__name__)
 
-COST_LOG = Path(__file__).parent.parent.parent / "data" / "cost_log.jsonl"
+COST_LOG = DATA_DIR / "cost_log.jsonl"
 
 
 def log_cost(

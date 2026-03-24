@@ -4,7 +4,7 @@ import pytest
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
-from src.utils import normalize_string_list
+from corp_knowledge_extractor.utils import normalize_string_list
 
 
 class TestNormalizeStringList:
@@ -48,7 +48,7 @@ class TestNormalizeStringList:
 class TestDedupWithDicts:
     def test_dedup_with_dicts_no_crash(self):
         """Synthesize dedup should not crash on dict items."""
-        from src.synthesize import normalize_string_list as nsl
+        from corp_knowledge_extractor.synthesize import normalize_string_list as nsl
         items = [{"name": "A"}, "B", {"name": "A"}]
         normalized = nsl(items)
         seen = set()
@@ -66,7 +66,7 @@ class TestDedupWithDicts:
 class TestUploadMemoryError:
     def test_upload_memory_error(self, tmp_path):
         """MemoryError during upload → graceful ExtractionError."""
-        from src.extract import _upload_and_wait, ExtractionError
+        from corp_knowledge_extractor.extract import _upload_and_wait, ExtractionError
 
         # Create a small file (the size check is based on stat, but MemoryError
         # comes from the SDK reading the file)
@@ -83,7 +83,7 @@ class TestUploadMemoryError:
 
     def test_upload_large_file_warns(self, tmp_path, caplog):
         """Files > 300MB log a warning about compression."""
-        from src.extract import _upload_and_wait
+        from corp_knowledge_extractor.extract import _upload_and_wait
 
         # We can't create a 300MB file in tests, so mock stat
         video = tmp_path / "big.mp4"

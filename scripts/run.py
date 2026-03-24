@@ -16,8 +16,10 @@ import shutil
 import sys
 from pathlib import Path
 
-# Ensure project root is on path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Ensure project root and src/ are on path
+_repo_root = Path(__file__).parent.parent
+sys.path.insert(0, str(_repo_root))
+sys.path.insert(0, str(_repo_root / "src"))
 
 import json
 import click
@@ -31,15 +33,15 @@ if _global_env.exists():
 load_dotenv(override=False)
 
 from config.config_loader import load_config
-from src.inventory import scan_input, FileType
-from src.extract import extract_knowledge, extract_from_text, extract_local, extract_pptx_multimodal, ExtractionError
-from src.correlate import correlate_files
-from src.synthesize import build_package, write_transcript_note
-from src.transcript import generate_transcript, TranscriptResult
-from src.reextract import reextract_package
-from src.frames.sampler import sample_frames, SampledFrame
-from src.frames.scene_detect import scene_detect
-from src.compress import compress_video
+from corp_knowledge_extractor.inventory import scan_input, FileType
+from corp_knowledge_extractor.extract import extract_knowledge, extract_from_text, extract_local, extract_pptx_multimodal, ExtractionError
+from corp_knowledge_extractor.correlate import correlate_files
+from corp_knowledge_extractor.synthesize import build_package, write_transcript_note
+from corp_knowledge_extractor.transcript import generate_transcript, TranscriptResult
+from corp_knowledge_extractor.reextract import reextract_package
+from corp_knowledge_extractor.frames.sampler import sample_frames, SampledFrame
+from corp_knowledge_extractor.frames.scene_detect import scene_detect
+from corp_knowledge_extractor.compress import compress_video
 
 logging.basicConfig(
     level=logging.INFO,
@@ -178,8 +180,8 @@ def _try_session_merge(files, extracts, extract_dir, _print_fn):
     """
     import hashlib as _hashlib
     import yaml as _yaml
-    from src.correlate_sessions import detect_stage1, confirm_stage2
-    from src.merge_session import merge_correlated
+    from corp_knowledge_extractor.correlate_sessions import detect_stage1, confirm_stage2
+    from corp_knowledge_extractor.merge_session import merge_correlated
 
     all_paths = [f.path for f in files]
     session_group = detect_stage1(all_paths)
@@ -332,7 +334,7 @@ def process(input_path: str | None, output: str, name: str | None, tier: int | N
         _print(f"  {f.type.value:12s}  {f.path.name}  ({f.size_bytes / 1024 / 1024:.1f} MB)")
 
     # --- 1b. Tier routing ---
-    from src.tier_router import route_tier, Tier, estimate_batch_cost
+    from corp_knowledge_extractor.tier_router import route_tier, Tier, estimate_batch_cost
 
     if dry_run_tiers:
         estimate = estimate_batch_cost(files, force_tier=tier)
@@ -408,13 +410,13 @@ def process(input_path: str | None, output: str, name: str | None, tier: int | N
                     existing = json.loads(existing_json.read_text(encoding="utf-8"))
                     existing_hash = (existing.get("freshness") or {}).get("source_hash")
                     if existing_hash:
-                        from src.freshness import compute_source_hash
+                        from corp_knowledge_extractor.freshness import compute_source_hash
                         current_hash = compute_source_hash(f.path)
                         if existing_hash == current_hash:
                             _print(f"    [SKIP] Already extracted (hash match)")
                             log.info("Skipping %s — already extracted (hash match)", f.path.name)
                             # Load existing result for downstream steps
-                            from src.extract import ExtractionResult
+                            from corp_knowledge_extractor.extract import ExtractionResult
                             extracts[f.name] = ExtractionResult(
                                 source_file=f,
                                 title=existing.get("title", f.path.stem),
@@ -433,7 +435,7 @@ def process(input_path: str | None, output: str, name: str | None, tier: int | N
                 result = extract_from_text(f, config, decision.text_result, custom_prompt=custom_prompt, user_context=context)
             elif f.path.suffix.lower() == ".pptx" and decision.tier == Tier.MULTIMODAL:
                 # PPTX multimodal: render slides as PNG, send to Gemini
-                from src.slides.renderer import render_slides
+                from corp_knowledge_extractor.slides.renderer import render_slides
                 temp_slides_dir = output_p / package_name / "temp_slides" / f.name
                 rendered = render_slides(f.path, temp_slides_dir)
                 rendered_pptx_slides[f.name] = rendered
@@ -630,7 +632,7 @@ def process_manifest(manifest_path: str, resume: bool, max_rpm: int, tier: int |
 
         cke process-manifest manifest.json --batch --batch-poll-interval 30
     """
-    from src.manifest import Manifest
+    from corp_knowledge_extractor.manifest import Manifest
 
     config = load_config()
     MODEL_MAP = {"flash": "gemini-3-flash-preview", "pro": "gemini-3.1-pro-preview"}
@@ -653,11 +655,11 @@ def process_manifest(manifest_path: str, resume: bool, max_rpm: int, tier: int |
     _print("")
 
     if batch:
-        from src.batch_api import BatchJobRunner
+        from corp_knowledge_extractor.batch_api import BatchJobRunner
         runner = BatchJobRunner(manifest, config, force_tier=tier, resume=resume, force=force)
         summary = runner.run(poll_interval=batch_poll_interval, timeout=batch_timeout)
     else:
-        from src.batch import BatchProcessor
+        from corp_knowledge_extractor.batch import BatchProcessor
         processor = BatchProcessor(manifest, config, max_rpm=max_rpm, resume=resume, force_tier=tier, force=force)
         summary = processor.process_all()
 
@@ -751,7 +753,7 @@ def info(package_path: str):
 )
 def scan(path: str, recursive: bool, output: str | None, exclude: tuple[str, ...]):
     """Scan files and extract local metadata (Tier 1, no API calls)."""
-    from src.scan import scan_path, results_to_json
+    from corp_knowledge_extractor.scan import scan_path, results_to_json
 
     input_path = Path(path).resolve()
     _print(f"Scanning: {input_path}")

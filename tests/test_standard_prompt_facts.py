@@ -50,8 +50,8 @@ class TestStandardExtractionParsing:
 
     def test_standard_extraction_has_facts_via_raw_json(self):
         """Mock standard extraction response with key_facts → parsed into raw_json."""
-        from src.extract import _result_from_json
-        from src.inventory import SourceFile, FileType
+        from corp_knowledge_extractor.extract import _result_from_json
+        from corp_knowledge_extractor.inventory import SourceFile, FileType
 
         mock_data = {
             "title": "Test Document",

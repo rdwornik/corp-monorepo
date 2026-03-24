@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from src.providers.router import select_model
+from corp_knowledge_extractor.providers.router import select_model
 
 
 class TestSelectModel:

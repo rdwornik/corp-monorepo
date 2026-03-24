@@ -3,8 +3,8 @@
 import pytest
 from pathlib import Path
 
-from src.inventory import SourceFile, FileType
-from src.correlate import correlate_files, FileGroup, _stem_prefix
+from corp_knowledge_extractor.inventory import SourceFile, FileType
+from corp_knowledge_extractor.correlate import correlate_files, FileGroup, _stem_prefix
 
 
 def _sf(name: str, ft: FileType, size: int = 1000) -> SourceFile:

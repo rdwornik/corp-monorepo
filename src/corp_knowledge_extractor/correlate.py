@@ -8,7 +8,7 @@ Heuristics (v1):
 4. Ungrouped files each become solo groups
 
 Usage:
-    from src.correlate import correlate_files, FileGroup
+    from corp_knowledge_extractor.correlate import correlate_files, FileGroup
 
     groups = correlate_files(files, extracts)
 """
@@ -17,8 +17,8 @@ import re
 import logging
 from dataclasses import dataclass, field
 
-from src.inventory import SourceFile, FileType
-from src.extract import ExtractionResult
+from corp_knowledge_extractor.inventory import SourceFile, FileType
+from corp_knowledge_extractor.extract import ExtractionResult
 
 log = logging.getLogger(__name__)
 

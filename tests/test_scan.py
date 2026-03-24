@@ -5,7 +5,7 @@ import pytest
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
-from src.scan import (
+from corp_knowledge_extractor.scan import (
     scan_file,
     scan_path,
     results_to_json,
@@ -43,7 +43,7 @@ class TestSha256:
     def test_skip_large_file(self, tmp_path):
         f = tmp_path / "big.bin"
         f.write_bytes(b"x")
-        with patch("src.scan.MAX_HASH_SIZE", 0):
+        with patch("corp_knowledge_extractor.scan.MAX_HASH_SIZE", 0):
             assert _sha256_file(f) is None
 
 
@@ -141,7 +141,7 @@ class TestScanFile:
         mock_prs.slides = [mock_slide]
 
         mock_metadata = {"slide_count": 1, "title_slide": "Slide Title", "char_count": 11}
-        with patch("src.scan._scan_pptx", return_value=mock_metadata):
+        with patch("corp_knowledge_extractor.scan._scan_pptx", return_value=mock_metadata):
             result = scan_file(f)
         assert result.extension == ".pptx"
 

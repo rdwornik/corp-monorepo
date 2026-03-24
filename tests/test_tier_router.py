@@ -4,9 +4,9 @@ import pytest
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
-from src.inventory import SourceFile, FileType
-from src.tier_router import route_tier, Tier, TierDecision, estimate_batch_cost, TIER_COSTS
-from src.text_extract import TextExtractionResult
+from corp_knowledge_extractor.inventory import SourceFile, FileType
+from corp_knowledge_extractor.tier_router import route_tier, Tier, TierDecision, estimate_batch_cost, TIER_COSTS
+from corp_knowledge_extractor.text_extract import TextExtractionResult
 
 
 def _make_file(path: str = "test.pdf", file_type: FileType = FileType.DOCUMENT, size: int = 1000):
@@ -36,7 +36,7 @@ def test_force_tier_override():
     assert "forced" in decision.reason
 
 
-@patch("src.tier_router.extract_text")
+@patch("corp_knowledge_extractor.tier_router.extract_text")
 def test_good_text_routes_tier2(mock_extract):
     """Documents with good text extraction → Tier 2."""
     mock_extract.return_value = TextExtractionResult(
@@ -48,7 +48,7 @@ def test_good_text_routes_tier2(mock_extract):
     assert decision.text_result is not None
 
 
-@patch("src.tier_router.extract_text")
+@patch("corp_knowledge_extractor.tier_router.extract_text")
 def test_partial_text_routes_tier3(mock_extract):
     """Documents with partial text → Tier 3 multimodal."""
     mock_extract.return_value = TextExtractionResult(
@@ -59,7 +59,7 @@ def test_partial_text_routes_tier3(mock_extract):
     assert decision.tier == Tier.MULTIMODAL
 
 
-@patch("src.tier_router.extract_text")
+@patch("corp_knowledge_extractor.tier_router.extract_text")
 def test_no_text_routes_tier3(mock_extract):
     """Documents with no extractable text → Tier 3."""
     mock_extract.return_value = TextExtractionResult(
@@ -70,7 +70,7 @@ def test_no_text_routes_tier3(mock_extract):
     assert decision.tier == Tier.MULTIMODAL
 
 
-@patch("src.tier_router.extract_text")
+@patch("corp_knowledge_extractor.tier_router.extract_text")
 def test_pptx_always_tier2(mock_extract):
     """Text-heavy PPTX routes to Tier 2."""
     mock_extract.return_value = TextExtractionResult(
@@ -87,7 +87,7 @@ def test_pptx_always_tier2(mock_extract):
     assert "pptx" in decision.reason.lower()
 
 
-@patch("src.tier_router.extract_text")
+@patch("corp_knowledge_extractor.tier_router.extract_text")
 def test_docx_always_tier2(mock_extract):
     """DOCX always routes to Tier 2 — Gemini rejects DOCX MIME type."""
     mock_extract.return_value = TextExtractionResult(
@@ -98,7 +98,7 @@ def test_docx_always_tier2(mock_extract):
     assert decision.tier == Tier.TEXT_AI
 
 
-@patch("src.tier_router.extract_text")
+@patch("corp_knowledge_extractor.tier_router.extract_text")
 def test_xlsx_always_tier2(mock_extract):
     """XLSX always routes to Tier 2 — Gemini rejects XLSX MIME type."""
     mock_extract.return_value = TextExtractionResult(
@@ -109,7 +109,7 @@ def test_xlsx_always_tier2(mock_extract):
     assert decision.tier == Tier.TEXT_AI
 
 
-@patch("src.tier_router.extract_text")
+@patch("corp_knowledge_extractor.tier_router.extract_text")
 def test_pptx_tier2_even_with_no_text(mock_extract):
     """PPTX with failed extraction still caps at Tier 2, not Tier 3."""
     mock_extract.return_value = TextExtractionResult(
@@ -120,7 +120,7 @@ def test_pptx_tier2_even_with_no_text(mock_extract):
     assert decision.tier == Tier.TEXT_AI
 
 
-@patch("src.tier_router.extract_text")
+@patch("corp_knowledge_extractor.tier_router.extract_text")
 def test_small_note_tier1(mock_extract):
     """Small text notes → Tier 1 (local only)."""
     mock_extract.return_value = TextExtractionResult(
@@ -132,7 +132,7 @@ def test_small_note_tier1(mock_extract):
     assert decision.estimated_cost == 0.0
 
 
-@patch("src.tier_router.extract_text")
+@patch("corp_knowledge_extractor.tier_router.extract_text")
 def test_estimate_batch_cost(mock_extract):
     """Batch cost estimation sums per-file costs."""
     mock_extract.return_value = TextExtractionResult(
