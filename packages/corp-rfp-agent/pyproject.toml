@@ -1,0 +1,39 @@
+[project]
+name = "corp-rfp-agent"
+version = "0.3.0"
+description = "AI-powered RFP answering system for Blue Yonder solutions"
+requires-python = ">=3.12"
+
+dependencies = [
+    "anthropic>=0.39.0",
+    "click>=8.0",
+    "colorama>=0.4",
+    "google-genai>=1.50",
+    "httpx>=0.28",
+    "ollama>=0.4.0",
+    "openai>=2.14",
+    "openpyxl>=3.1",
+    "python-docx>=1.1.0",
+    "python-dotenv>=1.0",
+    "pyyaml>=6.0",
+    "requests>=2.32",
+    "rich>=14.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.8",
+]
+
+[tool.ruff.lint]
+# E402: load_dotenv() and sys.path.insert() must run before env-dependent imports
+ignore = ["E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
