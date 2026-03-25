@@ -159,7 +159,10 @@ class OpsDB:
     and why. Every action is logged as an ingest_event for undo support.
     """
 
-    def __init__(self, db_path: Path | None = None) -> None:
+    def __init__(self, db_path: Path | None = None, config=None) -> None:
+        # config: PipelineConfig | None — avoids top-level import cycle
+        if db_path is None and config is not None:
+            db_path = config.ops_db_path
         self.db_path = db_path or get_ops_db_path()
         self._conn: sqlite3.Connection | None = None
 
@@ -671,8 +674,10 @@ class OpsDB:
         try:
             row = self.conn.execute(
                 """SELECT COUNT(*) as total,
-                          SUM(CASE WHEN routing_method = 'classifier_auto' THEN 1 ELSE 0 END) as auto,
-                          SUM(CASE WHEN routing_method = 'manual_override' THEN 1 ELSE 0 END) as manual,
+                          SUM(CASE WHEN routing_method = 'classifier_auto'
+                              THEN 1 ELSE 0 END) as auto,
+                          SUM(CASE WHEN routing_method = 'manual_override'
+                              THEN 1 ELSE 0 END) as manual,
                           SUM(CASE WHEN routing_method = 'batch_flag' THEN 1 ELSE 0 END) as batch
                    FROM routing_feedback WHERE reviewed = 0""",
             ).fetchone()

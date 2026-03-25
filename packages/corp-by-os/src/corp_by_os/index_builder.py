@@ -16,9 +16,9 @@ from datetime import datetime
 from pathlib import Path
 
 import yaml
-
 from corp_by_os.config import get_config
 from corp_by_os.models import IndexStats
+from corp_os_meta.pipeline_config import PipelineConfig
 
 logger = logging.getLogger(__name__)
 
@@ -162,11 +162,12 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
     conn.executescript(_SCHEMA)
 
 
-def rebuild_index(db_path: Path | None = None) -> IndexStats:
+def rebuild_index(db_path: Path | None = None, config: PipelineConfig | None = None) -> IndexStats:
     """Full rebuild: scan vault + OneDrive, aggregate into SQLite."""
     start = time.time()
-    cfg = get_config()
-    conn = _connect(db_path)
+    if config is None:
+        config = PipelineConfig.production()
+    conn = _connect(db_path or config.index_db_path)
 
     try:
         # Drop all content tables so schema changes (e.g. new columns)
@@ -189,7 +190,7 @@ def rebuild_index(db_path: Path | None = None) -> IndexStats:
         facts_count = 0
 
         # Collect all project folders from OneDrive + vault
-        project_dirs = _collect_project_dirs(cfg)
+        project_dirs = _collect_project_dirs(config)
 
         for pid, info in project_dirs.items():
             _insert_project(conn, pid, info)
@@ -207,10 +208,10 @@ def rebuild_index(db_path: Path | None = None) -> IndexStats:
                 )
 
         # Index CKE-generated notes from vault
-        notes_count = _index_cke_notes(conn, cfg.vault_path)
+        notes_count = _index_cke_notes(conn, config.vault_path)
 
         # Index extra roots (e.g. rfp_kb)
-        for extra_root in cfg.index_extra_roots:
+        for extra_root in config.index_extra_roots:
             if extra_root.exists():
                 extra_count = _index_cke_notes(conn, extra_root)
                 notes_count += extra_count
@@ -251,7 +252,7 @@ def rebuild_index(db_path: Path | None = None) -> IndexStats:
         )
         conn.commit()
 
-        path = db_path or get_index_path()
+        path = db_path or config.index_db_path
         logger.info(
             "Index rebuilt: %d projects, %d facts, %d notes in %.1fs -> %s",
             projects_count,
@@ -272,10 +273,13 @@ def rebuild_index(db_path: Path | None = None) -> IndexStats:
         conn.close()
 
 
-def update_project(project_id: str, db_path: Path | None = None) -> bool:
+def update_project(
+    project_id: str, db_path: Path | None = None, config: PipelineConfig | None = None
+) -> bool:
     """Update a single project in the index."""
-    cfg = get_config()
-    conn = _connect(db_path)
+    if config is None:
+        config = PipelineConfig.production()
+    conn = _connect(db_path or config.index_db_path)
 
     try:
         _ensure_schema(conn)
@@ -284,7 +288,7 @@ def update_project(project_id: str, db_path: Path | None = None) -> bool:
         conn.execute("DELETE FROM facts WHERE project_id = ?", (project_id,))
         conn.execute("DELETE FROM projects WHERE project_id = ?", (project_id,))
 
-        project_dirs = _collect_project_dirs(cfg)
+        project_dirs = _collect_project_dirs(config)
         info = project_dirs.get(project_id)
         if info is None:
             conn.commit()
