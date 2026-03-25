@@ -61,8 +61,9 @@ agents:
 
   corp-rfp-agent:
     cli: TBD
-    path: "C:\\Users\\1028120\\Documents\\Scripts\\corp-rfp-agent"
-    commands: {}
-    cost: TBD
-    confirmation: []
-    status: legacy  # needs rewire to ecosystem
+    path: "C:\\Users\\1028120\\Documents\\Scripts\\corp-monorepo\\packages\\corp-rfp-agent"
+    commands:
+      answer-excel: {description: "Answer RFP Excel file", args: [input_file]}
+      answer-word: {description: "Answer RFP Word document", args: [input_file]}
+    cost: "$0.10-1.00/RFP (model dependent)"
+    confirmation: [answer-excel, answer-word]

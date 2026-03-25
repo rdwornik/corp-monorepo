@@ -46,3 +46,18 @@ def test_corp_by_os_config_loads():
     from corp_by_os.config import AppConfig
 
     assert AppConfig is not None
+
+
+def test_rfp_agent_importable():
+    """RFP agent uses new namespace."""
+    from corp_rfp_agent.llm_router import LLMRouter
+
+    assert LLMRouter is not None
+
+
+def test_rfp_agent_paths_resolve():
+    """RFP agent _paths.py resolves to package root."""
+    from corp_rfp_agent._paths import REPO_ROOT
+
+    assert (REPO_ROOT / "pyproject.toml").exists()
+    assert REPO_ROOT.name == "corp-rfp-agent"
