@@ -21,8 +21,6 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-
-from corp_by_os.config import get_config
 from corp_by_os.models import (
     ZONE_MUTABILITY,
     Mutability,
@@ -33,6 +31,7 @@ from corp_by_os.models import (
     VaultPath,
     VaultZone,
 )
+from corp_os_meta.pipeline_config import PipelineConfig
 
 logger = logging.getLogger(__name__)
 
@@ -46,9 +45,11 @@ def resolve_vault_path(
     zone: VaultZone | str,
     project_id: str | None = None,
     filename: str | None = None,
+    config: PipelineConfig | None = None,
 ) -> VaultPath:
     """Build an absolute vault path from zone/project/filename components."""
-    cfg = get_config()
+    if config is None:
+        config = PipelineConfig.production()
     if isinstance(zone, str):
         zone = VaultZone(zone)
 
@@ -58,7 +59,7 @@ def resolve_vault_path(
     if filename:
         parts.append(filename)
 
-    absolute = cfg.vault_path
+    absolute = config.vault_path
     for p in parts:
         absolute = absolute / p
 
@@ -224,10 +225,11 @@ def _read_project_info_from_path(info_file: Path, project_id: str) -> ProjectInf
     )
 
 
-def _find_vault_project_dir(project_id: str) -> Path | None:
+def _find_vault_project_dir(project_id: str, config: PipelineConfig | None = None) -> Path | None:
     """Find vault project dir with case-insensitive matching."""
-    cfg = get_config()
-    projects_dir = cfg.vault_path / VaultZone.PROJECTS.value
+    if config is None:
+        config = PipelineConfig.production()
+    projects_dir = config.vault_path / VaultZone.PROJECTS.value
     if not projects_dir.exists():
         return None
 
@@ -258,17 +260,20 @@ def read_project_info(project_id: str) -> ProjectInfo | None:
     return _read_project_info_from_path(info_file, project_id)
 
 
-def list_projects(status_filter: str | None = None) -> list[ProjectSummary]:
+def list_projects(
+    status_filter: str | None = None, config: PipelineConfig | None = None
+) -> list[ProjectSummary]:
     """List all projects by merging OneDrive folders + vault folders.
 
     Returns a deduplicated list ordered alphabetically by project_id.
     """
-    cfg = get_config()
+    if config is None:
+        config = PipelineConfig.production()
     projects: dict[str, ProjectSummary] = {}
 
     # Scan OneDrive project folders
-    if cfg.projects_root.exists():
-        for folder in sorted(cfg.projects_root.iterdir()):
+    if config.projects_root.exists():
+        for folder in sorted(config.projects_root.iterdir()):
             if folder.is_dir() and not folder.name.startswith((".", "_")):
                 pid = folder.name.lower()
                 projects[pid] = ProjectSummary(
@@ -281,7 +286,7 @@ def list_projects(status_filter: str | None = None) -> list[ProjectSummary]:
                 )
 
     # Scan vault project folders and merge
-    vault_projects = cfg.vault_path / VaultZone.PROJECTS.value
+    vault_projects = config.vault_path / VaultZone.PROJECTS.value
     if vault_projects.exists():
         for folder in sorted(vault_projects.iterdir()):
             if folder.is_dir() and not folder.name.startswith((".", "_")):
@@ -369,19 +374,22 @@ def copy_to_vault(
     return copied
 
 
-def validate_vault(project_id: str | None = None) -> ValidationReport:
+def validate_vault(
+    project_id: str | None = None, config: PipelineConfig | None = None
+) -> ValidationReport:
     """Validate vault structure and frontmatter.
 
     Uses corp-os-meta's validate_frontmatter for .md files.
     Checks project-info.yaml exists and has required fields.
     """
-    cfg = get_config()
+    if config is None:
+        config = PipelineConfig.production()
     report = ValidationReport(project_id=project_id)
 
     # Determine which project folders to check
-    projects_dir = cfg.vault_path / VaultZone.PROJECTS.value
+    projects_dir = config.vault_path / VaultZone.PROJECTS.value
     if project_id:
-        found = _find_vault_project_dir(project_id)
+        found = _find_vault_project_dir(project_id, config=config)
         folders = [found] if found else [projects_dir / project_id]
     elif projects_dir.exists():
         folders = [f for f in sorted(projects_dir.iterdir()) if f.is_dir()]
@@ -426,7 +434,7 @@ def validate_vault(project_id: str | None = None) -> ValidationReport:
 
     # Also check sources if project_id specified
     if project_id:
-        sources_dir = cfg.vault_path / VaultZone.SOURCES.value / project_id
+        sources_dir = config.vault_path / VaultZone.SOURCES.value / project_id
         if sources_dir.exists():
             for md_file in sources_dir.rglob("*.md"):
                 report.notes_checked += 1

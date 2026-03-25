@@ -72,7 +72,10 @@ def get_state_db_path() -> Path:
 class OvernightState:
     """Manages overnight run state in SQLite."""
 
-    def __init__(self, db_path: Path | None = None) -> None:
+    def __init__(self, db_path: Path | None = None, config=None) -> None:
+        # config: PipelineConfig | None — avoids top-level import cycle
+        if db_path is None and config is not None:
+            db_path = config.state_db_path
         self.db_path = db_path or get_state_db_path()
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(str(self.db_path))

@@ -29,6 +29,7 @@ class PipelineConfig:
     templates_root: Path
     archive_root: Path
     app_data_path: Path
+    index_extra_roots: tuple[Path, ...] = ()
 
     # Derived paths — set by __post_init__, not passed as constructor args
     inbox_path: Path = field(init=False)
@@ -71,6 +72,13 @@ class PipelineConfig:
 
         local_appdata = Path(os.environ.get("LOCALAPPDATA", str(Path.home() / "AppData" / "Local")))
 
+        extra_roots_raw = os.environ.get("INDEX_EXTRA_ROOTS", "")
+        extra_roots = tuple(
+            Path(os.path.expandvars(p.strip()))
+            for p in extra_roots_raw.split(";")
+            if p.strip()
+        )
+
         return cls(
             vault_path=vault,
             mywork_root=mywork,
@@ -78,6 +86,7 @@ class PipelineConfig:
             templates_root=_env_or("TEMPLATES_ROOT", mywork / "30_Templates"),
             archive_root=_env_or("ARCHIVE_ROOT", mywork / "80_Archive"),
             app_data_path=_env_or("APP_DATA_PATH", local_appdata / "corp-by-os"),
+            index_extra_roots=extra_roots,
         )
 
     @classmethod
