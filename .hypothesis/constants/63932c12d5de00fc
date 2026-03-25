@@ -1,4 +1,0 @@
-# file: C:\Users\1028120\Documents\Scripts\corp-monorepo\packages\corp-by-os\src\corp_by_os\ingest\naming_config.py
-# hypothesis_version: 6.151.9
-
-['ARCH', 'COMP', 'DEMO', 'MEET', 'PRES', 'PROD', 'RFP', 'SEC', 'TRAIN', 'Untitled', '[^A-Za-z]', '_', 'architecture', 'brand', 'client_aliases', 'competitive', 'config', 'demo', 'description_rules', 'doc_type', 'fallback', 'filename_hint', 'max_length', 'meeting', 'naming_config.yaml', 'noise_words', 'product_doc', 'rfp', 'security_compliance', 'strip_pattern', 'training', 'type_codes', 'unknown_client', 'unknown_type', 'utf-8', 'word_separator']

@@ -1,4 +1,0 @@
-# file: C:\Users\1028120\Documents\Scripts\corp-monorepo\packages\corp-rfp-agent\src\corp_rfp_agent\anonymization\config.py
-# hypothesis_version: 6.151.9
-
-['[CUSTOMER]', 'anonymize_api_calls', 'blocklist', 'customer_name', 'customers', 'internal', 'kb_sources', 'log_enabled', 'log_path', 'placeholder', 'projects', 'r', 'session', 'settings', 'utf-8', 'w']

@@ -1,4 +1,0 @@
-# file: C:\Users\1028120\Documents\Scripts\corp-monorepo\packages\corp-project-extractor\src\corp_project_extractor\models.py
-# hypothesis_version: 6.151.9
-
-['1.0', 'FileEntry', 'Manifest', 'created_at', 'files', 'last_scanned', 'project_id', 'project_path', 'schema_version', 'utf-8']

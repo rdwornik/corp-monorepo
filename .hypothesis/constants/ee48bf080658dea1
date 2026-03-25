@@ -1,4 +1,0 @@
-# file: C:\Users\1028120\Documents\Scripts\corp-monorepo\packages\corp-os-meta\corp_os_meta\products.py
-# hypothesis_version: 6.151.9
-
-[0.0, 0.1, 0.85, '(?i)\\.(pptx?|key)$', '(?i)architect', '(?i)rfp|response', 'aliases', 'data', 'display_names', 'documentation', 'external_source', 'historical_rfp', 'implementation_guide', 'is_platform_service', 'key', 'meeting', 'official_product_doc', 'parent', 'presentation', 'products', 'products.yaml', 'release_note', 'release_notes', 'reliability_tiers', 'research', 'sales_deck', 'score', 'service_description', 'source_tiers.yaml', 'sub_products', 'training', 'training_material', 'user_notes', 'variants', 'vendor_marketing']
