@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+desktop.ini
+Thumbs.db
+.DS_Store
+
+# Environment
+.env
+
+# Testing
+.coverage
+htmlcov/
+
+# Claude
+.claude/
+
+# Data (repo-specific)
+*.db
