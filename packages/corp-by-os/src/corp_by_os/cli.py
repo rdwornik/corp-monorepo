@@ -3102,6 +3102,108 @@ def ingest_extractions_cmd(
             pass
 
 
+# --- Test Pipeline ---
+
+
+@cli.command("test-pipeline")
+@click.option("--live", is_flag=True, help="Use real CKE API calls (costs money)")
+@click.option("--keep-sandbox", is_flag=True, help="Keep sandbox directory after run")
+@click.option("--verbose", "-v", is_flag=True, help="Enable DEBUG logging during test")
+@click.option(
+    "--output",
+    "-o",
+    default=None,
+    type=click.Path(dir_okay=False),
+    help="Save JSON report to file",
+)
+@click.pass_obj
+def test_pipeline_command(
+    obj: dict,
+    live: bool,
+    keep_sandbox: bool,
+    verbose: bool,
+    output: str | None,
+) -> None:
+    """Run an end-to-end pipeline smoke test in an isolated sandbox.
+
+    Exercises all key pipeline stages (sandbox init, classify/rename, vault
+    ingest, index rebuild, retrieve) without touching production data.
+
+    Fixture mode (default): no API calls, runs in ~2s.
+    Live mode (--live): invokes real CKE extraction.
+
+    Examples:
+
+    \b
+        corp test-pipeline
+        corp test-pipeline --verbose
+        corp test-pipeline --live --keep-sandbox
+        corp test-pipeline --output report.json
+    """
+    import json as _json
+    from dataclasses import asdict
+
+    from corp_by_os.test_pipeline import PipelineTestReport, run_pipeline_test
+
+    config = (obj or {}).get("config") or PipelineConfig.production()
+
+    console.print("[bold cyan]Running pipeline smoke test...[/bold cyan]")
+
+    report: PipelineTestReport = run_pipeline_test(
+        config=config,
+        fixture_mode=not live,
+        verbose=verbose,
+        keep_sandbox=keep_sandbox,
+    )
+
+    # Inline report formatting (format_report added in Step 3)
+    _print_report(report)
+
+    if output:
+        out_path = Path(output)
+        report_dict = asdict(report)
+        # Path objects not JSON-serialisable — convert to str
+        if report_dict.get("sandbox_path") is not None:
+            report_dict["sandbox_path"] = str(report_dict["sandbox_path"])
+        out_path.write_text(_json.dumps(report_dict, indent=2), encoding="utf-8")
+        console.print(f"[dim]Report saved to {out_path}[/dim]")
+
+    sys.exit(0 if report.all_passed else 1)
+
+
+def _print_report(report) -> None:
+    """Print pipeline test report to console (minimal inline version)."""
+    from rich.text import Text
+
+    table = Table(title="Pipeline Smoke Test", show_lines=False, box=None)
+    table.add_column("Step", style="cyan", min_width=24)
+    table.add_column("Status", justify="center", min_width=8)
+    table.add_column("Time", justify="right", min_width=7)
+    table.add_column("Detail", style="dim")
+
+    for step in report.steps:
+        status_text = (
+            Text("PASS", style="bold green") if step.passed else Text("FAIL", style="bold red")
+        )
+        table.add_row(
+            step.name,
+            status_text,
+            f"{step.duration_s:.2f}s",
+            step.detail,
+        )
+
+    console.print(table)
+
+    if report.sandbox_path:
+        console.print(f"[dim]Sandbox: {report.sandbox_path}[/dim]")
+
+    if report.all_passed:
+        overall = "[bold green]ALL PASSED[/bold green]"
+    else:
+        overall = "[bold red]FAILED[/bold red]"
+    console.print(f"\nResult: {overall}")
+
+
 # --- Chat ---
 
 
