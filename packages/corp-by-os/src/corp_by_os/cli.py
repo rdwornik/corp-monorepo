@@ -394,6 +394,69 @@ def trust_status() -> None:
         console.print(f"  [yellow]Pending conflicts: {conflicts}[/yellow]")
 
 
+@cli.command("routing-review")
+def routing_review() -> None:
+    """Show routing override patterns for manual rule updates."""
+    from corp_by_os.ops.database import OpsDB
+
+    try:
+        ops = OpsDB()
+    except Exception as e:
+        console.print(f"[red]Cannot open ops.db: {e}[/red]")
+        return
+
+    overrides = ops.get_routing_overrides()
+    if overrides:
+        table = Table(title="Unreviewed Routing Overrides")
+        table.add_column("Destination", style="cyan")
+        table.add_column("Count", justify="right")
+        table.add_column("Example Files", max_width=60, style="dim")
+
+        for row in overrides:
+            examples = row.get("examples", "")
+            table.add_row(
+                row["final_destination"],
+                str(row["cnt"]),
+                (examples[:60] + "...") if len(examples) > 60 else examples,
+            )
+        console.print(table)
+    else:
+        console.print("[green]No unreviewed routing overrides.[/green]")
+
+    stats = ops.get_routing_stats()
+    console.print(
+        f"\nTotal: {stats['total']} | Auto: {stats['auto']} "
+        f"| Manual: {stats['manual']} | Batch: {stats['batch']}"
+    )
+
+    loose = stats["auto"] + stats["manual"]
+    if loose > 0:
+        override_rate = stats["manual"] / loose * 100
+        console.print(f"Override rate (loose files): {override_rate:.0f}%")
+        if override_rate > 40:
+            console.print(
+                "[yellow]Override rate >40% -- consider adding rules to content_registry.yaml[/yellow]"
+            )
+
+    ops.close()
+
+
+@cli.command("routing-mark-reviewed")
+def routing_mark_reviewed() -> None:
+    """Mark all current routing feedback as reviewed."""
+    from corp_by_os.ops.database import OpsDB
+
+    try:
+        ops = OpsDB()
+    except Exception as e:
+        console.print(f"[red]Cannot open ops.db: {e}[/red]")
+        return
+
+    count = ops.mark_routing_reviewed()
+    console.print(f"Marked {count} entries as reviewed.")
+    ops.close()
+
+
 # --- Workflow commands ---
 
 

@@ -434,6 +434,43 @@ def _register_file(file_path: Path, ops: OpsDB) -> None:
     )
 
 
+def _log_routing_feedback(
+    ops: OpsDB,
+    file_path: Path,
+    classification: object,
+    *,
+    final_destination: str,
+    was_overridden: bool,
+    routing_method: str,
+    user_context: str | None = None,
+) -> None:
+    """Log routing decision to ops.db. Fail-open — never blocks routing."""
+    try:
+        cls_dest = None
+        cls_conf = None
+        client = None
+        if hasattr(classification, "best_match") and classification.best_match:
+            cls_dest = classification.best_match.destination
+            cls_conf = classification.best_match.confidence
+        if hasattr(classification, "client") and classification.client:
+            client = classification.client
+
+        ops.log_routing_decision(
+            filename=file_path.name,
+            extension=file_path.suffix,
+            file_size_bytes=file_path.stat().st_size if file_path.exists() else 0,
+            classifier_destination=cls_dest,
+            classifier_confidence=cls_conf,
+            final_destination=final_destination,
+            was_overridden=was_overridden,
+            routing_method=routing_method,
+            user_context=user_context,
+            client=client,
+        )
+    except Exception as e:
+        logger.warning("Failed to log routing feedback: %s", e)
+
+
 def _trigger_extraction(
     file_path: Path,
     mywork_root: Path,
@@ -778,6 +815,12 @@ def process_file(
             classification, file_path.name, rename.proposed_name,
             None, not skip_extract,
         )
+        _log_routing_feedback(
+            ops, file_path, classification,
+            final_destination=dest,
+            was_overridden=bool(override_dest),
+            routing_method="batch_flag" if default_destination else "classifier_auto",
+        )
         console.print(
             f"[green]AUTO:[/green] {file_path.name} → {dest}/{rename.proposed_name}"
         )
@@ -873,6 +916,16 @@ def process_file(
                 ops, file_path, final_path, mywork_root,
                 classification, file_path.name, current_name,
                 user_context, not skip_extract,
+            )
+
+            _log_routing_feedback(
+                ops, file_path, classification,
+                final_destination=current_dest,
+                was_overridden=dest_was_set,
+                routing_method="manual_override" if dest_was_set else (
+                    "batch_flag" if default_destination else "classifier_auto"
+                ),
+                user_context=user_context,
             )
 
             console.print(
