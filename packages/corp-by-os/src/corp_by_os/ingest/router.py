@@ -159,6 +159,7 @@ def ingest_file(
     *,
     extract: bool = True,
     dry_run: bool = False,
+    config=None,  # PipelineConfig | None
 ) -> IngestResult:
     """Run the full ingest pipeline on a single file.
 
@@ -297,6 +298,7 @@ def ingest_file(
                 asset_id,
                 content_hash,
                 mtime_str,
+                config=config,
             )
             result.extracted = vault_note is not None
             result.extraction_cost = cost
@@ -316,6 +318,7 @@ def ingest_all(
     *,
     extract: bool = True,
     dry_run: bool = False,
+    config=None,  # PipelineConfig | None
 ) -> tuple[list[IngestResult], list[PackageIngestResult]]:
     """Scan inbox and ingest all files and folders.
 
@@ -347,6 +350,7 @@ def ingest_all(
             registry,
             extract=extract,
             dry_run=dry_run,
+            config=config,
         )
         package_results.append(result)
 
@@ -359,6 +363,7 @@ def ingest_all(
             registry,
             extract=extract,
             dry_run=dry_run,
+            config=config,
         )
         file_results.append(result)
 
@@ -373,6 +378,7 @@ def ingest_folder(
     *,
     extract: bool = True,
     dry_run: bool = False,
+    config=None,  # PipelineConfig | None
 ) -> PackageIngestResult:
     """Ingest a folder as a coherent package.
 
@@ -549,6 +555,7 @@ def ingest_folder(
                 ops,
                 package_id,
                 shared_context=f"All files in this folder relate to: {folder_path.name}",
+                config=config,
             )
             extracted = True
             ops.update_package_status(
@@ -585,6 +592,7 @@ def _run_package_extraction(
     ops: OpsDB,
     package_id: int | None,
     shared_context: str = "",
+    config=None,  # PipelineConfig | None
 ) -> float:
     """Run batch extraction on all files in a folder package.
 
@@ -605,13 +613,14 @@ def _run_package_extraction(
         logger.warning("CKE not available, skipping package extraction: %s", err)
         return 0.0
 
-    from corp_by_os.config import get_config
+    from corp_os_meta.pipeline_config import PipelineConfig
 
-    cfg = get_config()
+    if config is None:
+        config = PipelineConfig.production()
 
     # Build a multi-file manifest for the folder
     pkg_id = _make_entry_id(folder_path.name)
-    staging_dir = cfg.app_data_path / "staging" / "ingest" / pkg_id
+    staging_dir = config.app_data_path / "staging" / "ingest" / pkg_id
     staging_dir.mkdir(parents=True, exist_ok=True)
 
     file_entries = []
@@ -659,7 +668,7 @@ def _run_package_extraction(
     from corp_by_os.extraction.vault_writer import move_to_vault
 
     vault_target = "01_Knowledge"
-    move_to_vault(staging_dir, cfg.vault_path, vault_target)
+    move_to_vault(staging_dir, config.vault_path, vault_target)
 
     return cost
 
@@ -672,6 +681,7 @@ def _run_extraction(
     content_hash: str,
     mtime_str: str,
     user_context: str | None = None,
+    config=None,  # PipelineConfig | None
 ) -> tuple[str | None, float]:
     """Invoke CKE extraction on a single file.
 
@@ -693,13 +703,14 @@ def _run_extraction(
         logger.warning("CKE not available, skipping extraction: %s", err)
         return None, 0.0
 
-    from corp_by_os.config import get_config
+    from corp_os_meta.pipeline_config import PipelineConfig
 
-    cfg = get_config()
+    if config is None:
+        config = PipelineConfig.production()
 
     # Build a minimal manifest for this single file
     entry_id = _make_entry_id(file_path.name)
-    staging_dir = cfg.app_data_path / "staging" / "ingest" / entry_id
+    staging_dir = config.app_data_path / "staging" / "ingest" / entry_id
     staging_dir.mkdir(parents=True, exist_ok=True)
 
     file_entry: dict = {
@@ -739,7 +750,7 @@ def _run_extraction(
     from corp_by_os.extraction.vault_writer import move_to_vault
 
     vault_target = "01_Knowledge"
-    moved = move_to_vault(staging_dir, cfg.vault_path, vault_target)
+    moved = move_to_vault(staging_dir, config.vault_path, vault_target)
 
     vault_note_path = f"{vault_target}/{entry_id}" if moved > 0 else None
 

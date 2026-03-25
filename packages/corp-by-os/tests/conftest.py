@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 import yaml
-
 from corp_by_os.config import get_config
+from corp_by_os.sandbox import SandboxManager
 
 
 @pytest.fixture()
@@ -91,3 +91,33 @@ def app_config(
 
     # Clean up cache after test
     get_config.cache_clear()
+
+
+# ---------------------------------------------------------------------------
+# Sandbox fixtures (PipelineConfig-isolated)
+# ---------------------------------------------------------------------------
+
+_CORPUS_DIR = Path(__file__).parent / "fixtures" / "pipeline" / "corpus"
+
+
+@pytest.fixture()
+def sandbox(tmp_path: Path) -> SandboxManager:
+    """Isolated pipeline sandbox with empty databases.
+
+    Provides a SandboxManager whose config points entirely at tmp_path.
+    All three databases (ops.db, index.db, overnight_state.db) are
+    initialized with the real schema — no DDL duplication.
+    """
+    return SandboxManager(tmp_path).create()
+
+
+@pytest.fixture()
+def sandbox_with_corpus(tmp_path: Path) -> SandboxManager:
+    """Isolated pipeline sandbox with the standard fixture corpus staged in inbox.
+
+    Like ``sandbox`` but copies tests/fixtures/pipeline/corpus/ files into
+    the sandbox inbox so ingest/routing tests have real file input.
+    """
+    sb = SandboxManager(tmp_path).create()
+    sb.stage_files(_CORPUS_DIR)
+    return sb

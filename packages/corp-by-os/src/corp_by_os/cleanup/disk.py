@@ -18,9 +18,7 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 # OneDrive MyWork path (redundant copy of local MyWork after migration)
-_DEFAULT_ONEDRIVE_MYWORK = Path(
-    r"C:\Users\1028120\OneDrive - Blue Yonder\MyWork_OneDrive",
-)
+_DEFAULT_ONEDRIVE_MYWORK = Path.home() / "OneDrive - Blue Yonder" / "MyWork_OneDrive"
 
 
 @dataclass

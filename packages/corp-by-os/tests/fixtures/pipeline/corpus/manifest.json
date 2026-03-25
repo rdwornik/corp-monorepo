@@ -1,0 +1,40 @@
+{
+  "description": "Minimal fixture corpus for sandbox pipeline tests",
+  "files": [
+    {
+      "filename": "2024-01_DECK_ACME_QuarterlyReview.pptx",
+      "type": "pptx",
+      "expected_type_code": "DECK",
+      "expected_client": "ACME",
+      "is_duplicate_of": null
+    },
+    {
+      "filename": "2024-01_DECK_ACME_QuarterlyReview_copy.pptx",
+      "type": "pptx",
+      "expected_type_code": "DECK",
+      "expected_client": "ACME",
+      "is_duplicate_of": "2024-01_DECK_ACME_QuarterlyReview.pptx"
+    },
+    {
+      "filename": "2024-02_SOW_ACME_Implementation.docx",
+      "type": "docx",
+      "expected_type_code": "SOW",
+      "expected_client": "ACME",
+      "is_duplicate_of": null
+    },
+    {
+      "filename": "2024-03_DATA_ACME_Analytics.xlsx",
+      "type": "xlsx",
+      "expected_type_code": "DATA",
+      "expected_client": "ACME",
+      "is_duplicate_of": null
+    },
+    {
+      "filename": "2024-04_NOTE_ACME_MeetingNotes.txt",
+      "type": "txt",
+      "expected_type_code": "NOTE",
+      "expected_client": "ACME",
+      "is_duplicate_of": null
+    }
+  ]
+}

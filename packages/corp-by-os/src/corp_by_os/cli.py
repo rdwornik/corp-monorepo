@@ -45,13 +45,13 @@ from datetime import datetime
 from pathlib import Path
 
 import click
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-
 from corp_by_os.config import get_config
 from corp_by_os.project_resolver import resolve_project
 from corp_by_os.vault_io import list_projects, read_project_info, validate_vault
+from corp_os_meta.pipeline_config import PipelineConfig
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
 
 # Use ASCII-safe markers for Windows legacy console compatibility
 CHECK = "Y"
@@ -63,10 +63,13 @@ logger = logging.getLogger(__name__)
 
 @click.group()
 @click.option("--verbose", "-v", is_flag=True, help="Enable debug logging")
-def cli(verbose: bool) -> None:
+@click.pass_context
+def cli(ctx: click.Context, verbose: bool) -> None:
     """Corp-by-os — root orchestrator for the agent ecosystem."""
     level = logging.DEBUG if verbose else logging.INFO
     logging.basicConfig(level=level, format="%(levelname)s %(name)s: %(message)s")
+    ctx.ensure_object(dict)
+    ctx.obj["config"] = PipelineConfig.production()
 
 
 # --- Project commands ---
@@ -79,9 +82,11 @@ def project() -> None:
 
 @project.command("list")
 @click.option("--status", "-s", default=None, help="Filter by status (active, rfp, won, etc.)")
-def project_list(status: str | None) -> None:
+@click.pass_obj
+def project_list(obj: dict, status: str | None) -> None:
     """List all projects with metadata status."""
-    projects = list_projects(status_filter=status)
+    config = (obj or {}).get("config") or PipelineConfig.production()
+    projects = list_projects(status_filter=status, config=config)
 
     if not projects:
         console.print("[yellow]No projects found.[/yellow]")
@@ -189,8 +194,10 @@ def vault() -> None:
 
 @vault.command("validate")
 @click.argument("project", required=False, default=None)
-def vault_validate(project: str | None) -> None:
+@click.pass_obj
+def vault_validate(obj: dict, project: str | None) -> None:
     """Validate vault structure and frontmatter."""
+    config = (obj or {}).get("config") or PipelineConfig.production()
     project_id = None
     if project:
         resolved = resolve_project(project)
@@ -201,7 +208,7 @@ def vault_validate(project: str | None) -> None:
             sys.exit(1)
 
     console.print("[dim]Running validation...[/dim]")
-    report = validate_vault(project_id=project_id)
+    report = validate_vault(project_id=project_id, config=config)
 
     if report.is_valid and not report.issues:
         console.print(
@@ -395,12 +402,14 @@ def trust_status() -> None:
 
 
 @cli.command("routing-review")
-def routing_review() -> None:
+@click.pass_obj
+def routing_review(obj: dict) -> None:
     """Show routing override patterns for manual rule updates."""
     from corp_by_os.ops.database import OpsDB
 
+    config = (obj or {}).get("config") or PipelineConfig.production()
     try:
-        ops = OpsDB()
+        ops = OpsDB(config=config)
     except Exception as e:
         console.print(f"[red]Cannot open ops.db: {e}[/red]")
         return
@@ -435,19 +444,22 @@ def routing_review() -> None:
         console.print(f"Override rate (loose files): {override_rate:.0f}%")
         if override_rate > 40:
             console.print(
-                "[yellow]Override rate >40% -- consider adding rules to content_registry.yaml[/yellow]"
+                "[yellow]Override rate >40% -- consider adding rules to "
+                "content_registry.yaml[/yellow]"
             )
 
     ops.close()
 
 
 @cli.command("routing-mark-reviewed")
-def routing_mark_reviewed() -> None:
+@click.pass_obj
+def routing_mark_reviewed(obj: dict) -> None:
     """Mark all current routing feedback as reviewed."""
     from corp_by_os.ops.database import OpsDB
 
+    config = (obj or {}).get("config") or PipelineConfig.production()
     try:
-        ops = OpsDB()
+        ops = OpsDB(config=config)
     except Exception as e:
         console.print(f"[red]Cannot open ops.db: {e}[/red]")
         return
@@ -731,13 +743,16 @@ def index_group() -> None:
 
 @index_group.command("rebuild")
 @click.option("--project", "-p", default=None, help="Update single project only")
-def index_rebuild(project: str | None) -> None:
+@click.pass_obj
+def index_rebuild(obj: dict, project: str | None) -> None:
     """Rebuild the SQLite index from all projects."""
     from corp_by_os.index_builder import rebuild_index, update_project
 
+    config = (obj or {}).get("config") or PipelineConfig.production()
+
     if project:
         console.print(f"[dim]Updating index for {project}...[/dim]")
-        ok = update_project(project)
+        ok = update_project(project, config=config)
         if ok:
             console.print(f"[green]Updated {project} in index.[/green]")
         else:
@@ -745,7 +760,7 @@ def index_rebuild(project: str | None) -> None:
             sys.exit(1)
     else:
         console.print("[dim]Rebuilding full index...[/dim]")
-        stats = rebuild_index()
+        stats = rebuild_index(config=config)
         console.print(
             f"[green]Indexed {stats.projects_indexed} projects, "
             f"{stats.facts_indexed} facts, "
@@ -1160,7 +1175,9 @@ OVERNIGHT_SCOPES: dict[str, list[str]] = {
     "--auto-threshold", default=0.90, type=float, help="Auto-approve confidence threshold"
 )
 @click.option("--reset", is_flag=True, help="Clear all pending files from state DB and exit")
+@click.pass_obj
 def overnight_command(
+    obj: dict,
     scope: str,
     budget: float,
     dry_run: bool,
@@ -1169,10 +1186,11 @@ def overnight_command(
     reset: bool,
 ) -> None:
     """Run overnight extraction and reshape pipeline."""
+    config = (obj or {}).get("config") or PipelineConfig.production()
     if reset:
         from corp_by_os.overnight.state import OvernightState
 
-        state = OvernightState()
+        state = OvernightState(config=config)
         cleared = state.conn.execute("DELETE FROM files WHERE status = 'pending'").rowcount
         state.conn.commit()
         console.print(f"[green]Cleared {cleared} pending files from state DB.[/green]")
@@ -1198,9 +1216,9 @@ def overnight_command(
     console.print("  [green]All checks passed[/green]")
 
     if scope == "full-reshape":
-        _run_full_reshape(mywork_root, cfg, budget, dry_run, auto_threshold)
+        _run_full_reshape(mywork_root, cfg, budget, dry_run, auto_threshold, config=config)
     else:
-        _run_folder_extraction(scope, mywork_root, cfg, budget, dry_run, batch)
+        _run_folder_extraction(scope, mywork_root, cfg, budget, dry_run, batch, config=config)
 
 
 def _run_folder_extraction(
@@ -1210,6 +1228,7 @@ def _run_folder_extraction(
     budget: float,
     dry_run: bool,
     batch: bool,
+    config: PipelineConfig | None = None,
 ) -> None:
     """Extraction flow for named folder scopes."""
     import uuid
@@ -1219,7 +1238,7 @@ def _run_folder_extraction(
     from corp_by_os.overnight.state import OvernightState
 
     run_id = f"overnight-{scope}-{uuid.uuid4().hex[:8]}"
-    state = OvernightState()
+    state = OvernightState(config=config)
     monitor = OvernightMonitor(run_id)
 
     state.create_run(run_id, scope=scope, budget=budget)
@@ -1281,7 +1300,6 @@ def _run_folder_extraction(
 
     # Build per-folder manifests and extract
     import yaml
-
     from corp_by_os.extraction.non_project.folder_policy import PolicyError, load_policy
     from corp_by_os.extraction.non_project.manifest_emitter import build_manifest, write_manifest
     from corp_by_os.extraction.non_project.routing import resolve_route
@@ -1424,6 +1442,7 @@ def _run_full_reshape(
     budget: float,
     dry_run: bool,
     auto_threshold: float,
+    config: PipelineConfig | None = None,
 ) -> None:
     """Full MyWork reshape: scan → dedup → classify → plan.
 
@@ -1438,7 +1457,7 @@ def _run_full_reshape(
     from corp_by_os.overnight.state import OvernightState
 
     run_id = f"reshape-{uuid.uuid4().hex[:8]}"
-    state = OvernightState()
+    state = OvernightState(config=config)
     monitor = OvernightMonitor(run_id)
     state.create_run(run_id, scope="full-reshape", budget=budget)
     monitor.log_event("run_started", scope="full-reshape", budget=budget)
@@ -1492,7 +1511,6 @@ def _run_full_reshape(
     classifications: list = []
     try:
         import yaml
-
         from corp_by_os.overnight.classifier import classify_batch as reshape_classify
 
         routing_map_path = mywork_root / "90_System" / "routing_map.yaml"
@@ -2109,7 +2127,9 @@ def audit_command(skip_gemini: bool, budget: float, model: str) -> None:
 @click.argument("path", required=False, default=None, type=click.Path(exists=True))
 @click.option("--dry-run", is_flag=True, help="Match and report without moving files")
 @click.option("--no-extract", is_flag=True, help="Route only, skip CKE extraction")
+@click.pass_obj
 def ingest_command(
+    obj: dict,
     path: str | None,
     dry_run: bool,
     no_extract: bool,
@@ -2129,8 +2149,9 @@ def ingest_command(
     from corp_by_os.ops.database import OpsDB
     from corp_by_os.ops.registry import ContentRegistry, get_content_registry_path
 
+    config = (obj or {}).get("config") or PipelineConfig.production()
     cfg = get_config()
-    ops = OpsDB()
+    ops = OpsDB(config=config)
     registry = ContentRegistry(get_content_registry_path())
 
     extract = not no_extract
@@ -2297,7 +2318,9 @@ def ingest_command(
 @click.option("--list-all", is_flag=True, help="Show all ingest history (no limit).")
 @click.option("--destination", type=str, default=None,
               help="Default destination for all files (e.g. 10_Projects/JLR).")
+@click.pass_obj
 def ingest_inbox_command(
+    obj: dict,
     path: str | None,
     dry_run: bool,
     auto: bool,
@@ -2322,8 +2345,9 @@ def ingest_inbox_command(
     from corp_by_os.ops.database import OpsDB
     from corp_by_os.ops.registry import ContentRegistry, get_content_registry_path
 
+    config = (obj or {}).get("config") or PipelineConfig.production()
     cfg = get_config()
-    ops = OpsDB()
+    ops = OpsDB(config=config)
 
     # List mode
     if list_events or list_all:
@@ -2390,11 +2414,13 @@ def ingest_inbox_command(
 
 
 @cli.command("files-stats")
-def files_stats_command() -> None:
+@click.pass_obj
+def files_stats_command(obj: dict) -> None:
     """Show file registry statistics."""
     from corp_by_os.ops.database import OpsDB
 
-    ops = OpsDB()
+    config = (obj or {}).get("config") or PipelineConfig.production()
+    ops = OpsDB(config=config)
     conn = ops.conn
 
     total_files = conn.execute("SELECT COUNT(*) FROM files").fetchone()[0]
@@ -2427,14 +2453,16 @@ def files_stats_command() -> None:
 
 
 @cli.command("naming-stats")
-def naming_stats_command() -> None:
+@click.pass_obj
+def naming_stats_command(obj: dict) -> None:
     """Show naming convention type code distribution from routing feedback."""
     from collections import Counter
 
     from corp_by_os.ingest.naming_config import get_type_code, load_naming_config
     from corp_by_os.ops.database import OpsDB
 
-    ops = OpsDB()
+    pipeline_config = (obj or {}).get("config") or PipelineConfig.production()
+    ops = OpsDB(config=pipeline_config)
     rows = ops.conn.execute(
         "SELECT filename FROM routing_feedback ORDER BY timestamp DESC"
     ).fetchall()
@@ -2480,7 +2508,8 @@ def naming_stats_command() -> None:
 
 @cli.command("finalize")
 @click.option("--approve-all", is_flag=True, help="Move all staged files to final destinations")
-def finalize_command(approve_all: bool) -> None:
+@click.pass_obj
+def finalize_command(obj: dict, approve_all: bool) -> None:
     """Review and approve staged files.
 
     Files below the confidence threshold are staged in _Staging/ directories.
@@ -2490,8 +2519,9 @@ def finalize_command(approve_all: bool) -> None:
     from corp_by_os.ingest.router import finalize_file, get_staged_files
     from corp_by_os.ops.database import OpsDB
 
+    config = (obj or {}).get("config") or PipelineConfig.production()
     cfg = get_config()
-    ops = OpsDB()
+    ops = OpsDB(config=config)
 
     staged = get_staged_files(cfg.mywork_root)
 
@@ -2537,7 +2567,8 @@ def finalize_command(approve_all: bool) -> None:
 @click.option("--model", default="gemini-3-flash-preview", help="Gemini model for classification")
 @click.option("--budget", default=0.50, type=float, help="Maximum API spend ($)")
 @click.option("--dry-run", is_flag=True, help="Classify without moving files")
-def classify_command(model: str, budget: float, dry_run: bool) -> None:
+@click.pass_obj
+def classify_command(obj: dict, model: str, budget: float, dry_run: bool) -> None:
     """Classify quarantined files using Gemini LLM.
 
     Reads files in _Unmatched (quarantined by corp ingest),
@@ -2555,8 +2586,9 @@ def classify_command(model: str, budget: float, dry_run: bool) -> None:
     from corp_by_os.ops.database import OpsDB
     from corp_by_os.ops.registry import ContentRegistry, get_content_registry_path
 
+    config = (obj or {}).get("config") or PipelineConfig.production()
     cfg = get_config()
-    ops = OpsDB()
+    ops = OpsDB(config=config)
     registry = ContentRegistry(get_content_registry_path())
 
     if dry_run:
@@ -2971,9 +3003,13 @@ def rfp_answer_cmd(
 @click.argument("cke_output_path", type=click.Path(exists=True, file_okay=False))
 @click.option("--dry-run", is_flag=True, help="Show what would be ingested")
 @click.option("--force", is_flag=True, help="Overwrite even verified notes")
-@click.option("--quality-threshold", default=25, type=int, help="Min quality_score to accept (0-100)")
+@click.option(
+    "--quality-threshold", default=25, type=int, help="Min quality_score to accept (0-100)"
+)
 @click.option("--rebuild-index", is_flag=True, help="Rebuild FTS5 search index after ingest")
+@click.pass_obj
 def ingest_extractions_cmd(
+    obj: dict,
     cke_output_path: str,
     dry_run: bool,
     force: bool,
@@ -2998,12 +3034,13 @@ def ingest_extractions_cmd(
     """
     from corp_by_os.ingest.extractions import ingest_extractions
 
+    config = (obj or {}).get("config") or PipelineConfig.production()
     cfg = get_config()
 
     try:
         from corp_by_os.ops.database import OpsDB
 
-        ops = OpsDB()
+        ops = OpsDB(config=config)
     except Exception:
         ops = None
 
@@ -3038,18 +3075,20 @@ def ingest_extractions_cmd(
             console.print(f"  {dest}: {count}")
 
     if result.errors:
-        console.print(f"\n[red]Errors:[/red]")
+        console.print("\n[red]Errors:[/red]")
         for err in result.errors:
             console.print(f"  {err}")
 
     if result.notes_quarantined > 0:
-        console.print(f"\n[yellow]{result.notes_quarantined} note(s) quarantined to _quarantine/[/yellow]")
+        console.print(
+            f"\n[yellow]{result.notes_quarantined} note(s) quarantined to _quarantine/[/yellow]"
+        )
 
     if result.notes_ingested > 0 and not dry_run and rebuild_index:
         console.print("\n[dim]Rebuilding search index...[/dim]")
         try:
             from corp_by_os.index_builder import rebuild_index as do_rebuild
-            stats = do_rebuild()
+            stats = do_rebuild(config=config)
             console.print(f"[green]Index rebuilt: {stats.total_facts} facts indexed.[/green]")
         except Exception as e:
             console.print(f"[red]Index rebuild failed: {e}[/red]")
