@@ -1,0 +1,29 @@
+# Architecture Decision Records
+
+Distilled from AI Council debates in `.ecosystem/decisions/` (Scripts root).
+Max 20 lines each. Format: Context / Decision / Consequences.
+
+| ADR | Title | Status |
+|-----|-------|--------|
+| [ADR-01](ADR-01-knowledge-architecture.md) | Knowledge Management Architecture | Accepted |
+| [ADR-02](ADR-02-extraction-quality.md) | CKE Extraction Quality | Accepted |
+| [ADR-03](ADR-03-model-selection.md) | Model Selection for Text Extraction | Superseded by ADR-08a |
+| [ADR-04](ADR-04-vault-structure.md) | Vault Structure | Superseded by ADR-07 |
+| [ADR-05](ADR-05-reextraction-strategy.md) | Re-extraction Strategy | Accepted |
+| [ADR-06](ADR-06-quality-gate.md) | Ingestion Quality Gate | Accepted |
+| [ADR-07](ADR-07-vault-navigation.md) | Obsidian Vault Navigation | Accepted |
+| [ADR-08a](ADR-08a-model-tiering.md) | Model Tiering and Routing | Accepted |
+| [ADR-08b](ADR-08b-gemini-capabilities.md) | Gemini API Capability Adoption | Accepted |
+| [ADR-09](ADR-09-knowledge-dimensions.md) | Knowledge Dimensions and File Organization | Accepted |
+| [ADR-10](ADR-10-naming-convention.md) | Vault Naming Convention (type-first) | Superseded by ADR-14 |
+| [ADR-11](ADR-11-file-distribution.md) | File Distribution Algorithm | Accepted |
+| [ADR-12](ADR-12-execution-patterns.md) | Claude Code Execution Patterns | Accepted |
+| [ADR-14](ADR-14-naming-convention-v2.md) | Naming Convention v2 (date-first) | Accepted |
+
+## How to add a new ADR
+
+1. Copy any existing ADR as a template
+2. Assign the next available number
+3. Keep it under 20 lines (excluding title/metadata)
+4. Add a row to this table
+5. If superseding an existing ADR, update the old ADR's status line
