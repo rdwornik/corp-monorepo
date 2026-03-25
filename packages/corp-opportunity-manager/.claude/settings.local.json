@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(python:*)",
+      "Bash(.venv/Scripts/pip install:*)",
+      "Bash(.venv/Scripts/python:*)",
+      "Bash(.venv/Scripts/com:*)",
+      "Bash(rm:*)",
+      "Bash(cp:*)",
+      "Read(//c/Users/1028120/OneDrive - Blue Yonder/MyWork/10_Projects/**)",
+      "Read(//c/Users/1028120/OneDrive - Blue Yonder/MyWork/**)",
+      "Read(//c/Users/1028120/OneDrive - Blue Yonder/MyWork/80_Archive/**)",
+      "Read(//c/Users/1028120/OneDrive - Blue Yonder/MyWork/90_System/**)",
+      "Bash(PYTHONPATH=src .venv/Scripts/python:*)"
+    ]
+  }
+}
