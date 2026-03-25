@@ -40,3 +40,15 @@
 - NEVER let cleanup touch "OneDrive - Blue Yonder" paths
 - Test after every change
 - Git feature branches, never commit to main directly
+
+## Session Protocol
+1. Read last 5 entries from JOURNAL.md before starting work
+2. After implementation, self-review: focus on error handling, edge cases, gotchas
+3. Before merging, run: ./scripts/dev-check.ps1
+4. Append session summary to JOURNAL.md before ending
+
+## Prompt Decision Rule
+- 1 file, 1 package → conversational (just talk to Claude Code)
+- 2-3 files, 1 package → conversational with context
+- 3+ files, 2+ packages → formal .md prompt
+- Architecture decision → AI Council debate
