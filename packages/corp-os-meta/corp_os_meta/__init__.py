@@ -20,6 +20,7 @@ from .overlays import (
     RFPOverlay,
     SecurityOverlay,
 )
+from .pipeline_config import PipelineConfig
 from .products import (
     classify_source_tier,
     expand_product_query,
@@ -55,6 +56,7 @@ __all__ = [
     "ValidationResult",
     "get_output_path",
     "generate_links_line",
+    "PipelineConfig",
     "parse_llm_json",
     "resolve_product_key",
     "get_product_display_name",
