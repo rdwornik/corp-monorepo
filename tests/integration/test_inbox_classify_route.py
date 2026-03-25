@@ -1,4 +1,5 @@
 """Magistrala classifier produces valid type codes and destinations."""
+
 from corp_by_os.ingest.naming_config import get_type_code, load_naming_config
 
 

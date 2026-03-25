@@ -1,4 +1,5 @@
 """CKE extraction output has valid frontmatter structure."""
+
 import json
 from pathlib import Path
 
@@ -18,10 +19,14 @@ def test_cke_sample_output_has_expected_structure():
     fixture_dir = Path("packages/corp-knowledge-extractor/tests/fixtures")
     sample_path = fixture_dir / "sample_output.json"
     if not sample_path.exists():
-        return  # Skip if fixture not present
+        import pytest
+
+        pytest.skip("sample_output.json fixture not present")
     data = json.loads(sample_path.read_text())
     entry = data[0] if isinstance(data, list) else data
     # Deep extraction output has qa_pairs or slide_breakdown; shallow has title/schema_version
     has_deep = "qa_pairs" in entry or "slide_breakdown" in entry
     has_shallow = "title" in entry or "schema_version" in entry
-    assert has_deep or has_shallow, f"Unexpected sample_output structure: {list(entry.keys())}"
+    assert has_deep or has_shallow, (
+        f"Unexpected sample_output structure: {list(entry.keys())}"
+    )

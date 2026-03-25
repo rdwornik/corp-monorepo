@@ -1,4 +1,5 @@
 """Trust level protection works across the ingest boundary."""
+
 from corp_os_meta.models import DocumentType, NoteFrontmatter
 
 
@@ -31,6 +32,7 @@ def test_trust_level_none_is_accepted():
 def test_note_frontmatter_requires_title_and_type():
     """NoteFrontmatter requires title, type, source_tool, source_file."""
     import pytest
+    from pydantic import ValidationError
 
-    with pytest.raises(Exception):
+    with pytest.raises(ValidationError):
         NoteFrontmatter()  # Missing required fields

@@ -1,4 +1,5 @@
 """Vault ingest accepts CKE output format and writes valid notes."""
+
 import json
 from pathlib import Path
 
@@ -19,4 +20,6 @@ def test_classifier_training_doc_types_are_strings():
     data = json.loads((fixtures / "classifier_training.json").read_text())
     for entry in data:
         dt = entry.get("doc_type")
-        assert isinstance(dt, str) and dt, f"Invalid doc_type in entry: {entry.get('filename')}"
+        assert isinstance(dt, str) and dt, (
+            f"Invalid doc_type in entry: {entry.get('filename')}"
+        )

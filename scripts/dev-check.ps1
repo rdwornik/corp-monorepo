@@ -3,18 +3,23 @@
 # Usage: ./scripts/dev-check.ps1
 
 $ErrorActionPreference = "Continue"
+$root = $PSScriptRoot | Split-Path -Parent
 $failed = @()
 
+Write-Host "`n=== Ruff Format ===" -ForegroundColor Cyan
+ruff format "$root/packages/"
+if ($LASTEXITCODE -ne 0) { $failed += "ruff-format" }
+
 Write-Host "`n=== Ruff Lint ===" -ForegroundColor Cyan
-ruff check packages/ --fix
-if ($LASTEXITCODE -ne 0) { $failed += "ruff" }
+ruff check "$root/packages/" --fix
+if ($LASTEXITCODE -ne 0) { $failed += "ruff-lint" }
 
 Write-Host "`n=== Unit Tests ===" -ForegroundColor Cyan
-& .\scripts\run-all-tests.ps1
+& "$PSScriptRoot\run-all-tests.ps1"
 if ($LASTEXITCODE -ne 0) { $failed += "unit-tests" }
 
 Write-Host "`n=== Integration Tests ===" -ForegroundColor Cyan
-pytest tests/integration/ -v
+py -m pytest "$root/tests/integration/" -v
 if ($LASTEXITCODE -ne 0) { $failed += "integration-tests" }
 
 Write-Host "`n=== Results ===" -ForegroundColor Cyan
