@@ -4,7 +4,7 @@
 agents:
   corp-opportunity-manager:
     cli: com
-    path: "C:\\Users\\1028120\\Documents\\Scripts\\corp-opportunity-manager"
+    path: "C:\\Users\\1028120\\Documents\\Scripts\\corp-monorepo\\packages\\corp-opportunity-manager"
     commands:
       new: {description: "Create new opportunity", args: [client, product, "contact?"]}
       list: {description: "List all opportunities"}

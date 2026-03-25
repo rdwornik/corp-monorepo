@@ -11,7 +11,9 @@ $packages = @(
     "packages/corp-os-meta",
     "packages/corp-knowledge-extractor",
     "packages/corp-by-os",
-    "packages/corp-project-extractor"
+    "packages/corp-project-extractor",
+    "packages/corp-rfp-agent",
+    "packages/corp-opportunity-manager"
 )
 
 foreach ($pkg in $packages) {
