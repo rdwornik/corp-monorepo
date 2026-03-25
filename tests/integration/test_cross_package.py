@@ -61,3 +61,10 @@ def test_rfp_agent_paths_resolve():
 
     assert (REPO_ROOT / "pyproject.toml").exists()
     assert REPO_ROOT.name == "corp-rfp-agent"
+
+
+def test_com_importable():
+    """Opportunity manager is importable."""
+    from corp_opportunity_manager.cli import cli
+
+    assert cli is not None

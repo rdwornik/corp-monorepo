@@ -7,16 +7,17 @@
 - Subprocess boundaries between packages (not Python imports)
 - Each package has its own pyproject.toml and tests
 
-## Packages (2,084+ tests)
+## Packages (2,153+ tests)
 
 | Package | CLI | Version | Tests |
 |---------|-----|---------|-------|
-| corp-os-meta | `corp-meta` | 1.0.0 | 117 |
-| corp-knowledge-extractor | `cke` | 0.8.0 | 834 |
-| corp-by-os | `corp` | 0.3.0 | 925 |
+| corp-os-meta | `corp-meta` | 1.0.0 | 118 |
+| corp-knowledge-extractor | `cke` | 0.8.0 | 838 |
+| corp-by-os | `corp` | 0.3.0 | 926 |
 | corp-project-extractor | `cpe` | 0.1.0 | 45 |
 | corp-rfp-agent | scripts | 0.3.0 | 155 |
-| Integration | — | — | 8 |
+| corp-opportunity-manager | `com` | 0.2.0 | 62 |
+| Integration | — | — | 9 |
 
 ## Development
 - Feature branches: `feat/`, `fix/`, `refactor/`, `chore/`
