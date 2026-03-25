@@ -32,3 +32,9 @@ _outputs/
 
 # Package-specific (each package may have its own .gitignore too)
 packages/corp-knowledge-extractor/_outputs/
+
+# Hypothesis
+.hypothesis/
+
+# Test output
+output/
