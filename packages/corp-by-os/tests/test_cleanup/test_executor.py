@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
+import pytest
 import yaml
 
-from corp_by_os.cleanup.executor import execute_moves
+from corp_by_os.cleanup.executor import _guard_onedrive, execute_moves
 
 
 def _write_moves(path, entries):
@@ -143,3 +146,43 @@ def test_execute_missing_source(mywork_cleanup, tmp_path):
 
     result = execute_moves(moves_file, mywork_cleanup)
     assert result.failed == 1
+
+
+# --- OneDrive safety guard ---
+
+
+def test_guard_onedrive_blocks_onedrive_path():
+    """OneDrive paths are blocked by safety guard."""
+    with pytest.raises(RuntimeError, match="BLOCKED"):
+        _guard_onedrive(Path("C:/Users/rob/OneDrive - Blue Yonder/MyWork/file.txt"))
+
+
+def test_guard_onedrive_allows_local_path():
+    """Local paths pass the guard without error."""
+    _guard_onedrive(Path("C:/Users/rob/Documents/MyWork/file.txt"))
+
+
+def test_execute_blocks_onedrive_source(tmp_path):
+    """Execute refuses to act on OneDrive source paths."""
+    # Create a fake mywork root that contains "OneDrive - Blue Yonder"
+    onedrive_root = tmp_path / "OneDrive - Blue Yonder" / "MyWork"
+    inbox = onedrive_root / "00_Inbox"
+    inbox.mkdir(parents=True)
+    (inbox / "test.txt").write_text("test", encoding="utf-8")
+
+    moves_file = tmp_path / "moves.yaml"
+    _write_moves(
+        moves_file,
+        [
+            {
+                "source": "00_Inbox/test.txt",
+                "action": "delete",
+                "destination": "DELETE",
+                "proposed_name": "test.txt",
+                "approved": True,
+            },
+        ],
+    )
+
+    with pytest.raises(RuntimeError, match="BLOCKED"):
+        execute_moves(moves_file, onedrive_root)

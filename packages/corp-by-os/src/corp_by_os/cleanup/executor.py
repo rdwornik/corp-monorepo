@@ -14,6 +14,17 @@ import yaml
 
 log = logging.getLogger(__name__)
 
+_ONEDRIVE_BLOCKED = "OneDrive - Blue Yonder"
+
+
+def _guard_onedrive(path: Path) -> None:
+    """Raise if path is under OneDrive — hard safety guard."""
+    if _ONEDRIVE_BLOCKED in str(path):
+        raise RuntimeError(
+            f"BLOCKED: Cannot modify OneDrive path: {path}. "
+            f"OneDrive paths are read-only. See gotchas for details."
+        )
+
 
 @dataclass
 class ExecutionResult:
@@ -59,6 +70,8 @@ def execute_moves(
             log.warning("Source not found, skipping: %s", source_rel)
             result.failed += 1
             continue
+
+        _guard_onedrive(source)
 
         if action == "delete":
             if dry_run:
