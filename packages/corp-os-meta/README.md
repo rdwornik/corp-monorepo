@@ -15,7 +15,7 @@ Shared metadata schema and taxonomy for the corp-by-os agent ecosystem. This pac
 ## Installation
 
 ```bash
-pip install -e C:\Users\1028120\Documents\Scripts\corp-os-meta
+pip install -e packages/corp-os-meta  # from monorepo root
 ```
 
 Dependencies: pydantic, pyyaml, click, rich, json-repair
@@ -77,7 +77,7 @@ Key modules:
 pytest tests/ -v
 ```
 
-87 tests covering models, normalization, validation, preprocessing, products, utilities, deep extraction fields, and dimension fields.
+117 tests covering models, normalization, validation, preprocessing, products, utilities, deep extraction fields, dimension fields, and CLI.
 
 ## Related repos
 

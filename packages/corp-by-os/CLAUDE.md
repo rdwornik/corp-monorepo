@@ -124,7 +124,7 @@ py -m pytest -x        # stop on first failure
 py -m pytest -k "test_query"  # run specific tests
 ```
 
-- **679 tests passing**, 1 skipped (as of 2026-03-15)
+- **900 tests passing**, 1 skipped (as of 2026-03-25)
 - Full coverage of: query engine, index builder, workflow engine, intent router, LLM router, vault I/O, template manager, project resolver, task manager, cleanup, doctor, freshness, ingest, overnight, retrieval, extraction
 - Tests use `tmp_path` fixtures and monkeypatching — no real filesystem or API calls
 

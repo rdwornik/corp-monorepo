@@ -63,7 +63,7 @@ src/
 python -m pytest
 ```
 
-151 tests across 8 files covering Excel/Word agents, LLM routing, answer scoring, profile validation, vault retrieval, and feedback CLI.
+155 tests across 9 files covering Excel/Word agents, LLM routing, answer scoring, profile validation, vault retrieval, feedback CLI, and smoke tests.
 
 ## Related repos
 

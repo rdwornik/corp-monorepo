@@ -7,10 +7,10 @@ Python pipeline that extracts structured knowledge from corporate files (video, 
 ## Quick start
 
 ```bash
-pip install -e ../corp-os-meta    # shared schema dependency
-pip install -e .                  # install CKE + deps
+pip install -e packages/corp-os-meta             # shared schema (from monorepo root)
+pip install -e packages/corp-knowledge-extractor # install CKE + deps
 cke process <path>                # process a file or folder
-python -m pytest                  # run tests (474+ pass, 4 skip)
+python -m pytest                  # run tests (693 pass, 4 skip)
 ```
 
 ## Architecture
@@ -121,7 +121,7 @@ cke info <package_path>                # show package info
 ## Test suite
 
 ```bash
-python -m pytest                       # 670 pass, 4 skip
+python -m pytest                       # 693 pass, 4 skip
 python -m pytest --tb=short -q         # quick summary
 python -m ruff check src/corp_knowledge_extractor/  # lint check
 ```

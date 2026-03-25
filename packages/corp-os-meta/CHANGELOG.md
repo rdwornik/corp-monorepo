@@ -1,6 +1,6 @@
 # Changelog — corp-os-meta
 
-## [1.0.0] — 2026-03-15
+## [1.0.0] — 2026-03-15 (monorepo: 2026-03-25)
 
 - Schema v2: NoteFrontmatter with full Pydantic validation
 - Taxonomy normalization with alias resolution

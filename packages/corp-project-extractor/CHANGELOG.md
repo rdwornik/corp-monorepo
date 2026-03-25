@@ -1,6 +1,6 @@
 # Changelog — corp-project-extractor
 
-## [0.1.0] — 2026-03-01
+## [0.1.0] — 2026-03-01 (monorepo: 2026-03-25)
 
 - Initial release: project folder classifier and orchestrator
 - 20-priority classification rules (file-level before path-based)

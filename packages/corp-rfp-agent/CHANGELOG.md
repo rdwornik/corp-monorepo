@@ -1,6 +1,6 @@
 # Changelog — corp-rfp-agent
 
-## [0.3.0] — 2026-03-15
+## [0.3.0] — 2026-03-15 (monorepo: 2026-03-25)
 
 - Simplification refactor: removed ChromaDB hard dependency, streamlined retrieval
 - 5-stage answer quality scoring (answer_selector.py)
@@ -9,7 +9,7 @@
 - Excel green-cell detection for RFP questions
 - Word document section tree parsing
 - Multi-LLM support: Gemini (primary), Claude, GPT
-- 151 tests passing
+- 155 tests passing
 
 ## [0.1.0] — 2025-12-01
 

@@ -7,7 +7,7 @@ Shared metadata schema and taxonomy for the corp-by-os agent ecosystem. Defines 
 ## Quick start
 
 ```bash
-pip install -e C:\Users\1028120\Documents\Scripts\corp-os-meta
+pip install -e packages/corp-os-meta  # from monorepo root
 pytest tests/ -v
 python -c "from corp_os_meta import NoteFrontmatter; print('OK')"
 ```
@@ -66,7 +66,7 @@ pytest tests/ -v
 ## Test suite
 
 ```bash
-pytest tests/ -v    # 87 tests, all passing
+pytest tests/ -v    # 117 tests, all passing
 ```
 
 Coverage: models, normalize, validate, preprocess, products, utils, deep extraction fields, dimension fields.

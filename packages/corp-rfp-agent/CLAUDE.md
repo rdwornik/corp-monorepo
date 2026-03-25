@@ -9,7 +9,7 @@ AI-powered RFP answering engine for Blue Yonder pre-sales. Reads Excel (green-hi
 ```bash
 pip install -e ".[dev]"           # install deps from pyproject.toml
 cp .env.example .env              # add GEMINI_API_KEY at minimum
-python -m pytest                  # 151 tests, all should pass
+python -m pytest                  # 155 tests, all should pass
 ```
 
 ## Architecture
@@ -108,7 +108,7 @@ python -m pytest tests/test_excel_acceptance.py -v  # specific file
 python -m ruff check src/ tests/   # lint
 ```
 
-**155 tests** across 9 test files:
+**155 tests** (as of 2026-03-25) across 9 test files:
 
 | File | Tests | Covers |
 |------|-------|--------|

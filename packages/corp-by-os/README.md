@@ -20,19 +20,12 @@ Root orchestrator for the Corporate OS agent ecosystem. A CLI tool (`corp`) that
 
 ```bash
 # Clone (outside OneDrive to avoid sync issues)
-git clone <repo> C:\Dev\corp-by-os
-cd C:\Dev\corp-by-os
-
-# Create venv and install
-python -m venv .venv
-.venv\Scripts\activate
-pip install -e ".[dev]"
-
-# Optional: LLM support (Gemini Flash)
-pip install -e ".[llm]"
+# From monorepo root
+pip install -e packages/corp-os-meta
+pip install -e "packages/corp-by-os[dev,llm]"
 
 # Configure
-cp .env.example .env
+cp packages/corp-by-os/.env.example packages/corp-by-os/.env
 # Set: VAULT_PATH, PROJECTS_ROOT, TEMPLATES_ROOT, ARCHIVE_ROOT, APP_DATA_PATH
 ```
 
@@ -176,7 +169,7 @@ src/corp_by_os/
 ## Testing
 
 ```bash
-py -m pytest           # 680 tests, ~19s
+py -m pytest           # 900 tests, ~29s
 py -m pytest -x -q     # stop on first failure
 py -m ruff check src/  # lint (clean)
 ```
@@ -187,16 +180,11 @@ Tests use `tmp_path` fixtures and monkeypatching -- no real filesystem or API ca
 
 | Repo | Purpose | Tests |
 |---|---|---|
-| **corp-by-os** | Root orchestrator, CLI, vault writer | 680 |
-| **corp-os-meta** | Shared metadata schemas and taxonomy | 87 |
-| **corp-knowledge-extractor** | Tiered Gemini extraction pipeline | 421 |
-| **corp-rfp-agent** | AI-powered RFP response automation | 151 |
+| **corp-by-os** | Root orchestrator, CLI, vault writer | 900 |
+| **corp-os-meta** | Shared metadata schemas and taxonomy | 117 |
+| **corp-knowledge-extractor** | Tiered Gemini extraction pipeline | 693 |
+| **corp-rfp-agent** | AI-powered RFP response automation | 155 |
 | **corp-project-extractor** | Project folder scanning and structuring | 45 |
-| **corp-opportunity-manager** | Opportunity lifecycle management | 61 |
-| **ai-council** | Multi-model AI debate framework | 73 |
-| **corp-pdf-toolkit** | PDF text extraction and anonymization | -- |
-| **corp-sca-time-automation** | SCA time entry automation | 2 |
-| **corp-ops** | Operational tooling | -- |
 
 ## Dependencies
 
