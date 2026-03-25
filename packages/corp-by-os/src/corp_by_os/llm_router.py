@@ -55,9 +55,10 @@ If the message is chitchat or unclear, set workflow_id to null and provide respo
 
 def _get_usage_path() -> Path:
     """Get the path to the usage tracking file."""
+    _local_appdata = os.environ.get("LOCALAPPDATA", str(Path.home() / "AppData" / "Local"))
     app_data = os.environ.get(
         "APP_DATA_PATH",
-        os.path.expandvars(r"%LOCALAPPDATA%\corp-by-os"),
+        str(Path(_local_appdata) / "corp-by-os"),
     )
     return Path(app_data) / "usage.json"
 

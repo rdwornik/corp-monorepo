@@ -14,16 +14,15 @@ from datetime import datetime
 from pathlib import Path
 
 import click
-from rich.console import Console
-from rich.panel import Panel
-from rich.prompt import Confirm, Prompt
-from rich.table import Table
-
 from corp_by_os.ingest.classifier import Classification, classify
 from corp_by_os.ingest.renamer import RenameProposal, propose_name
 from corp_by_os.ingest.router import _SKIP_EXTENSIONS, _SKIP_NAMES, compute_file_hash
 from corp_by_os.ops.database import OpsDB
 from corp_by_os.ops.registry import ContentRegistry
+from rich.console import Console
+from rich.panel import Panel
+from rich.prompt import Prompt
+from rich.table import Table
 
 logger = logging.getLogger(__name__)
 console = Console()
@@ -155,7 +154,7 @@ def _get_user_context() -> str:
         "\n[bold]Context for extraction[/bold] (what is this file about?):"
     )
     context = Prompt.ask(">")
-    console.print(f"[green]Context saved as extraction hint.[/green]")
+    console.print("[green]Context saved as extraction hint.[/green]")
     return context
 
 
@@ -296,12 +295,13 @@ def _log_ingest_event(
     return event_id
 
 
-def _remove_vault_package(vault_note_path: str) -> None:
+def _remove_vault_package(vault_note_path: str, config=None) -> None:
     """Remove existing vault package to make way for re-extraction."""
-    from corp_by_os.config import get_config
+    from corp_os_meta.pipeline_config import PipelineConfig
 
-    cfg = get_config()
-    pkg_path = cfg.vault_path / vault_note_path.replace("/", "\\")
+    if config is None:
+        config = PipelineConfig.production()
+    pkg_path = config.vault_path / vault_note_path.replace("/", "\\")
 
     if pkg_path.exists():
         if pkg_path.is_dir():
@@ -371,7 +371,9 @@ def _check_dedup(
                 f"  [dim]Already extracted, skipping: "
                 f"{latest.vault_note_path}[/dim]"
             )
-            _log_dedup_skip(ops, file_path, content_hash, "already_extracted_auto", latest.vault_note_path)
+            _log_dedup_skip(
+                ops, file_path, content_hash, "already_extracted_auto", latest.vault_note_path
+            )
             return "skip"
 
         console.print(
@@ -386,7 +388,9 @@ def _check_dedup(
 
         if answer == "s":
             console.print("  [dim]Skipped — existing note kept.[/dim]")
-            _log_dedup_skip(ops, file_path, content_hash, "already_extracted_user_skip", latest.vault_note_path)
+            _log_dedup_skip(
+                ops, file_path, content_hash, "already_extracted_user_skip", latest.vault_note_path
+            )
             return "skip"
 
         # User chose re-extract: remove old vault package
@@ -502,6 +506,7 @@ def _trigger_extraction(
     ops: OpsDB,
     user_context: str | None,
     event_id: int | None = None,
+    config=None,  # PipelineConfig | None
 ) -> bool:
     """Run CKE extraction and record result in FileRegistry.
 
@@ -523,20 +528,23 @@ def _trigger_extraction(
         asset = ops.get_asset(rel_path)
         asset_id = asset["id"] if asset else None
 
+        from corp_os_meta.pipeline_config import PipelineConfig
+
+        if config is None:
+            config = PipelineConfig.production()
+
         vault_note, cost = _run_extraction(
             file_path, mywork_root, ops, asset_id, content_hash, mtime_str,
             user_context=user_context,
+            config=config,
         )
 
         if vault_note:
             console.print(f"  [green]Extracted → {vault_note}[/green]")
 
             # Record extraction in registry
-            from corp_by_os.config import get_config
-
-            cfg = get_config()
             model = (
-                _read_model_from_vault_note(vault_note, cfg.vault_path)
+                _read_model_from_vault_note(vault_note, config.vault_path)
                 or "unknown"
             )
             cost_cents = int(cost * 100) if cost else None
@@ -726,17 +734,19 @@ def _full_revert(
     *,
     vault_path: Path | None = None,
     app_data_path: Path | None = None,
+    config=None,  # PipelineConfig | None
 ) -> None:
     """Remove vault package and staging artifacts, rebuild index.
 
-    vault_path and app_data_path default to values from get_config().
+    vault_path and app_data_path default to values from PipelineConfig.production().
     """
     if vault_path is None or app_data_path is None:
-        from corp_by_os.config import get_config
+        from corp_os_meta.pipeline_config import PipelineConfig
 
-        cfg = get_config()
-        vault_path = vault_path or cfg.vault_path
-        app_data_path = app_data_path or cfg.app_data_path
+        if config is None:
+            config = PipelineConfig.production()
+        vault_path = vault_path or config.vault_path
+        app_data_path = app_data_path or config.app_data_path
 
     # Step 1: Remove vault package if we know where it is
     vault_note = event.get("vault_note_path")
@@ -1002,10 +1012,10 @@ def ingest_inbox(
     Processes one file at a time with Rich UI: classify, confirm
     destination, rename, move, then trigger CKE extraction.
     """
-    from corp_by_os.config import get_config
     from corp_by_os.ops.registry import get_content_registry_path
+    from corp_os_meta.pipeline_config import PipelineConfig
 
-    cfg = get_config()
+    cfg = PipelineConfig.production()
     ops = OpsDB()
     registry = ContentRegistry(get_content_registry_path())
 

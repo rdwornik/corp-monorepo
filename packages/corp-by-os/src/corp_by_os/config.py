@@ -67,29 +67,31 @@ def get_config() -> AppConfig:
     # Local .env (project-specific vars only)
     load_dotenv(repo_path / ".env", override=False)
 
+    _local_appdata = os.environ.get("LOCALAPPDATA", str(Path.home() / "AppData" / "Local"))
+    _home_docs = Path.home() / "Documents"
     vault_path = os.environ.get(
         "VAULT_PATH",
-        r"C:\Users\1028120\Documents\ObsidianVault",
+        str(_home_docs / "ObsidianVault"),
     )
     projects_root = os.environ.get(
         "PROJECTS_ROOT",
-        r"C:\Users\1028120\OneDrive - Blue Yonder\MyWork\10_Projects",
+        str(_home_docs / "MyWork" / "10_Projects"),
     )
     templates_root = os.environ.get(
         "TEMPLATES_ROOT",
-        r"C:\Users\1028120\OneDrive - Blue Yonder\MyWork\30_Templates",
+        str(_home_docs / "MyWork" / "30_Templates"),
     )
     archive_root = os.environ.get(
         "ARCHIVE_ROOT",
-        r"C:\Users\1028120\OneDrive - Blue Yonder\MyWork\80_Archive",
+        str(_home_docs / "MyWork" / "80_Archive"),
     )
     app_data_path = os.environ.get(
         "APP_DATA_PATH",
-        os.path.expandvars(r"%LOCALAPPDATA%\corp-by-os"),
+        str(Path(_local_appdata) / "corp-by-os"),
     )
     mywork_root = os.environ.get(
         "MYWORK_ROOT",
-        r"C:\Users\1028120\Documents\MyWork",
+        str(_home_docs / "MyWork"),
     )
 
     # Extra index roots (e.g. rfp_kb) — semicolon-separated paths

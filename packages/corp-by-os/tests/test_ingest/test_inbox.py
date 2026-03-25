@@ -7,17 +7,12 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
-
 from corp_by_os.ingest.inbox import (
-    _check_dedup,
-    _full_revert,
     _get_custom_destination,
     _list_events,
-    _log_dedup_skip,
     _log_ingest_event,
     _move_file,
     _prompt_action,
-    _register_file,
     _scan_inbox_files,
     _undo_event,
     process_file,
@@ -368,7 +363,6 @@ class TestUserContext:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """Verify user_context is included in the CKE manifest when passed."""
-        import json
 
         inbox = mywork / "00_Inbox"
         f = inbox / "Cognitive_Friday_S4.pptx"
@@ -376,11 +370,9 @@ class TestUserContext:
 
         captured_context: list[str | None] = []
 
-        original_run_extraction = None
-
         def mock_run_extraction(
             file_path, mywork_root, ops_db, asset_id, content_hash, mtime_str,
-            user_context=None,
+            user_context=None, config=None,
         ):
             captured_context.append(user_context)
             return None, 0.0
@@ -419,7 +411,7 @@ class TestUserContext:
 
         def mock_run_extraction(
             file_path, mywork_root, ops_db, asset_id, content_hash, mtime_str,
-            user_context=None,
+            user_context=None, config=None,
         ):
             captured_context.append(user_context)
             return None, 0.0
@@ -662,7 +654,6 @@ class TestRegistrationAtRouteTime:
         assert action == "routed"
 
         # File should be in files table
-        fr = FileRegistry(ops.conn)
         count = ops.conn.execute("SELECT COUNT(*) FROM files").fetchone()[0]
         assert count == 1, f"Expected 1 file in registry, got {count}"
 
@@ -824,7 +815,10 @@ class TestContextBehavior:
             return "a"  # Second: accept
 
         with patch("corp_by_os.ingest.inbox._prompt_action", side_effect=mock_prompt_action):
-            with patch("corp_by_os.ingest.inbox._get_user_context", return_value="This is an RFI from the client"):
+            with patch(
+                "corp_by_os.ingest.inbox._get_user_context",
+                return_value="This is an RFI from the client",
+            ):
                 action = process_file(
                     f, mywork, registry, ops, skip_extract=True,
                 )
