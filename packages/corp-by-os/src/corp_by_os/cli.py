@@ -3107,6 +3107,11 @@ def ingest_extractions_cmd(
 
 @cli.command("test-pipeline")
 @click.option("--live", is_flag=True, help="Use real CKE API calls (costs money)")
+@click.option(
+    "--record",
+    is_flag=True,
+    help="Record live CKE responses as reusable fixture JSONs (implies --live)",
+)
 @click.option("--keep-sandbox", is_flag=True, help="Keep sandbox directory after run")
 @click.option("--verbose", "-v", is_flag=True, help="Enable DEBUG logging during test")
 @click.option(
@@ -3120,6 +3125,7 @@ def ingest_extractions_cmd(
 def test_pipeline_command(
     obj: dict,
     live: bool,
+    record: bool,
     keep_sandbox: bool,
     verbose: bool,
     output: str | None,
@@ -3130,7 +3136,10 @@ def test_pipeline_command(
     ingest, index rebuild, retrieve) without touching production data.
 
     Fixture mode (default): no API calls, runs in ~2s.
-    Live mode (--live): invokes real CKE extraction.
+      If recorded fixtures exist they are replayed instead of mock notes.
+    Live mode (--live): invokes real CKE extraction (costs money).
+    Record mode (--record): live mode + saves responses as fixture JSONs.
+      Run once to refresh fixtures when CKE models change.
 
     Examples:
 
@@ -3138,6 +3147,7 @@ def test_pipeline_command(
         corp test-pipeline
         corp test-pipeline --verbose
         corp test-pipeline --live --keep-sandbox
+        corp test-pipeline --record
         corp test-pipeline --output report.json
     """
     import json as _json
@@ -3147,16 +3157,28 @@ def test_pipeline_command(
 
     config = (obj or {}).get("config") or PipelineConfig.production()
 
+    # --record implies --live
+    effective_live = live or record
+
     console.print("[bold cyan]Running pipeline smoke test...[/bold cyan]")
+    if record:
+        console.print("[bold yellow]Record mode: making real API calls...[/bold yellow]")
 
     report = run_pipeline_test(
         config=config,
-        fixture_mode=not live,
+        fixture_mode=not effective_live,
         verbose=verbose,
         keep_sandbox=keep_sandbox,
+        record=record,
     )
 
     format_report(report)
+
+    if record:
+        console.print(
+            f"Recorded {report.recorded_fixtures} fixtures, "
+            f"total cost ${report.recording_cost:.2f}"
+        )
 
     if output:
         out_path = Path(output)

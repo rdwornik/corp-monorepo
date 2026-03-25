@@ -137,3 +137,33 @@ def test_format_report_on_failure() -> None:
     )
     # Should not raise
     format_report(report)
+
+
+# ---------------------------------------------------------------------------
+# --record flag
+# ---------------------------------------------------------------------------
+
+
+def test_report_has_recording_fields() -> None:
+    """PipelineTestReport must have recorded_fixtures and recording_cost fields defaulting to 0."""
+    report = PipelineTestReport()
+    assert report.recorded_fixtures == 0
+    assert report.recording_cost == 0.0
+
+
+def test_record_flag_graceful_skip(
+    tmp_path: Path, sandbox_config: PipelineConfig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """record=True with CKE unavailable should not crash and leave recorded_fixtures == 0."""
+    monkeypatch.setattr(
+        "corp_by_os.overnight.cke_client.is_available",
+        lambda: (False, "no key"),
+    )
+    report = run_pipeline_test(
+        sandbox_config,
+        fixture_mode=False,  # record implies live
+        record=True,
+        tmp_root=tmp_path / "sandbox",
+    )
+    assert report.recorded_fixtures == 0
+    assert isinstance(report, PipelineTestReport)
