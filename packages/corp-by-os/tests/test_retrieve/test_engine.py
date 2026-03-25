@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import sqlite3
 from pathlib import Path
 
@@ -565,3 +566,27 @@ class TestRfpOnlyFilter:
         filters = RetrievalFilter(rfp_only=False)
         result = retrieve("Architecture", rfp_db, vault, filters=filters)
         assert result.total_found >= 2
+
+
+class TestRetrieveLogging:
+    def test_retrieve_logs_query(
+        self, test_db: Path, vault_root: Path, caplog
+    ) -> None:
+        """Retrieve query is logged with result count for audit trail."""
+        with caplog.at_level(logging.INFO, logger="corp_by_os.retrieve.engine"):
+            retrieve("Lenzing", test_db, vault_root)
+        assert "retrieve query=" in caplog.text
+        assert "results=" in caplog.text
+
+    def test_retrieve_logs_filters(
+        self, test_db: Path, vault_root: Path, caplog
+    ) -> None:
+        """Retrieve log includes filter details."""
+        with caplog.at_level(logging.INFO, logger="corp_by_os.retrieve.engine"):
+            retrieve(
+                "planning",
+                test_db,
+                vault_root,
+                filters=RetrievalFilter(client="Lenzing"),
+            )
+        assert "client=Lenzing" in caplog.text

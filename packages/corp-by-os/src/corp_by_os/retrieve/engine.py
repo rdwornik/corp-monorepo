@@ -289,6 +289,16 @@ def retrieve(
         sufficient = len(notes) >= min_results_for_sufficient
         coverage_gaps = _find_coverage_gaps(query, filters, notes)
 
+        logger.info(
+            "retrieve query=%r filters={client=%s, products=%s, rfp_only=%s} results=%d sufficient=%s",
+            query,
+            filters.client,
+            filters.products,
+            filters.rfp_only,
+            len(notes),
+            sufficient,
+        )
+
         return RetrievalResult(
             query=query,
             filters=filters,
