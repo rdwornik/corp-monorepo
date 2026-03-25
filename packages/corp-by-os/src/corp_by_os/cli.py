@@ -2426,6 +2426,58 @@ def files_stats_command() -> None:
     ops.close()
 
 
+@cli.command("naming-stats")
+def naming_stats_command() -> None:
+    """Show naming convention type code distribution from routing feedback."""
+    from collections import Counter
+
+    from corp_by_os.ingest.naming_config import get_type_code, load_naming_config
+    from corp_by_os.ops.database import OpsDB
+
+    ops = OpsDB()
+    rows = ops.conn.execute(
+        "SELECT filename FROM routing_feedback ORDER BY timestamp DESC"
+    ).fetchall()
+
+    if not rows:
+        console.print("[dim]No routing feedback yet.[/dim]")
+        ops.close()
+        return
+
+    type_counts: Counter = Counter()
+    for (filename,) in rows:
+        code = get_type_code(filename=filename)
+        type_counts[code] += 1
+
+    total = sum(type_counts.values())
+    config = load_naming_config()
+    threshold = config["fallback"]["misc_review_threshold"]
+
+    table = Table(title=f"Naming Convention Stats ({total} files)")
+    table.add_column("Type Code", style="bold")
+    table.add_column("Label")
+    table.add_column("Count", justify="right")
+    table.add_column("%", justify="right")
+
+    for code, count in type_counts.most_common():
+        pct = count / total * 100
+        label = config["type_codes"].get(code, {}).get("label", "")
+        style = "red bold" if code == "MISC" and pct > threshold * 100 else ""
+        table.add_row(code, label, str(count), f"{pct:.0f}%", style=style)
+
+    console.print(table)
+
+    misc_count = type_counts.get("MISC", 0)
+    misc_rate = misc_count / total if total else 0
+    if misc_rate > threshold:
+        console.print(
+            f"\n[yellow]Warning:[/yellow] MISC rate is {misc_rate:.0%} "
+            f"(threshold: {threshold:.0%}). Review unclassified files."
+        )
+
+    ops.close()
+
+
 @cli.command("finalize")
 @click.option("--approve-all", is_flag=True, help="Move all staged files to final destinations")
 def finalize_command(approve_all: bool) -> None:
