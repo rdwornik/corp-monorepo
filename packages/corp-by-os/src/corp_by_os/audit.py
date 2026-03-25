@@ -146,17 +146,7 @@ def _get_gemini_client() -> Any:
 
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        # Try loading from CKE .env
-        try:
-            from corp_by_os.overnight.cke_client import _ensure_cke_importable
-
-            _ensure_cke_importable()
-            api_key = os.environ.get("GEMINI_API_KEY")
-        except Exception:
-            pass
-
-    if not api_key:
-        raise RuntimeError("GEMINI_API_KEY not set. Set it in .env or load CKE's .env.")
+        raise RuntimeError("GEMINI_API_KEY not set. Set it in Documents/.secrets/.env")
 
     return genai.Client(api_key=api_key)
 

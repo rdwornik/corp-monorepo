@@ -1,97 +1,34 @@
 """Thin wrapper around CKE — direct import, no subprocess.
 
 Imports CKE's BatchJobRunner (batch API) and BatchProcessor (sync)
-directly. Falls back to subprocess with env passthrough if import fails.
-
-CKE path is resolved from agents.yaml via AppConfig.
+directly. CKE is pip-installed in the monorepo, so normal imports work.
 """
 
 from __future__ import annotations
 
 import logging
-import os
-import sys
 from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
-_cke_imported = False
-_import_error: str | None = None
-
-
-def _get_cke_path() -> Path:
-    """Resolve CKE repo path from agents.yaml config."""
-    from corp_by_os.config import get_config
-
-    cfg = get_config()
-    agent = cfg.agents.get("corp-knowledge-extractor", {})
-    path = agent.get("path", "")
-    if not path:
-        raise RuntimeError("corp-knowledge-extractor path not set in agents.yaml")
-    return Path(path)
-
-
-def _ensure_cke_importable() -> None:
-    """Add CKE src to sys.path and load its .env for API keys."""
-    global _cke_imported, _import_error
-
-    if _cke_imported:
-        return
-
-    cke_root = _get_cke_path()
-    cke_src = str(cke_root / "src")
-
-    if cke_src not in sys.path:
-        sys.path.insert(0, cke_src)
-        logger.debug("Added CKE to sys.path: %s", cke_src)
-
-    # Load CKE's .env for GEMINI_API_KEY
-    env_path = cke_root / ".env"
-    if env_path.exists():
-        from dotenv import dotenv_values
-
-        for k, v in dotenv_values(env_path).items():
-            if v and k not in os.environ:
-                os.environ[k] = v
-        logger.debug("Loaded CKE .env from %s", env_path)
-
-    # Verify import works
-    try:
-        import corp_knowledge_extractor.batch_api  # noqa: F401
-        import corp_knowledge_extractor.manifest  # noqa: F401
-
-        _cke_imported = True
-        logger.info("CKE direct import OK from %s", cke_src)
-    except ImportError as exc:
-        _import_error = str(exc)
-        _cke_imported = False
-        logger.warning("CKE direct import failed: %s", exc)
-
 
 def is_available() -> tuple[bool, str]:
     """Check if CKE is importable. Returns (ok, error_message)."""
     try:
-        _ensure_cke_importable()
-    except RuntimeError as exc:
+        import corp_knowledge_extractor.batch_api  # noqa: F401
+        import corp_knowledge_extractor.manifest  # noqa: F401
+
+        return True, ""
+    except ImportError as exc:
         return False, str(exc)
-    if not _cke_imported:
-        return False, _import_error or "Unknown import error"
-    return True, ""
 
 
 def load_cke_config() -> dict[str, Any]:
     """Load CKE's own configuration (settings, processing, etc.)."""
-    _ensure_cke_importable()
     from config.config_loader import load_config  # type: ignore[import-untyped]
 
-    # CKE's load_config expects to be run from CKE's root
-    original_cwd = os.getcwd()
-    try:
-        os.chdir(str(_get_cke_path()))
-        return load_config()
-    finally:
-        os.chdir(original_cwd)
+    return load_config()
 
 
 def estimate_cost(manifest_path: Path) -> dict[str, Any]:
@@ -99,7 +36,6 @@ def estimate_cost(manifest_path: Path) -> dict[str, Any]:
 
     Returns: {total_cost, tier_breakdown: {1: n, 2: n, 3: n}, file_count}
     """
-    _ensure_cke_importable()
     from corp_knowledge_extractor.inventory import FileType, SourceFile  # type: ignore[import-untyped]
     from corp_knowledge_extractor.manifest import Manifest  # type: ignore[import-untyped]
     from corp_knowledge_extractor.tier_router import estimate_batch_cost  # type: ignore[import-untyped]
@@ -142,7 +78,6 @@ def extract_batch(
 
     Returns: {total, done, error, skipped, cost, tiers}
     """
-    _ensure_cke_importable()
     from corp_knowledge_extractor.batch_api import BatchJobRunner  # type: ignore[import-untyped]
     from corp_knowledge_extractor.manifest import Manifest  # type: ignore[import-untyped]
 
@@ -182,7 +117,6 @@ def extract_sync(
 
     Returns: {total, done, error, skipped, cost, tiers}
     """
-    _ensure_cke_importable()
     from corp_knowledge_extractor.batch import BatchProcessor  # type: ignore[import-untyped]
     from corp_knowledge_extractor.manifest import Manifest  # type: ignore[import-untyped]
 
@@ -232,7 +166,6 @@ def scan_local(
         List of FileScanResult dicts with keys:
         path, filename, extension, size_bytes, file_hash, tier, metadata, error
     """
-    _ensure_cke_importable()
     from dataclasses import asdict
 
     from corp_knowledge_extractor.scan import scan_path  # type: ignore[import-untyped]
