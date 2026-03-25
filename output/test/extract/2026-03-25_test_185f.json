@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "id": "2026-03-25_test_185f",
+  "source_file": "C:/Users/1028120/AppData/Local/Temp/pytest-of-1028120/pytest-467/test_cli_accepts_flash0/test.txt",
+  "title": "Insufficient Input for Technical Analysis",
+  "summary": "The provided content contains only a greeting and provides no technical, operational, or business-related data. As a result, no meaningful insights or facts regarding supply chain systems or corporate decisions can be extracted.",
+  "topics": [],
+  "products": [],
+  "people": [],
+  "domains": [
+    "Industry & Supply Chain"
+  ],
+  "key_points": [
+    "Missing Content: The input lacks any factual claims, numbers, or specific product mentions required for a professional analysis.",
+    "Vague Context: There are no decisions, timelines, or commitments recorded in this document."
+  ],
+  "content_type": "discussion",
+  "source_type": "internal_update",
+  "layer": "learning",
+  "confidentiality": "internal",
+  "authority": "tribal",
+  "client": null,
+  "project": null,
+  "slides_count": 0,
+  "links_line": "",
+  "validation_result": "quarantine",
+  "valid_to": null,
+  "source_date": "2026-03",
+  "facts": [
+    {
+      "fact": "Missing Content: The input lacks any factual claims, numbers, or specific product mentions required for a professional analysis.",
+      "source_date": "2026-03",
+      "locator": null,
+      "polarity": "negative"
+    },
+    {
+      "fact": "Vague Context: There are no decisions, timelines, or commitments recorded in this document.",
+      "source_date": "2026-03",
+      "locator": null,
+      "polarity": "unknown"
+    }
+  ],
+  "processed_at": "2026-03-25T12:11:55.633597",
+  "extraction_version": 1,
+  "depth": "standard",
+  "doc_type": "general",
+  "key_facts": [],
+  "entities_mentioned": [],
+  "overlay": {},
+  "freshness": {
+    "source_path": "C:/Users/1028120/AppData/Local/Temp/pytest-of-1028120/pytest-467/test_cli_accepts_flash0/test.txt",
+    "source_hash": "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969",
+    "source_mtime": "2026-03-25T12:11:41.698128",
+    "extracted_at": "2026-03-25T12:11:48.576460"
+  }
+}

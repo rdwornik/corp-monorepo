@@ -1,0 +1,4 @@
+# file: C:\Users\1028120\Documents\Scripts\corp-monorepo\packages\corp-os-meta\corp_os_meta\overlays.py
+# hypothesis_version: 6.151.9
+
+['architecture', 'commercial', 'meeting', 'product_doc', 'rfp_response', 'security', 'training']

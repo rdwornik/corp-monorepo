@@ -1,0 +1,8 @@
+extracted_at: "2026-03-25T11:11:48.579465+00:00"
+model: "gemini-3-flash-preview"
+pipeline_version: "2.0.0"
+prompt_hash: "39cd74d64591"
+source_files:
+  - path: "C:\Users\1028120\AppData\Local\Temp\pytest-of-1028120\pytest-467\test_cli_accepts_flash0\test.txt"
+    type: "note"
+    size_bytes: 5

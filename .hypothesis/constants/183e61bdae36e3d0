@@ -1,0 +1,4 @@
+# file: C:\Users\1028120\Documents\Scripts\corp-monorepo\packages\corp-os-meta\corp_os_meta\__init__.py
+# hypothesis_version: 6.151.9
+
+['ArchitectureOverlay', 'Authority', 'CommercialOverlay', 'Confidentiality', 'DocumentType', 'DomainEnum', 'Layer', 'MeetingOverlay', 'NoteFrontmatter', 'OVERLAY_MAP', 'QualityLevel', 'RFPOverlay', 'SCHEMA_VERSION', 'SecurityOverlay', 'SourceType', 'ValidationResult', 'classify_source_tier', 'expand_product_query', 'generate_links_line', 'get_children', 'get_output_path', 'get_parent', 'is_platform_service', 'load_taxonomy', 'normalize_terms', 'parse_llm_json', 'resolve_product_key', 'validate_frontmatter']

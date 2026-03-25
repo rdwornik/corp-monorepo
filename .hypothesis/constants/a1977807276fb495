@@ -1,0 +1,4 @@
+# file: C:\Users\1028120\Documents\Scripts\corp-monorepo\packages\corp-rfp-agent\src\corp_rfp_agent\anonymization\__init__.py
+# hypothesis_version: 6.151.9
+
+['add_to_blocklist', 'anonymize', 'check', 'deanonymize', 'get_blocklist', 'get_session', 'get_settings', 'load_config', 'set_session_customer']
