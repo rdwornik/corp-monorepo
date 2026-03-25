@@ -1,16 +1,11 @@
 """Acceptance tests for LLM router -- retry, error handling, and retrieval."""
 
-import sys
 import time
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT / "src"))
-
-from llm_router import retry_with_backoff, extract_question, extract_answer
+from corp_rfp_agent.llm_router import retry_with_backoff, extract_question, extract_answer
 
 
 # ---------------------------------------------------------------------------
@@ -100,7 +95,7 @@ def test_non_rate_limit_error_not_retried():
 # ---------------------------------------------------------------------------
 def test_model_registry():
     """Model registry contains exactly 4 models with correct providers."""
-    from llm_router import MODELS
+    from corp_rfp_agent.llm_router import MODELS
 
     # Verify exactly 4 models
     assert len(MODELS) == 4
@@ -128,7 +123,7 @@ def test_model_registry():
 # ---------------------------------------------------------------------------
 def test_models_dict_has_sonnet():
     """Model registry has 'sonnet' pointing to claude-sonnet-4-6."""
-    from llm_router import MODELS
+    from corp_rfp_agent.llm_router import MODELS
 
     assert "sonnet" in MODELS
     assert MODELS["sonnet"]["provider"] == "anthropic"
@@ -140,7 +135,7 @@ def test_models_dict_has_sonnet():
 # ---------------------------------------------------------------------------
 def test_only_three_providers():
     """Only google, anthropic, and openai providers exist."""
-    from llm_router import MODELS
+    from corp_rfp_agent.llm_router import MODELS
 
     providers = {config["provider"] for config in MODELS.values()}
     assert providers == {"google", "anthropic", "openai"}
@@ -161,10 +156,10 @@ def test_compare_mode_calls_both(monkeypatch):
 
     # Patch LLMRouter.__init__ to avoid ChromaDB/file dependencies
     with (
-        patch("llm_router.LLMRouter.__init__", return_value=None),
-        patch("llm_router.LLMRouter.generate_answer", fake_generate),
+        patch("corp_rfp_agent.llm_router.LLMRouter.__init__", return_value=None),
+        patch("corp_rfp_agent.llm_router.LLMRouter.generate_answer", fake_generate),
     ):
-        from llm_router import compare_models
+        from corp_rfp_agent.llm_router import compare_models
 
         results = compare_models("test query", models=["gemini", "sonnet"])
 
@@ -244,10 +239,10 @@ def test_get_context_from_vault():
     ]
 
     with (
-        patch("llm_router.LLMRouter.__init__", return_value=None),
-        patch("llm_router.vault_retrieve", return_value=vault_notes),
+        patch("corp_rfp_agent.llm_router.LLMRouter.__init__", return_value=None),
+        patch("corp_rfp_agent.llm_router.vault_retrieve", return_value=vault_notes),
     ):
-        from llm_router import LLMRouter
+        from corp_rfp_agent.llm_router import LLMRouter
 
         router = LLMRouter.__new__(LLMRouter)
         router.family = "wms"
@@ -280,10 +275,10 @@ def test_get_context_fallback_to_chromadb():
     }
 
     with (
-        patch("llm_router.LLMRouter.__init__", return_value=None),
-        patch("llm_router.vault_retrieve", side_effect=Exception("vault down")),
+        patch("corp_rfp_agent.llm_router.LLMRouter.__init__", return_value=None),
+        patch("corp_rfp_agent.llm_router.vault_retrieve", side_effect=Exception("vault down")),
     ):
-        from llm_router import LLMRouter
+        from corp_rfp_agent.llm_router import LLMRouter
 
         router = LLMRouter.__new__(LLMRouter)
         router.family = "planning"

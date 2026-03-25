@@ -8,7 +8,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Define project root
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 # Global API keys (Documents/.secrets/.env)
 _global_env = Path.home() / "Documents" / ".secrets" / ".env"
@@ -45,7 +45,7 @@ try:
 except ImportError:
     CHROMADB_AVAILABLE = False
 
-from vault_adapter import retrieve as vault_retrieve
+from corp_rfp_agent.vault_adapter import retrieve as vault_retrieve
 
 logger = logging.getLogger(__name__)
 

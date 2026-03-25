@@ -1,17 +1,10 @@
 """Acceptance tests for Word agent -- structure checks only (no LLM calls)."""
 
-import sys
-from pathlib import Path
-
 import pytest
 from docx import Document
 from docx.oxml.ns import qn
 
-# Add src/ to import path
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT / "src"))
-
-from rfp_answer_word import (
+from corp_rfp_agent.rfp_answer_word import (
     detect_heading_level,
     build_section_tree,
     collect_answerable_sections,

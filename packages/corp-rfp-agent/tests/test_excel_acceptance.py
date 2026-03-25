@@ -1,15 +1,8 @@
 """Acceptance tests for Excel agent -- structure checks only (no LLM calls)."""
 
-import sys
-from pathlib import Path
-
 from openpyxl import load_workbook
 
-# Add src/ to import path
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT / "src"))
-
-from rfp_excel_agent import (
+from corp_rfp_agent.rfp_excel_agent import (
     is_green_cell,
     find_header_row,
     detect_question_column,

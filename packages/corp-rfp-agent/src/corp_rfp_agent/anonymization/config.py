@@ -7,7 +7,7 @@ import yaml
 from pathlib import Path
 from typing import List
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 CONFIG_PATH = PROJECT_ROOT / "config/anonymization.yaml"
 
 DEFAULT_CONFIG = {

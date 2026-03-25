@@ -626,7 +626,7 @@ def save_improve_report(
         },
         "decisions": audit_log,
     }
-    out_dir = output_dir or Path(__file__).resolve().parents[1] / "data" / "kb"
+    out_dir = output_dir or Path(__file__).resolve().parents[2] / "data" / "kb"
     path = out_dir / "improve_report.json"
     with open(path, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2, ensure_ascii=False, cls=NumpyEncoder)

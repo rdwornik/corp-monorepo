@@ -1,13 +1,8 @@
 """Tests for validate_profiles -- product profile validation."""
 
-import sys
-from pathlib import Path
-
 import yaml
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-
-from validate_profiles import (
+from corp_rfp_agent.validate_profiles import (
     validate_profile,
     build_auto_fix,
     save_override,

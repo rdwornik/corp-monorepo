@@ -18,7 +18,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 KB_DIR = PROJECT_ROOT / "data" / "kb"
 VERIFIED_DIR = KB_DIR / "verified"
 DRAFTS_DIR = KB_DIR / "drafts"

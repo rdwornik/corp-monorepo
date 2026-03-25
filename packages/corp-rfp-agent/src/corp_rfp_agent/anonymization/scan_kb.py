@@ -11,7 +11,7 @@ from pathlib import Path
 from .config import get_blocklist
 from .core import check
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 KB_PATH = (
     PROJECT_ROOT / "data_kb/canonical/RFP_Database_Cognitive_Planning_CANONICAL.json"
 )

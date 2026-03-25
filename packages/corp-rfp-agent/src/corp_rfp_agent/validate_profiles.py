@@ -23,7 +23,7 @@ import yaml
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 PROFILES_DIR = PROJECT_ROOT / "config" / "product_profiles"
 EFFECTIVE_DIR = PROFILES_DIR / "_effective"
 OVERRIDES_DIR = PROFILES_DIR / "_overrides"

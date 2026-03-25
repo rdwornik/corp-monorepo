@@ -29,8 +29,7 @@ from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
 # Project root setup
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT / "src"))
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 from dotenv import load_dotenv
 
@@ -54,14 +53,14 @@ try:
 except ImportError:
     CHROMADB_AVAILABLE = False
 
-from llm_router import (
+from corp_rfp_agent.llm_router import (
     MODELS,
     clean_bold_markdown,
     retry_with_backoff,
     extract_question,
     extract_answer,
 )
-from vault_adapter import retrieve as vault_retrieve
+from corp_rfp_agent.vault_adapter import retrieve as vault_retrieve
 
 # --- CONFIGURATION ---
 FAMILY_CONFIG_PATH = PROJECT_ROOT / "data/kb/schema/family_config.json"

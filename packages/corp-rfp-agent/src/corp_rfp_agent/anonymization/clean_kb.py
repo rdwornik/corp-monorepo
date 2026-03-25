@@ -13,7 +13,7 @@ from pathlib import Path
 from datetime import datetime
 from .core import anonymize
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 KB_PATH = (
     PROJECT_ROOT / "data_kb/canonical/RFP_Database_Cognitive_Planning_CANONICAL.json"
 )

@@ -1,13 +1,8 @@
 """Tests for answer_selector -- 5-stage answer selection algorithm."""
 
 import json
-import sys
-from pathlib import Path
 
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-
-from answer_selector import (
+from corp_rfp_agent.answer_selector import (
     _count_red_flags,
     _count_deprecated,
     apply_hard_gates,

@@ -11,7 +11,7 @@ import json
 import re
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 DEFAULT_VERIFIED_DIR = PROJECT_ROOT / "data" / "kb" / "verified"
 DEFAULT_DRAFTS_DIR = PROJECT_ROOT / "data" / "kb" / "drafts"

@@ -27,6 +27,14 @@ dev = [
     "ruff>=0.8",
 ]
 
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["corp_rfp_agent*"]
+
 [tool.ruff.lint]
 # E402: load_dotenv() and sys.path.insert() must run before env-dependent imports
 ignore = ["E402"]
