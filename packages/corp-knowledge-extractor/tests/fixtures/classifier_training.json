@@ -1,0 +1,2482 @@
+[
+  {
+    "filename": "Almajdouie_WMS_RFP_Technical_Proposal_Draft_23.10.25.docx",
+    "extension": ".docx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": "Almajdouie Motors",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BRC_RfP SIOP_Service and Technical.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BYPlatform-Architecture.pptx",
+    "extension": ".pptx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder Platform Services - Analytics.pptx",
+    "extension": ".pptx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_Platform_Services_-_Analytics.pptx",
+    "extension": ".pptx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "DO NOT USE !! BRC_RfP SIOP_Service and Technical.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Key Technical Insights for Blue Yonder Engagement with PepsiCo.docx",
+    "extension": ".docx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": "PepsiCo",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Key_Technical_Insights_for_Blue_Yonder_Engagement_with_PepsiCo.docx",
+    "extension": ".docx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": "PepsiCo",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "LOCALCOPY AFTER FIRST REVIEW Port of Neom Technical Requirements_Assigned.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": "NEOM",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "LOCALCOPY_AFTER_FIRST_REVIEW_Port_of_Neom_Technical_Requirements_Assigned.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": "NEOM",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lenzing Platform Use Case.docx",
+    "extension": ".docx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lenzing_Platform_UseCase.pptx",
+    "extension": ".pptx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lenzing_Platform_Use_Case.docx",
+    "extension": ".docx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "PepsiCo_BY_Platform_8th_Jan.pptx",
+    "extension": ".pptx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": "PepsiCo",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Planning - WMS using BY Platform.pptx",
+    "extension": ".pptx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Platform Overview.pptx",
+    "extension": ".pptx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "SGDBF_Technical_Deep_Dive_20260316.pptx",
+    "extension": ".pptx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": "Saint-Gobain Distribution Bâtiment France",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Technical Requirements - Table Questions.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": "Stellantis",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Technical_Requirements_-_Table_Questions.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": "Stellantis",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Technical_Requirements_for_Solution_Architectures_in_SaaS_v1.0.docx",
+    "extension": ".docx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": "Stellantis",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Use case per BY Platform service.pptx",
+    "extension": ".pptx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Use_case_per_BY_Platform_service.pptx",
+    "extension": ".pptx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Wurth_Blue_Yonder_Platform_Service_Description.pptx",
+    "extension": ".pptx",
+    "doc_type": "architecture",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BRC_RfP SIOP_Commercials.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "commercial",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BRC_RfP_SIOP_Commercials.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "commercial",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BSC FRS Questionnaire 2030-06-30 v1_Asssigned  (Commercial ONLY).xlsx",
+    "extension": ".xlsx",
+    "doc_type": "commercial",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BY_MS_Dynamics_Customer_logo_slide.pptx",
+    "extension": ".pptx",
+    "doc_type": "commercial",
+    "source_type": "documentation",
+    "client": "Metcash",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_sustainability_Pierre_Farbre.pptx",
+    "extension": ".pptx",
+    "doc_type": "commercial",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Commercial Offer  - DRAFT.pptx",
+    "extension": ".pptx",
+    "doc_type": "commercial",
+    "source_type": "meeting",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Composable_Journey_Workshop_Slides_-_Clicks.pptx",
+    "extension": ".pptx",
+    "doc_type": "commercial",
+    "source_type": "documentation",
+    "client": "Clicks",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Corning_-_Blue_Yonder_Differentiation_Summary.pdf",
+    "extension": ".pdf",
+    "doc_type": "commercial",
+    "source_type": "documentation",
+    "client": "Corning",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "20250709 Michelin - Composable Journey IS Stream (Summary).docx",
+    "extension": ".docx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Michelin",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "20250709_Michelin_-_Composable_Journey_IS_Stream_(Summary).docx",
+    "extension": ".docx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Michelin",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "2026-03_MISC_GEN_GCC_Discovery_Supply_Chain_Operations_-_RFI_V2_Blue_Yonder_Responses.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Jaguar Land Rover",
+    "batch": "jlr_pilot"
+  },
+  {
+    "filename": "Agenda and Objectives Pepsico 2 days workshop MOD.docx",
+    "extension": ".docx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "PepsiCo",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Agenda proposal.docx",
+    "extension": ".docx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Agenda_and_Objectives_Pepsico_2_days_workshop_MOD.docx",
+    "extension": ".docx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "PepsiCo",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Ahold Delhaize Tech Workshop 28012026.pptx",
+    "extension": ".pptx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Ahold",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Ahold_Delhaize_Tech_Workshop_28012026.pptx",
+    "extension": ".pptx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Ahold",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder - Integration Workshop - 14 september.pdf",
+    "extension": ".pdf",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder - Integration Workshop - 14 september.pptx",
+    "extension": ".pptx",
+    "doc_type": "meeting",
+    "source_type": "workshop",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder - Integration Workshop.pptx",
+    "extension": ".pptx",
+    "doc_type": "meeting",
+    "source_type": "workshop",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Clicks Agenda.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Clicks Group",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Clicks Roadmap Workshop.pptx",
+    "extension": ".pptx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Clicks",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Clicks_Agenda.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Clicks",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Clicks_Roadmap_Workshop.pptx",
+    "extension": ".pptx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Clicks",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Discovery - 6th of May 2025.docx",
+    "extension": ".docx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Intro Ernesto & Christian.docx",
+    "extension": ".docx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "JDALenzing - Round 2 Interview-20190717 1419-1.mp4",
+    "extension": ".mp4",
+    "doc_type": "meeting",
+    "source_type": "meeting",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lenzing & BY 24th of July.pptx",
+    "extension": ".pptx",
+    "doc_type": "meeting",
+    "source_type": "meeting",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lenzing & BY 28th of Aug_Working Session.pptx",
+    "extension": ".pptx",
+    "doc_type": "meeting",
+    "source_type": "meeting",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lenzing & BY 8th of Aug meeting tech QA and follow up.pptx",
+    "extension": ".pptx",
+    "doc_type": "meeting",
+    "source_type": "presentation",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lenzing Discovery Prep.docx",
+    "extension": ".docx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lenzing Meeting Notes 18-Aug-25.docx",
+    "extension": ".docx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lenzing Meeting Notes 21-Aug-25.docx",
+    "extension": ".docx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lenzing Move to IBP - Discovery call .pptx",
+    "extension": ".pptx",
+    "doc_type": "meeting",
+    "source_type": "presentation",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lenzing Move to IBP - Implementation Proposal update - 05 Sept 2023.pptx",
+    "extension": ".pptx",
+    "doc_type": "meeting",
+    "source_type": "presentation",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lenzing Planning and Operations Discovery.docx",
+    "extension": ".docx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lenzing_IBP_Executive_Briefing.docx",
+    "extension": ".docx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Meeting notes 21st Aug.docx",
+    "extension": ".docx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Michelin_DesignThinking_Deck_08072025.pptx",
+    "extension": ".pptx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Michelin_DesignThinking_Deck_08072025_[Autosaved].pptx",
+    "extension": ".pptx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Michelin",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Michelin_DesignThinking_Short_Debrief_15072025.pptx",
+    "extension": ".pptx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Michelin",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Michelin_DesignThinking_WorkshopAgenda_08072025.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Michelin",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Michelin_Workshop_Prep_Parking_lot.docx",
+    "extension": ".docx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Michelin",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Michelin_payload.csv",
+    "extension": ".csv",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Michelin",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Timetable_Day1.pdf",
+    "extension": ".pdf",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Michelin",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Timetable_Day2.pdf",
+    "extension": ".pdf",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Michelin",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Transformation Journey for Lenzing AG 15 Oct 2025 v1.pptx",
+    "extension": ".pptx",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "cfs-statements-notes-lenzing-ar22.pdf",
+    "extension": ".pdf",
+    "doc_type": "meeting",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "2023_March_BY_WMS_HWSizing_ILS.docx",
+    "extension": ".docx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": "ILS",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "ARB_Planning_Architecture_Reivew_(monthly)-20230801_110344-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "product_doc",
+    "source_type": "meeting",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "ARB_Review_-_MDAP_as_a_Service_(MaaS)-20220921_010854.mp4",
+    "extension": ".mp4",
+    "doc_type": "product_doc",
+    "source_type": "meeting",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Annex_7_-_TEMP_DSI_2481_Convention_Cybersécurité_-_v1.1_EN.pdf",
+    "extension": ".pdf",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": "Pierre Fabre SA",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BYPlatform-Architecture.pdf",
+    "extension": ".pdf",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BlueYonder_StandardEntities.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_&_Snowflake_Data_Sharing_&_Architecture.pptx",
+    "extension": ".pptx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_-_SAP_Template_2.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_Brand_Guidelines_2025.1.1.pdf",
+    "extension": ".pdf",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_Warehouse_Management_Architecture_v2.docx",
+    "extension": ".docx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Cognitive_Demand_Data_Requirements.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "DMS_-_Ingestion_Service.pdf",
+    "extension": ".pdf",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Data_Requirements.pptx",
+    "extension": ".pptx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Deep_Meta_Learning.pptx",
+    "extension": ".pptx",
+    "doc_type": "product_doc",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Diagram_WMS_Integration_2026-01.txt",
+    "extension": ".txt",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Enterprise_Data_Orchestration_Pitch_Deck.pptx",
+    "extension": ".pptx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Episode_1_-_Platform_Overview_and_Foundation_Services.pdf",
+    "extension": ".pdf",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Gabriel__Rey_CB-_Interop.mp4",
+    "extension": ".mp4",
+    "doc_type": "product_doc",
+    "source_type": "training",
+    "client": "Rittal",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Generic_Cognitive_Planning_Reference_Material.pptx",
+    "extension": ".pptx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "KYP_'23_Spring_Edition,_EP_#1_-_Platform_Overview_and_Foundation_Services.pdf",
+    "extension": ".pdf",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "KYP_'23_Spring_Edition,_EP_#2_-_Data_Services.pdf",
+    "extension": ".pdf",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "LifeScience_session1v2.mp4",
+    "extension": ".mp4",
+    "doc_type": "product_doc",
+    "source_type": "meeting",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "MachineLearning_DemandEdge_Reality.pptx",
+    "extension": ".pptx",
+    "doc_type": "product_doc",
+    "source_type": "presentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Noatum_Tech_presentation_27oct2023.pptx",
+    "extension": ".pptx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Oracle_Mapping_Matrix.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Platform_Editedv2.mp4",
+    "extension": ".mp4",
+    "doc_type": "product_doc",
+    "source_type": "presentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Platform_Usage_by_Product.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Platform_and_Cognitive_-_High_Level_Architecture.pptx",
+    "extension": ".pptx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "SAP_Mapping_Matrix.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "SAP_Mapping_Matrix_2.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Security_Slides_Edited.pptx",
+    "extension": ".pptx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "WFM_Requerimientos_a_cumplimentar_English_Translation_WIP.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": "El Corte Inglés",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "WMS_-_PDC_-_Reference_Document.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "product_doc",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BRC_RfP SIOP_Commercials_Blue Yonder Responses.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BRC_RfP SIOP_Service and Technical_Blue Yonder Responses.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BRC_RfP_SIOP_Business_Requirements_Blue Yonder Responses.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BRC_RfP_SIOP_Commercials_Blue_Yonder_Responses.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BRC_RfP_SIOP_Commercials_Blue_Yonder_Responses_Revised 05022026.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder Cloud Services Standards 11.0.pdf",
+    "extension": ".pdf",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder General Reference Architecture.pdf",
+    "extension": ".pdf",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder Responses_BRC_RfP SIOP_Service and Technical.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder Responses_BRC_RfP_SIOP_Business_Requirements.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_Executive_Summary_Lenzing_RFP.pdf",
+    "extension": ".pdf",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_Response_to_Alfa_Laval_RFP_November_2025.docx",
+    "extension": ".docx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Alfa Laval",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_Response_to_Coca-Cola_İçecek-_RFP_End-to-End_Supply_Chain_Planning_Platform-July_2025-V1.docx",
+    "extension": ".docx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Coca-Cola İçecek",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_Response_to_Greencore_RFP_20251403_-_FINAL.docx",
+    "extension": ".docx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Greencore",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_Response_to_Pure_Health-_RFP_Supply_Chain_Planning_Platform_&_Network-August_2025-v0.3.docx",
+    "extension": ".docx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "PureHealth",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_Response_to_Rolls_Royce_APS_RFP_18_July_2025.docx",
+    "extension": ".docx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Rolls-Royce Plc",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_Responses_BRC_RfP_SIOP_Commercials.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_Responses_Lenzing_Forecast_Exercise.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "LENZING AG - Forecasts_final_Devdatta_remarks_28Jan2028 - Copy.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lenzing RFP - Blue Yonder response.pptx",
+    "extension": ".pptx",
+    "doc_type": "rfp_response",
+    "source_type": "presentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "NOT USE! Blue Yonder Response to (Company Name) RFP 2026XXXX - 20260102.docx",
+    "extension": ".docx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "OLD!! BRC_RfP SIOP_Commercials_Blue Yonder Responses.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "RFP Response Lenzing - Blue Yonder.pdf",
+    "extension": ".pdf",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "RFP Response Lenzing Revised for 12Feb26 for submission.pptx",
+    "extension": ".pptx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Lenzing",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "RFP Response Lenzing Revised for 12Feb26.pptx",
+    "extension": ".pptx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "RFP Response Lenzing.pptx",
+    "extension": ".pptx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Lenzing AG",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "RFP_Response_Final_2026-01-15_v02.txt",
+    "extension": ".txt",
+    "doc_type": "rfp_response",
+    "source_type": "rfp",
+    "client": "Global Logistics Corp",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "[Tech_Only]_Blue_Yonder_Response_to_Pure_Health-_RFP_Supply_Chain_Planning_Platform_&_Network-August_2025-v0.3.docx",
+    "extension": ".docx",
+    "doc_type": "rfp_response",
+    "source_type": "documentation",
+    "client": "Pure Health",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "2025_09_22_Zabka_Tech_Snowflake_SLA_Support.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": "Żabka",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "2025_10_03_Rossmann_CyberSecurity_Session.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder (Cloud Services & Spectrum) - 2025 Type 2 SOC 2 - Report.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder (Cloud Services) - 2023 Type 2 SOC 2 - Report.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder (Cloud Services) - 2024 (July) Type 2 SOC 1 - Report.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder (Heritage) - 2025 (Oct) Type 2 SOC 1 - Report.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder - ISO 22301 2023 Certificate.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder - ISO 22301 Certificate.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder - ISO 27001_27701 Certificate.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder - ISO 27001_ISO27701 2023 Certificate.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder Customer Security Measures 3.0.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder ISO27001 and ISO27701.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue Yonder Security Whitepaper.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_(Cloud_Services)_-_2024_(July)_Type_2_SOC_1_-_Report.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_(Cloud_Services_&_Spectrum)_-_2025_Type_2_SOC_2_-_Report.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_(Heritage)_-_2025_(Oct)_Type_2_SOC_1_-_Report.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_2023_SOC_1_Type_2_-_Report.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_2023_SOC_2_Type_2_-_Report.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_Customer_Security_Measures_3.0.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_ISO22301.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_ISO27001_and_ISO27701.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_Security_Whitepaper.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Cloud_Services_Standards_9.0.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Customer_Security_Measures.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Customer_Security_Measures_2_0_0_0.pdf",
+    "extension": ".pdf",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "EN Local LabelVie AO TMS IS Security Questionnaire.docx",
+    "extension": ".docx",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": "LabelVie Group",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Local LabelVie AO TMS IS Security Questionnaire.docx",
+    "extension": ".docx",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": "LabelVie Group",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "ORIGINAL LOCALCOPYAnnex A CCI SC E2E Planning Compliance Matrix Functional Technical.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": "Coca-Cola İçecek",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "ORIGINAL_LOCALCOPYAnnex_A_CCI_SC_E2E_Planning_Compliance_Matrix_Functional_Technical.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": "Coca-Cola İçecek",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Security_Questiond.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "security",
+    "source_type": "documentation",
+    "client": "Groupe LabelVie",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "1_Demo2Win_Exercise_Packet.pdf",
+    "extension": ".pdf",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "20240304_CMFP_Intro.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "2_Demo2Win_Virtual_Reference_Cards.pdf",
+    "extension": ".pdf",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "3_Demo2Win_Student_Template.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "4_Demo2Win Observations.pdf",
+    "extension": ".pdf",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "5_Takeways.docx",
+    "extension": ".docx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "AI_ML_Christian_Haag-Barcelona_2024_Presentation.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "ALM_Day#1_Lighthouse_-_Cognitive_Shorts-20250210_130230-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "ALM_Day#2_Lighthouse_-_Cognitive_Shorts-20250214_073129-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Heineken",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Actors_Procedures_Process_ProcedureMapping.Lighthouse_-_Cognitive_Shorts-20241017_073106-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Adeo_Data_Mappibg.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Adeo_Data_Mappings.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Adidas_Demo_-_12.4.23_FINAL.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Andy.pdf",
+    "extension": ".pdf",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Anishka.pdf",
+    "extension": ".pdf",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "AutomationTestCases_Part_2_Lighthouse_-_Cognitive_Shorts-20250205_130157-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Automation_-_Test_Cases_-_Part1_Lighthouse_-_Cognitive_Shorts-20250204_125321-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Heineken",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Avon_Implementation_Lighthouse_-_Cognitive_Shorts-20250224_130206-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Avon",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BDM_Day#1_Lighthouse_-_Cognitive_Shorts-20241024_073106-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BDM_Day#2_Lighthouse_-_Cognitive_Shorts-20241025_073106-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BDM_Day#3_Temporal_Curation_Lighthouse_-_Cognitive_Shorts-20241028_083109-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BH_Deep_Meta-Learning.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BH_Snowflake_Data_Story_(Storyboard).pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "BY_Internal_Training_-_Asda_George_Presentation.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": "George",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Blue_Yonder_Platform_Training_-_15-17_October_2025.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CDAR-Logical Model - Lighthouse - Cognitive Shorts-20250605_123320-Meeting Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CDAR-Logical_Model_-_Lighthouse_-_Cognitive_Shorts-20250605_123320-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CDAR_template_-_Lighthouse_-_Cognitive_Shorts-20250522_123057-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CDP_Architecture_Lighthouse_-_Cognitive_Shorts-20240927_073123-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CDP_DataModelling_BYDM_WB_Lighthouse_-_Cognitive_Shorts-20241004_123036-Meeting_Recording_1.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CDP_Model_Algorithms_Lighthouse_-_Cognitive_Shorts-20250116_130108-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CDP_PartialWeeks_Lighthouse_-_Cognitive_Shorts-20250109_073310-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CDP_Pre-Sales_Functional_Training.docx",
+    "extension": ".docx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CDP_non-functional_Configuration_Pre-Sales_Training_Apr-8.docx",
+    "extension": ".docx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CIBP_Nestle_Purnia_Demand_Classification_Segmentation_Lighthouse_-_Cognitive_Shorts-20250311_125917-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Nestle Purina",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CMFP-April8th-Workshop-BYOrchestrator_Sample_Questions.docx",
+    "extension": ".docx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CMFP_Pre-Sales_Functional_Training.docx",
+    "extension": ".docx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CMFP_report._Lighthouse_-_Cognitive_Shorts-20250203_180322-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CMFP_template_Day#1_Lighthouse_-_Cognitive_Shorts-20250227_125957-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Retail Softlines Customers (UA, Manor, PVH)",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CPI.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CPI8.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CPI8.csv.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CPI88.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "CP_Enablement_Macy's_v1.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": "Macy's",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Challenge_Yourself_Action_Book.pdf",
+    "extension": ".pdf",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Cognitive Friday S4E1 - Journey to the Cloud.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "meeting",
+    "client": "Multiple (Polaris, Heineken, Intel, H&M, Tata mentioned)",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Cognitive Friday S4E1 J2CC.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Cognitive Friday Season 2 - Product Analytics Program.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Cognitive_Demand_Planning_Help.pdf",
+    "extension": ".pdf",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Cognitive_Demand_Planning_Messaging_Guide_Final_August_2023_Challenger_Modified.docx",
+    "extension": ".docx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Cognitive_Demand_Planning_Questions.docx",
+    "extension": ".docx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Cognitive_Training_Attendee_List.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Consensus_Planning_Workflow_Lighthouse_-_Cognitive_Shorts-20250127_125052-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Create_the_custom_entities_Lighthouse_-_Cognitive_Shorts-20241007_074701-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "DG_CMFP_-_Enablement_Presentation.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": "Dollar General",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "DG_Demo_script_-_enablement.docx",
+    "extension": ".docx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "DOTERRA_Demo_-_3.20.24_FINAL.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Data_mapping_Retail_from_Chalhoub_-_Lighthouse_-_Cognitive_Shorts-20250520_123138-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Chalhoub Group",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Data_quality_workflow_Lighthouse_-_Cognitive_Shorts-20250113_125215-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Martin Brower",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "DeepML_Avni_Jain-Barcelona_2024_Presentation.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Heineken",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Demo_Environments.docx",
+    "extension": ".docx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "E2E-Automated-Deployment-Framework_Lighthouse_-_Cognitive_Shorts-20250206_130335-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Evaluation_process_and_dashboards_Lighthouse_-_Cognitive_Shorts-20250117_125803-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "ExplainabilityChartData.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "ExploringIngestionServices.docx",
+    "extension": ".docx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "FAAS_Day#1_Lighthouse_-_Cognitive_Shorts-20250318_125743-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "FAAS_Day#2_Lighthouse_-_Cognitive_Shorts-20250321_125946-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "GRE_CMFP.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "GTM_Cognitive_Training_v10.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "GTM_Cognitive_Training_v10_-_Challenger_Slides.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Garrett.pdf",
+    "extension": ".pdf",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "HEB_Deck.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": "H.E.B",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "HEB_Deck_2.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": "H.E.B",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "HEB_Deck_3.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": "H.E.B",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Horizon_Web_-_How_To_Access.docx",
+    "extension": ".docx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "IBP-FEMSA-Lighthouse_-_Cognitive_Shorts-20250417_133602-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Coca-Cola FEMSA",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "INTEL_CDP_Implementation_Journey_Lighthouse_-_Cognitive_Shorts-20250226_130222-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "meeting",
+    "client": "Intel",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Intel-_Parallel_execution_of_Actors_and_Procedures-_Lighthouse_-_Cognitive_Shorts-20250515_183213-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Intel",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Introduction_to_CDP_Lighthouse_-_Cognitive_Shorts-20240925_073323-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts--Day#43-Process_Orchestration-Day#4-20241126_073116.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Copy_Inheritance-Day#1-20250212_133949-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Copy_Inheritance-Day#2-20250213_125236-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Day#10-Exploring_the_types_of_ingestion_service_and_Ingesting_data_into_Platform_Data_Cloud_-_Day#1-20241010_073249.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Day#11-Exploring_the_types_of_ingestion_service_and_Ingesting_data_into_Platform_Data_Cloud_-_Day#2-20241014_073044.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Day#12_-_Data_Curation_flow_-_Day#1_-_20241021_073146.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Heineken",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Day#13_-_Data_Curation_flow_-_Day#2_-_20241022_073047.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Heineken",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Day#14-_Pre-Curation,_Post_Curation_and_Generic_Plugins_-20241023_073222-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Day#36-Batch_Ingress-20241108_073125.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Day#37_-_Pre-curation_validation_actor-20241111_133302.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Heineken",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Day#38-_PDC-CDP_-_Batch_Scheduling_-20241112_073146.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Day#39_-_Outbound_Extracts-20241114_073128.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Heineken",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Day#40-Process_Orchestration-Day#1-20241118_073106.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Avon",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Day#41-Process_Orchestration-Q&A-Day#2-20241119_073112.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Day#42-Process_Orchestration-Day#3-20241125_073112.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Day#44-Process_Orchestration-Day#5-20241127_073102.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Day#45-Exception_Workflow-20241209_073049.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Day#47-MaaS-20241211_073132.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Lighthouse_-_Cognitive_Shorts-Day#9-Pre-Curation_Validations-20241009_080106.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Heineken",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Luminate_Portal_Day#1_Lighthouse_-_Cognitive_Shorts-20240930_073210-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Luminate_Portal_Day#2_Lighthouse_-_Cognitive_Shorts-20241001_073053-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "MDAP_As_A_Service(MaaS)__Lighthouse_-_Cognitive_Shorts--Day#46-20241210_073123-Recording_3.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "MFG_Cognitive_-_ML_Studio___Workflow___RaaS-20240321_114221-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "MLR_Lighthouse_-_Cognitive_Shorts-20250305_130216-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Martin Brower",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "MQV_Lighthouse_-_Cognitive_Shorts-20250121_125347-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "MaaS_Guardrails_Lighthouse_-_Cognitive_Shorts-20250508_122803-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "MaaS_HighLevelOverview_Lighthouse_-_Cognitive_Shorts-Day#46-20241210_073123-Recording_1.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Maas-Command_Center_Lighthouse_-_Cognitive_Shorts-Day#46-20241210_073123-Recording_2.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Martin_Brower_POC_Lighthouse_-_Cognitive_Shorts-20250225_130503-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Martin Brower",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Martin_Brower_POC__Day#2_Lighthouse_-_Cognitive_Shorts-20250303_124948-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Martin Brower",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Mfg_Barcelona_Cognitive_Demand_Planning_Functional_Training.docx",
+    "extension": ".docx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Model_configuration_script.docx",
+    "extension": ".docx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "NPI_Day#1_Lighthouse_-_Cognitive_Shorts-20250218_130511-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Heineken",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "NPI_Day#2_Lighthouse_-_Cognitive_Shorts-20250219_130155-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Heineken",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Navigate_to_SNA_through_Luminate_portal_Logical_Data_Model_Lighthouse_-_Cognitive_Shorts-20241015_073130-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Nick.pdf",
+    "extension": ".pdf",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "OBI_-_Cognitive_Training.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": "OBI",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "ODA_Walkthrough_Lighthouse_-_Cognitive_Shorts-20250115_125935-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "PMC_Tool.docx",
+    "extension": ".docx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "PlatformDataCloud_v2023.1_v3_BY_Training_Guide.pdf",
+    "extension": ".pdf",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "PreSales_Resource_Requested.docx",
+    "extension": ".docx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Prompt_Scripting.docx",
+    "extension": ".docx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": "Hornbach",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "RBAC-_Lighthouse_-_Cognitive_Shorts-20250401_122359-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Rack_Room_Shoes_-_4_11.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": "Rack Room Shoes",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Reporting_As_A_Service(RaaS)_Lighthouse_-_Cognitive_Shorts-20250129_130125-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Role_of_Assignments_Lighthouse_-_Cognitive_Shorts-20250217_130112-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Avon",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Sleep_Country_D&F_Demo_3.12.24.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Sleep_Country_Demo_Working.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Snowflake_Day#1_Lighthouse_-_Cognitive_Shorts-20241029_083055-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Avon",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Team_Tesco.pptx",
+    "extension": ".pptx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": "Tesco",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Testing_For_Customers_Lighthouse_-_Cognitive_Shorts-20250422_123239-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": "Heineken",
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Training_Presenations_Skills_1.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "Training_Presentation_Skills-20231127_110402-Meeting_Recording.mp4",
+    "extension": ".mp4",
+    "doc_type": "training",
+    "source_type": "training",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "demandChannels_13022024_102953150506.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "extCPICountries_1.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "extCausalConsumerPriceIndexesCityLevels_13022024_102954432172.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "extCausalEventses_13022024_102955030282.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "extCausalMedianIncomeses_13022024_102959996476.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "extCausalPopulationGrowthByCountries_13022024_103000252473.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "extCausalProductsByCountries_13022024_102958897770.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "extCausalTradePromotionses_13022024_102955503434.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "extCausalWeathers_13022024_102956012641.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "extProductFamilyRegionCustomerNodes_13022024_102959144913.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "internal_update",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "histShipments_13022024_102956706377.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "itemLocationCustomers_13022024_102959395437.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "itemLocations_13022024_102959701502.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "items_13022024_102953839045.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "locations_13022024_102954078462.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "pipeline_config.xlsx",
+    "extension": ".xlsx",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "prodLocCustMeasures_13022024_102957700706.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  },
+  {
+    "filename": "sampe-chatgpt-data.csv",
+    "extension": ".csv",
+    "doc_type": "training",
+    "source_type": "documentation",
+    "client": null,
+    "batch": "_outputs"
+  }
+]

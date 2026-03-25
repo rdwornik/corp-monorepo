@@ -427,10 +427,20 @@ def main() -> None:
         print("ERROR: No notes found. Check _outputs/ directory.", file=sys.stderr)
         sys.exit(1)
 
-    # Save raw metadata
+    # Save raw metadata (stripped of heavy fields to keep size reasonable)
+    _KEEP_FIELDS = {
+        "title", "type", "doc_type", "source_type", "topics", "products",
+        "people", "domains", "quality", "quality_score", "client",
+        "confidentiality", "source_path", "model", "depth", "tags",
+        "tokens_used", "layer", "_source_batch", "_filename",
+    }
+    slim_notes = [
+        {k: v for k, v in n.items() if k in _KEEP_FIELDS}
+        for n in notes
+    ]
     raw_path = CKE_FIXTURES / "training_data_raw.json"
-    _write_json(raw_path, notes)
-    print(f"  Raw metadata: {raw_path} ({len(notes)} notes)")
+    _write_json(raw_path, slim_notes)
+    print(f"  Raw metadata: {raw_path} ({len(slim_notes)} notes)")
 
     # Generate fixtures
     classifier = gen_classifier_fixtures(notes)

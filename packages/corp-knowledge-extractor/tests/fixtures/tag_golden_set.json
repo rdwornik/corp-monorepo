@@ -1,0 +1,1434 @@
+[
+  {
+    "tag": "topic/supply-chain-planning",
+    "count": 152,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "domain/delivery-implementation",
+    "count": 137,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "topic/demand-planning",
+    "count": 135,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "type/general",
+    "count": 114,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "domain/product-platform-architecture",
+    "count": 111,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "source/documentation",
+    "count": 111,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "topic/change-management",
+    "count": 107,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/implementation",
+    "count": 102,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "topic/api-integration",
+    "count": 89,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "topic/machine-learning",
+    "count": 82,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "topic/performance-optimization",
+    "count": 82,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "domain/industry-supply-chain",
+    "count": 79,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "product/blue-yonder-demand-planning",
+    "count": 71,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/data-migration",
+    "count": 67,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/blue-yonder-platform",
+    "count": 63,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "topic/pricing",
+    "count": 62,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "product/blue-yonder-supply-planning",
+    "count": 60,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "domain/commercials",
+    "count": 60,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/workflow-orchestration",
+    "count": 59,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "client/lenzing",
+    "count": 58,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/saas-architecture",
+    "count": 56,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "client/lenzing-ag",
+    "count": 53,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "domain/go-to-market",
+    "count": 42,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "domain/customer-success",
+    "count": 39,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "topic/replenishment",
+    "count": 36,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "topic/security",
+    "count": 35,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "type/product-doc",
+    "count": 33,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/azure",
+    "count": 32,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "domain/product",
+    "count": 30,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "source/rfp",
+    "count": 28,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "topic/competitive-analysis",
+    "count": 28,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "domain/platform-architecture",
+    "count": 25,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "type/meeting",
+    "count": 22,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "topic/control-tower",
+    "count": 22,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "type/rfp-response",
+    "count": 22,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/cloud-infrastructure",
+    "count": 22,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/blue-yonder-wms",
+    "count": 20,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "topic/wms",
+    "count": 20,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "product/blue-yonder-control-tower",
+    "count": 19,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "source/opportunity",
+    "count": 19,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/customer-success",
+    "count": 19,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/blue-yonder-tms",
+    "count": 18,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "topic/workforce-management",
+    "count": 18,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "product/demand-planning",
+    "count": 17,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/disaster-recovery",
+    "count": 16,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "topic/network-optimization",
+    "count": 15,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "topic/iso-certifications",
+    "count": 15,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "source/presentation",
+    "count": 15,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/sla",
+    "count": 14,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/tms",
+    "count": 13,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "source/internal-update",
+    "count": 13,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "source/meeting",
+    "count": 12,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/non-production-environments",
+    "count": 12,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/sustainability",
+    "count": 12,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/incident-management",
+    "count": 11,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/supply-planning",
+    "count": 10,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "domain/competitive",
+    "count": 10,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/blue-yonder-workforce-management",
+    "count": 7,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "product/control-tower",
+    "count": 7,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/inventory-optimization",
+    "count": 7,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/sap-erp",
+    "count": 6,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "type/architecture",
+    "count": 5,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/risk-management",
+    "count": 5,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/technical-account-manager",
+    "count": 4,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/capital-allocation",
+    "count": 4,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "source/research",
+    "count": 4,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/inventory-management",
+    "count": 4,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/demand-and-supply-planning",
+    "count": 4,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/blue-yonder-oms",
+    "count": 3,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "topic/oms",
+    "count": 3,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "product/sap",
+    "count": 3,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/sap-s/4hana",
+    "count": 3,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/supply-chain-planning-platform",
+    "count": 3,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "type/commercial",
+    "count": 3,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/veocel-nonwoven-fibers",
+    "count": 3,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/tencel",
+    "count": 3,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/cost-management",
+    "count": 3,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/tencel-brand-fibers",
+    "count": 3,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/veocel-brand-fibers",
+    "count": 3,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/demand-planning-module",
+    "count": 3,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/forecast-accuracy",
+    "count": 3,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/snowflake",
+    "count": 3,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "client/jaguar-land-rover",
+    "count": 2,
+    "batches": [
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "product/blue-yonder-network-design",
+    "count": 2,
+    "batches": [
+      "_outputs",
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "product/sap-r/3",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "source/workshop",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "type/security",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/supply-chain-platform",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/sop-platform",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/planning-engine",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/sop",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/scenario-management",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/tencel-lyocell-and-modal-fibers",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/lenzing-ecovero-eco-viscose",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/digital-transformation",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/veocel",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/lenzing-ecovero",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/ibp",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/lenzing-ecovero-viscose-fibers",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/platform",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/scope-management",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/inventory-optimization",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/inventory-planning",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/luminate-dynamic-segmentation",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/integrated-business-planning",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/sap-cloud-platform-integration-cpi",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/sales-and-operations-planning",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/d360",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/refibra",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "source/training",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/supply-planning-solution",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/power-bi",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/sales-operations-planning",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/microsoft-dynamics-365-crm",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/platform-architecture",
+    "count": 2,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/transportation-modeling",
+    "count": 1,
+    "batches": [
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "product/logistics-emissions-calculator",
+    "count": 1,
+    "batches": [
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "product/platform-data-cloud",
+    "count": 1,
+    "batches": [
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "topic/inventory-control",
+    "count": 1,
+    "batches": [
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "client/jlr",
+    "count": 1,
+    "batches": [
+      "jlr_pilot"
+    ]
+  },
+  {
+    "tag": "product/sap-s/4",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/microsoft-bi",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/jda",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/integrated-planning-tool",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/better-supply-chain-ibp-tool-proposed",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/sap-cloud-platform-integration",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/jda-tactical-planning",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/statistical-forecasting",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/blue-yonder-commerce",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/sap-cpi",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/jda-supply-chain-planning-system",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/doxis4",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/platform-sop",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/operational-excellence",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/lenzing",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/risk-management-and-corporate-audit",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/compliance",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/governance-structure",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/succession-planning",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/contract-management",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/dsp",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/financial-planning-and-finance-linkage",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/process-orchestration-approvals-action-tracking",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/scenario-management-and-versioning",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/tencel-lyocell-fibers-for-textiles",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/veocel-lyocell-fibers-for-nonwovens",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/tencel-modal-modal-fibers",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/tencel-lyocell-fibers",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/tencel-modal-fibers",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/sustainability-leadership",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/platform-demand-planning-module",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/platform-supply-planning-module",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/network-design",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/intellectual-property",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/idsp-integrated-demand-supply-inventory-planning",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/sparq-solver",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/lp-solver",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/tencel-lyocell-and-modal-fibers-for-textiles",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/lenzing-ecovero-viscose-fibers-with-eco-care-technology",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/veocel-lyocell-and-viscose-fibers-for-nonwovens",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/lenzing-b2b-specialty-fibers-and-technical-applications",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/capital-management",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/lenzing-ecovero-fibers",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/lenzing-lyocell-dry-fibers",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/innovation",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/platform-demand-planning-supply-planning-allocation-replenishment",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/supply-assist-agent",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/inventory-ops-agent",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/financial-performance",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/leverage-and-debt-management",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/cash-flow-crisis",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/working-capital-management",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/capital-expenditure-strategy",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/market-valuation",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/dividend-policy",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "client/fiber-manufacturer-lenzing-referenced-in-comments",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/sop-module",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "client/fiber/textiles-manufacturing-company-lenzing-referenced-in-comments",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/sales-operations-planning",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "client/lenzing-group",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/sap-s/4-hana",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/demand-planning-tool",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/siop-sales-inventory-operations-planning-tool",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/capacity-planning",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/compliance-regulatory",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/oms",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/jda-sop",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/jda-platform",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/tms",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/wms",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/approval-workflow",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "source/release-note",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/integrated-business-planning",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/demand-supply-planning-dsp",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/integrated-business-planning-ibp",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "topic/product-innovation",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/ecovero-brand-fibers",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/dissolving-wood-pulp",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/refibra-recycled-content-lyocell",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  },
+  {
+    "tag": "product/supply-planning-platform",
+    "count": 1,
+    "batches": [
+      "_outputs"
+    ]
+  }
+]

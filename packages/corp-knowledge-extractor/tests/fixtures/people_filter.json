@@ -1,0 +1,2666 @@
+[
+  {
+    "input": "Sindujah Ravichandran",
+    "count": 17,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ryan Mackie (Principal, Schellman Compliance, LLC)",
+    "count": 6,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "Technical Account Manager (TAM)",
+    "count": 5,
+    "expected": "filter",
+    "type": "role"
+  },
+  {
+    "input": "Sujay DN",
+    "count": 5,
+    "expected": "filter",
+    "type": "role"
+  },
+  {
+    "input": "Martin Goerner",
+    "count": 5,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Alexander Merz",
+    "count": 5,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sharron Chan (Opportunity Owner)",
+    "count": 5,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Satish Kalpathy (VP, PMG Head Platform)",
+    "count": 4,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ravichandran (Organizer)",
+    "count": 4,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Powlomi Banerjee",
+    "count": 4,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Anjali Alpana Surin",
+    "count": 4,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Technical Account Manager (role referenced, not named)",
+    "count": 3,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Kartheek Miriyala",
+    "count": 3,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Marshall Goodman (Sr Solutions Advisor, Blue Yonder)",
+    "count": 3,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Michael Rowan (Director, Strategic Services, Blue Yonder)",
+    "count": 3,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Angel Ferran Pousa",
+    "count": 3,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ernesto (VP Global Supply Chain, Lenzing)",
+    "count": 3,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Abhishek Bhaskar (CW)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Shiv Jethi (Organizer/Speaker)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Mathieu Linder (CVP Solution Strategy)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ravi Shrivastava (SVP Product Management)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Blue Yonder Advisors",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Blue Yonder Architects",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Customer Success Manager (CSM)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Duncan Angove (Chief Executive Officer)",
+    "count": 2,
+    "expected": "filter",
+    "type": "role"
+  },
+  {
+    "input": "Salil Joshi (Chief Technology Officer)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Chief Financial Officer (referenced, not named)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Devdatta (forecast/technical contributor)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Kent (Enterprise Architect)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Julien (Architect)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Olivier",
+    "count": 2,
+    "expected": "filter",
+    "type": "ambiguous"
+  },
+  {
+    "input": "Valerie (Integration and licensing contact)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Thomas (Cloud transition enablement)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Michelin (customer organization)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Simon Tunstall (Gartner analyst, WMS Magic Quadrant)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Dwight Klappich (Gartner analyst, WMS Magic Quadrant)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Brock Johns (Gartner analyst, TMS Magic Quadrant)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Pieter (Note Taker)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Technical Account Manager (role referenced)",
+    "count": 2,
+    "expected": "filter",
+    "type": "role"
+  },
+  {
+    "input": "Customer Success Manager (role referenced)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Customer Executive (role referenced)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Customer Success Manager (role referenced, not named)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Customer Executive (role referenced, not named)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Technical Account Manager (role referenced, no individual named)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Würth (customer/prospect)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Lenzing AG (Client organization)",
+    "count": 2,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "Yahyah Pandor (Vice President and General Manager, Blue Yonder Middle East FZ-LLC)",
+    "count": 2,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "Indrajeev Kumar (Product Manager)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ashutosh Sangwan (Sr. Director, PMG Platform Data Services)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Patrick DeMartine (Sr. Director, PMG Platform Extensibility)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Avni Jain (Presenter)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Arka (Integration/Mapping Reviewer)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ravichandran (Organizer/Recorder)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Duncan Angove (Chief Executive Officer, Blue Yonder)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Salil Joshi (Chief Technology Officer, Blue Yonder)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Wayne Usie (Chief Strategy Officer, Blue Yonder)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Christian Haag",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Joshua Roney",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Railton Matthew",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sujay DN (Presenter)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ravichandran (Moderator)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ravichandran (Organizer and Host)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Rahul Goyal",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Amaranatha Reddy",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Illia Babounikau",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Powlomi Banerjee (CW)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Mathieu Linder (CVP, Solution Strategy)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Shiv Jethi (Session Organizer)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ravi Shrivastava (VP, Product Management)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Powlomi Banerjee (Moderator)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "SaiKiran Pollamarasetty (Value Analyst, Transformation Advisory, Blue Yonder)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ravichandran (Meeting Organizer/Host)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ravichandran (Session Organizer)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Srinidhi Parthasarathy",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ravichandran (Organizer and Recorder)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Duncan Angove (CEO)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Simona Darjan (Chief Transformation Officer)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Global demand planner",
+    "count": 2,
+    "expected": "filter",
+    "type": "role"
+  },
+  {
+    "input": "Viktoria Schiller (Author)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Wolfgang Aigner (Author)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Christian Schneider (Reviewer)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Christoph Hubl",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Dr. Nico Reiner (Chief Financial Officer)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Cord Prinzhorn (Chairman of Supervisory Board)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Stephan Sielaff (CEO, appointed April 1, 2022)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sébastien Knus (VP Capital Markets)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Christian (S&OP Manager, Lenzing)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Matilda Jonsson",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Wilm Neubauer",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Martin Brown (Chief Supply Chain Officer, Knauf)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Vin Carneiro (Senior Manager, Global Center of Excellence and Customer Insights, Ingredion)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Margaret Hug (Vice President, Sales, Inventory and Operations Planning, MCC)",
+    "count": 2,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Amy Wilkes (Supply Chain Degree Apprentice, RFI purchasing contact)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ankit Sehgal (CW)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Matt Russell",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Brooke Cormier",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Darren Saumur (President, Customer Experience and Cloud)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Darren Saumur (President-Customer Experience and Cloud)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Blue Yonder Customer Executive (referenced for IFM Electronic, not named)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Blue Yonder Presales Representative (Presales)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ernesto (Role: unknown, has competitor solution experience)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Christian (Role: unknown)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Olivier Portail (Licensing and capabilities discussion)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Olivier Portail (Product leadership discussion)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Michelin stakeholders (Design Thinking workshop participants)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Lead Facilitator (Role)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Co-Facilitator (Role)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "BY Solution Expert (Role)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Lead Facilitator (role)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Co-Facilitator (role)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "BY Solution Expert (role)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Yashpal (RFP contributor – support/SLA questions)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Mike (RFP contributor – technical/identity/mobile questions)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Karim (RFP contributor – non-standard answer alignment)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Woolworths project teams (referenced as case study, not individual names provided)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Yashpal (Internal — RFP response contributor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Mike (Internal — RFP response contributor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Karim (Internal — open questions alignment)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sarah Jenkins (Project Lead)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Marcus V (IT Architect)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Esme (Timekeeper/Facilitator)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Shashi (Timekeeper/Facilitator)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Esme (Timekeeper / Session Enforcer)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Renzo (Team Member)",
+    "count": 1,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "Support and Evolution Manager",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "IT Application Manager",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sarah Chen (role unknown — client or internal)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "David Lee (role unknown — client or internal)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sami Baroudi (Transformation PM, Supply Chain, SGDBF)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Laurent Mondino (Buyer, external contractor, SGDBF)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Marie-Hélène Courgeon (IT Project Manager, SGDBF)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Technical Account Manager (role referenced, no name given)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Customer Success Manager (role referenced, no name given)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Customer Executive (role referenced, no name given)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Technical Account Manager (role referenced, no name provided)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Customer Success Manager (role referenced, no name provided)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Customer Executive (role referenced, no name provided)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Würth (customer organization)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Würth (prospect organization)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Robert (Owner, Technical Support and Maintenance section)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Dennis Kouwenhoven (Customer Executive, Blue Yonder)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Darren Payne (Customer Executive / Account Manager, Blue Yonder)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Rachael Coad (Greencore Group plc contact)",
+    "count": 1,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "James Donald Armstrong (Founder, JDA Software)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Hamad Abdulla Mohamed Alshorafa Alhammadi (Chairman, PureHealth Holding)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Konrad Preuninger (Senior Customer Executive, Blue Yonder)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Coca-Cola FEMSA (Customer)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Charter (Customer)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sarah Chen (Technical Lead)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Marcus Vane (Project Manager)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "John Vrankovich (Principal Architect / Moderator)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Vinod Donthi (MaaS Architect)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Gabriel Kohen (VP Product Management / UI UX Lead)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Vinod (Lead Architect)",
+    "count": 1,
+    "expected": "filter",
+    "type": "role"
+  },
+  {
+    "input": "Pawan (Platform Lead)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "John (Architecture Review Board Member)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Duncan Angove (CEO, Blue Yonder)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Simona Darjan (Chief Transformation Officer, example persona)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Satish Rajapa (Platform PMG Lead)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Gurdeep (Platform Engineering/Leadership)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Indrajeev Kumar (Product Manager, Foundation Services)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Reyaz Mohamed",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Chris Burchett",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Gabriel Werner",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Michael Orr (Case Studies Lead - needs verification)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Shri (Industry Strategy - needs verification)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Avni (Customer Value Presentation - needs verification)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Tiffany Brewer (Sr. Director, Industry Strategies, Life Sciences & Specialty Chemicals)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Simon Bowes (CVP, Industry Strategies, EMEA)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ho-Sub Shin (VP, Industry Strategies, APAC)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Gabriel Werner (Field CTO, Blue Yonder)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Chris Brichat (Mentioned regarding historical platform context)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Manoj Mathai Mathew (Presenter)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Alexander Merz (Attendee/Inquirer)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Martin Goerner (Inquisitor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Safena Teresa Philip Arputharaj",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Safena Teresa Philip Arputharaj (Automation Lead / Presenter)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Pranav Joshi (Technical Contributor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Suraj Singh (Lead Presenter/Implementation Consultant)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Anjali Alpana Surin (Session Moderator)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Poulomi Banerjee",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Powlomi Banerjee (Presenter)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Jagadish Ambati (Participant)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Powlomi Banerjee (Presenter/Technical Expert)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ravichandran (Organizer/Host)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Karthiek Miriyala (Technical Contributor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Snr. Supply Chain Manager, The Source (unnamed)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Brian (User Persona)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Lars Priebe (Subject Matter Expert)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Tanmay Gupta (ML and Technology Expert)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Vikas Kumar (Transformational Advisory and Change)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Mohammad Anwar (Lead Architect for Data and Logical Models)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Powlomi Banerjee (Session Moderator)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Mohammad Anwar",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Shankar Lakkaraju (Retail PD Planning Team)",
+    "count": 1,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "Poulomi Banerjee (Host)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ingolf Mollat (Attendee/Questioner)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Subrata Patra (Senior Solution Architect)",
+    "count": 1,
+    "expected": "filter",
+    "type": "role"
+  },
+  {
+    "input": "Sindujah Ravichandran (Training Organizer)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Alexander Merz (Technical Questioner)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ramon Vega",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sethukumar Chikkegowda",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Saurav Sarangi",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Kranthi Remala (Speaker/Trainer)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Roja Mukkala (Subject Matter Expert)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Anjali Alpana Surin (Host and Session Coordinator)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Venkata Subbareddy (Senior Consultant and Primary Presenter)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Suman N (Participant/Technical Questioner)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Matt Russell (Product Manager)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Brooke Cormier (Value Architect)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Matt Getman (Author/GTM)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Mathieu Linder (Author/GTM)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Avni J. (Author)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "James Peck (Approver / Global Lead)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Francesco Galati (EMEA Manager)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Jeff Ziegler (NA Manager)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Manoj Mathew",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ramon Vega (Lead Presenter/Technical Expert)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ravichandran (Organizer and Moderator)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Martin Goerner (Technical Contributor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Amaranatha Reddy (Speaker)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Thomas Hermanns (Contributor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Mohammad Anwar (Logical Data Model Owner)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Polina Potoskueva (Lighthouse Team Presenter)",
+    "count": 1,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "Vikas Kumar (Attendee/Questioner)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Railton Matthew (Expert/Moderator)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Christian Haag (Senior Technical Participant)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Avni (Presenter/Demand Edge Team)",
+    "count": 1,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "David Rodriguez (Senior Director, Transformation Advisory, Retail Global, Blue Yonder)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Megan Chance (Demo Orchestrator Persona)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Maya Berkner",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ingolf",
+    "count": 1,
+    "expected": "filter",
+    "type": "ambiguous"
+  },
+  {
+    "input": "Illia Babounikau (Senior Data Scientist)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Illia Babounikau (Lead Presenter/Technical Expert)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sneha Nair (Moderator)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Adrian Buslowski",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Josh Buck (Sr Solutions Advisor, Blue Yonder)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sankaranarayanan S (Lead Presenter)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Rahul Goyal (IBP/S&OP Expert)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Praveen Kumar (Session Facilitator)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Carlos Ramon Vega Gonzalez (Enterprise Technical Architect)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Carlos Ramon Vega Gonzalez",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ravi Shrivastava (Presenter/Technical Expert)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Alexander Merz (Attendee/Interrogator)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ravichandran (Organizer/Recorded by)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Tony Stark (Manager)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Bruce Wayne (Manager)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Peter Parker (Manager)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sujay DN (Presenter and Technical Lead)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ravichandran (Meeting Organizer and Recorder)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Alexander Merz (Attendee and Contributor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Anjali Alphena Suren",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sandeep Karumuri",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ramon Vega (Technical Presenter)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ramon Vega (Presenter)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Alexander Merz (Participant)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Manoj",
+    "count": 1,
+    "expected": "filter",
+    "type": "ambiguous"
+  },
+  {
+    "input": "Karthiek Miriyala (Presenter/Technical Expert)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sujay DN (Lead Presenter/Technical Architect)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Alexander Merz (Recording Facilitator)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Jagadish Ambati",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Swathi Nagaraj",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sujay DN (Lead Presenter and Technical Expert)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ravichandran (Organizer and Session Moderator)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Pratik Prasun (Technical Contributor and Questioner)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sudalai Rajendran (Presenter)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Alexander Merz (Questioner)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Pratik Prasun",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Lalitha Krishnamurthy (Senior Technical Architect, Blue Yonder)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Martin Goerner (Technical Lead)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Merle Studendorf",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Srinidhi Parthasarathy (Lead Presenter/Technical Expert)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Bhaskar Chakrabarti (Product/Technical Contributor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Abhishek Bhaskar (Technical Presenter (CW))",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ravichandran (Session Organizer and Recorder)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Srinidhi Parthasarathy (Presenter)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Abhishek Bhaskar",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ingolf Mollat",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sushant Kulshrestha (Speaker/Presenter)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Anjali Alpana Surin (Moderator)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Gayathri Ganesan (Contributor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sushant Kulshrestha",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Abhishek Bhaskar (Presenter)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Utku Elagoz (Presenter)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Anjali Alpana Surin (Organizer)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Powlomi Banerjee (Collaborator)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Saurabh (configuration owner, needs verification)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Manoj Mathai Mathew (Lead Presenter)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ravichandran (Organizer/Moderator)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Shankar (Attendee/Questioner)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Powlomi Banerjee (CW) - Presenter",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ramchandran - Moderator",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Raghavendra Naik - Participant",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Esme McGowan (Solutions Advisor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Philipp Mack (Senior Data Science Advisor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Hugh Hendry (Senior Principal Advisor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Polina Potoskueva (Self Service Solutions Consultant)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ravichandran (Meeting Host)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Vipin Hegde (Speaker/Presenter)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Suraj Singh",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Rosana Vazquez Gomez",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Wojciech Cyganowski",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Roja Mukkala (PMG Analytics)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Kranthi Remala (PMG Analytics)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sindujah Ravichandran (Host)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Polina Potoskueva",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Stefan Ulbrich",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Maik Ticky",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Li Meng",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Dan Sanchez",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Deanna Emsley",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sujay DN (Presenter and Technical Expert)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Kim (Blue Yonder, 20 years retail experience)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Thomas (Blue Yonder, 20 years retail experience)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Brendan (Blue Yonder, 25 years retail experience)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Busenur Aktilav",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Brendan Rapose",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Robert Dwornik",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Salil Joshi (CTO)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Robert",
+    "count": 1,
+    "expected": "filter",
+    "type": "ambiguous"
+  },
+  {
+    "input": "Product Management Group (Author)",
+    "count": 1,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "Global SIOP manager",
+    "count": 1,
+    "expected": "filter",
+    "type": "role"
+  },
+  {
+    "input": "Commercial BU head",
+    "count": 1,
+    "expected": "filter",
+    "type": "role"
+  },
+  {
+    "input": "Johannes Grünbacher (Global Demand Planner)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Christian Schneider (Global SIOP Fiber)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Thomas Panholzer (Global Supply Planner)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Author xy (Document Author)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Reviewer xy (Document Reviewer)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Approver xy (Document Approver)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Victoria",
+    "count": 1,
+    "expected": "filter",
+    "type": "ambiguous"
+  },
+  {
+    "input": "Robert (IT session lead)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Gabriel (Functionalities session lead)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Matilda (Blue Yonder contact/author)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Christoph Hubl (Lenzing - main person driving modernization of integration format)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ryan Mackie (Managing Principal, Schellman Compliance, LLC)",
+    "count": 1,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "Global S&OP manager",
+    "count": 1,
+    "expected": "filter",
+    "type": "role"
+  },
+  {
+    "input": "VP operations (BU level)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Lenzing AG (Client)",
+    "count": 1,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "B&C Group (majority shareholder)",
+    "count": 1,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "Suzano S.A. (15% strategic stakeholder, pulp partner)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Stephan Helmut Sielaff (Chairman and CEO)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Thomas Cord Prinzhorn (Supervisory Board Chair)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Stephan Sielaff (Chairman, Managing Board)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Cord Prinzhorn (Chairman, Supervisory Board)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Stephan Sielaff (Chief Executive Officer)",
+    "count": 1,
+    "expected": "filter",
+    "type": "role"
+  },
+  {
+    "input": "Robert van de Kerkhof (Former Managing Board Member)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sharron Chan (CP)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Matilda Jonsson (CE)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Wendy Thomas",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Lenzing (customer contact, not individual named)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Lenzing AG (client organization)",
+    "count": 1,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "Nico Reiner (CFO, appointed January 1, 2023)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Rohit Aggarwal (Chief Executive Officer)",
+    "count": 1,
+    "expected": "filter",
+    "type": "role"
+  },
+  {
+    "input": "Walter Bickel (Chief Transformation Officer)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Cord Prinzhorn (Chairman of the Supervisory Board)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Matilda (Presenter/Account Lead)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Martin Brown (Chief Supply Chain Officer, Knauf - customer reference)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Margaret Hug (Vice President SIOP, MCC - customer reference)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Global Demand Planner (unnamed)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sales Managers (23 FTEs, unnamed)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Commercial Directors (6 FTEs, unnamed)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Mircea Nita (Purchasing Manager)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Christian Platzer (VP Global IT/Digital Innovation, Project Sponsor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ernesto Schroeder (VP Global Supply Chain, Project Sponsor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Christian Schneider (Sr. Dir. Global Sales, Inventory & Operations Planning, Process Owner)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Simeon Nachev",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Mathieu",
+    "count": 1,
+    "expected": "filter",
+    "type": "ambiguous"
+  },
+  {
+    "input": "Jonathan",
+    "count": 1,
+    "expected": "filter",
+    "type": "ambiguous"
+  },
+  {
+    "input": "Stephan Sielaff (CEO)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Nico Reiner (CFO)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Matilda (Account/Presales Team Member)",
+    "count": 1,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "CEO (referenced for strategic decision-making role)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "CFO (referenced for financial arbitration role)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "SVP Pulp & Refinery and VP Purchasing (referenced for supply optimization role)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Lenzing (implied director/operations lead, not named)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Lenzing (client/customer)",
+    "count": 1,
+    "expected": "filter",
+    "type": "role"
+  },
+  {
+    "input": "Rohit Aggarwal (CEO, assumed position Sept 1, 2024)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Stephan Sielaff (Former CEO, departed Aug 31, 2024)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Walter Bickel (Chief Transformation Officer, appointed April 15, 2024)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Lenzing AG Management (CEO noted markets 'remain challenging' in 2024)",
+    "count": 1,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "Christian Schneider (Sr. Dir. Global Sales, Inventory & Operations Planning)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Pascal Hurenkamp (Global S&OP Manager)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Viktoria Schiller (BPL Forecast to Plan EVP Commercial)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sébastien Knus (VP Investor Relations)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Stefan Sielaff (CEO)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ruediger Kluge",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Nikhil Jha",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Michael Gerke",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Gabriel (Blue Yonder)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Wilm (Blue Yonder)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Michael (Blue Yonder)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Lenzing (organization)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Lennart Kirstein (Sr. Solution Advisor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Peter van den Berg (Sr. Services Sales Director)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Gabriel Werner (Vice President DACH)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Enterprise Solution Architect (role, not named)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Project Manager (role, not named)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Business Consultant - Offshore (role, not named)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Manju (S&OP stakeholder, Lenzing)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Matilda Jonsson (Client Executive)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Wilm Neubauer (Solution Advisor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ruediger Kluge (Director Transformation Advisory)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Anna (Blue Yonder, contributor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Vicky (Blue Yonder, contributor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Christian (Lenzing, commercial team)",
+    "count": 1,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "Anna (Lenzing, role unknown)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Vicky (Lenzing, role unknown)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Christian (Lenzing, Commercial Team)",
+    "count": 1,
+    "expected": "filter",
+    "type": "organization"
+  },
+  {
+    "input": "Nico Reiner (Chief Financial Officer, appointed January 1, 2023)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Christian Skilich (Chief Pulp Officer, mandate extended to May 31, 2026)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Robert van de Kerkhof (Chief Commercial Officer Fiber, Managing Board member until December 31, 2023)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Simon Tunstall (Gartner analyst)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Dwight Klappich (Gartner analyst)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Pia Orup Lund (Gartner analyst)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Lenzing (customer organization)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Technical Account Manager (TAM) (role referenced)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Ernesto (role unknown)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Christian (role unknown)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Antoine Tokplo (Opportunity Owner)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Peter van den Berg (Opportunity Owner)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sales Managers",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Commercial Directors",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Global SIOP Super Users",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Sales Managers (role identified)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Commercial Directors (role identified)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Global SIOP Super Users (role identified)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Christian Schneider (SIOP Director, Lenzing – Main Influencer)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Gabriel Werner (Executive Sponsor)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Lenzing (customer reference, not individual)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Vinod Donthi (Architect/Presenter)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Gabriel Kohen (Architecture Reviewer)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "John Vrankovich (Meeting Organizer/Reviewer)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Vinod",
+    "count": 1,
+    "expected": "filter",
+    "type": "ambiguous"
+  },
+  {
+    "input": "John",
+    "count": 1,
+    "expected": "filter",
+    "type": "ambiguous"
+  },
+  {
+    "input": "Satish Rajapa (Platform PMG Lead / Pre-Sales Technology)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Gurdeep (Platform Engineering Leadership)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Indrajeev Kumar (Product Manager, Foundation Services, India)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Reyaz Mohamed (CVP Product Management)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Chris Burchett (SVP Product Development)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Gabriel Werner (Field CTO)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Michael Orr",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Mathieu Linder",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Robin Bhatnagar",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  },
+  {
+    "input": "Avni Jain (Speaker)",
+    "count": 1,
+    "expected": "keep",
+    "type": "real_person"
+  }
+]

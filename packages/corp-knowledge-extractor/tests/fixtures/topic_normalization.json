@@ -1,0 +1,554 @@
+[
+  {
+    "topic": "Supply Chain Planning",
+    "count": 332
+  },
+  {
+    "topic": "Demand Planning",
+    "count": 324
+  },
+  {
+    "topic": "API Integration",
+    "count": 320
+  },
+  {
+    "topic": "SaaS Architecture",
+    "count": 276
+  },
+  {
+    "topic": "Implementation",
+    "count": 261
+  },
+  {
+    "topic": "Machine Learning",
+    "count": 243
+  },
+  {
+    "topic": "Data Migration",
+    "count": 218
+  },
+  {
+    "topic": "Change Management",
+    "count": 213
+  },
+  {
+    "topic": "Workflow Orchestration",
+    "count": 210
+  },
+  {
+    "topic": "Performance Optimization",
+    "count": 192
+  },
+  {
+    "topic": "Security",
+    "count": 149
+  },
+  {
+    "topic": "Cloud Infrastructure",
+    "count": 147
+  },
+  {
+    "topic": "Replenishment",
+    "count": 105
+  },
+  {
+    "topic": "Pricing",
+    "count": 88
+  },
+  {
+    "topic": "Disaster Recovery",
+    "count": 83
+  },
+  {
+    "topic": "Customer Success",
+    "count": 74
+  },
+  {
+    "topic": "Incident Management",
+    "count": 68
+  },
+  {
+    "topic": "Competitive Analysis",
+    "count": 62
+  },
+  {
+    "topic": "WMS",
+    "count": 61
+  },
+  {
+    "topic": "SLA",
+    "count": 57
+  },
+  {
+    "topic": "Control Tower",
+    "count": 50
+  },
+  {
+    "topic": "ISO Certifications",
+    "count": 50
+  },
+  {
+    "topic": "Non-Production Environments",
+    "count": 42
+  },
+  {
+    "topic": "TMS",
+    "count": 36
+  },
+  {
+    "topic": "Workforce Management",
+    "count": 25
+  },
+  {
+    "topic": "Network Optimization",
+    "count": 21
+  },
+  {
+    "topic": "Sustainability",
+    "count": 13
+  },
+  {
+    "topic": "Technical Account Manager",
+    "count": 12
+  },
+  {
+    "topic": "OMS",
+    "count": 10
+  },
+  {
+    "topic": "Inventory Optimization",
+    "count": 7
+  },
+  {
+    "topic": "Inventory Management",
+    "count": 6
+  },
+  {
+    "topic": "Risk Management",
+    "count": 5
+  },
+  {
+    "topic": "S&OP",
+    "count": 4
+  },
+  {
+    "topic": "Inventory Planning",
+    "count": 4
+  },
+  {
+    "topic": "Scenario Planning",
+    "count": 4
+  },
+  {
+    "topic": "Go-to-Market",
+    "count": 4
+  },
+  {
+    "topic": "Capital Allocation",
+    "count": 4
+  },
+  {
+    "topic": "Blue Yonder Platform",
+    "count": 3
+  },
+  {
+    "topic": "Analytics",
+    "count": 3
+  },
+  {
+    "topic": "Data Quality",
+    "count": 3
+  },
+  {
+    "topic": "Platform & Architecture",
+    "count": 3
+  },
+  {
+    "topic": "Integrated Business Planning",
+    "count": 3
+  },
+  {
+    "topic": "Cost Management",
+    "count": 3
+  },
+  {
+    "topic": "Forecast Accuracy",
+    "count": 3
+  },
+  {
+    "topic": "Technical debt",
+    "count": 2
+  },
+  {
+    "topic": "Identity and Access Management",
+    "count": 2
+  },
+  {
+    "topic": "Data Modeling",
+    "count": 2
+  },
+  {
+    "topic": "Compliance & Regulatory",
+    "count": 2
+  },
+  {
+    "topic": "Retail Technology",
+    "count": 2
+  },
+  {
+    "topic": "Delivery & Implementation",
+    "count": 2
+  },
+  {
+    "topic": "Scenario Management",
+    "count": 2
+  },
+  {
+    "topic": "Digital Transformation",
+    "count": 2
+  },
+  {
+    "topic": "Scope Management",
+    "count": 2
+  },
+  {
+    "topic": "Sales and Operations Planning",
+    "count": 2
+  },
+  {
+    "topic": "Inventory Control",
+    "count": 1
+  },
+  {
+    "topic": "Product Analytics",
+    "count": 1
+  },
+  {
+    "topic": "UX Transformation",
+    "count": 1
+  },
+  {
+    "topic": "Tactical Supply Planning",
+    "count": 1
+  },
+  {
+    "topic": "Operational Supply Planning",
+    "count": 1
+  },
+  {
+    "topic": "Order Promising",
+    "count": 1
+  },
+  {
+    "topic": "Integration Capabilities",
+    "count": 1
+  },
+  {
+    "topic": "S&OP and IBP",
+    "count": 1
+  },
+  {
+    "topic": "RFP",
+    "count": 1
+  },
+  {
+    "topic": "Pricing & Promotion",
+    "count": 1
+  },
+  {
+    "topic": "Transportation & Logistics",
+    "count": 1
+  },
+  {
+    "topic": "Access Control",
+    "count": 1
+  },
+  {
+    "topic": "Model Explainability",
+    "count": 1
+  },
+  {
+    "topic": "Training & Knowledge Transfer",
+    "count": 1
+  },
+  {
+    "topic": "Security & Compliance",
+    "count": 1
+  },
+  {
+    "topic": "Regulatory Compliance",
+    "count": 1
+  },
+  {
+    "topic": "Micro-Service Architecture",
+    "count": 1
+  },
+  {
+    "topic": "Event driven",
+    "count": 1
+  },
+  {
+    "topic": "Deep Meta Learning",
+    "count": 1
+  },
+  {
+    "topic": "UI Automation",
+    "count": 1
+  },
+  {
+    "topic": "WebdriverIO",
+    "count": 1
+  },
+  {
+    "topic": "TypeScript",
+    "count": 1
+  },
+  {
+    "topic": "Testing Frameworks",
+    "count": 1
+  },
+  {
+    "topic": "Assortment Management",
+    "count": 1
+  },
+  {
+    "topic": "Promotions",
+    "count": 1
+  },
+  {
+    "topic": "Allocation",
+    "count": 1
+  },
+  {
+    "topic": "Product",
+    "count": 1
+  },
+  {
+    "topic": "Standardization",
+    "count": 1
+  },
+  {
+    "topic": "Consensus Planning",
+    "count": 1
+  },
+  {
+    "topic": "NPI",
+    "count": 1
+  },
+  {
+    "topic": "Platform Data Cloud",
+    "count": 1
+  },
+  {
+    "topic": "Business Data Model",
+    "count": 1
+  },
+  {
+    "topic": "Brand Positioning & Messaging",
+    "count": 1
+  },
+  {
+    "topic": "Design System & Visual Identity",
+    "count": 1
+  },
+  {
+    "topic": "Tone of Voice & Copywriting",
+    "count": 1
+  },
+  {
+    "topic": "Logo & Trademark Usage",
+    "count": 1
+  },
+  {
+    "topic": "Photography & Art Direction",
+    "count": 1
+  },
+  {
+    "topic": "Color Palette & Application",
+    "count": 1
+  },
+  {
+    "topic": "Audience Segmentation",
+    "count": 1
+  },
+  {
+    "topic": "Typography & Layout Standards",
+    "count": 1
+  },
+  {
+    "topic": "Statistical Forecasting",
+    "count": 1
+  },
+  {
+    "topic": "Operational Excellence",
+    "count": 1
+  },
+  {
+    "topic": "Risk management and Corporate Audit",
+    "count": 1
+  },
+  {
+    "topic": "Compliance",
+    "count": 1
+  },
+  {
+    "topic": "Governance Structure",
+    "count": 1
+  },
+  {
+    "topic": "Succession Planning",
+    "count": 1
+  },
+  {
+    "topic": "Contract Management",
+    "count": 1
+  },
+  {
+    "topic": "Financial planning and finance linkage",
+    "count": 1
+  },
+  {
+    "topic": "Process orchestration, approvals, action tracking",
+    "count": 1
+  },
+  {
+    "topic": "Inventory optimization",
+    "count": 1
+  },
+  {
+    "topic": "Scenario management and versioning",
+    "count": 1
+  },
+  {
+    "topic": "Sustainability Leadership",
+    "count": 1
+  },
+  {
+    "topic": "Intellectual Property",
+    "count": 1
+  },
+  {
+    "topic": "Capital Management",
+    "count": 1
+  },
+  {
+    "topic": "Innovation",
+    "count": 1
+  },
+  {
+    "topic": "Financial Performance",
+    "count": 1
+  },
+  {
+    "topic": "Leverage and Debt Management",
+    "count": 1
+  },
+  {
+    "topic": "Cash Flow Crisis",
+    "count": 1
+  },
+  {
+    "topic": "Working Capital Management",
+    "count": 1
+  },
+  {
+    "topic": "Capital Expenditure Strategy",
+    "count": 1
+  },
+  {
+    "topic": "Market Valuation",
+    "count": 1
+  },
+  {
+    "topic": "Dividend Policy",
+    "count": 1
+  },
+  {
+    "topic": "Sales & Operations Planning",
+    "count": 1
+  },
+  {
+    "topic": "Capacity Planning",
+    "count": 1
+  },
+  {
+    "topic": "Approval Workflow",
+    "count": 1
+  },
+  {
+    "topic": "Product Innovation",
+    "count": 1
+  },
+  {
+    "topic": "Cash Flow Generation",
+    "count": 1
+  },
+  {
+    "topic": "Debt Management",
+    "count": 1
+  },
+  {
+    "topic": "Product Premiumization",
+    "count": 1
+  },
+  {
+    "topic": "Market Demand Analysis",
+    "count": 1
+  },
+  {
+    "topic": "Factory Throughput Optimization",
+    "count": 1
+  },
+  {
+    "topic": "Procurement Cost Reduction",
+    "count": 1
+  },
+  {
+    "topic": "Sustainability & ESG",
+    "count": 1
+  },
+  {
+    "topic": "Product Mix Strategy",
+    "count": 1
+  },
+  {
+    "topic": "Scenario Modeling",
+    "count": 1
+  },
+  {
+    "topic": "Professional Services Estimator",
+    "count": 1
+  },
+  {
+    "topic": "EMEA Rate Card",
+    "count": 1
+  },
+  {
+    "topic": "Supply Planning",
+    "count": 1
+  },
+  {
+    "topic": "Data Integration",
+    "count": 1
+  },
+  {
+    "topic": "Raw Material Sourcing",
+    "count": 1
+  },
+  {
+    "topic": "Seasonality Analysis",
+    "count": 1
+  },
+  {
+    "topic": "UI/UX",
+    "count": 1
+  },
+  {
+    "topic": "Cognitive Business Planning",
+    "count": 1
+  },
+  {
+    "topic": "Data Aggregation",
+    "count": 1
+  }
+]

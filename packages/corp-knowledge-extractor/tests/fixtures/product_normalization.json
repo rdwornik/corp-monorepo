@@ -1,0 +1,258 @@
+[
+  {
+    "product": "Blue Yonder Platform",
+    "count": 288
+  },
+  {
+    "product": "Blue Yonder Demand Planning",
+    "count": 207
+  },
+  {
+    "product": "Azure",
+    "count": 189
+  },
+  {
+    "product": "Blue Yonder Supply Planning",
+    "count": 119
+  },
+  {
+    "product": "Blue Yonder WMS",
+    "count": 96
+  },
+  {
+    "product": "Blue Yonder TMS",
+    "count": 77
+  },
+  {
+    "product": "Blue Yonder Control Tower",
+    "count": 43
+  },
+  {
+    "product": "Snowflake",
+    "count": 39
+  },
+  {
+    "product": "Demand Planning",
+    "count": 24
+  },
+  {
+    "product": "Platform Data Cloud",
+    "count": 23
+  },
+  {
+    "product": "Blue Yonder Workforce Management",
+    "count": 17
+  },
+  {
+    "product": "Blue Yonder OMS",
+    "count": 12
+  },
+  {
+    "product": "Supply Planning",
+    "count": 12
+  },
+  {
+    "product": "Platform",
+    "count": 12
+  },
+  {
+    "product": "ML Studio",
+    "count": 12
+  },
+  {
+    "product": "Blue Yonder Network Design",
+    "count": 10
+  },
+  {
+    "product": "Control Tower",
+    "count": 9
+  },
+  {
+    "product": "WMS",
+    "count": 8
+  },
+  {
+    "product": "SAP",
+    "count": 8
+  },
+  {
+    "product": "Supply Chain Planning Platform",
+    "count": 6
+  },
+  {
+    "product": "TMS",
+    "count": 6
+  },
+  {
+    "product": "SAP ERP",
+    "count": 6
+  },
+  {
+    "product": "Supply Chain Planning",
+    "count": 5
+  },
+  {
+    "product": "OMS",
+    "count": 5
+  },
+  {
+    "product": "Demand and Supply Planning",
+    "count": 5
+  },
+  {
+    "product": "Semantic Network Architect",
+    "count": 4
+  },
+  {
+    "product": "Supply Chain Platform",
+    "count": 4
+  },
+  {
+    "product": "Power BI",
+    "count": 4
+  },
+  {
+    "product": "Microsoft Teams",
+    "count": 3
+  },
+  {
+    "product": "SAP S/4HANA",
+    "count": 3
+  },
+  {
+    "product": "SAP R/3",
+    "count": 3
+  },
+  {
+    "product": "Blue Yonder Commerce",
+    "count": 3
+  },
+  {
+    "product": "TENCEL",
+    "count": 3
+  },
+  {
+    "product": "Demand Planning Module",
+    "count": 3
+  },
+  {
+    "product": "Blue Yonder Network",
+    "count": 2
+  },
+  {
+    "product": "CDP Co-Pilot",
+    "count": 2
+  },
+  {
+    "product": "LDE",
+    "count": 2
+  },
+  {
+    "product": "SCPO",
+    "count": 2
+  },
+  {
+    "product": "BYDM Workbench",
+    "count": 2
+  },
+  {
+    "product": "Platform WMS",
+    "count": 2
+  },
+  {
+    "product": "Platform (supply chain SaaS)",
+    "count": 2
+  },
+  {
+    "product": "SAP ECC6",
+    "count": 2
+  },
+  {
+    "product": "Platform Data Cloud (PDC)",
+    "count": 2
+  },
+  {
+    "product": "SAP S/4",
+    "count": 2
+  },
+  {
+    "product": "Microsoft BI",
+    "count": 2
+  },
+  {
+    "product": "Doxis4",
+    "count": 2
+  },
+  {
+    "product": "Cognitive Planning",
+    "count": 2
+  },
+  {
+    "product": "Blue Yonder Planning",
+    "count": 2
+  },
+  {
+    "product": "Demand Edge",
+    "count": 2
+  },
+  {
+    "product": "Sigma",
+    "count": 2
+  },
+  {
+    "product": "S&OP Platform",
+    "count": 2
+  },
+  {
+    "product": "Planning Engine",
+    "count": 2
+  },
+  {
+    "product": "VEOCEL",
+    "count": 2
+  },
+  {
+    "product": "LENZING ECOVERO",
+    "count": 2
+  },
+  {
+    "product": "IBP",
+    "count": 2
+  },
+  {
+    "product": "Inventory Optimization",
+    "count": 2
+  },
+  {
+    "product": "Luminate Dynamic Segmentation",
+    "count": 2
+  },
+  {
+    "product": "SAP Cloud Platform Integration (CPI)",
+    "count": 2
+  },
+  {
+    "product": "D360",
+    "count": 2
+  },
+  {
+    "product": "REFIBRA",
+    "count": 2
+  },
+  {
+    "product": "Supply Planning Solution",
+    "count": 2
+  },
+  {
+    "product": "SAP S/4Hana",
+    "count": 2
+  },
+  {
+    "product": "Sales & Operations Planning",
+    "count": 2
+  },
+  {
+    "product": "Microsoft Dynamics 365 CRM",
+    "count": 2
+  }
+]
