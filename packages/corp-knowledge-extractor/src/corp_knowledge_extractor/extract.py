@@ -261,7 +261,7 @@ def _parse_response(response_text: str, source_file: SourceFile) -> dict:
     try:
         return parse_llm_json(response_text)
     except ValueError as exc:
-        raise ExtractionError(f"Failed to parse JSON response for {source_file.path.name}: {exc}")
+        raise ExtractionError(f"Failed to parse JSON response for {source_file.path.name}: {exc}") from exc
 
 
 def _build_locator(page_ref, file_ext: str, max_pages: int) -> dict | None:
@@ -577,7 +577,7 @@ def extract_knowledge(
         try:
             text_content = file.path.read_text(encoding="utf-8", errors="replace")
         except Exception as exc:
-            raise ExtractionError(f"Could not read {file.path.name}: {exc}")
+            raise ExtractionError(f"Could not read {file.path.name}: {exc}") from exc
         contents = [types.Part.from_text(text=f"{prompt}\n\n--- FILE CONTENT ---\n{text_content[:50000]}")]
 
     else:
