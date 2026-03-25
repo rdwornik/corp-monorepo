@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
+from unittest.mock import patch
 
-from corp_by_os.extraction.vault_writer import move_to_vault
+import pytest
+
+from corp_by_os.extraction.vault_writer import _read_trust_level, move_to_vault
 
 
 def _make_package(staging: Path, pkg_name: str, files: dict[str, bytes]) -> None:
@@ -143,3 +147,97 @@ def test_move_to_vault_creates_conflict_for_verified(tmp_path):
     conflicts = list(dest.glob("*_conflict_*.md"))
     assert len(conflicts) == 1
     assert "New" in conflicts[0].read_text(encoding="utf-8")
+
+
+# --- Fix 1: shutil.move error handling ---
+
+
+def test_move_to_vault_raises_on_move_failure(tmp_path):
+    """shutil.move failure raises OSError, doesn't silently continue."""
+    staging = tmp_path / "staging"
+    _make_package(staging, "pkg-001", {"extract/note.md": b"content"})
+    vault = tmp_path / "vault"
+
+    with patch("corp_by_os.extraction.vault_writer.shutil.move", side_effect=OSError("disk full")):
+        with pytest.raises(OSError, match="disk full"):
+            move_to_vault(staging, vault, "target")
+
+
+def test_move_to_vault_merge_raises_on_move_failure(tmp_path):
+    """shutil.move failure during merge raises OSError."""
+    vault = tmp_path / "vault"
+    dest = vault / "target" / "pkg-001" / "extract"
+    dest.mkdir(parents=True)
+    (dest / "note.md").write_bytes(b"old content")
+
+    staging = tmp_path / "staging"
+    _make_package(staging, "pkg-001", {"extract/note.md": b"new content"})
+
+    with patch("corp_by_os.extraction.vault_writer.shutil.move", side_effect=OSError("permission denied")):
+        with pytest.raises(OSError, match="permission denied"):
+            move_to_vault(staging, vault, "target")
+
+
+def test_move_to_vault_logs_error_on_failure(tmp_path, caplog):
+    """Move failure is logged at ERROR level before re-raising."""
+    staging = tmp_path / "staging"
+    _make_package(staging, "pkg-001", {"extract/note.md": b"content"})
+    vault = tmp_path / "vault"
+
+    with patch("corp_by_os.extraction.vault_writer.shutil.move", side_effect=OSError("boom")):
+        with caplog.at_level(logging.ERROR):
+            with pytest.raises(OSError):
+                move_to_vault(staging, vault, "target")
+    assert "Failed to move" in caplog.text
+
+
+# --- Fix 2: _read_trust_level safe defaults ---
+
+
+def test_trust_level_reads_verified(tmp_path):
+    """Reads trust_level=verified from well-formed frontmatter."""
+    note = tmp_path / "note.md"
+    note.write_text("---\ntitle: Test\ntrust_level: verified\n---\nBody\n", encoding="utf-8")
+    assert _read_trust_level(note) == "verified"
+
+
+def test_trust_level_reads_extracted(tmp_path):
+    """Reads trust_level=extracted from frontmatter."""
+    note = tmp_path / "note.md"
+    note.write_text("---\ntitle: Test\ntrust_level: extracted\n---\nBody\n", encoding="utf-8")
+    assert _read_trust_level(note) == "extracted"
+
+
+def test_trust_level_returns_none_when_missing(tmp_path):
+    """Returns None when trust_level key is absent (normal extracted note)."""
+    note = tmp_path / "note.md"
+    note.write_text("---\ntitle: Test\n---\nBody\n", encoding="utf-8")
+    assert _read_trust_level(note) is None
+
+
+def test_trust_level_defaults_verified_on_read_error(tmp_path):
+    """Defaults to 'verified' when file cannot be read (safe)."""
+    note = tmp_path / "nonexistent.md"
+    assert _read_trust_level(note) == "verified"
+
+
+def test_trust_level_defaults_verified_on_parse_error(tmp_path):
+    """Defaults to 'verified' when YAML parsing fails (safe)."""
+    note = tmp_path / "note.md"
+    note.write_text("---\n{{{invalid yaml\n---\nBody\n", encoding="utf-8")
+    assert _read_trust_level(note) == "verified"
+
+
+def test_trust_level_logs_warning_on_read_error(tmp_path, caplog):
+    """Read errors produce a WARNING log."""
+    note = tmp_path / "nonexistent.md"
+    with caplog.at_level(logging.WARNING):
+        _read_trust_level(note)
+    assert "Defaulting to 'verified'" in caplog.text
+
+
+def test_trust_level_no_frontmatter(tmp_path):
+    """Returns None for files without YAML frontmatter."""
+    note = tmp_path / "note.md"
+    note.write_text("Just plain text, no frontmatter.", encoding="utf-8")
+    assert _read_trust_level(note) is None

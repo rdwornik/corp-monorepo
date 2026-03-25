@@ -18,11 +18,16 @@ log = logging.getLogger(__name__)
 
 
 def _read_trust_level(path: Path) -> str | None:
-    """Read trust_level from a markdown note's frontmatter."""
+    """Read trust_level from a markdown note's frontmatter.
+
+    Defaults to 'verified' on read/parse errors — safe default prevents
+    accidental overwrite of protected notes.
+    """
     try:
         text = path.read_text(encoding="utf-8")
-    except Exception:
-        return None
+    except Exception as e:
+        log.warning("Cannot read trust_level from %s: %s. Defaulting to 'verified' (safe).", path.name, e)
+        return "verified"
     if not text.startswith("---"):
         return None
     end = text.find("---", 3)
@@ -31,8 +36,9 @@ def _read_trust_level(path: Path) -> str | None:
     try:
         fm = yaml.safe_load(text[3:end])
         return fm.get("trust_level") if isinstance(fm, dict) else None
-    except Exception:
-        return None
+    except Exception as e:
+        log.warning("Cannot parse frontmatter in %s: %s. Defaulting to 'verified' (safe).", path.name, e)
+        return "verified"
 
 
 def _file_hash(path: Path) -> str:
@@ -91,7 +97,11 @@ def move_to_vault(
                 ):
                     date_str = datetime.now().strftime("%Y%m%d")
                     conflict = dst_file.with_stem(f"{dst_file.stem}_conflict_{date_str}")
-                    shutil.move(str(src_file), str(conflict))
+                    try:
+                        shutil.move(str(src_file), str(conflict))
+                    except OSError as e:
+                        log.error("Failed to move conflict %s -> %s: %s", src_file.name, conflict, e)
+                        raise
                     log.warning(
                         "CONFLICT: %s is verified. New extraction saved as %s",
                         str(rel).replace("\\", "/"),
@@ -100,7 +110,11 @@ def move_to_vault(
                     continue
 
                 dst_file.parent.mkdir(parents=True, exist_ok=True)
-                shutil.move(str(src_file), str(dst_file))
+                try:
+                    shutil.move(str(src_file), str(dst_file))
+                except OSError as e:
+                    log.error("Failed to move %s -> %s: %s", src_file.name, dst_file, e)
+                    raise
                 log.info(
                     "Updated: %s -> %s",
                     str(rel).replace("\\", "/"),
@@ -109,7 +123,11 @@ def move_to_vault(
                 moved += 1
         else:
             # New package: move entire directory
-            shutil.move(str(item), str(dest_pkg))
+            try:
+                shutil.move(str(item), str(dest_pkg))
+            except OSError as e:
+                log.error("Failed to move package %s -> %s: %s", item.name, dest_pkg, e)
+                raise
             file_count = sum(1 for _ in dest_pkg.rglob("*") if _.is_file())
             log.info(
                 "Moved package: %s (%d files)",
