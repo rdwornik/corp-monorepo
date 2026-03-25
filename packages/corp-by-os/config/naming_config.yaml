@@ -1,0 +1,126 @@
+# Naming Convention v2 (Council Decision #14)
+# Pattern: {YYYY-MM}_{TYPE}_{CLIENT}_{Description}.{ext}
+# Replaces MISC_GEN catch-all with specific type codes
+
+version: 2
+pattern: "{date}_{type}_{client}_{description}.{ext}"
+date_format: "YYYY-MM"
+max_filename_length: 120
+
+# Type codes — mapped from doc_type (CKE/classifier) and filename hints
+# Order matters: filename_hint checked first (most specific), then doc_type
+type_codes:
+  RFI:
+    doc_type: rfp_response
+    label: "Request for Information"
+    filename_hint: "(?i)rfi|request.for.information"
+  RFQ:
+    doc_type: rfp_response
+    label: "Request for Quotation"
+    filename_hint: "(?i)rfq|request.for.quotation"
+  VA:
+    doc_type: vendor_assessment
+    label: "Vendor Assessment"
+    filename_hint: "(?i)questionnaire|vendor.assess|\\bva\\b|security.assessment"
+  SOW:
+    doc_type: commercial
+    label: "Statement of Work"
+    filename_hint: "(?i)\\bsow\\b|statement.of.work"
+  RFP:
+    doc_type: rfp_response
+    label: "RFP Response"
+  DISC:
+    doc_type: discovery
+    label: "Discovery"
+  MEET:
+    doc_type: meeting
+    label: "Meeting/Workshop"
+    filename_hint: "(?i)meeting|minutes|standup|debrief|recap"
+  TRAIN:
+    doc_type: training
+    label: "Training"
+    filename_hint: "(?i)training|enablement|certification|bootcamp"
+  WORK:
+    doc_type: workshop
+    label: "Workshop"
+    filename_hint: "(?i)workshop|hands.on"
+  ARCH:
+    doc_type: architecture
+    label: "Architecture"
+    filename_hint: "(?i)architecture|system.design|technical.overview"
+  PROD:
+    doc_type: product_doc
+    label: "Product Documentation"
+  PRES:
+    doc_type: presentation
+    label: "Presentation"
+  COMM:
+    doc_type: commercial
+    label: "Commercial/Pricing"
+    filename_hint: "(?i)pricing|commercial|quote"
+  SEC:
+    doc_type: security
+    label: "Security/Compliance"
+    filename_hint: "(?i)security|soc.2|iso.27|pentest|certificate|gdpr"
+  COMP:
+    doc_type: competitive
+    label: "Competitive Analysis"
+    filename_hint: "(?i)competitive|battlecard|comparison"
+  DATA:
+    doc_type: master_data
+    label: "Master Data/Catalog"
+    filename_hint: "(?i)catalog|hierarchy|master.data|price.list"
+  DEMO:
+    doc_type: demo
+    label: "Demo/Showcase"
+  REF:
+    doc_type: document
+    label: "Reference Document"
+  MISC:
+    doc_type: null
+    label: "Uncategorized"
+
+# Client aliases: short codes (max 6 chars, uppercase)
+client_aliases:
+  JLR: ["Jaguar Land Rover", "Jaguar", "JLR", "jaguar-land-rover"]
+  PEPSI: ["PepsiCo", "Pepsico", "PEP", "pepsico"]
+  MICH: ["Michelin", "michelin"]
+  LENZ: ["Lenzing", "Lenzing AG", "lenzing", "lenzing-ag"]
+  SGDBF: ["Saint-Gobain", "SGDBF", "Saint Gobain", "sgdbf"]
+  HONDA: ["Honda", "honda"]
+  HAEF: ["Haefele", "Häfele", "haefele"]
+  LABEL: ["LabelVie", "labelvie"]
+  REVL: ["Revlon", "revlon"]
+  AHOLD: ["Ahold Delhaize", "Ahold", "ahold"]
+  CLICK: ["Clicks", "clicks"]
+  ALMAJ: ["Almajdouie", "almajdouie"]
+  ROSSM: ["Rossmann", "rossmann"]
+  GRNCR: ["Greencore", "greencore"]
+  INT: ["Internal", "Blue Yonder", "BY"]
+  UNK: []  # fallback for unknown client
+
+# Description cleaning rules
+description_rules:
+  strip_pattern: "[^a-zA-Z0-9_ ]"
+  word_separator: "_"
+  max_length: 50
+  noise_words:
+    - "Copy"
+    - "of"
+    - "Final"
+    - "FINAL"
+    - "v1"
+    - "v2"
+    - "v3"
+    - "draft"
+    - "Draft"
+    - "DRAFT"
+    - "the"
+    - "for"
+    - "and"
+    - "to"
+
+fallback:
+  unknown_type: "MISC"
+  unknown_client: "GEN"
+  misc_review_threshold: 0.15
