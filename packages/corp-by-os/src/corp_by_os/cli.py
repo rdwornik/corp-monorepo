@@ -3143,21 +3143,20 @@ def test_pipeline_command(
     import json as _json
     from dataclasses import asdict
 
-    from corp_by_os.test_pipeline import PipelineTestReport, run_pipeline_test
+    from corp_by_os.test_pipeline import format_report, run_pipeline_test
 
     config = (obj or {}).get("config") or PipelineConfig.production()
 
     console.print("[bold cyan]Running pipeline smoke test...[/bold cyan]")
 
-    report: PipelineTestReport = run_pipeline_test(
+    report = run_pipeline_test(
         config=config,
         fixture_mode=not live,
         verbose=verbose,
         keep_sandbox=keep_sandbox,
     )
 
-    # Inline report formatting (format_report added in Step 3)
-    _print_report(report)
+    format_report(report)
 
     if output:
         out_path = Path(output)
@@ -3169,39 +3168,6 @@ def test_pipeline_command(
         console.print(f"[dim]Report saved to {out_path}[/dim]")
 
     sys.exit(0 if report.all_passed else 1)
-
-
-def _print_report(report) -> None:
-    """Print pipeline test report to console (minimal inline version)."""
-    from rich.text import Text
-
-    table = Table(title="Pipeline Smoke Test", show_lines=False, box=None)
-    table.add_column("Step", style="cyan", min_width=24)
-    table.add_column("Status", justify="center", min_width=8)
-    table.add_column("Time", justify="right", min_width=7)
-    table.add_column("Detail", style="dim")
-
-    for step in report.steps:
-        status_text = (
-            Text("PASS", style="bold green") if step.passed else Text("FAIL", style="bold red")
-        )
-        table.add_row(
-            step.name,
-            status_text,
-            f"{step.duration_s:.2f}s",
-            step.detail,
-        )
-
-    console.print(table)
-
-    if report.sandbox_path:
-        console.print(f"[dim]Sandbox: {report.sandbox_path}[/dim]")
-
-    if report.all_passed:
-        overall = "[bold green]ALL PASSED[/bold green]"
-    else:
-        overall = "[bold red]FAILED[/bold red]"
-    console.print(f"\nResult: {overall}")
 
 
 # --- Chat ---

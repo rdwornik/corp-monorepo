@@ -30,6 +30,9 @@ from corp_os_meta.pipeline_config import PipelineConfig
 
 logger = logging.getLogger(__name__)
 
+CHECK = "[bold green]PASS[/bold green]"
+CROSS = "[bold red]FAIL[/bold red]"
+
 
 # ---------------------------------------------------------------------------
 # Public data model
@@ -129,6 +132,55 @@ def run_pipeline_test(
             shutil.rmtree(tmp_root, ignore_errors=True)
 
     return report
+
+
+# ---------------------------------------------------------------------------
+# Rich console formatter
+# ---------------------------------------------------------------------------
+
+
+def format_report(report: PipelineTestReport) -> None:
+    """Print a Rich-formatted pipeline test report to stdout.
+
+    Uses a Panel + Table layout for ADHD-scannable output.
+    Exits with status 0/1 based on report.all_passed (caller responsibility).
+    """
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.table import Table
+    from rich.text import Text
+
+    _console = Console()
+
+    table = Table(show_lines=False, box=None, pad_edge=False)
+    table.add_column("Step", style="cyan", min_width=24)
+    table.add_column("Status", justify="center", min_width=8)
+    table.add_column("Time", justify="right", min_width=7)
+    table.add_column("Detail", style="dim")
+
+    for step in report.steps:
+        status_text = (
+            Text("PASS", style="bold green") if step.passed else Text("FAIL", style="bold red")
+        )
+        table.add_row(
+            step.name,
+            status_text,
+            f"{step.duration_s:.2f}s",
+            step.detail,
+        )
+
+    passed = sum(1 for s in report.steps if s.passed)
+    total = len(report.steps)
+    if report.all_passed:
+        summary = f"[bold green]{passed}/{total} passed[/bold green]"
+    else:
+        summary = f"[bold red]{passed}/{total} passed[/bold red]"
+
+    title = f"Pipeline Smoke Test  {summary}"
+    _console.print(Panel(table, title=title, border_style="green" if report.all_passed else "red"))
+
+    if report.sandbox_path:
+        _console.print(f"[dim]Sandbox: {report.sandbox_path}[/dim]")
 
 
 # ---------------------------------------------------------------------------
