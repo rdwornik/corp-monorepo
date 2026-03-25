@@ -371,6 +371,7 @@ def _check_dedup(
                 f"  [dim]Already extracted, skipping: "
                 f"{latest.vault_note_path}[/dim]"
             )
+            _log_dedup_skip(ops, file_path, content_hash, "already_extracted_auto", latest.vault_note_path)
             return "skip"
 
         console.print(
@@ -385,6 +386,7 @@ def _check_dedup(
 
         if answer == "s":
             console.print("  [dim]Skipped — existing note kept.[/dim]")
+            _log_dedup_skip(ops, file_path, content_hash, "already_extracted_user_skip", latest.vault_note_path)
             return "skip"
 
         # User chose re-extract: remove old vault package
@@ -400,6 +402,7 @@ def _check_dedup(
             console.print(
                 f"  [dim]File already routed to {dest}, skipping.[/dim]"
             )
+            _log_dedup_skip(ops, file_path, content_hash, "already_routed_auto", dest)
             return "skip"
 
         console.print(
@@ -412,11 +415,33 @@ def _check_dedup(
 
         if answer == "s":
             console.print("  [dim]Skipped.[/dim]")
+            _log_dedup_skip(ops, file_path, content_hash, "already_routed_user_skip", dest)
             return "skip"
 
         # User wants to extract — proceed (file will be re-registered
         # at its new location after move)
         return None
+
+
+def _log_dedup_skip(
+    ops: OpsDB,
+    file_path: Path,
+    content_hash: str,
+    reason: str,
+    existing_path: str | None,
+) -> None:
+    """Record dedup skip in ops.db for traceability."""
+    try:
+        source = str(file_path).replace("\\", "/")
+        ops.log_event(
+            action="dedup_skip",
+            source_path=source,
+            destination_path=existing_path,
+            reasoning=f"hash={content_hash[:12]}; {reason}",
+            reversible=False,
+        )
+    except Exception as e:
+        logger.warning("Failed to log dedup skip: %s", e)
 
 
 def _register_file(file_path: Path, ops: OpsDB) -> None:

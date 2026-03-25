@@ -13,6 +13,7 @@ from corp_by_os.ingest.inbox import (
     _full_revert,
     _get_custom_destination,
     _list_events,
+    _log_dedup_skip,
     _log_ingest_event,
     _move_file,
     _prompt_action,
@@ -774,6 +775,34 @@ class TestRegistrationAtRouteTime:
                 f2, mywork, registry, ops, skip_extract=True,
             )
         assert action == "skipped"
+
+
+    def test_dedup_skip_logged_to_ops(
+        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
+    ) -> None:
+        """Dedup skip creates a dedup_skip event in ops.db."""
+        inbox = mywork / "00_Inbox"
+        content = b"logged_dedup_content"
+
+        # First: register + fake extract (auto mode)
+        f1 = inbox / "Cognitive_Friday_S10.pptx"
+        f1.write_bytes(content)
+        process_file(f1, mywork, registry, ops, auto=True, skip_extract=True)
+        fr = FileRegistry(ops.conn)
+        file_rec = ops.conn.execute("SELECT file_id FROM files").fetchone()
+        fr.record_extraction(file_rec[0], "model-a", "01_Knowledge/pkg")
+
+        # Second file with same content → dedup skip
+        f2 = inbox / "Cognitive_Friday_S10_dup.pptx"
+        f2.write_bytes(content)
+        process_file(f2, mywork, registry, ops, auto=True, skip_extract=True)
+
+        # Verify dedup_skip event was logged
+        row = ops.conn.execute(
+            "SELECT * FROM ingest_events WHERE action = 'dedup_skip'"
+        ).fetchone()
+        assert row is not None, "dedup_skip event should be logged to ops.db"
+        assert "hash=" in row["reasoning"]
 
 
 class TestContextBehavior:
