@@ -130,6 +130,33 @@ class TestIdempotentResume:
         state2.close()
 
 
+class TestForeignKeys:
+    def test_foreign_keys_enabled(self, state: OvernightState) -> None:
+        """FK constraints are enforced at runtime, not just defined in DDL."""
+        row = state.conn.execute("PRAGMA foreign_keys").fetchone()
+        assert row[0] == 1
+
+    def test_foreign_key_rejects_orphan_file(self, state: OvernightState) -> None:
+        """Inserting a file with nonexistent run_id fails with FK enforcement."""
+        import sqlite3
+
+        with pytest.raises(sqlite3.IntegrityError):
+            state.conn.execute(
+                "INSERT INTO files (run_id, path, file_hash, tier) VALUES (?, ?, ?, ?)",
+                ("nonexistent_run", "/x.pdf", "abc", "tier2"),
+            )
+
+    def test_foreign_key_rejects_orphan_batch(self, state: OvernightState) -> None:
+        """Inserting a batch with nonexistent run_id fails with FK enforcement."""
+        import sqlite3
+
+        with pytest.raises(sqlite3.IntegrityError):
+            state.conn.execute(
+                "INSERT INTO batches (batch_id, run_id, file_count) VALUES (?, ?, ?)",
+                ("batch_orphan", "nonexistent_run", 1),
+            )
+
+
 class TestRunStats:
     def test_get_run_stats(self, state: OvernightState) -> None:
         state.create_run("stats_run", "all-non-project", budget=3.0)
