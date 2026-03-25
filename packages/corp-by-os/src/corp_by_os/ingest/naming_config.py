@@ -83,12 +83,15 @@ def get_client_alias(client_name: str | None) -> str:
         return config["fallback"]["unknown_client"]
 
     client_lower = client_name.lower().strip()
+    # Also try the first part before underscore (classifier gives "Lenzing_Planning")
+    client_first = client_lower.split("_")[0]
 
     for alias, names in config["client_aliases"].items():
-        if client_lower in (n.lower() for n in names):
+        names_lower = [n.lower() for n in names]
+        if client_lower in names_lower or client_first in names_lower:
             return alias
 
-    # Auto-generate: first 5 chars uppercase, strip spaces
+    # Auto-generate: first 5 chars uppercase, strip non-alpha
     auto = re.sub(r"[^A-Za-z]", "", client_name)[:5].upper()
     return auto or config["fallback"]["unknown_client"]
 

@@ -11,21 +11,19 @@ max_filename_length: 120
 # Order matters: filename_hint checked first (most specific), then doc_type
 type_codes:
   RFI:
-    doc_type: rfp_response
     label: "Request for Information"
-    filename_hint: "(?i)rfi|request.for.information"
+    filename_hint: "(?i)(?:^|[^a-z])rfi(?:[^a-z]|$)|request.for.information"
   RFQ:
-    doc_type: rfp_response
     label: "Request for Quotation"
-    filename_hint: "(?i)rfq|request.for.quotation"
+    filename_hint: "(?i)(?:^|[^a-z])rfq(?:[^a-z]|$)|request.for.quotation"
   VA:
     doc_type: vendor_assessment
     label: "Vendor Assessment"
-    filename_hint: "(?i)questionnaire|vendor.assess|\\bva\\b|security.assessment"
+    filename_hint: "(?i)questionnaire|vendor.assess|(?:^|[^a-z])va(?:[^a-z]|$)|security.assessment"
   SOW:
     doc_type: commercial
     label: "Statement of Work"
-    filename_hint: "(?i)\\bsow\\b|statement.of.work"
+    filename_hint: "(?i)(?:^|[^a-z])sow(?:[^a-z]|$)|statement.of.work"
   RFP:
     doc_type: rfp_response
     label: "RFP Response"

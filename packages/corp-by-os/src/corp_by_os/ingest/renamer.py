@@ -1,55 +1,30 @@
-"""Naming convention for inbox-ingested files (Decision #10).
+"""Naming convention for inbox-ingested files (Decision #14).
 
-Pattern: YYYY-MM_TYPE_TOPIC[_CLIENT]_Description.ext
+Pattern: YYYY-MM_TYPE_CLIENT_Description.ext
 
 Where:
-- YYYY-MM  = file date (from mtime or current date)
-- TYPE     = content type code (TRAINING, PRODUCT, etc.)
-- TOPIC    = normalized topic from classification
-- CLIENT   = optional, from client pattern match
-- Description = sanitized original name or user description
+- YYYY-MM     = file date (from mtime or current date)
+- TYPE        = type code from naming_config.yaml (PRES, RFP, TRAIN, etc.)
+- CLIENT      = client alias (JLR, LENZ, GEN for unknown)
+- Description = sanitized original filename
 """
 
 from __future__ import annotations
 
+import logging
 import re
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
 from corp_by_os.ingest.classifier import Classification
+from corp_by_os.ingest.naming_config import (
+    clean_description,
+    get_client_alias,
+    get_type_code,
+)
 
-# Type codes — derived from source_category in registry metadata
-_TYPE_MAP: dict[str, str] = {
-    "training": "TRAINING",
-    "product_doc": "PRODUCT",
-    "competitive": "COMPETITIVE",
-    "rfp": "RFP",
-    "security_compliance": "COMPLIANCE",
-    "meeting": "MEETING",
-    "demo": "DEMO",
-    "architecture": "ARCH",
-    "brand": "BRAND",
-}
-
-# Topic codes — derived from series/rule metadata or keywords
-_TOPIC_MAP: dict[str, str] = {
-    "cognitive planning": "PLATFORM",
-    "ai/ml": "PLATFORM",
-    "platform": "PLATFORM",
-    "enablement": "ENABLEMENT",
-    "wms": "WMS",
-    "warehouse": "WMS",
-    "tms": "TMS",
-    "transport": "TMS",
-    "planning": "PLANNING",
-    "demand": "PLANNING",
-    "supply": "PLANNING",
-    "retail": "RETAIL",
-    "network": "NETWORK",
-    "catman": "CATMAN",
-    "category": "CATMAN",
-}
+logger = logging.getLogger(__name__)
 
 # Max filename length (Windows path safety — MyWork root is ~45 chars)
 _MAX_NAME_LENGTH = 120
@@ -61,7 +36,7 @@ class RenameProposal:
 
     original_name: str
     proposed_name: str
-    components: dict  # date, type, topic, client, description
+    components: dict  # date, type, client, description
 
 
 def _sanitize(text: str) -> str:
@@ -75,63 +50,26 @@ def _sanitize(text: str) -> str:
 
 
 def _infer_type(classification: Classification) -> str:
-    """Infer content type code from classification metadata."""
-    if classification.best_match is None:
-        return "MISC"
+    """Infer content type code from classification metadata and filename."""
+    filename = classification.file_info.filename
+    doc_type = None
+    source_category = None
 
-    meta = classification.best_match.metadata
-    source_cat = meta.get("source_category", "")
-    if source_cat in _TYPE_MAP:
-        return _TYPE_MAP[source_cat]
-
-    # Fallback: check series destination for hints
-    dest = classification.best_match.destination or ""
-    if "Training" in dest:
-        return "TRAINING"
-    if "Product" in dest:
-        return "PRODUCT"
-    if "Competitive" in dest:
-        return "COMPETITIVE"
-    if "RFP" in dest:
-        return "RFP"
-
-    return "MISC"
-
-
-def _infer_topic(classification: Classification, user_context: str | None = None) -> str:
-    """Infer topic code from classification metadata.
-
-    user_context is accepted for API compat but ignored — context is an
-    extraction hint, not a naming source. Topic comes from classification.
-    """
-    # Check metadata topics
-    if classification.best_match:
+    if classification.best_match is not None:
         meta = classification.best_match.metadata
-        topics = meta.get("topics", [])
-        for topic in topics:
-            topic_lower = topic.lower()
-            for keyword, code in _TOPIC_MAP.items():
-                if keyword in topic_lower:
-                    return code
+        source_category = meta.get("source_category")
+        doc_type = meta.get("doc_type")
 
-        # Check products
-        products = meta.get("products", [])
-        for product in products:
-            product_lower = product.lower()
-            for keyword, code in _TOPIC_MAP.items():
-                if keyword in product_lower:
-                    return code
-
-    return "GEN"
+    return get_type_code(
+        doc_type=doc_type,
+        filename=filename,
+        source_category=source_category,
+    )
 
 
-def _infer_client(classification: Classification) -> str | None:
-    """Extract client code from classification."""
-    if classification.detected_client:
-        # Take the first part before underscore as short code
-        parts = classification.detected_client.split("_")
-        return parts[0].upper() if parts else None
-    return None
+def _infer_client(classification: Classification) -> str:
+    """Get client alias from classification."""
+    return get_client_alias(classification.detected_client)
 
 
 def _extract_description(
@@ -145,7 +83,7 @@ def _extract_description(
     The filename always comes from the original file.
     """
     stem = Path(filename).stem
-    return _sanitize(stem)
+    return clean_description(stem)
 
 
 def propose_name(
@@ -153,9 +91,9 @@ def propose_name(
     classification: Classification,
     user_context: str | None = None,
 ) -> RenameProposal:
-    """Propose a new filename following Decision #10 convention.
+    """Propose a new filename following Decision #14 convention.
 
-    Pattern: YYYY-MM_TYPE_TOPIC[_CLIENT]_Description.ext
+    Pattern: YYYY-MM_TYPE_CLIENT_Description.ext
     """
     # Date from file mtime
     try:
@@ -165,7 +103,6 @@ def propose_name(
         date_str = datetime.now().strftime("%Y-%m")
 
     type_code = _infer_type(classification)
-    topic_code = _infer_topic(classification, user_context)
     client_code = _infer_client(classification)
     series_id = classification.best_match.series_id if classification.best_match else None
 
@@ -175,12 +112,15 @@ def propose_name(
         user_context,
     )
 
-    # Build name components
-    parts = [date_str, type_code, topic_code]
-    if client_code:
-        parts.append(client_code)
-    parts.append(description)
+    # Log MISC for taxonomy review
+    if type_code == "MISC":
+        logger.info(
+            "MISC classification for %s — review needed",
+            classification.file_info.filename,
+        )
 
+    # Build name: date_type_client_description.ext
+    parts = [date_str, type_code, client_code, description]
     extension = classification.file_info.extension
     proposed_stem = "_".join(parts)
 
@@ -199,7 +139,6 @@ def propose_name(
         components={
             "date": date_str,
             "type": type_code,
-            "topic": topic_code,
             "client": client_code,
             "description": description,
         },
