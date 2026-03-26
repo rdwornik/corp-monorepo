@@ -211,10 +211,10 @@ class TestExpandedFilenamePatterns:
         assert classify_from_filename("Kinaxis_vs_BY_Battlecard.pptx") == "competitive"
 
     def test_classify_workshop(self):
-        assert classify_from_filename("Demand_Planning_Workshop.pptx") == "workshop"
+        assert classify_from_filename("Demand_Planning_Workshop.pptx") == "meeting"
 
     def test_classify_demo(self):
-        assert classify_from_filename("WMS_Demo_Script.pptx") == "demo"
+        assert classify_from_filename("WMS_Demo_Script.pptx") == "presentation"
 
     def test_classify_meeting_notes(self):
         assert classify_from_filename("Discovery_Meeting_Notes_March.md") == "meeting"
@@ -247,6 +247,9 @@ class TestExpandedDocTypeDepth:
 
     def test_demo_deep(self):
         assert should_extract_deep("demo") is True
+
+    def test_presentation_deep(self):
+        assert should_extract_deep("presentation") is True
 
     def test_master_data_standard(self):
         """Master data is Tier 1 — no deep extraction needed."""

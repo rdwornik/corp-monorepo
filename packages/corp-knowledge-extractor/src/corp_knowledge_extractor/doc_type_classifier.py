@@ -29,6 +29,7 @@ DEEP_DOC_TYPES = {
     "competitive",
     "workshop",
     "demo",
+    "presentation",
 }
 # master_data is Tier 1 — no deep extraction needed for structured data tables
 STANDARD_DOC_TYPES = {"general", "master_data"}
@@ -38,6 +39,8 @@ FILENAME_DOC_TYPE_PATTERNS = [
     # RFP / vendor assessment (highest priority — specific doc types)
     (r"(?i)(RFI|RFP|request.for.(information|proposal))", "rfp_response"),
     (r"(?i)(questionnaire|vendor.assessment|security.assessment|VA\b)", "vendor_assessment"),
+    # Security (before training — SOC2/ISO27 certs aren't training materials)
+    (r"(?i)(SOC.?[12]|ISO.?27|pentest|vulnerability|encryption|gdpr|compliance.matrix|security.measures?)", "security"),
     # Requirements / specifications
     (r"(?i)(FRS|functional.requirement|user.stor)", "requirements_spec"),
     # Proposals / SOWs
@@ -46,18 +49,22 @@ FILENAME_DOC_TYPE_PATTERNS = [
     (r"(?i)(annual.report|earnings|financial.report|investor)", "financial_report"),
     # Master data / catalogs (standard depth — no deep extraction)
     (r"(?i)(product.catalog|hierarchy|master.data|item.master|price.list)", "master_data"),
+    # Product documentation / technical specs
+    (r"(?i)(datasheet|user.guide|admin.guide|release.notes|spec.sheet|sizing.guide|brand.guide|mapping.matrix|reference.material)", "product_doc"),
     # Architecture / technical
     (r"(?i)(architecture|technical.overview|system.design)", "architecture"),
     # Competitive
     (r"(?i)(competitive|battlecard|comparison|vs\.)", "competitive"),
-    # Training / enablement
-    (r"(?i)(training|enablement|curriculum|course)", "training"),
-    # Workshop / hands-on
-    (r"(?i)(workshop|hands.on|lab\b)", "workshop"),
-    # Demo / showcase
-    (r"(?i)(demo|demonstration|showcase)", "demo"),
-    # Meeting / debrief
-    (r"(?i)(meeting.notes|minutes|recap|debrief)", "meeting"),
+    # Training / enablement (expanded)
+    (r"(?i)(training|enablement|curriculum|course|certification|academy|learning|onboarding|meeting.recording|cognitive.shorts)", "training"),
+    # Workshop / hands-on → meeting (workshops are a type of facilitated meeting)
+    (r"(?i)(workshop|hands.on|lab\b)", "meeting"),
+    # Demo / showcase → presentation
+    (r"(?i)(demo|demonstration|showcase)", "presentation"),
+    # Meeting / debrief (expanded)
+    (r"(?i)(meeting.notes|minutes|recap|debrief|agenda|standup|interview|briefing|timetable|working.session)", "meeting"),
+    # Commercial / pricing
+    (r"(?i)(commercial\b|pricing|quote\b|subscription\b|saas.fee)", "commercial"),
     # Discovery (keep last — "requirements" moved to requirements_spec)
     (r"(?i)(discovery)", "discovery"),
 ]
