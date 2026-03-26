@@ -5,6 +5,12 @@ Claude Code: read last 5 entries before starting work.
 
 ---
 
+## 2026-03-26 client normalization migration
+
+- **Did:** Full client normalization migration on branch `fix/client-normalization-migration`. (1) Vault audit: 583 notes, 22 distinct client values, key splits found (Lenzing AG/Group, JLR/Jaguar Land Rover, Pepsi variants, SGDBF long-forms, etc.). (2) Expanded `client_aliases.yaml` in CKE from 8 to 48 entries covering all vault variants. (3) Added `get_client_variants()` to corp-by-os + OR LIKE expansion in retrieve engine — `corp prep "JLR"` now finds 3 sources (was 1). (4) Created `scripts/migrate_client_names.py` (dry-run + --apply); applied migration: 77 vault notes normalised. (5) Rebuilt index: 493 notes. (6) Added `schema.yaml` contract to corp-os-meta + `validate_against_schema()` (warn-only). (7) Wired schema check into CKE `post_process_extraction()`. Eval: no regression. 970 tests pass (6 pre-existing Jinja2 failures unrelated).
+- **Errors:** 6 pre-existing test failures (TemplateNotFound: meta.yaml.j2) — not caused by this work, present on main too.
+- **Next:** Merge `fix/client-normalization-migration` to main. Consider fixing the 6 pre-existing Jinja2 template test failures separately.
+
 ## 2026-03-26 early morning (continued)
 - **Did:** v2 bulk ingest (387 notes, 493 total indexed, 25 projects). Vault now has real data. corp retrieve returns 30 results across topics.
 - **Failed:** 2 Cognitive Friday YAML parse errors (unquoted hyphen in session_id)
@@ -77,3 +83,8 @@ Claude Code: read last 5 entries before starting work.
 - **Did:** Health check (HEALTHY), JLR pilot (3 notes ingested, retrieve works), v3 bulk ingest (201 notes, 0 quarantined), IndexStats bug fixed, gotcha added
 - **Failed:** jlr_pilot flat structure required manual staging (gotcha added)
 - **Next:** v2 bulk ingest (763 notes), RFP KB + vault merge decision (Council), Obsidian optimization, 30-day eval
+
+## 2026-03-26 morning
+- **Did:** Eval baseline (classifier 51.3%, tags 0.753). JLR real usage test (useful output). Client alias fix (retrieve + prep). Obsidian setup (8 MOCs, plugin recs). Lint cleanup. v2/v3 bulk ingest (493→587 vault notes). Context scope in ROUTING.md.
+- **Failed:** Classifier still 51.3% (filename-only ceiling, LLM needed for 70%+)
+- **Next:** Council CLI integration. Obsidian plugins install. Lenzing normalization. RFP KB + vault merge.

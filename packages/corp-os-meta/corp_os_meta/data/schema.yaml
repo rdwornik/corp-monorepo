@@ -1,0 +1,125 @@
+# Corporate OS frontmatter schema contract — v2
+# Machine-readable complement to models.py (Pydantic is authoritative for blocking validation;
+# this file drives warn-only checks in validate_against_schema()).
+#
+# Kept in sync with NoteFrontmatter in models.py.
+
+schema_version: 2
+
+required_fields:
+  - title
+  - type
+  - source_tool
+  - source_file
+
+optional_fields:
+  - date
+  - topics
+  - schema_version
+  - source_type
+  - layer
+  - domains
+  - confidentiality
+  - authority
+  - valid_to
+  - last_verified
+  - products
+  - people
+  - client
+  - project
+  - language
+  - quality
+  - summary
+  - duration_min
+  - model
+  - tokens_used
+  - confidence
+  - trust_level
+  - tags
+  - extraction_version
+  - depth
+  - doc_type
+  - key_facts
+  - entities_mentioned
+  - needs_review
+  - source_path
+  - source_hash
+  - source_mtime
+  - extracted_at
+  - content_origin
+  - source_category
+  - source_locator
+  - routing_confidence
+  - tool_meta
+  - routing_reason
+  - prompt_version
+
+allowed_values:
+  type:
+    - presentation
+    - meeting
+    - training
+    - demo
+    - workshop
+    - rfp
+    - contract
+    - email
+    - notes
+    - document
+    - report
+    - tutorial
+    - security_questionnaire
+    - spreadsheet
+    - vendor_assessment
+    - discovery
+
+  quality:
+    - full
+    - partial
+    - fragment
+
+  confidentiality:
+    - public
+    - internal
+    - confidential
+    - restricted
+
+  authority:
+    - authoritative
+    - approved
+    - tribal
+
+  layer:
+    - operational
+    - learning
+    - reference
+
+  source_type:
+    - opportunity
+    - rfp
+    - meeting
+    - training
+    - documentation
+    - release_note
+    - research
+    - internal_update
+
+  depth:
+    - standard
+    - deep
+
+  trust_level:
+    - verified
+    - extracted
+    - generated
+    - draft
+
+cardinality:
+  topics:
+    max: 8
+  products:
+    max: 4
+  people:
+    max: 3
+  domains:
+    max: 3

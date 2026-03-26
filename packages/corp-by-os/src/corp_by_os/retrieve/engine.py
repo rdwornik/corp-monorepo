@@ -20,6 +20,20 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
+def _get_client_variants(client: str) -> list[str]:
+    """Expand a client name/alias to all known variants for fuzzy matching.
+
+    Delegates to naming_config so "JLR" matches "Jaguar Land Rover" notes
+    and vice versa. Falls back to [client] if config is unavailable.
+    """
+    try:
+        from corp_by_os.ingest.naming_config import get_client_variants
+
+        return get_client_variants(client)
+    except Exception:
+        return [client]
+
+
 @dataclass
 class RetrievalFilter:
     """Metadata filters for retrieval queries."""
@@ -146,8 +160,10 @@ def retrieve(
         params: list[str] = []
 
         if filters.client:
-            where_clauses.append("n.client LIKE ?")
-            params.append(f"%{filters.client}%")
+            variants = _get_client_variants(filters.client)
+            client_clauses = ["n.client LIKE ?" for _ in variants]
+            where_clauses.append(f"({' OR '.join(client_clauses)})")
+            params.extend(f"%{v}%" for v in variants)
 
         if filters.project_id:
             where_clauses.append("n.project_id LIKE ?")
@@ -216,6 +232,8 @@ def retrieve(
         if filters.client and len(rows) < top_n:
             seen_ids = {r["id"] for r in rows}
             placeholders = ",".join(str(sid) for sid in seen_ids) or "0"
+            variants = _get_client_variants(filters.client)
+            client_or = " OR ".join("n.client LIKE ?" for _ in variants)
             meta_sql = f"""
                 SELECT
                     n.id, n.title, n.client, n.project_id,
@@ -224,13 +242,13 @@ def retrieve(
                     n.confidence,
                     999 as rank
                 FROM notes n
-                WHERE n.client LIKE ?
+                WHERE ({client_or})
                 AND n.id NOT IN ({placeholders})
                 LIMIT ?
             """
             extra = conn.execute(
                 meta_sql,
-                [f"%{filters.client}%", top_n - len(rows)],
+                [f"%{v}%" for v in variants] + [top_n - len(rows)],
             ).fetchall()
             rows = list(rows) + list(extra)
 
@@ -488,8 +506,10 @@ def _fallback_search(
         params.append(f"%{word}%")
 
     if filters.client:
-        conditions.append("n.client LIKE ?")
-        params.append(f"%{filters.client}%")
+        variants = _get_client_variants(filters.client)
+        client_clauses = ["n.client LIKE ?" for _ in variants]
+        conditions.append(f"({' OR '.join(client_clauses)})")
+        params.extend(f"%{v}%" for v in variants)
 
     where = " OR ".join(conditions) if conditions else "1=1"
     sql = f"""

@@ -865,6 +865,48 @@ def test_client_alias_empty():
     assert normalize_client("") == ""
 
 
+def test_client_alias_pepsi_variants():
+    """Pepsi and Pepsi EMEA normalize to PepsiCo."""
+    assert normalize_client("Pepsi") == "PepsiCo"
+    assert normalize_client("Pepsi EMEA") == "PepsiCo"
+    assert normalize_client("PepsiCo Europe") == "PepsiCo"
+
+
+def test_client_alias_sgdbf_variants():
+    """Saint-Gobain variants normalize to SGDBF."""
+    assert normalize_client("Saint-Gobain") == "SGDBF"
+    assert normalize_client("Saint Gobain") == "SGDBF"
+    assert normalize_client("Saint-Gobain Distribution Bâtiment France") == "SGDBF"
+
+
+def test_client_alias_labelvie_variants():
+    """LabelVie group variants normalize to LabelVie."""
+    assert normalize_client("LabelVie Group") == "LabelVie"
+    assert normalize_client("Groupe LabelVie") == "LabelVie"
+
+
+def test_client_alias_clicks_group():
+    """Clicks Group normalizes to Clicks."""
+    assert normalize_client("Clicks Group") == "Clicks"
+
+
+def test_client_alias_rolls_royce_variants():
+    """Rolls Royce spelling variants normalize to Rolls-Royce."""
+    assert normalize_client("Rolls Royce") == "Rolls-Royce"
+    assert normalize_client("Rolls-Royce Plc") == "Rolls-Royce"
+
+
+def test_client_alias_ifm_variants():
+    """IFM variants normalize to IFM Electronics."""
+    assert normalize_client("ifm") == "IFM Electronics"
+    assert normalize_client("IFM") == "IFM Electronics"
+
+
+def test_client_alias_purehealth_variants():
+    """Pure Health normalizes to PureHealth."""
+    assert normalize_client("Pure Health") == "PureHealth"
+
+
 # ---------------------------------------------------------------------------
 # Fix 5: Tag ceiling
 # ---------------------------------------------------------------------------

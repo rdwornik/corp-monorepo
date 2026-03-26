@@ -9,11 +9,11 @@ from pathlib import Path
 
 import pytest
 import yaml
-
 from corp_by_os.ingest.classifier import classify
 from corp_by_os.ingest.naming_config import (
     clean_description,
     get_client_alias,
+    get_client_variants,
     get_type_code,
 )
 from corp_by_os.ingest.renamer import (
@@ -341,3 +341,27 @@ class TestProposeName:
         result = propose_name(f, c)
         # "RFI" in filename should give RFI type code
         assert "_RFI_" in result.proposed_name
+
+
+class TestGetClientVariants:
+    def test_alias_expands_to_full_names(self) -> None:
+        """'JLR' returns all Jaguar Land Rover variants."""
+        variants = get_client_variants("JLR")
+        assert "Jaguar Land Rover" in variants
+        assert "JLR" in variants
+
+    def test_full_name_expands_to_alias(self) -> None:
+        """'Jaguar Land Rover' returns the same group including 'JLR'."""
+        variants = get_client_variants("Jaguar Land Rover")
+        assert "JLR" in variants
+        assert "Jaguar Land Rover" in variants
+
+    def test_unknown_client_returns_itself(self) -> None:
+        """Unknown client falls back to [client_name]."""
+        variants = get_client_variants("SomeUnknownCorp")
+        assert variants == ["SomeUnknownCorp"]
+
+    def test_case_insensitive_lookup(self) -> None:
+        """Lookup is case-insensitive."""
+        variants = get_client_variants("jaguar land rover")
+        assert "Jaguar Land Rover" in variants
