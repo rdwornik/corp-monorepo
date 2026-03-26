@@ -1,11 +1,15 @@
 """Tests for file:/// link in note body."""
 
+from pathlib import Path
+
 from jinja2 import Environment, FileSystemLoader
+
+_TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 
 
 class TestFileLink:
     def _render(self, source_file):
-        env = Environment(loader=FileSystemLoader("templates"))
+        env = Environment(loader=FileSystemLoader(_TEMPLATES_DIR))
         env.filters["tojson_raw"] = lambda v: str(v)
         tmpl = env.get_template("extract.md.j2")
         return tmpl.render(

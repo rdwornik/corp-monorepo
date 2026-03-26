@@ -1,14 +1,18 @@
 """Tests for cover_slide/cover_frame in _meta.yaml."""
 
+from pathlib import Path
+
 import yaml
 
 from jinja2 import Environment, FileSystemLoader
+
+_TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 
 
 class TestMetaCover:
     def test_meta_cover_slide(self):
         """Package with slides → cover_slide in yaml."""
-        env = Environment(loader=FileSystemLoader("templates"))
+        env = Environment(loader=FileSystemLoader(_TEMPLATES_DIR))
         tmpl = env.get_template("meta.yaml.j2")
         content = tmpl.render(
             extracted_at="2026-03-20T12:00:00",
@@ -25,7 +29,7 @@ class TestMetaCover:
 
     def test_meta_cover_frame(self):
         """Package with frames → cover_frame in yaml."""
-        env = Environment(loader=FileSystemLoader("templates"))
+        env = Environment(loader=FileSystemLoader(_TEMPLATES_DIR))
         tmpl = env.get_template("meta.yaml.j2")
         content = tmpl.render(
             extracted_at="2026-03-20T12:00:00",
@@ -42,7 +46,7 @@ class TestMetaCover:
 
     def test_meta_no_cover(self):
         """No slides or frames → no cover field."""
-        env = Environment(loader=FileSystemLoader("templates"))
+        env = Environment(loader=FileSystemLoader(_TEMPLATES_DIR))
         tmpl = env.get_template("meta.yaml.j2")
         content = tmpl.render(
             extracted_at="2026-03-20T12:00:00",

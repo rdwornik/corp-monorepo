@@ -219,9 +219,11 @@ class TestValidationWired:
 
     def test_flagged_fact_in_template(self):
         """Flagged facts render in the markdown template."""
+        from pathlib import Path
+
         from jinja2 import Environment, FileSystemLoader
 
-        env = Environment(loader=FileSystemLoader("templates"))
+        env = Environment(loader=FileSystemLoader(Path(__file__).parent.parent / "templates"))
         env.filters["tojson_raw"] = lambda v: str(v)
         tmpl = env.get_template("extract.md.j2")
 
