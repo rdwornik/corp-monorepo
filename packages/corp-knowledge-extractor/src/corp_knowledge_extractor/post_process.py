@@ -461,6 +461,52 @@ def cap_tags(tags: list[str], max_tags: int = MAX_TAGS) -> list[str]:
     return tags[:max_tags]
 
 
+# BY product short-forms and legacy names → canonical taxonomy slugs.
+# Used in validate_tags to recognise known aliases without requiring normalisation.
+_TAG_ALIASES: dict[str, str] = {
+    # Core BY product short forms
+    "product/wms": "product/blue-yonder-wms",
+    "product/tms": "product/blue-yonder-tms",
+    "product/oms": "product/blue-yonder-oms",
+    "product/demand-planning": "product/blue-yonder-demand-planning",
+    "product/demand-planning-module": "product/blue-yonder-demand-planning",
+    "product/demand-planning-tool": "product/blue-yonder-demand-planning",
+    "product/demand-supply-planning-dsp": "product/blue-yonder-demand-planning",
+    "product/demand-and-supply-planning": "product/blue-yonder-demand-planning",
+    "product/dsp": "product/blue-yonder-demand-planning",
+    "product/idsp-integrated-demand-supply-inventory-planning": "product/blue-yonder-demand-planning",
+    "product/supply-planning": "product/blue-yonder-supply-planning",
+    "product/supply-planning-platform": "product/blue-yonder-supply-planning",
+    "product/supply-planning-solution": "product/blue-yonder-supply-planning",
+    "product/control-tower": "product/blue-yonder-control-tower",
+    "product/platform": "product/blue-yonder-platform",
+    "product/platform-data-cloud": "product/blue-yonder-platform",
+    "product/platform-demand-planning-module": "product/blue-yonder-platform",
+    "product/platform-demand-planning-supply-planning-allocation-replenishment": "product/blue-yonder-platform",
+    "product/platform-sop": "product/blue-yonder-platform",
+    "product/platform-supply-planning-module": "product/blue-yonder-platform",
+    "product/supply-chain-planning-platform": "product/blue-yonder-platform",
+    "product/supply-chain-platform": "product/blue-yonder-platform",
+    "product/sop-platform": "product/blue-yonder-platform",
+    "product/sop-module": "product/blue-yonder-supply-planning",
+    "product/network-design": "product/blue-yonder-network-design",
+    "product/transportation-modeling": "product/blue-yonder-tms",
+    # IBP / S&OP platform variants (all refer to BY Platform capability)
+    "product/integrated-business-planning": "product/blue-yonder-platform",
+    "product/integrated-business-planning-ibp": "product/blue-yonder-platform",
+    "product/integrated-planning-tool": "product/blue-yonder-platform",
+    "product/ibp": "product/blue-yonder-platform",
+    "product/sales-operations-planning": "product/blue-yonder-supply-planning",
+    "product/siop-sales-inventory-operations-planning-tool": "product/blue-yonder-supply-planning",
+    # JDA = legacy Blue Yonder brand name (pre-2020 acquisition)
+    "product/jda": "product/blue-yonder-platform",
+    "product/jda-platform": "product/blue-yonder-platform",
+    "product/jda-sop": "product/blue-yonder-supply-planning",
+    "product/jda-supply-chain-planning-system": "product/blue-yonder-platform",
+    "product/jda-tactical-planning": "product/blue-yonder-supply-planning",
+}
+
+
 def validate_tags(tags: list[str]) -> list[dict]:
     """Validate tags against corp-os-meta taxonomy.
 
@@ -484,8 +530,9 @@ def validate_tags(tags: list[str]) -> list[dict]:
             results.append({"tag": tag, "valid": False, "reason": "unknown_prefix"})
             continue
 
-        # Extract prefix and value
-        prefix, _, value = tag.partition("/")
+        # Resolve known aliases to canonical form before taxonomy lookup
+        canonical = _TAG_ALIASES.get(tag, tag)
+        prefix, _, value = canonical.partition("/")
 
         # Check value against taxonomy known values
         known_values = _get_known_values(taxonomy, prefix)

@@ -900,13 +900,6 @@
     ]
   },
   {
-    "tag": "product/better-supply-chain-ibp-tool-proposed",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
     "tag": "product/sap-cloud-platform-integration",
     "count": 1,
     "batches": [
@@ -1405,13 +1398,6 @@
   },
   {
     "tag": "product/ecovero-brand-fibers",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/dissolving-wood-pulp",
     "count": 1,
     "batches": [
       "_outputs"
