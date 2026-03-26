@@ -2,13 +2,56 @@
 # Key = alias, Value = canonical name
 
 aliases:
-  "lenzing-ag": "lenzing"
-  "lenzing-group": "lenzing"
+  # Lenzing
+  "lenzing-ag": "Lenzing"
+  "lenzing-group": "Lenzing"
   "Lenzing AG": "Lenzing"
   "Lenzing Group": "Lenzing"
-  "jaguar-land-rover": "jlr"
+  # LLM-generated descriptions that resolved to Lenzing in context
+  "Fiber manufacturer (Lenzing referenced in comments)": "Lenzing"
+  "Fiber/Textiles Manufacturing Company (Lenzing referenced in comments)": "Lenzing"
+
+  # JLR
+  "jaguar-land-rover": "JLR"
   "Jaguar Land Rover": "JLR"
-  "pepsico-europe": "pepsico"
+  "Jaguar": "JLR"
+
+  # PepsiCo
+  "pepsico-europe": "PepsiCo"
   "PepsiCo Europe": "PepsiCo"
-  "saint-gobain": "sgdbf"
+  "Pepsi": "PepsiCo"
+  "Pepsi EMEA": "PepsiCo"
+  "pepsico": "PepsiCo"
+  "PEP": "PepsiCo"
+
+  # Saint-Gobain / SGDBF
+  "saint-gobain": "SGDBF"
   "Saint-Gobain": "SGDBF"
+  "Saint Gobain": "SGDBF"
+  "sgdbf": "SGDBF"
+  "SGDBF (Saint-Gobain Distribution Bâtiment France)": "SGDBF"
+  "Saint-Gobain Distribution Bâtiment France": "SGDBF"
+
+  # LabelVie
+  "LabelVie Group": "LabelVie"
+  "Groupe LabelVie": "LabelVie"
+  "labelvie": "LabelVie"
+
+  # Clicks
+  "Clicks Group": "Clicks"
+  "clicks": "Clicks"
+
+  # Rolls-Royce
+  "Rolls Royce": "Rolls-Royce"
+  "Rolls-Royce Plc": "Rolls-Royce"
+  "rolls-royce": "Rolls-Royce"
+
+  # IFM Electronics
+  "ifm": "IFM Electronics"
+  "IFM": "IFM Electronics"
+  "IFM Electronics (referenced in context)": "IFM Electronics"
+  "ifm-electronics": "IFM Electronics"
+
+  # PureHealth
+  "Pure Health": "PureHealth"
+  "pure-health": "PureHealth"
