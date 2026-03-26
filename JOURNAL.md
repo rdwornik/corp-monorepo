@@ -5,6 +5,12 @@ Claude Code: read last 5 entries before starting work.
 
 ---
 
+## 2026-03-26 hybrid TF-IDF classifier pipeline
+
+- **Did:** Full dual-vectorizer hybrid classifier — 8 steps: (1) Locked stratified 80/20 train/test split (`create_classifier_split.py` → 248 train, 62 test). (2) Trained `LogisticRegression` with char n-gram filename vectorizer + word n-gram content vectorizer, JSON serialization (no pickle) — CV 85.5% combined, +3.2pp content uplift. (3) JSON loader `hybrid_loader.py` with `lru_cache`, zero pickle risk. (4) One-time test eval: **85.5% hybrid vs 53.2% regex (+32.3pp)**, 0 high-confidence errors; at 0.5 threshold → 100% acc on 45% of files, 18% LLM fallback. (5) `classify_doc_type_hybrid()` integrated into `doc_type_classifier.py` — TF-IDF → regex → None pipeline with `USE_TFIDF` flag. (6) `eval.py` updated with three-way comparison section (1b). (7) 11 tests in `test_hybrid_classifier.py`. (8) Full suite: **863 CKE tests pass**. Merged `feat/hybrid-classifier` to main.
+- **Errors:** ruff E402 on multi-line imports needed `# noqa` on `from ... import (` line not inner line. ruff E741 ambiguous `l` → `lbl`. `multi_class` removed in sklearn 1.7+ (lbfgs multinomial default).
+- **Next:** Wire `classify_doc_type_hybrid()` into live extraction pipeline (inventory.py or tier_router.py). Consider expanding enriched training set for higher content %.
+
 ## 2026-03-26 light_scan module + classifier/tag improvements
 
 - **Did:** (1) Classifier: added 6 high-priority filename patterns to `doc_type_classifier.py` (cognitive.shorts/friday, demo2win, iso22301/cybersecurity, extended product_doc/architecture terms) — accuracy 51.3% → **57.1%** (+18 correct, 0 false positives). Fixed architecture pattern ordering bug (cognitive content was matching architecture before training). (2) Tags: added `inventory-ops-agent`, `logistics-emissions-calculator`, `demand-edge` to `taxonomy.yaml` + `_TAG_ALIASES` + `product_aliases.yaml` — mean tag score 0.791 → **0.797**. (3) Light scan: implemented `light_scan.py` (Council Decision #19) — `ScanResult` dataclass with separate `filename_text`/`content_text` feature spaces, 7 format scanners (pptx/docx/pdf/xlsx/csv/txt-md/mp4), tiered fault tolerance (`full`/`degraded`/`filename_only`). 25 tests all pass. (4) Enrichment: `enrich_training_data.py` retroactively scanned 310 training examples — 82 (26%) enriched with real content, 228 filename-only fallback. Output: `classifier_training_enriched.json`. Merged `feat/light-scan` to main. **968 tests pass**.
