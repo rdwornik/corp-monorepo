@@ -1,0 +1,2320 @@
+{
+  "schema_version": 1,
+  "project": "vault_rebuild",
+  "output_dir": "C:\\Users\\1028120\\Documents\\Scripts\\corp-monorepo\\.ecosystem\\rebuild_staging\\source_library\\rebuild",
+  "files": [
+    {
+      "id": "20250709_Michelin_-_Composable_Journey_IS_Stream_(Summary)",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Michelin_Planning/Michelin - Design Thinking Workshop - 08072025/20250709_Michelin_-_Composable_Journey_IS_Stream_(Summary).docx",
+      "doc_type": "meeting",
+      "name": "20250709_Michelin_-_Composable_Journey_IS_Stream_(Summary)",
+      "client": "Michelin",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 20250709_Michelin_-_Composable_Journey_IS_Stream_(Summary).md"
+    },
+    {
+      "id": "2025_09_22_Zabka_Tech_Snowflake_SLA_Support",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Zabka_Retail/2025_09_22_Zabka_Tech_Snowflake_SLA_Support.pdf",
+      "doc_type": "security",
+      "name": "2025_09_22_Zabka_Tech_Snowflake_SLA_Support",
+      "client": "Żabka",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2025_09_22_Zabka_Tech_Snowflake_SLA_Support.md"
+    },
+    {
+      "id": "2025_10_03_Rossmann_CyberSecurity_Session",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Rossmann_Migration/2025_10_03_Rossmann_CyberSecurity_Session.pdf",
+      "doc_type": "security",
+      "name": "2025_10_03_Rossmann_CyberSecurity_Session",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2025_10_03_Rossmann_CyberSecurity_Session.md"
+    },
+    {
+      "id": "2025_10_13_Zabka_Snowflake_to_Snowflake",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Zabka_Retail/2025_10_13_Zabka_Snowflake_to_Snowflake.pdf",
+      "doc_type": "general",
+      "name": "2025_10_13_Zabka_Snowflake_to_Snowflake",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2025_10_13_Zabka_Snowflake_to_Snowflake.md"
+    },
+    {
+      "id": "2025_10_29_Rossman_Tech_Session",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Rossmann_Migration/2025_10_29_Rossman_Tech_Session.pptx",
+      "doc_type": "general",
+      "name": "2025_10_29_Rossman_Tech_Session",
+      "client": "Rossmann",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2025_10_29_Rossman_Tech_Session.md"
+    },
+    {
+      "id": "2025_10_29_Rossmann_Tech_Session",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Rossmann_Migration/2025_10_29_Rossmann_Tech_Session.pdf",
+      "doc_type": "general",
+      "name": "2025_10_29_Rossmann_Tech_Session",
+      "client": "Rossmann",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2025_10_29_Rossmann_Tech_Session.md"
+    },
+    {
+      "id": "2026-03-23_202306_bsc_frs_questionnaire_ac4c",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/04 RfP docs/202306 BSC FRS Questionnaire.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_202306_bsc_frs_questionnaire_ac4c",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_202306_bsc_frs_questionnaire_ac4c.md"
+    },
+    {
+      "id": "2026-03-23_230506_lenzing_ibp_functional_requirements_overview_by_ce86",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/04 RfP docs/230506 Lenzing IBP Functional Requirements Overview BY.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_230506_lenzing_ibp_functional_requirements_overview_by_ce86",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_230506_lenzing_ibp_functional_requirements_overview_by_ce86.md"
+    },
+    {
+      "id": "2026-03-23_230607_lenzing_ibp_functional_requirements_details_4_by_b608",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/04 RfP docs/230607 Lenzing IBP Functional Requirements Details 4 BY.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_230607_lenzing_ibp_functional_requirements_details_4_by_b608",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_230607_lenzing_ibp_functional_requirements_details_4_by_b608.md"
+    },
+    {
+      "id": "2026-03-23_230619_bettersupplychain_frs_document_version_009_a0ca",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/04 RfP docs/230619 BetterSupplyChain FRS Document Version 009.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_230619_bettersupplychain_frs_document_version_009_a0ca",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_230619_bettersupplychain_frs_document_version_009_a0ca.md"
+    },
+    {
+      "id": "2026-03-23_230629_bsc_user_stories_3e9d",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/04 RfP docs/230629 BSC User Stories.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_230629_bsc_user_stories_3e9d",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_230629_bsc_user_stories_3e9d.md"
+    },
+    {
+      "id": "2026-03-23_260623_bettersupplychain_frs_document_version_102_2779",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/04 RfP docs/260623 BetterSupplyChain FRS Document Version 102.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_260623_bettersupplychain_frs_document_version_102_2779",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_260623_bettersupplychain_frs_document_version_102_2779.md"
+    },
+    {
+      "id": "2026-03-23_260623_bettersupplychain_frs_document_version_112_61e9",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/04 RfP docs/260623 BetterSupplyChain FRS Document Version 112.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_260623_bettersupplychain_frs_document_version_112_61e9",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_260623_bettersupplychain_frs_document_version_112_61e9.md"
+    },
+    {
+      "id": "2026-03-23_additional_answers_oct_28_2023v1_1abc",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/05 Services estimates/Additional answers (Oct 28 2023).V1.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_additional_answers_oct_28_2023v1_1abc",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_additional_answers_oct_28_2023v1_1abc.md"
+    },
+    {
+      "id": "2026-03-23_agenda_proposal_f2ca",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/Transformation Journey Workshop 15-Oct-2025/Agenda proposal.docx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_agenda_proposal_f2ca",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_agenda_proposal_f2ca.md"
+    },
+    {
+      "id": "2026-03-23_automationvav9outside_in_va_lenzing_2025_v4_a31c",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/2025 Opportunity/Automation_VA_v9_Outside In VA Lenzing 2025 v4.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_automationvav9outside_in_va_lenzing_2025_v4_a31c",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_automationvav9outside_in_va_lenzing_2025_v4_a31c.md"
+    },
+    {
+      "id": "2026-03-23_automationvav9outside_in_va_lenzing_2025_v5_6780",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/2025 Opportunity/Automation_VA_v9_Outside In VA Lenzing 2025 v5.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_automationvav9outside_in_va_lenzing_2025_v5_6780",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_automationvav9outside_in_va_lenzing_2025_v5_6780.md"
+    },
+    {
+      "id": "2026-03-23_blue_yonder_cloud_services_spectrum_2025_type_2_soc_2_report_7032",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Blue Yonder Responses/Supporting Documents/Blue Yonder (Cloud Services & Spectrum) - 2025 Type 2 SOC 2 - Report.pdf",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_blue_yonder_cloud_services_spectrum_2025_type_2_soc_2_report_7032",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blue_yonder_cloud_services_spectrum_2025_type_2_soc_2_report_7032.md"
+    },
+    {
+      "id": "2026-03-23_blue_yonder_cloud_services_standards_110_d89a",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Blue Yonder Responses/Supporting Documents/Blue Yonder Cloud Services Standards 11.0.pdf",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_blue_yonder_cloud_services_standards_110_d89a",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blue_yonder_cloud_services_standards_110_d89a.md"
+    },
+    {
+      "id": "2026-03-23_blue_yonder_general_reference_architecture_6e0c",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Blue Yonder Responses/Supporting Documents/Blue Yonder General Reference Architecture.pdf",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_blue_yonder_general_reference_architecture_6e0c",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blue_yonder_general_reference_architecture_6e0c.md"
+    },
+    {
+      "id": "2026-03-23_blue_yonder_heritage_2025_oct_type_2_soc_1_report_36ff",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Blue Yonder Responses/Supporting Documents/Blue Yonder (Heritage) - 2025 (Oct) Type 2 SOC 1 - Report.pdf",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_blue_yonder_heritage_2025_oct_type_2_soc_1_report_36ff",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blue_yonder_heritage_2025_oct_type_2_soc_1_report_36ff.md"
+    },
+    {
+      "id": "2026-03-23_blue_yonder_integration_workshop_14_september_63de",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/02 Integration Workshop - September 14th 2023/Blue Yonder - Integration Workshop - 14 september.pptx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_blue_yonder_integration_workshop_14_september_63de",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blue_yonder_integration_workshop_14_september_63de.md"
+    },
+    {
+      "id": "2026-03-23_blue_yonder_integration_workshop_14_september_c8af",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/02 Integration Workshop - September 14th 2023/Blue Yonder - Integration Workshop - 14 september.pdf",
+      "doc_type": "meeting",
+      "name": "2026-03-23_blue_yonder_integration_workshop_14_september_c8af",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blue_yonder_integration_workshop_14_september_c8af.md"
+    },
+    {
+      "id": "2026-03-23_blue_yonder_integration_workshop_7d66",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/02 Integration Workshop - September 14th 2023/Blue Yonder - Integration Workshop.pptx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_blue_yonder_integration_workshop_7d66",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blue_yonder_integration_workshop_7d66.md"
+    },
+    {
+      "id": "2026-03-23_blue_yonder_iso_2700127701_certificate_833e",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Blue Yonder Responses/Supporting Documents/Blue Yonder - ISO 27001_27701 Certificate.pdf",
+      "doc_type": "security",
+      "name": "2026-03-23_blue_yonder_iso_2700127701_certificate_833e",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blue_yonder_iso_2700127701_certificate_833e.md"
+    },
+    {
+      "id": "2026-03-23_blue_yonder_responsesbrcrfp_siopservice_and_technical_f6f2",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Official Response Documents/Submission/Blue Yonder Responses_BRC_RfP SIOP_Service and Technical.xlsx",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_blue_yonder_responsesbrcrfp_siopservice_and_technical_f6f2",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blue_yonder_responsesbrcrfp_siopservice_and_technical_f6f2.md"
+    },
+    {
+      "id": "2026-03-23_blue_yonder_responsesbrcrfpsiopbusinessrequirements_9a1f",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Official Response Documents/Submission/Blue Yonder Responses_BRC_RfP_SIOP_Business_Requirements.xlsx",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_blue_yonder_responsesbrcrfpsiopbusinessrequirements_9a1f",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blue_yonder_responsesbrcrfpsiopbusinessrequirements_9a1f.md"
+    },
+    {
+      "id": "2026-03-23_blue_yonder_sap_integration_overview_5fda",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/Blue Yonder - SAP Integration Overview.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_blue_yonder_sap_integration_overview_5fda",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blue_yonder_sap_integration_overview_5fda.md"
+    },
+    {
+      "id": "2026-03-23_blue_yonder_security_whitepaper_b6fb",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Blue Yonder Responses/Supporting Documents/Blue Yonder Security Whitepaper.pdf",
+      "doc_type": "security",
+      "name": "2026-03-23_blue_yonder_security_whitepaper_b6fb",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blue_yonder_security_whitepaper_b6fb.md"
+    },
+    {
+      "id": "2026-03-23_blue_yonder_snop_business_models_cn_126a",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/20 Input from Lenzing/Blue Yonder SnOP Business Models CN.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_blue_yonder_snop_business_models_cn_126a",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blue_yonder_snop_business_models_cn_126a.md"
+    },
+    {
+      "id": "2026-03-23_blue_yonder_snop_business_models_ta_10d9",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/20 Input from Lenzing/Blue Yonder SnOP Business Models TA.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_blue_yonder_snop_business_models_ta_10d9",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blue_yonder_snop_business_models_ta_10d9.md"
+    },
+    {
+      "id": "2026-03-23_blueyonderexecutivesummarylenzingrfp_63a9",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Official Response Documents/Submission/Blue_Yonder_Executive_Summary_Lenzing_RFP.pdf",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_blueyonderexecutivesummarylenzingrfp_63a9",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blueyonderexecutivesummarylenzingrfp_63a9.md"
+    },
+    {
+      "id": "2026-03-23_blueyonderresponsesbrcrfpsiopcommercials_d82d",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Official Response Documents/Submission/Blue_Yonder_Responses_BRC_RfP_SIOP_Commercials.xlsx",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_blueyonderresponsesbrcrfpsiopcommercials_d82d",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blueyonderresponsesbrcrfpsiopcommercials_d82d.md"
+    },
+    {
+      "id": "2026-03-23_blueyonderresponseslenzingforecastexercise_53b6",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Official Response Documents/Submission/Blue_Yonder_Responses_Lenzing_Forecast_Exercise.xlsx",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_blueyonderresponseslenzingforecastexercise_53b6",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_blueyonderresponseslenzingforecastexercise_53b6.md"
+    },
+    {
+      "id": "2026-03-23_brcrfp_siopbusiness_requirements_21c9",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Original/BRC_RfP SIOP_Business Requirements.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_brcrfp_siopbusiness_requirements_21c9",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_brcrfp_siopbusiness_requirements_21c9.md"
+    },
+    {
+      "id": "2026-03-23_brcrfp_siopcommercials_9e40",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Original/BRC_RfP SIOP_Commercials.xlsx",
+      "doc_type": "commercial",
+      "name": "2026-03-23_brcrfp_siopcommercials_9e40",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_brcrfp_siopcommercials_9e40.md"
+    },
+    {
+      "id": "2026-03-23_brcrfp_siopcommercialsblue_yonder_responses_3d5e",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Original Files/BRC_RfP SIOP_Commercials_Blue Yonder Responses.xlsx",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_brcrfp_siopcommercialsblue_yonder_responses_3d5e",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_brcrfp_siopcommercialsblue_yonder_responses_3d5e.md"
+    },
+    {
+      "id": "2026-03-23_brcrfp_siopservice_and_technical_9543",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Original/BRC_RfP SIOP_Service and Technical.xlsx",
+      "doc_type": "architecture",
+      "name": "2026-03-23_brcrfp_siopservice_and_technical_9543",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_brcrfp_siopservice_and_technical_9543.md"
+    },
+    {
+      "id": "2026-03-23_brcrfp_siopservice_and_technicalblue_yonder_responses_c0a3",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Blue Yonder Responses/BRC_RfP SIOP_Service and Technical_Blue Yonder Responses.xlsx",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_brcrfp_siopservice_and_technicalblue_yonder_responses_c0a3",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_brcrfp_siopservice_and_technicalblue_yonder_responses_c0a3.md"
+    },
+    {
+      "id": "2026-03-23_brcrfpsiopbusinessrequirementsblue_yonder_responses_c5a4",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Blue Yonder Responses/BRC_RfP_SIOP_Business_Requirements_Blue Yonder Responses.xlsx",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_brcrfpsiopbusinessrequirementsblue_yonder_responses_c5a4",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_brcrfpsiopbusinessrequirementsblue_yonder_responses_c5a4.md"
+    },
+    {
+      "id": "2026-03-23_brcrfpsiopcommercialsblueyonderresponses_649a",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Blue Yonder Responses/BRC_RfP_SIOP_Commercials_Blue_Yonder_Responses.xlsx",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_brcrfpsiopcommercialsblueyonderresponses_649a",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_brcrfpsiopcommercialsblueyonderresponses_649a.md"
+    },
+    {
+      "id": "2026-03-23_brcrfpsiopcommercialsblueyonderresponsesrevised_05022026_8ac3",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Blue Yonder Responses/BRC_RfP_SIOP_Commercials_Blue_Yonder_Responses_Revised 05022026.xlsx",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_brcrfpsiopcommercialsblueyonderresponsesrevised_05022026_8ac3",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_brcrfpsiopcommercialsblueyonderresponsesrevised_05022026_8ac3.md"
+    },
+    {
+      "id": "2026-03-23_briefing_booklenzingapril_2025_d3a3",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/Briefing Book_Lenzing_April 2025.docx",
+      "doc_type": "general",
+      "name": "2026-03-23_briefing_booklenzingapril_2025_d3a3",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_briefing_booklenzingapril_2025_d3a3.md"
+    },
+    {
+      "id": "2026-03-23_bsc_frs_questionnaire_20300630_v1asssigned_bcf7",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/04 RfP docs/BSC FRS Questionnaire 2030-06-30 v1_Asssigned.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_bsc_frs_questionnaire_20300630_v1asssigned_bcf7",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_bsc_frs_questionnaire_20300630_v1asssigned_bcf7.md"
+    },
+    {
+      "id": "2026-03-23_bsc_frs_questionnaire_20300630_v1asssigned_commercial_only_2cca",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/04 RfP docs/BSC FRS Questionnaire 2030-06-30 v1_Asssigned  (Commercial ONLY).xlsx",
+      "doc_type": "commercial",
+      "name": "2026-03-23_bsc_frs_questionnaire_20300630_v1asssigned_commercial_only_2cca",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_bsc_frs_questionnaire_20300630_v1asssigned_commercial_only_2cca.md"
+    },
+    {
+      "id": "2026-03-23_bsc_frs_questionnaire_20300905_v2_published_bb02",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/04 RfP docs/BSC FRS Questionnaire 2030-09-05 v2 Published.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_bsc_frs_questionnaire_20300905_v2_published_bb02",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_bsc_frs_questionnaire_20300905_v2_published_bb02.md"
+    },
+    {
+      "id": "2026-03-23_business_briefing_lenzing_ag_4df5",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/Business Briefing Lenzing AG.docx",
+      "doc_type": "general",
+      "name": "2026-03-23_business_briefing_lenzing_ag_4df5",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_business_briefing_lenzing_ag_4df5.md"
+    },
+    {
+      "id": "2026-03-23_cfsstatementsnoteslenzingar22_dd63",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/cfs-statements-notes-lenzing-ar22.pdf",
+      "doc_type": "meeting",
+      "name": "2026-03-23_cfsstatementsnoteslenzingar22_dd63",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_cfsstatementsnoteslenzingar22_dd63.md"
+    },
+    {
+      "id": "2026-03-23_cgcorporategovernancereportlenzingar22_05aa",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/cg-corporate-governance-report-lenzing-ar22.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_cgcorporategovernancereportlenzingar22_05aa",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_cgcorporategovernancereportlenzingar22_05aa.md"
+    },
+    {
+      "id": "2026-03-23_commercial_offer_draft_7411",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/03 Presentation in July 19th - @ Lenzing/Commercial Offer  - DRAFT.pptx",
+      "doc_type": "commercial",
+      "name": "2026-03-23_commercial_offer_draft_7411",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_commercial_offer_draft_7411.md"
+    },
+    {
+      "id": "2026-03-23_compare_ibp_and_dsp_for_lenzing_cef6",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/Compare IBP and DSP for Lenzing.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_compare_ibp_and_dsp_for_lenzing_cef6",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_compare_ibp_and_dsp_for_lenzing_cef6.md"
+    },
+    {
+      "id": "2026-03-23_cpycompanylenzingar22_6600",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/cpy-company-lenzing-ar22.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_cpycompanylenzingar22_6600",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_cpycompanylenzingar22_6600.md"
+    },
+    {
+      "id": "2026-03-23_cpycompanylenzingar23_6679",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/10 Public Info/cpy-company-lenzing-ar23.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_cpycompanylenzingar23_6679",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_cpycompanylenzingar23_6679.md"
+    },
+    {
+      "id": "2026-03-23_create_a_revenue_and_profit_chart_for_the_past_5_12cc",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/create a revenue and profit chart for the past 5....docx",
+      "doc_type": "general",
+      "name": "2026-03-23_create_a_revenue_and_profit_chart_for_the_past_5_12cc",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_create_a_revenue_and_profit_chart_for_the_past_5_12cc.md"
+    },
+    {
+      "id": "2026-03-23_deal_alignment_review_lenzing_op0274765_v10_50d6",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Implementation Services/Deal Alignment Review _Lenzing OP-0274765 v1.0.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_deal_alignment_review_lenzing_op0274765_v10_50d6",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_deal_alignment_review_lenzing_op0274765_v10_50d6.md"
+    },
+    {
+      "id": "2026-03-23_discovery_6th_of_may_2025_3306",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/30 Discovery Meetings with Lenzing/Discovery - 6th of May 2025.docx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_discovery_6th_of_may_2025_3306",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_discovery_6th_of_may_2025_3306.md"
+    },
+    {
+      "id": "2026-03-23_do_not_use_brcrfp_siopbusiness_requirements_94e9",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Original Files/DO NOT USE BRC_RfP SIOP_Business Requirements.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_do_not_use_brcrfp_siopbusiness_requirements_94e9",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_do_not_use_brcrfp_siopbusiness_requirements_94e9.md"
+    },
+    {
+      "id": "2026-03-23_do_not_use_brcrfp_siopservice_and_technical_cc16",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Original Files/DO NOT USE !! BRC_RfP SIOP_Service and Technical.xlsx",
+      "doc_type": "architecture",
+      "name": "2026-03-23_do_not_use_brcrfp_siopservice_and_technical_cc16",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_do_not_use_brcrfp_siopservice_and_technical_cc16.md"
+    },
+    {
+      "id": "2026-03-23_do_not_use_lenzingby_poc_sowop0276731_v10_b998",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Questions 19th of Feb/DO NOT USE Lenzing_BY POC SOW_OP-0276731 v1.0.docx",
+      "doc_type": "general",
+      "name": "2026-03-23_do_not_use_lenzingby_poc_sowop0276731_v10_b998",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_do_not_use_lenzingby_poc_sowop0276731_v10_b998.md"
+    },
+    {
+      "id": "2026-03-23_donotuselenzing_poc_proposal_2f6b",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Questions 19th of Feb/DONOTUSE_Lenzing - POC Proposal.docx",
+      "doc_type": "general",
+      "name": "2026-03-23_donotuselenzing_poc_proposal_2f6b",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_donotuselenzing_poc_proposal_2f6b.md"
+    },
+    {
+      "id": "2026-03-23_dspbaseeffortestimationplan_e6a2",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Implementation Services/DSP_Base_Effort_Estimation_Plan.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_dspbaseeffortestimationplan_e6a2",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_dspbaseeffortestimationplan_e6a2.md"
+    },
+    {
+      "id": "2026-03-23_dspbaseeffortestimationplan_lenzing_0ba9",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Implementation Services/DSP_Base_Effort_Estimation_Plan Lenzing.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_dspbaseeffortestimationplan_lenzing_0ba9",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_dspbaseeffortestimationplan_lenzing_0ba9.md"
+    },
+    {
+      "id": "2026-03-23_dspbaseeffortestimationplan_lenzing_option_1_5282",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Implementation Services/DSP_Base_Effort_Estimation_Plan Lenzing Option 1.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_dspbaseeffortestimationplan_lenzing_option_1_5282",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_dspbaseeffortestimationplan_lenzing_option_1_5282.md"
+    },
+    {
+      "id": "2026-03-23_dspbaseeffortestimationplan_lenzing_option_2_6efa",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Implementation Services/DSP_Base_Effort_Estimation_Plan Lenzing Option 2 .xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_dspbaseeffortestimationplan_lenzing_option_2_6efa",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_dspbaseeffortestimationplan_lenzing_option_2_6efa.md"
+    },
+    {
+      "id": "2026-03-23_entirelenzingar22_d638",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/entire-lenzing-ar22.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_entirelenzingar22_d638",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_entirelenzingar22_d638.md"
+    },
+    {
+      "id": "2026-03-23_entirelenzingar23_f9bf",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/10 Public Info/entire-lenzing-ar23.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_entirelenzingar23_f9bf",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_entirelenzingar23_f9bf.md"
+    },
+    {
+      "id": "2026-03-23_entirelenzingar24_cfb8",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/10 Public Info/entire-lenzing-ar24.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_entirelenzingar24_cfb8",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_entirelenzingar24_cfb8.md"
+    },
+    {
+      "id": "2026-03-23_exec_summary_180b",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Exec Summary.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_exec_summary_180b",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_exec_summary_180b.md"
+    },
+    {
+      "id": "2026-03-23_factsheet_16cb",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/Factsheet.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_factsheet_16cb",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_factsheet_16cb.md"
+    },
+    {
+      "id": "2026-03-23_financial_questionnaire_lenzing_20250711_2d08",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/2025 Opportunity/Financial Questionnaire/Financial Questionnaire Lenzing 20250711.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_financial_questionnaire_lenzing_20250711_2d08",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_financial_questionnaire_lenzing_20250711_2d08.md"
+    },
+    {
+      "id": "2026-03-23_financial_questionnaire_lenzing_20250714_90e1",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/2025 Opportunity/Financial Questionnaire/Financial Questionnaire Lenzing 20250714.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_financial_questionnaire_lenzing_20250714_90e1",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_financial_questionnaire_lenzing_20250714_90e1.md"
+    },
+    {
+      "id": "2026-03-23_financial_questionnaire_lenzing_20250714rk_55b7",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/2025 Opportunity/Financial Questionnaire/Financial Questionnaire Lenzing 20250714_rk.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_financial_questionnaire_lenzing_20250714rk_55b7",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_financial_questionnaire_lenzing_20250714rk_55b7.md"
+    },
+    {
+      "id": "2026-03-23_financial_questionnaire_lenzing_2025_35e3",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/Financial Questionnaire Lenzing 2025.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_financial_questionnaire_lenzing_2025_35e3",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_financial_questionnaire_lenzing_2025_35e3.md"
+    },
+    {
+      "id": "2026-03-23_financial_questionnaire_lenzing_96df",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/Financial Questionnaire Lenzing.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_financial_questionnaire_lenzing_96df",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_financial_questionnaire_lenzing_96df.md"
+    },
+    {
+      "id": "2026-03-23_global_ibpsioprfp_acronyms_1_f65c",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Original/Global IBP_SIOP_RFP Acronyms 1.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_global_ibpsioprfp_acronyms_1_f65c",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_global_ibpsioprfp_acronyms_1_f65c.md"
+    },
+    {
+      "id": "2026-03-23_global_ibpsioprfp_document_5153",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Original/Global IBP_SIOP_RFP Document.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_global_ibpsioprfp_document_5153",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_global_ibpsioprfp_document_5153.md"
+    },
+    {
+      "id": "2026-03-23_global_ibpsioprfp_documentmarks_a610",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Original/Global IBP_SIOP_RFP Document_marks.docx",
+      "doc_type": "general",
+      "name": "2026-03-23_global_ibpsioprfp_documentmarks_a610",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_global_ibpsioprfp_documentmarks_a610.md"
+    },
+    {
+      "id": "2026-03-23_intro_ernesto_christian_9889",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/30 Discovery Meetings with Lenzing/Intro Ernesto & Christian.docx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_intro_ernesto_christian_9889",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_intro_ernesto_christian_9889.md"
+    },
+    {
+      "id": "2026-03-23_jdalenzing_round_2_interview20190717_14191_5f03",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/01 Discovery/JDALenzing - Round 2 Interview-20190717 1419-1.mp4",
+      "doc_type": "meeting",
+      "name": "2026-03-23_jdalenzing_round_2_interview20190717_14191_5f03",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_jdalenzing_round_2_interview20190717_14191_5f03.md"
+    },
+    {
+      "id": "2026-03-23_laginvestorpresentationhj2023_e143",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/LAG_Investor_Presentation_HJ_2023.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_laginvestorpresentationhj2023_e143",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_laginvestorpresentationhj2023_e143.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_2022_4168",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/Lenzing 2022.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_2022_4168",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_2022_4168.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_ag_2024_annual_report_updated_summary_and_6f62",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/Lenzing AG 2024 Annual Report_ Updated Summary and.docx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_ag_2024_annual_report_updated_summary_and_6f62",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_ag_2024_annual_report_updated_summary_and_6f62.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_ag_annual_report_2024en_0aa8",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/10 Public Info/Lenzing AG Annual Report 2024_en.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_ag_annual_report_2024en_0aa8",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_ag_annual_report_2024en_0aa8.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_ag_client_briefing_book_global_specialty_fiber_manufactu_a750",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/Lenzing AG – Client Briefing Book _(Global Specialty Fiber Manufacturer)_.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_ag_client_briefing_book_global_specialty_fiber_manufactu_a750",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_ag_client_briefing_book_global_specialty_fiber_manufactu_a750.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_ag_data_for_forecast_generation_f4ed",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/LENZING AG - Data for Forecast Generation.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_ag_data_for_forecast_generation_f4ed",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_ag_data_for_forecast_generation_f4ed.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_ag_forecastsfinaldevdattaremarks28jan2028_copy_ae69",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Blue Yonder Responses/LENZING AG - Forecasts_final_Devdatta_remarks_28Jan2028 - Copy.xlsx",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_lenzing_ag_forecastsfinaldevdattaremarks28jan2028_copy_ae69",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_ag_forecastsfinaldevdattaremarks28jan2028_copy_ae69.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_ag_ibp_presentation_33a5",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/Lenzing AG - IBP Presentation.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_ag_ibp_presentation_33a5",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_ag_ibp_presentation_33a5.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_ag_investorpresentationfy2024_5a9b",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/10 Public Info/Lenzing AG investor_presentation_fy_2024.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_ag_investorpresentationfy2024_5a9b",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_ag_investorpresentationfy2024_5a9b.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_agoutside_in_vajuly_2025_v1_db5d",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/2025 Opportunity/Lenzing AG_Outside in VA_July 2025 v1.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_agoutside_in_vajuly_2025_v1_db5d",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_agoutside_in_vajuly_2025_v1_db5d.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_agoutside_in_vajuly_2025_v2_b3e2",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/2025 Opportunity/Lenzing AG_Outside in VA_July 2025 v2.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_agoutside_in_vajuly_2025_v2_b3e2",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_agoutside_in_vajuly_2025_v2_b3e2.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_agoutside_in_vajuly_2025_v4_2b29",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/2025 Opportunity/Lenzing AG_Outside in VA_July 2025 v4.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_agoutside_in_vajuly_2025_v4_2b29",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_agoutside_in_vajuly_2025_v4_2b29.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_agoutside_in_vajuly_2025_v5_cdf2",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/2025 Opportunity/Lenzing AG_Outside in VA_July 2025 v5.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_agoutside_in_vajuly_2025_v5_cdf2",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_agoutside_in_vajuly_2025_v5_cdf2.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_automationvav4regular_va1_099b",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/2025 Opportunity/Lenzing Automation_VA_v4_Regular VA_1.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_automationvav4regular_va1_099b",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_automationvav4regular_va1_099b.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_automationvav4regular_va2_2f66",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/2025 Opportunity/Lenzing Automation_VA_v4_Regular VA_2.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_automationvav4regular_va2_2f66",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_automationvav4regular_va2_2f66.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_automationvav4regular_va3_8a28",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/2025 Opportunity/Lenzing Automation_VA_v4_Regular VA_3.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_automationvav4regular_va3_8a28",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_automationvav4regular_va3_8a28.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_automationvav4regular_va4_7f2e",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/2025 Opportunity/Lenzing Automation_VA_v4_Regular VA_4.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_automationvav4regular_va4_7f2e",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_automationvav4regular_va4_7f2e.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_bcg_analysis_d573",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/Lenzing BCG Analysis.docx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_bcg_analysis_d573",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_bcg_analysis_d573.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_by_24th_of_july_4e33",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/2025.07.24 - meeting/Lenzing & BY 24th of July.pptx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_lenzing_by_24th_of_july_4e33",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_by_24th_of_july_4e33.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_by_24th_sept_c17a",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/2025.09.24 demo/Lenzing & BY - 24th Sept.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_by_24th_sept_c17a",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_by_24th_sept_c17a.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_by_28th_of_augworking_session_8350",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/2025.08.28 - Prep Meeting/Lenzing & BY 28th of Aug_Working Session.pptx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_lenzing_by_28th_of_augworking_session_8350",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_by_28th_of_augworking_session_8350.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_by_8th_of_aug_meeting_tech_qa_and_follow_up_f629",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/2025.08.08 - meeting tech QA and follow up/Lenzing & BY 8th of Aug meeting tech QA and follow up.pptx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_lenzing_by_8th_of_aug_meeting_tech_qa_and_follow_up_f629",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_by_8th_of_aug_meeting_tech_qa_and_follow_up_f629.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_discovery_prep_3b7e",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/30 Discovery Meetings with Lenzing/Lenzing Discovery Prep.docx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_lenzing_discovery_prep_3b7e",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_discovery_prep_3b7e.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_fc_best_practice_4873",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/Lenzing FC Best Practice.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_fc_best_practice_4873",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_fc_best_practice_4873.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_meeting_notes_18aug25_a393",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/30 Discovery Meetings with Lenzing/Lenzing Meeting Notes 18-Aug-25.docx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_lenzing_meeting_notes_18aug25_a393",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_meeting_notes_18aug25_a393.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_meeting_notes_21aug25_c8fc",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/30 Discovery Meetings with Lenzing/Lenzing Meeting Notes 21-Aug-25.docx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_lenzing_meeting_notes_21aug25_c8fc",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_meeting_notes_21aug25_c8fc.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_move_to_ibp_dfbf",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/Lenzing Move to IBP.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_move_to_ibp_dfbf",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_move_to_ibp_dfbf.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_move_to_ibp_discovery_call_041d",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/01 Discovery/Lenzing Move to IBP - Discovery call .pptx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_lenzing_move_to_ibp_discovery_call_041d",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_move_to_ibp_discovery_call_041d.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_move_to_ibp_implementation_proposal_update_05_sept_2023_4b93",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/01 Discovery/Lenzing Move to IBP - Implementation Proposal update - 05 Sept 2023.pptx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_lenzing_move_to_ibp_implementation_proposal_update_05_sept_2023_4b93",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_move_to_ibp_implementation_proposal_update_05_sept_2023_4b93.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_planning_and_operations_discovery_54ec",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/30 Discovery Meetings with Lenzing/Lenzing Planning and Operations Discovery.docx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_lenzing_planning_and_operations_discovery_54ec",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_planning_and_operations_discovery_54ec.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_platform_use_case_cb66",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/Lenzing Platform Use Case.docx",
+      "doc_type": "architecture",
+      "name": "2026-03-23_lenzing_platform_use_case_cb66",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_platform_use_case_cb66.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_ppt_template_4235",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/Lenzing ppt template.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_ppt_template_4235",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_ppt_template_4235.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_presentation_190723_draft_374f",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/03 Presentation in July 19th - @ Lenzing/Lenzing Presentation 190723 - DRAFT.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_presentation_190723_draft_374f",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_presentation_190723_draft_374f.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_resource_plan_9ee8",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/05 Services estimates/Lenzing resource plan.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_resource_plan_9ee8",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_resource_plan_9ee8.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_resource_plan_v2_21_july_5503",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/05 Services estimates/Lenzing resource plan v2 - 21 July.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_resource_plan_v2_21_july_5503",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_resource_plan_v2_21_july_5503.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_resource_plan_v3_5_sep_2023_f39d",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/05 Services estimates/Lenzing resource plan v3 - 5 sep 2023.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_resource_plan_v3_5_sep_2023_f39d",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_resource_plan_v3_5_sep_2023_f39d.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_resource_plan_v4_6_sep_2023_269f",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/05 Services estimates/Lenzing resource plan v4 - 6 sep 2023.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_resource_plan_v4_6_sep_2023_269f",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_resource_plan_v4_6_sep_2023_269f.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_resource_plan_v5_21_sep_2023_e8d9",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/05 Services estimates/Lenzing resource plan v5 - 21 sep 2023.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_resource_plan_v5_21_sep_2023_e8d9",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_resource_plan_v5_21_sep_2023_e8d9.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_rfp_blue_yonder_response_243d",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/2025 Oppty/RFP/WIP/Lenzing RFP - Blue Yonder response.pptx",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_lenzing_rfp_blue_yonder_response_243d",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_rfp_blue_yonder_response_243d.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_rfp_presentation_19_feb_2026old_f0b6",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Lenzing RFP Presentation - 19 Feb 2026_old.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_rfp_presentation_19_feb_2026old_f0b6",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_rfp_presentation_19_feb_2026old_f0b6.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_roadmap_8a46",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/Lenzing Roadmap.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_roadmap_8a46",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_roadmap_8a46.md"
+    },
+    {
+      "id": "2026-03-23_lenzing_tech_upgrade_with_quick_wins_august_8_dadb",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/05 Services estimates/Lenzing - Tech Upgrade with Quick Wins - August 8.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzing_tech_upgrade_with_quick_wins_august_8_dadb",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzing_tech_upgrade_with_quick_wins_august_8_dadb.md"
+    },
+    {
+      "id": "2026-03-23_lenzingby_poc_sowop0276731_v20_a753",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Questions 19th of Feb/Lenzing_BY POC SOW_OP-0276731 v2.0.docx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzingby_poc_sowop0276731_v20_a753",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzingby_poc_sowop0276731_v20_a753.md"
+    },
+    {
+      "id": "2026-03-23_lenzingdpasioptemplate_530d",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Lenzing_DPA_SIOP_Template.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzingdpasioptemplate_530d",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzingdpasioptemplate_530d.md"
+    },
+    {
+      "id": "2026-03-23_lenzingibpexecutivebriefing_664a",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/30 Discovery Meetings with Lenzing/Lenzing_IBP_Executive_Briefing.docx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_lenzingibpexecutivebriefing_664a",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzingibpexecutivebriefing_664a.md"
+    },
+    {
+      "id": "2026-03-23_lenzinginventory_c3ac",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/lenzing_inventory.csv",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzinginventory_c3ac",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzinginventory_c3ac.md"
+    },
+    {
+      "id": "2026-03-23_lenzingpayload_c54f",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/Lenzing_payload.csv",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzingpayload_c54f",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzingpayload_c54f.md"
+    },
+    {
+      "id": "2026-03-23_lenzingplatformusecase_b712",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/Lenzing_Platform_UseCase.pptx",
+      "doc_type": "architecture",
+      "name": "2026-03-23_lenzingplatformusecase_b712",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzingplatformusecase_b712.md"
+    },
+    {
+      "id": "2026-03-23_lenzingplatformusecase_cb66",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/Lenzing_Platform_Use_Case.docx",
+      "doc_type": "architecture",
+      "name": "2026-03-23_lenzingplatformusecase_cb66",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzingplatformusecase_cb66.md"
+    },
+    {
+      "id": "2026-03-23_lenzingpocproposal_33fe",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Questions 19th of Feb/Lenzing_POC_Proposal.docx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzingpocproposal_33fe",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzingpocproposal_33fe.md"
+    },
+    {
+      "id": "2026-03-23_lenzingrfpsummary_52a6",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Original/Lenzing_RFP_Summary.docx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzingrfpsummary_52a6",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzingrfpsummary_52a6.md"
+    },
+    {
+      "id": "2026-03-23_lenzingsop_business_case_final_d105",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/2016 Opportunity/Lenzing_SOP_ Business Case Final.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzingsop_business_case_final_d105",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzingsop_business_case_final_d105.md"
+    },
+    {
+      "id": "2026-03-23_lenzingusecasepresentation_7ba7",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/Lenzing_UseCase_Presentation.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_lenzingusecasepresentation_7ba7",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_lenzingusecasepresentation_7ba7.md"
+    },
+    {
+      "id": "2026-03-23_meeting_notes_21st_aug_16d5",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/2025.08.28 - Prep Meeting/Meeting notes 21st Aug.docx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_meeting_notes_21st_aug_16d5",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_meeting_notes_21st_aug_16d5.md"
+    },
+    {
+      "id": "2026-03-23_meeting_notes_21st_aug_71e7",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/30 Discovery Meetings with Lenzing/Meeting notes 21st Aug.docx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_meeting_notes_21st_aug_71e7",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_meeting_notes_21st_aug_71e7.md"
+    },
+    {
+      "id": "2026-03-23_mgrmanagementreportlenzingar22_b335",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/mgr-management-report-lenzing-ar22.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_mgrmanagementreportlenzingar22_b335",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_mgrmanagementreportlenzingar22_b335.md"
+    },
+    {
+      "id": "2026-03-23_mgrmanagementreportlenzingar23_b07c",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/10 Public Info/mgr-management-report-lenzing-ar23.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_mgrmanagementreportlenzingar23_b07c",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_mgrmanagementreportlenzingar23_b07c.md"
+    },
+    {
+      "id": "2026-03-23_not_use_blue_yonder_response_to_company_name_rfp_2026xxxx_202601_58e2",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Blue Yonder Responses/NOT USE! Blue Yonder Response to (Company Name) RFP 2026XXXX - 20260102.docx",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_not_use_blue_yonder_response_to_company_name_rfp_2026xxxx_202601_58e2",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_not_use_blue_yonder_response_to_company_name_rfp_2026xxxx_202601_58e2.md"
+    },
+    {
+      "id": "2026-03-23_offer_questions_blue_yonder_8978",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Questions 19th of Feb/Offer Questions Blue Yonder.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_offer_questions_blue_yonder_8978",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_offer_questions_blue_yonder_8978.md"
+    },
+    {
+      "id": "2026-03-23_old_brcrfp_siopcommercialsblue_yonder_responses_4307",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Blue Yonder Responses/OLD!! BRC_RfP SIOP_Commercials_Blue Yonder Responses.xlsx",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_old_brcrfp_siopcommercialsblue_yonder_responses_4307",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_old_brcrfp_siopcommercialsblue_yonder_responses_4307.md"
+    },
+    {
+      "id": "2026-03-23_other_questions_5c7f",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Questions 19th of Feb/Other questions.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_other_questions_5c7f",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_other_questions_5c7f.md"
+    },
+    {
+      "id": "2026-03-23_payloadlenzing2_72ac",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/payload_Lenzing2.csv",
+      "doc_type": "general",
+      "name": "2026-03-23_payloadlenzing2_72ac",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_payloadlenzing2_72ac.md"
+    },
+    {
+      "id": "2026-03-23_pepsi_emea_discovery_call_832d",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/PepsiCo_Planning/pepsi emea discovery call.txt",
+      "doc_type": null,
+      "name": "2026-03-23_pepsi_emea_discovery_call_832d",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_pepsi_emea_discovery_call_832d.md"
+    },
+    {
+      "id": "2026-03-23_pepsiemeadiscoverycall_832d",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/PepsiCo_Planning/pepsi_emea_discovery_call.txt",
+      "doc_type": null,
+      "name": "2026-03-23_pepsiemeadiscoverycall_832d",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_pepsiemeadiscoverycall_832d.md"
+    },
+    {
+      "id": "2026-03-23_pocibpeml_integration_documentation_0ac2",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/POC-IBP-EML Integration - documentation.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_pocibpeml_integration_documentation_0ac2",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_pocibpeml_integration_documentation_0ac2.md"
+    },
+    {
+      "id": "2026-03-23_preplenzing20260314192225_8bb7",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/prep_Lenzing_20260314_192225.md",
+      "doc_type": "general",
+      "name": "2026-03-23_preplenzing20260314192225_8bb7",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_preplenzing20260314192225_8bb7.md"
+    },
+    {
+      "id": "2026-03-23_production_plants_0681",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/10 Public Info/Production plants.docx",
+      "doc_type": "general",
+      "name": "2026-03-23_production_plants_0681",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_production_plants_0681.md"
+    },
+    {
+      "id": "2026-03-23_psestimatortm2023_op0246055_21aug2023_5437",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/05 Services estimates/PSEstimator_T&M_2023 OP-0246055 21Aug2023.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_psestimatortm2023_op0246055_21aug2023_5437",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_psestimatortm2023_op0246055_21aug2023_5437.md"
+    },
+    {
+      "id": "2026-03-23_psestimatortm2023_op0246055_24jul2023_discounted_version_2_1128",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/05 Services estimates/PSEstimator_T&M_2023 OP-0246055 24JUL2023 Discounted version #2.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_psestimatortm2023_op0246055_24jul2023_discounted_version_2_1128",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_psestimatortm2023_op0246055_24jul2023_discounted_version_2_1128.md"
+    },
+    {
+      "id": "2026-03-23_psestimatortm2025lenzing_rfp_jan_2026_v2_revisedlz4_1cb6",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Implementation Services/PSEstimator_T&M_2025_Lenzing RFP Jan 2026 v2 Revised_LZ4.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_psestimatortm2025lenzing_rfp_jan_2026_v2_revisedlz4_1cb6",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_psestimatortm2025lenzing_rfp_jan_2026_v2_revisedlz4_1cb6.md"
+    },
+    {
+      "id": "2026-03-23_psestimatortm2026op0274765lenzing_v10_606d",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Implementation Services/PSEstimator_T&M_2026_OP-0274765_Lenzing v1.0.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_psestimatortm2026op0274765lenzing_v10_606d",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_psestimatortm2026op0274765lenzing_v10_606d.md"
+    },
+    {
+      "id": "2026-03-23_psestimatortm2026op0274765lenzing_v20_revised_d6e6",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Implementation Services/PSEstimator_T&M_2026_OP-0274765_Lenzing v2.0 (revised).xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_psestimatortm2026op0274765lenzing_v20_revised_d6e6",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_psestimatortm2026op0274765lenzing_v20_revised_d6e6.md"
+    },
+    {
+      "id": "2026-03-23_psestimatortm2026op0274765lenzing_v20_revisedlz5_5a5f",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Implementation Services/PSEstimator_T&M_2026_OP-0274765_Lenzing v2.0 (revised)_LZ5.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_psestimatortm2026op0274765lenzing_v20_revisedlz5_5a5f",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_psestimatortm2026op0274765lenzing_v20_revisedlz5_5a5f.md"
+    },
+    {
+      "id": "2026-03-23_psestimatortm2026op0274765lenzing_v20_revisedlz6_197a",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Implementation Services/PSEstimator_T&M_2026_OP-0274765_Lenzing v2.0 (revised)_LZ6.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_psestimatortm2026op0274765lenzing_v20_revisedlz6_197a",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_psestimatortm2026op0274765lenzing_v20_revisedlz6_197a.md"
+    },
+    {
+      "id": "2026-03-23_qa_for_demand_planningsop_tool_7ecf",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/Original Files/Q&A for Demand Planning-S&OP Tool.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_qa_for_demand_planningsop_tool_7ecf",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_qa_for_demand_planningsop_tool_7ecf.md"
+    },
+    {
+      "id": "2026-03-23_qa_for_demand_planningsop_toolpublished_7ba9",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Q&A for Demand Planning-S&OP Tool.Published.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_qa_for_demand_planningsop_toolpublished_7ba9",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_qa_for_demand_planningsop_toolpublished_7ba9.md"
+    },
+    {
+      "id": "2026-03-23_qa_for_demand_planningsop_toolpublished_v2_cb2d",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Q&A for Demand Planning-S&OP Tool.Published v2.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_qa_for_demand_planningsop_toolpublished_v2_cb2d",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_qa_for_demand_planningsop_toolpublished_v2_cb2d.md"
+    },
+    {
+      "id": "2026-03-23_rfp_executive_summary_8005",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Original/RFP Executive Summary.docx",
+      "doc_type": "general",
+      "name": "2026-03-23_rfp_executive_summary_8005",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_rfp_executive_summary_8005.md"
+    },
+    {
+      "id": "2026-03-23_rfp_response_lenzing_9637",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/RFP Response Lenzing.pptx",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_rfp_response_lenzing_9637",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_rfp_response_lenzing_9637.md"
+    },
+    {
+      "id": "2026-03-23_rfp_response_lenzing_blue_yonder_b519",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Official Response Documents/Submission/RFP Response Lenzing - Blue Yonder.pdf",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_rfp_response_lenzing_blue_yonder_b519",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_rfp_response_lenzing_blue_yonder_b519.md"
+    },
+    {
+      "id": "2026-03-23_rfp_response_lenzing_revised_for_12feb26_340b",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/RFP Response Lenzing Revised for 12Feb26.pptx",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_rfp_response_lenzing_revised_for_12feb26_340b",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_rfp_response_lenzing_revised_for_12feb26_340b.md"
+    },
+    {
+      "id": "2026-03-23_rfp_response_lenzing_revised_for_12feb26_for_submission_7326",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/WIP/RFP Response Lenzing Revised for 12Feb26 for submission.pptx",
+      "doc_type": "rfp_response",
+      "name": "2026-03-23_rfp_response_lenzing_revised_for_12feb26_for_submission_7326",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_rfp_response_lenzing_revised_for_12feb26_for_submission_7326.md"
+    },
+    {
+      "id": "2026-03-23_s4_e2e_process_flow_sipoc_analysis_87b2",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/04 RfP docs/S4 E2E Process Flow SIPOC Analysis.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_s4_e2e_process_flow_sipoc_analysis_87b2",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_s4_e2e_process_flow_sipoc_analysis_87b2.md"
+    },
+    {
+      "id": "2026-03-23_sprint_planning_8c71",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Implementation Services/Sprint Planning.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_sprint_planning_8c71",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_sprint_planning_8c71.md"
+    },
+    {
+      "id": "2026-03-23_stat_fcst_exercise_assessment_by_dbf2",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Questions 19th of Feb/Stat Fcst Exercise Assessment BY.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_stat_fcst_exercise_assessment_by_dbf2",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_stat_fcst_exercise_assessment_by_dbf2.md"
+    },
+    {
+      "id": "2026-03-23_strategy_lenzing_c9ce",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/RFP/Strategy Lenzing.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_strategy_lenzing_c9ce",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_strategy_lenzing_c9ce.md"
+    },
+    {
+      "id": "2026-03-23_survey_lenzing_7419",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/Survey Lenzing.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-23_survey_lenzing_7419",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_survey_lenzing_7419.md"
+    },
+    {
+      "id": "2026-03-23_transformation_journey_for_lenzing_ag_15_oct_2025_v1_792d",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/50 2026 Oppty/Transformation Journey Workshop 15-Oct-2025/Transformation Journey for Lenzing AG 15 Oct 2025 v1.pptx",
+      "doc_type": "meeting",
+      "name": "2026-03-23_transformation_journey_for_lenzing_ag_15_oct_2025_v1_792d",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_transformation_journey_for_lenzing_ag_15_oct_2025_v1_792d.md"
+    },
+    {
+      "id": "2026-03-23_transformation_journey_for_lenzing_ag_orga_and_headcount_133f",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/99 Value/Transformation Journey for Lenzing AG - Orga and Headcount.pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_transformation_journey_for_lenzing_ag_orga_and_headcount_133f",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_transformation_journey_for_lenzing_ag_orga_and_headcount_133f.md"
+    },
+    {
+      "id": "2026-03-23_updated_proposed_delivery_approach_2567",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/05 Services estimates/Updated Proposed delivery Approach.pdf",
+      "doc_type": "general",
+      "name": "2026-03-23_updated_proposed_delivery_approach_2567",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_updated_proposed_delivery_approach_2567.md"
+    },
+    {
+      "id": "2026-03-23_updated_proposed_delivery_approach_v10_aug82023_9314",
+      "path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive/10_Projects_OneDrive/Lenzing_Planning/_Lenzing 2023 - Documents/General/40 2023 Oppty/05 Services estimates/Updated Proposed delivery Approach (v1.0 Aug8-2023) .pptx",
+      "doc_type": "general",
+      "name": "2026-03-23_updated_proposed_delivery_approach_v10_aug82023_9314",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-23_updated_proposed_delivery_approach_v10_aug82023_9314.md"
+    },
+    {
+      "id": "2026-03-24_202603miscgendigitalpropertyrfitransportmanagementv11_76cf",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Jaguar_Land_Rover_TMS_WMS_OMS/2026-03_MISC_GEN_Digital_Property_RFI_-_Transport_Management_v1.1.docx",
+      "doc_type": "general",
+      "name": "2026-03-24_202603miscgendigitalpropertyrfitransportmanagementv11_76cf",
+      "client": "JLR",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-24_202603miscgendigitalpropertyrfitransportmanagementv11_76cf.md"
+    },
+    {
+      "id": "2026-03-24_202603miscgengccdiscoverysupplychainoperationsrfiv2blueyonderres_b097",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Jaguar_Land_Rover_TMS_WMS_OMS/2026-03_MISC_GEN_GCC_Discovery_Supply_Chain_Operations_-_RFI_V2_Blue_Yonder_Responses.xlsx",
+      "doc_type": "meeting",
+      "name": "2026-03-24_202603miscgengccdiscoverysupplychainoperationsrfiv2blueyonderres_b097",
+      "client": "JLR",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-24_202603miscgengccdiscoverysupplychainoperationsrfiv2blueyonderres_b097.md"
+    },
+    {
+      "id": "2026-03-24_202603miscgenjaguarjlrvaquestionnairewmstmsoms_4946",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Jaguar_Land_Rover_TMS_WMS_OMS/2026-03_MISC_GEN_JAGUAR_JLR_VA_Questionnaire_WMS_TMS_OMS.xlsx",
+      "doc_type": "general",
+      "name": "2026-03-24_202603miscgenjaguarjlrvaquestionnairewmstmsoms_4946",
+      "client": "JLR",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: 2026-03-24_202603miscgenjaguarjlrvaquestionnairewmstmsoms_4946.md"
+    },
+    {
+      "id": "Agenda and Objectives Pepsico 2 days workshop MOD",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/PepsiCo_Planning/Agenda and Objectives Pepsico 2 days workshop MOD.docx",
+      "doc_type": "meeting",
+      "name": "Agenda and Objectives Pepsico 2 days workshop MOD",
+      "client": "PepsiCo",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Agenda and Objectives Pepsico 2 days workshop MOD.md"
+    },
+    {
+      "id": "Agenda_and_Objectives_Pepsico_2_days_workshop_MOD",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/PepsiCo_Planning/Agenda_and_Objectives_Pepsico_2_days_workshop_MOD.docx",
+      "doc_type": "meeting",
+      "name": "Agenda_and_Objectives_Pepsico_2_days_workshop_MOD",
+      "client": "PepsiCo",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Agenda_and_Objectives_Pepsico_2_days_workshop_MOD.md"
+    },
+    {
+      "id": "Ahold Delhaize Tech Workshop 28012026",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Ahold_Delhaize_CatMan/Ahold Delhaize Tech Workshop 28012026.pptx",
+      "doc_type": "meeting",
+      "name": "Ahold Delhaize Tech Workshop 28012026",
+      "client": "Ahold",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Ahold Delhaize Tech Workshop 28012026.md"
+    },
+    {
+      "id": "Ahold_Delhaize_Tech_Workshop_28012026",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Ahold_Delhaize_CatMan/Ahold_Delhaize_Tech_Workshop_28012026.pptx",
+      "doc_type": "meeting",
+      "name": "Ahold_Delhaize_Tech_Workshop_28012026",
+      "client": "Ahold",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Ahold_Delhaize_Tech_Workshop_28012026.md"
+    },
+    {
+      "id": "Blue Yonder - ISO 22301 Certificate",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Wurth_Retail/RFI/Supporting documents/Blue Yonder - ISO 22301 Certificate.pdf",
+      "doc_type": "security",
+      "name": "Blue Yonder - ISO 22301 Certificate",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Blue Yonder - ISO 22301 Certificate.md"
+    },
+    {
+      "id": "Blue Yonder - ISO 27001_ISO27701 2023 Certificate",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Wurth_Retail/RFI/Supporting documents/Blue Yonder - ISO 27001_ISO27701 2023 Certificate.pdf",
+      "doc_type": "security",
+      "name": "Blue Yonder - ISO 27001_ISO27701 2023 Certificate",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Blue Yonder - ISO 27001_ISO27701 2023 Certificate.md"
+    },
+    {
+      "id": "Blue Yonder Customer Security Measures 3.0",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Rossmann_Migration/Blue Yonder Customer Security Measures 3.0.pdf",
+      "doc_type": "security",
+      "name": "Blue Yonder Customer Security Measures 3.0",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Blue Yonder Customer Security Measures 3.0.md"
+    },
+    {
+      "id": "Blue_Yonder_Customer_Security_Measures_3.0",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Rossmann_Migration/Blue_Yonder_Customer_Security_Measures_3.0.pdf",
+      "doc_type": "security",
+      "name": "Blue_Yonder_Customer_Security_Measures_3.0",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Blue_Yonder_Customer_Security_Measures_3.0.md"
+    },
+    {
+      "id": "Blue_Yonder_Response_API_Checklist",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/QDF_CatMan/Blue_Yonder_Response_API_Checklist.xlsx",
+      "doc_type": "general",
+      "name": "Blue_Yonder_Response_API_Checklist",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Blue_Yonder_Response_API_Checklist.md"
+    },
+    {
+      "id": "Blue_Yonder_Response_to_SGDBF_Architecural_requirements",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/SGDBF_Retail/Blue_Yonder_Response_to_SGDBF_Architecural_requirements.docx",
+      "doc_type": "general",
+      "name": "Blue_Yonder_Response_to_SGDBF_Architecural_requirements",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Blue_Yonder_Response_to_SGDBF_Architecural_requirements.md"
+    },
+    {
+      "id": "BlueYonder-Powerpoint-Template 2025-ConfidentialFooter-usecases",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Wurth_Retail/BlueYonder-Powerpoint-Template 2025-ConfidentialFooter-usecases.pptx",
+      "doc_type": "general",
+      "name": "BlueYonder-Powerpoint-Template 2025-ConfidentialFooter-usecases",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: BlueYonder-Powerpoint-Template 2025-ConfidentialFooter-usecases.md"
+    },
+    {
+      "id": "BlueYonder-Powerpoint-Template_2025-ConfidentialFooter-usecases",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Wurth_Retail/BlueYonder-Powerpoint-Template_2025-ConfidentialFooter-usecases.pptx",
+      "doc_type": "general",
+      "name": "BlueYonder-Powerpoint-Template_2025-ConfidentialFooter-usecases",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: BlueYonder-Powerpoint-Template_2025-ConfidentialFooter-usecases.md"
+    },
+    {
+      "id": "Clicks_Agenda",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Michelin_Planning/Michelin - Design Thinking Workshop - 08072025/Clicks Files For Reference/Clicks_Agenda.xlsx",
+      "doc_type": "meeting",
+      "name": "Clicks_Agenda",
+      "client": "Clicks",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Clicks_Agenda.md"
+    },
+    {
+      "id": "Clicks_Roadmap_Workshop",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Michelin_Planning/Michelin - Design Thinking Workshop - 08072025/Clicks Files For Reference/Clicks_Roadmap_Workshop.pptx",
+      "doc_type": "meeting",
+      "name": "Clicks_Roadmap_Workshop",
+      "client": "Clicks",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Clicks_Roadmap_Workshop.md"
+    },
+    {
+      "id": "DEMO_PREP_LabelVie_TMS_032026",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/LabelVie_TMS/DEMO_PREP_LabelVie_TMS_032026.pptx",
+      "doc_type": "general",
+      "name": "DEMO_PREP_LabelVie_TMS_032026",
+      "client": "LabelVie",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: DEMO_PREP_LabelVie_TMS_032026.md"
+    },
+    {
+      "id": "EN Local LabelVie AO TMS IS Security Questionnaire",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/LabelVie_TMS/EN Local LabelVie AO TMS IS Security Questionnaire.docx",
+      "doc_type": "security",
+      "name": "EN Local LabelVie AO TMS IS Security Questionnaire",
+      "client": "LabelVie",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: EN Local LabelVie AO TMS IS Security Questionnaire.md"
+    },
+    {
+      "id": "Infrastructure Recommendations for NEOM WMS OnPremise",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/NEOM_WMS/Infrastructure Recommendations for NEOM WMS OnPremise.docx",
+      "doc_type": "general",
+      "name": "Infrastructure Recommendations for NEOM WMS OnPremise",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Infrastructure Recommendations for NEOM WMS OnPremise.md"
+    },
+    {
+      "id": "Infrastructure_Recommendations_for_NEOM_WMS_OnPremise",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/NEOM_WMS/Infrastructure_Recommendations_for_NEOM_WMS_OnPremise.docx",
+      "doc_type": "general",
+      "name": "Infrastructure_Recommendations_for_NEOM_WMS_OnPremise",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Infrastructure_Recommendations_for_NEOM_WMS_OnPremise.md"
+    },
+    {
+      "id": "Key Technical Insights for Blue Yonder Engagement with PepsiCo",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/PepsiCo_Planning/Key Technical Insights for Blue Yonder Engagement with PepsiCo.docx",
+      "doc_type": "architecture",
+      "name": "Key Technical Insights for Blue Yonder Engagement with PepsiCo",
+      "client": "PepsiCo",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Key Technical Insights for Blue Yonder Engagement with PepsiCo.md"
+    },
+    {
+      "id": "Key_Technical_Insights_for_Blue_Yonder_Engagement_with_PepsiCo",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/PepsiCo_Planning/Key_Technical_Insights_for_Blue_Yonder_Engagement_with_PepsiCo.docx",
+      "doc_type": "architecture",
+      "name": "Key_Technical_Insights_for_Blue_Yonder_Engagement_with_PepsiCo",
+      "client": "PepsiCo",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Key_Technical_Insights_for_Blue_Yonder_Engagement_with_PepsiCo.md"
+    },
+    {
+      "id": "Lenzing Platform Use Case",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Lenzing_Planning/Lenzing Platform Use Case.docx",
+      "doc_type": "architecture",
+      "name": "Lenzing Platform Use Case",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Lenzing Platform Use Case.md"
+    },
+    {
+      "id": "lenzing_inventory",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Lenzing_Planning/lenzing_inventory.csv",
+      "doc_type": "general",
+      "name": "lenzing_inventory",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: lenzing_inventory.md"
+    },
+    {
+      "id": "Lenzing_payload",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Lenzing_Planning/Lenzing_payload.csv",
+      "doc_type": "general",
+      "name": "Lenzing_payload",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Lenzing_payload.md"
+    },
+    {
+      "id": "Lenzing_Platform_Use_Case",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Lenzing_Planning/Lenzing_Platform_Use_Case.docx",
+      "doc_type": "architecture",
+      "name": "Lenzing_Platform_Use_Case",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Lenzing_Platform_Use_Case.md"
+    },
+    {
+      "id": "Lenzing_Platform_UseCase",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Lenzing_Planning/Lenzing_Platform_UseCase.pptx",
+      "doc_type": "architecture",
+      "name": "Lenzing_Platform_UseCase",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Lenzing_Platform_UseCase.md"
+    },
+    {
+      "id": "Lenzing_UseCase_Presentation",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Lenzing_Planning/Lenzing_UseCase_Presentation.pptx",
+      "doc_type": "general",
+      "name": "Lenzing_UseCase_Presentation",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Lenzing_UseCase_Presentation.md"
+    },
+    {
+      "id": "Local LabelVie AO TMS IS Security Questionnaire",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/LabelVie_TMS/Local LabelVie AO TMS IS Security Questionnaire.docx",
+      "doc_type": "security",
+      "name": "Local LabelVie AO TMS IS Security Questionnaire",
+      "client": "LabelVie",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Local LabelVie AO TMS IS Security Questionnaire.md"
+    },
+    {
+      "id": "LOCALCOPY AFTER FIRST REVIEW Port of Neom Technical Requirements_Assigned",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/NEOM_WMS/LOCALCOPY AFTER FIRST REVIEW Port of Neom Technical Requirements_Assigned.xlsx",
+      "doc_type": "architecture",
+      "name": "LOCALCOPY AFTER FIRST REVIEW Port of Neom Technical Requirements_Assigned",
+      "client": "NEOM",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: LOCALCOPY AFTER FIRST REVIEW Port of Neom Technical Requirements_Assigned.md"
+    },
+    {
+      "id": "LOCALCOPY2_ifm_APS_Annex1_",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/IFM_Planning/LOCALCOPY2_ifm_APS_Annex1_.xlsx",
+      "doc_type": "general",
+      "name": "LOCALCOPY2_ifm_APS_Annex1_",
+      "client": "IFM Electronics",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: LOCALCOPY2_ifm_APS_Annex1_.md"
+    },
+    {
+      "id": "LOCALCOPY_AFTER_FIRST_REVIEW_Port_of_Neom_Technical_Requirements_Assigned",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/NEOM_WMS/LOCALCOPY_AFTER_FIRST_REVIEW_Port_of_Neom_Technical_Requirements_Assigned.xlsx",
+      "doc_type": "architecture",
+      "name": "LOCALCOPY_AFTER_FIRST_REVIEW_Port_of_Neom_Technical_Requirements_Assigned",
+      "client": "NEOM",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: LOCALCOPY_AFTER_FIRST_REVIEW_Port_of_Neom_Technical_Requirements_Assigned.md"
+    },
+    {
+      "id": "LOCALCOPY_ifm_APS_Annex1_",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/IFM_Planning/LOCALCOPY_ifm_APS_Annex1_.xlsx",
+      "doc_type": "general",
+      "name": "LOCALCOPY_ifm_APS_Annex1_",
+      "client": "IFM Electronics",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: LOCALCOPY_ifm_APS_Annex1_.md"
+    },
+    {
+      "id": "Localhost_Architecural_requirements",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/SGDBF_Retail/Localhost_Architecural_requirements.docx",
+      "doc_type": "general",
+      "name": "Localhost_Architecural_requirements",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Localhost_Architecural_requirements.md"
+    },
+    {
+      "id": "Localhost_Architecural_requirements_BY_RESPONSE",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/SGDBF_Retail/Localhost_Architecural_requirements_BY_RESPONSE.docx",
+      "doc_type": "general",
+      "name": "Localhost_Architecural_requirements_BY_RESPONSE",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Localhost_Architecural_requirements_BY_RESPONSE.md"
+    },
+    {
+      "id": "Localhost_Oribco_IT_Questionnaire",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Orbico_Planning/Localhost_Oribco_IT_Questionnaire.xlsx",
+      "doc_type": "general",
+      "name": "Localhost_Oribco_IT_Questionnaire",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Localhost_Oribco_IT_Questionnaire.md"
+    },
+    {
+      "id": "Localhost_RFP_Alfa_Laval_Sheet-Additional questions",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Alfa_Laval_Planning/Localhost_RFP_Alfa_Laval_Sheet-Additional questions.xlsx",
+      "doc_type": "general",
+      "name": "Localhost_RFP_Alfa_Laval_Sheet-Additional questions",
+      "client": "Alfa Laval",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Localhost_RFP_Alfa_Laval_Sheet-Additional questions.md"
+    },
+    {
+      "id": "Localhost_RFP_Alfa_Laval_Sheet-Additional_questions",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Alfa_Laval_Planning/Localhost_RFP_Alfa_Laval_Sheet-Additional_questions.xlsx",
+      "doc_type": "general",
+      "name": "Localhost_RFP_Alfa_Laval_Sheet-Additional_questions",
+      "client": "Alfa Laval",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Localhost_RFP_Alfa_Laval_Sheet-Additional_questions.md"
+    },
+    {
+      "id": "Localhost_RFP_Alfa_Laval_Sheet-Supplier review",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Alfa_Laval_Planning/Localhost_RFP_Alfa_Laval_Sheet-Supplier review.xlsx",
+      "doc_type": "general",
+      "name": "Localhost_RFP_Alfa_Laval_Sheet-Supplier review",
+      "client": "Alfa Laval",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Localhost_RFP_Alfa_Laval_Sheet-Supplier review.md"
+    },
+    {
+      "id": "Localhost_RFP_Alfa_Laval_Sheet-Supplier_review",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Alfa_Laval_Planning/Localhost_RFP_Alfa_Laval_Sheet-Supplier_review.xlsx",
+      "doc_type": "general",
+      "name": "Localhost_RFP_Alfa_Laval_Sheet-Supplier_review",
+      "client": "Alfa Laval",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Localhost_RFP_Alfa_Laval_Sheet-Supplier_review.md"
+    },
+    {
+      "id": "Michelin_-_Post_Design_Thinking_-_IT_Session_04122025",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Michelin_Planning/Michelin_-_Post_Design_Thinking_-_IT_Session_04122025.pptx",
+      "doc_type": "general",
+      "name": "Michelin_-_Post_Design_Thinking_-_IT_Session_04122025",
+      "client": "Michelin",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Michelin_-_Post_Design_Thinking_-_IT_Session_04122025.md"
+    },
+    {
+      "id": "Michelin_-_Post_Design_Thinking_-_IT_Session_29092025",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Michelin_Planning/Michelin_-_Post_Design_Thinking_-_IT_Session_29092025.pptx",
+      "doc_type": "general",
+      "name": "Michelin_-_Post_Design_Thinking_-_IT_Session_29092025",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Michelin_-_Post_Design_Thinking_-_IT_Session_29092025.md"
+    },
+    {
+      "id": "Michelin_DesignThinking_Debrief_15072025",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Michelin_Planning/Michelin_DesignThinking_Debrief_15072025.pdf",
+      "doc_type": "general",
+      "name": "Michelin_DesignThinking_Debrief_15072025",
+      "client": "Michelin",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Michelin_DesignThinking_Debrief_15072025.md"
+    },
+    {
+      "id": "Michelin_DesignThinking_Deck_08072025",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Michelin_Planning/Michelin - Design Thinking Workshop - 08072025/Michelin_DesignThinking_Deck_08072025.pptx",
+      "doc_type": "meeting",
+      "name": "Michelin_DesignThinking_Deck_08072025",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Michelin_DesignThinking_Deck_08072025.md"
+    },
+    {
+      "id": "Michelin_DesignThinking_Short_Debrief_15072025",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Michelin_Planning/Michelin - Design Thinking Workshop - 08072025/Michelin_DesignThinking_Short_Debrief_15072025.pptx",
+      "doc_type": "meeting",
+      "name": "Michelin_DesignThinking_Short_Debrief_15072025",
+      "client": "Michelin",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Michelin_DesignThinking_Short_Debrief_15072025.md"
+    },
+    {
+      "id": "Michelin_DesignThinking_WorkshopAgenda_08072025",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Michelin_Planning/Michelin - Design Thinking Workshop - 08072025/Michelin_DesignThinking_WorkshopAgenda_08072025.xlsx",
+      "doc_type": "meeting",
+      "name": "Michelin_DesignThinking_WorkshopAgenda_08072025",
+      "client": "Michelin",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Michelin_DesignThinking_WorkshopAgenda_08072025.md"
+    },
+    {
+      "id": "Michelin_payload",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Michelin_Planning/Michelin - Design Thinking Workshop - 08072025/Michelin_payload.csv",
+      "doc_type": "meeting",
+      "name": "Michelin_payload",
+      "client": "Michelin",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Michelin_payload.md"
+    },
+    {
+      "id": "Michelin_Tech_29092025",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Michelin_Planning/Michelin_Tech_29092025.pptx",
+      "doc_type": "general",
+      "name": "Michelin_Tech_29092025",
+      "client": "Michelin",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Michelin_Tech_29092025.md"
+    },
+    {
+      "id": "Michelin_Workshop_Prep_Parking_lot",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Michelin_Planning/Michelin - Design Thinking Workshop - 08072025/Michelin_Workshop_Prep_Parking_lot.docx",
+      "doc_type": "meeting",
+      "name": "Michelin_Workshop_Prep_Parking_lot",
+      "client": "Michelin",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Michelin_Workshop_Prep_Parking_lot.md"
+    },
+    {
+      "id": "NEOM Action plan to finish document",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/NEOM_WMS/NEOM Action plan to finish document.docx",
+      "doc_type": "general",
+      "name": "NEOM Action plan to finish document",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: NEOM Action plan to finish document.md"
+    },
+    {
+      "id": "NEOM Tech Questions LOCALCOPY",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/NEOM_WMS/NEOM Tech Questions LOCALCOPY.xlsx",
+      "doc_type": "general",
+      "name": "NEOM Tech Questions LOCALCOPY",
+      "client": "NEOM",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: NEOM Tech Questions LOCALCOPY.md"
+    },
+    {
+      "id": "NEOM_Action_plan_to_finish_document",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/NEOM_WMS/NEOM_Action_plan_to_finish_document.docx",
+      "doc_type": "general",
+      "name": "NEOM_Action_plan_to_finish_document",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: NEOM_Action_plan_to_finish_document.md"
+    },
+    {
+      "id": "NEOM_Tech_Questions_LOCALCOPY",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/NEOM_WMS/NEOM_Tech_Questions_LOCALCOPY.xlsx",
+      "doc_type": "general",
+      "name": "NEOM_Tech_Questions_LOCALCOPY",
+      "client": "NEOM",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: NEOM_Tech_Questions_LOCALCOPY.md"
+    },
+    {
+      "id": "ORIGINAL LOCALCOPYAnnex A CCI SC E2E Planning Compliance Matrix Functional Technical",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/CCI_Planning/ORIGINAL LOCALCOPYAnnex A CCI SC E2E Planning Compliance Matrix Functional Technical.xlsx",
+      "doc_type": "security",
+      "name": "ORIGINAL LOCALCOPYAnnex A CCI SC E2E Planning Compliance Matrix Functional Technical",
+      "client": "Coca-Cola İçecek",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: ORIGINAL LOCALCOPYAnnex A CCI SC E2E Planning Compliance Matrix Functional Technical.md"
+    },
+    {
+      "id": "ORIGINAL_LOCALCOPYAnnex_A_CCI_SC_E2E_Planning_Compliance_Matrix_Functional_Technical",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/CCI_Planning/ORIGINAL_LOCALCOPYAnnex_A_CCI_SC_E2E_Planning_Compliance_Matrix_Functional_Technical.xlsx",
+      "doc_type": "security",
+      "name": "ORIGINAL_LOCALCOPYAnnex_A_CCI_SC_E2E_Planning_Compliance_Matrix_Functional_Technical",
+      "client": "Coca-Cola İçecek",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: ORIGINAL_LOCALCOPYAnnex_A_CCI_SC_E2E_Planning_Compliance_Matrix_Functional_Technical.md"
+    },
+    {
+      "id": "payload_Almarai",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Almarai_Planning/payload_Almarai.csv",
+      "doc_type": "general",
+      "name": "payload_Almarai",
+      "client": "Almarai",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: payload_Almarai.md"
+    },
+    {
+      "id": "payload_Lenzing2",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Lenzing_Planning/payload_Lenzing2.csv",
+      "doc_type": "general",
+      "name": "payload_Lenzing2",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: payload_Lenzing2.md"
+    },
+    {
+      "id": "payload_Pepsico",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/PepsiCo_Planning/payload_Pepsico.csv",
+      "doc_type": "general",
+      "name": "payload_Pepsico",
+      "client": "PepsiCo",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: payload_Pepsico.md"
+    },
+    {
+      "id": "PepsiCo_BY_Platform_8th_Jan",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/PepsiCo_Planning/PepsiCo_BY_Platform_8th_Jan.pptx",
+      "doc_type": "architecture",
+      "name": "PepsiCo_BY_Platform_8th_Jan",
+      "client": "PepsiCo",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: PepsiCo_BY_Platform_8th_Jan.md"
+    },
+    {
+      "id": "prep_Lenzing_20260314_192225",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Lenzing_Planning/prep_Lenzing_20260314_192225.md",
+      "doc_type": "general",
+      "name": "prep_Lenzing_20260314_192225",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: prep_Lenzing_20260314_192225.md"
+    },
+    {
+      "id": "prep_SGDBF_20260320_213050",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/SGDBF_Retail/prep_SGDBF_20260320_213050.md",
+      "doc_type": "general",
+      "name": "prep_SGDBF_20260320_213050",
+      "client": "SGDBF",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: prep_SGDBF_20260320_213050.md"
+    },
+    {
+      "id": "QATAR DF",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/QDF_CatMan/QATAR DF.docx",
+      "doc_type": "general",
+      "name": "QATAR DF",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: QATAR DF.md"
+    },
+    {
+      "id": "QATAR_DF",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/QDF_CatMan/QATAR_DF.docx",
+      "doc_type": "general",
+      "name": "QATAR_DF",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: QATAR_DF.md"
+    },
+    {
+      "id": "Recording_Pepsi_Emea_2026-01-15",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/PepsiCo_Planning/Recording_Pepsi_Emea_2026-01-15.txt",
+      "doc_type": "general",
+      "name": "Recording_Pepsi_Emea_2026-01-15",
+      "client": "PepsiCo",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Recording_Pepsi_Emea_2026-01-15.md"
+    },
+    {
+      "id": "Recording_Pepsi_Emea_2026-01",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/PepsiCo_Planning/Recording_Pepsi_Emea_2026-01.txt",
+      "doc_type": "general",
+      "name": "Recording_Pepsi_Emea_2026-01",
+      "client": "PepsiCo",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Recording_Pepsi_Emea_2026-01.md"
+    },
+    {
+      "id": "Redcare-Pharmacy - 21st October",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Redcare_Planning/Redcare-Pharmacy - 21st October.pptx",
+      "doc_type": "general",
+      "name": "Redcare-Pharmacy - 21st October",
+      "client": "Redcare Pharmacy",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Redcare-Pharmacy - 21st October.md"
+    },
+    {
+      "id": "Redcare-Pharmacy_-_21st_October",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Redcare_Planning/Redcare-Pharmacy_-_21st_October.pptx",
+      "doc_type": "general",
+      "name": "Redcare-Pharmacy_-_21st_October",
+      "client": "Redcare Pharmacy",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Redcare-Pharmacy_-_21st_October.md"
+    },
+    {
+      "id": "Security_Questiond",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/LabelVie_TMS/Security_Questiond.xlsx",
+      "doc_type": "security",
+      "name": "Security_Questiond",
+      "client": "LabelVie",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Security_Questiond.md"
+    },
+    {
+      "id": "SGDBF-Architecural requirements",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/SGDBF_Retail/SGDBF-Architecural requirements.docx",
+      "doc_type": "general",
+      "name": "SGDBF-Architecural requirements",
+      "client": "SGDBF",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: SGDBF-Architecural requirements.md"
+    },
+    {
+      "id": "SGDBF-Architecural_requirements",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/SGDBF_Retail/SGDBF-Architecural_requirements.docx",
+      "doc_type": "general",
+      "name": "SGDBF-Architecural_requirements",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: SGDBF-Architecural_requirements.md"
+    },
+    {
+      "id": "SGDBF_Technical_Deep_Dive_20260316",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/SGDBF_Retail/SGDBF_Technical_Deep_Dive_20260316.pptx",
+      "doc_type": "architecture",
+      "name": "SGDBF_Technical_Deep_Dive_20260316",
+      "client": "SGDBF",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: SGDBF_Technical_Deep_Dive_20260316.md"
+    },
+    {
+      "id": "Stellantis_payload",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Stellantis_Mopar_E2E/Stellantis_payload.csv",
+      "doc_type": "general",
+      "name": "Stellantis_payload",
+      "client": "Stellantis",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Stellantis_payload.md"
+    },
+    {
+      "id": "Technical_Requirements_-_Table_Questions",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Stellantis_Mopar_E2E/Technical_Requirements_-_Table_Questions.xlsx",
+      "doc_type": "architecture",
+      "name": "Technical_Requirements_-_Table_Questions",
+      "client": "Stellantis",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Technical_Requirements_-_Table_Questions.md"
+    },
+    {
+      "id": "Timetable_Day1",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Michelin_Planning/Michelin - Design Thinking Workshop - 08072025/Timetable_Day1.pdf",
+      "doc_type": "meeting",
+      "name": "Timetable_Day1",
+      "client": "Michelin",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Timetable_Day1.md"
+    },
+    {
+      "id": "Timetable_Day2",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Michelin_Planning/Michelin - Design Thinking Workshop - 08072025/Timetable_Day2.pdf",
+      "doc_type": "meeting",
+      "name": "Timetable_Day2",
+      "client": "Michelin",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Timetable_Day2.md"
+    },
+    {
+      "id": "Veronesi - Minimum Data Requirements",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Veronesi_Planning/Veronesi - Minimum Data Requirements.xlsx",
+      "doc_type": "general",
+      "name": "Veronesi - Minimum Data Requirements",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Veronesi - Minimum Data Requirements.md"
+    },
+    {
+      "id": "Veronesi Template PPT",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Veronesi_Planning/Veronesi Template PPT.pptx",
+      "doc_type": "general",
+      "name": "Veronesi Template PPT",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Veronesi Template PPT.md"
+    },
+    {
+      "id": "Veronesi_-_Minimum_Data_Requirements",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Veronesi_Planning/Veronesi_-_Minimum_Data_Requirements.xlsx",
+      "doc_type": "general",
+      "name": "Veronesi_-_Minimum_Data_Requirements",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Veronesi_-_Minimum_Data_Requirements.md"
+    },
+    {
+      "id": "Veronesi_Template_PPT",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Veronesi_Planning/Veronesi_Template_PPT.pptx",
+      "doc_type": "general",
+      "name": "Veronesi_Template_PPT",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Veronesi_Template_PPT.md"
+    },
+    {
+      "id": "WORKING_FILE_ifm_planning_gemini_20260103_1844",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/IFM_Planning/WORKING_FILE_ifm_planning_gemini_20260103_1844.xlsx",
+      "doc_type": "general",
+      "name": "WORKING_FILE_ifm_planning_gemini_20260103_1844",
+      "client": "IFM Electronics",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: WORKING_FILE_ifm_planning_gemini_20260103_1844.md"
+    },
+    {
+      "id": "Wurth & BY 3rd of Dec",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Wurth_Retail/Wurth & BY 3rd of Dec.pdf",
+      "doc_type": "general",
+      "name": "Wurth & BY 3rd of Dec",
+      "client": "Würth",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Wurth & BY 3rd of Dec.md"
+    },
+    {
+      "id": "Wurth & BY It session 21st of October",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Wurth_Retail/Wurth & BY It session 21st of October.pptx",
+      "doc_type": "general",
+      "name": "Wurth & BY It session 21st of October",
+      "client": "Würth",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Wurth & BY It session 21st of October.md"
+    },
+    {
+      "id": "Wurth_&_BY_3rd_of_Dec",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Wurth_Retail/Wurth_&_BY_3rd_of_Dec.pdf",
+      "doc_type": "general",
+      "name": "Wurth_&_BY_3rd_of_Dec",
+      "client": "Würth",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Wurth_&_BY_3rd_of_Dec.md"
+    },
+    {
+      "id": "Wurth_&_BY_It_session_21st_of_October",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Wurth_Retail/Wurth_&_BY_It_session_21st_of_October.pptx",
+      "doc_type": "general",
+      "name": "Wurth_&_BY_It_session_21st_of_October",
+      "client": "Würth",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Wurth_&_BY_It_session_21st_of_October.md"
+    },
+    {
+      "id": "Wurth_Cloud_Approval_Application_Template",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Wurth_Retail/RFI/Wurth_Cloud_Approval_Application_Template.xlsx",
+      "doc_type": "general",
+      "name": "Wurth_Cloud_Approval_Application_Template",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Wurth_Cloud_Approval_Application_Template.md"
+    },
+    {
+      "id": "Wurth_payload",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Wurth_Retail/Tech Demo Platform 21st of October/Wurth_payload.csv",
+      "doc_type": "general",
+      "name": "Wurth_payload",
+      "client": "Würth",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Wurth_payload.md"
+    }
+  ]
+}
