@@ -5,6 +5,12 @@ Claude Code: read last 5 entries before starting work.
 
 ---
 
+## 2026-03-26 light_scan module + classifier/tag improvements
+
+- **Did:** (1) Classifier: added 6 high-priority filename patterns to `doc_type_classifier.py` (cognitive.shorts/friday, demo2win, iso22301/cybersecurity, extended product_doc/architecture terms) — accuracy 51.3% → **57.1%** (+18 correct, 0 false positives). Fixed architecture pattern ordering bug (cognitive content was matching architecture before training). (2) Tags: added `inventory-ops-agent`, `logistics-emissions-calculator`, `demand-edge` to `taxonomy.yaml` + `_TAG_ALIASES` + `product_aliases.yaml` — mean tag score 0.791 → **0.797**. (3) Light scan: implemented `light_scan.py` (Council Decision #19) — `ScanResult` dataclass with separate `filename_text`/`content_text` feature spaces, 7 format scanners (pptx/docx/pdf/xlsx/csv/txt-md/mp4), tiered fault tolerance (`full`/`degraded`/`filename_only`). 25 tests all pass. (4) Enrichment: `enrich_training_data.py` retroactively scanned 310 training examples — 82 (26%) enriched with real content, 228 filename-only fallback. Output: `classifier_training_enriched.json`. Merged `feat/light-scan` to main. **968 tests pass**.
+- **Errors:** ruff pre-commit blocked twice (redundant `"r"` mode, line-too-long E501) — fixed and recommitted. Unicode `→` in log string broke Windows cp1252 console — fixed to plain text.
+- **Next:** Use `content_text` + `filename_text` dual-vectorizer in classifier training. Consider running enrich on machines with more source files available.
+
 ## 2026-03-26 client normalization migration
 
 - **Did:** Full client normalization migration on branch `fix/client-normalization-migration`. (1) Vault audit: 583 notes, 22 distinct client values, key splits found (Lenzing AG/Group, JLR/Jaguar Land Rover, Pepsi variants, SGDBF long-forms, etc.). (2) Expanded `client_aliases.yaml` in CKE from 8 to 48 entries covering all vault variants. (3) Added `get_client_variants()` to corp-by-os + OR LIKE expansion in retrieve engine — `corp prep "JLR"` now finds 3 sources (was 1). (4) Created `scripts/migrate_client_names.py` (dry-run + --apply); applied migration: 77 vault notes normalised. (5) Rebuilt index: 493 notes. (6) Added `schema.yaml` contract to corp-os-meta + `validate_against_schema()` (warn-only). (7) Wired schema check into CKE `post_process_extraction()`. Eval: no regression. 970 tests pass (6 pre-existing Jinja2 failures unrelated).
