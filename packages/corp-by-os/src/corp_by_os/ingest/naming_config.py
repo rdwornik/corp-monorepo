@@ -71,6 +71,26 @@ def get_type_code(
     return config["fallback"]["unknown_type"]
 
 
+def get_client_variants(client_name: str) -> list[str]:
+    """Get all known name variants for a client (alias-aware matching).
+
+    Given "JLR" or "Jaguar Land Rover", returns every name in the same
+    alias group from naming_config.yaml. Used by the retrieval engine so
+    that searching for "JLR" also matches notes tagged "Jaguar Land Rover".
+
+    Falls back to [client_name] when no alias group is found.
+    """
+    config = load_naming_config()
+    client_lower = client_name.lower().strip()
+
+    for names in config["client_aliases"].values():
+        names_lower = [n.lower() for n in names]
+        if client_lower in names_lower:
+            return list(names)
+
+    return [client_name]
+
+
 def get_client_alias(client_name: str | None) -> str:
     """Get short client alias from full name.
 

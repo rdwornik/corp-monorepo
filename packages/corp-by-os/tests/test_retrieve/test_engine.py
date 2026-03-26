@@ -599,3 +599,87 @@ class TestRetrieveLogging:
                 filters=RetrievalFilter(client="Lenzing"),
             )
         assert "client=Lenzing" in caplog.text
+
+
+class TestClientAliasResolution:
+    """Alias filter: 'JLR' must match notes tagged 'Jaguar Land Rover'."""
+
+    @pytest.fixture()
+    def jlr_db(self, tmp_path: Path) -> Path:
+        """DB with one note tagged client='Jaguar Land Rover'."""
+        db_path = tmp_path / "index.db"
+        conn = sqlite3.connect(str(db_path))
+        conn.executescript(_TEST_SCHEMA)
+
+        vault = tmp_path / "vault"
+        vault.mkdir()
+
+        conn.execute(
+            """INSERT INTO notes
+               (project_id, client, title, type, source_type,
+                topics, products, domains, note_path)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                "jlr_tms",
+                "Jaguar Land Rover",
+                "JLR TMS RFI Response",
+                "rfp",
+                "documentation",
+                json.dumps(["TMS", "Network Optimization"]),
+                json.dumps(["TMS"]),
+                json.dumps(["Transportation"]),
+                str(vault / "jlr_tms.md"),
+            ),
+        )
+        conn.commit()
+        conn.close()
+
+        (vault / "jlr_tms.md").write_text(
+            "---\ntitle: JLR TMS RFI Response\nclient: Jaguar Land Rover\n---\n\n"
+            "Transport management system requirements for Jaguar Land Rover.",
+            encoding="utf-8",
+        )
+        return db_path
+
+    def test_alias_jlr_finds_jaguar_land_rover_note(
+        self, jlr_db: Path, tmp_path: Path
+    ) -> None:
+        """Filtering by 'JLR' returns notes tagged 'Jaguar Land Rover'."""
+        vault = tmp_path / "vault"
+        result = retrieve(
+            "transport management",
+            jlr_db,
+            vault,
+            filters=RetrievalFilter(client="JLR"),
+        )
+        titles = [n.title for n in result.notes]
+        assert "JLR TMS RFI Response" in titles
+
+    def test_full_name_finds_same_note(
+        self, jlr_db: Path, tmp_path: Path
+    ) -> None:
+        """Filtering by 'Jaguar Land Rover' also returns the note."""
+        vault = tmp_path / "vault"
+        result = retrieve(
+            "transport management",
+            jlr_db,
+            vault,
+            filters=RetrievalFilter(client="Jaguar Land Rover"),
+        )
+        titles = [n.title for n in result.notes]
+        assert "JLR TMS RFI Response" in titles
+
+    def test_alias_supplement_finds_unmatched_fts(
+        self, jlr_db: Path, tmp_path: Path
+    ) -> None:
+        """Alias expansion also works in the metadata-only supplement path."""
+        vault = tmp_path / "vault"
+        # Use a query that won't FTS-match, forcing the supplement path
+        result = retrieve(
+            "xyznonexistent",
+            jlr_db,
+            vault,
+            filters=RetrievalFilter(client="JLR"),
+        )
+        titles = [n.title for n in result.notes]
+        assert "JLR TMS RFI Response" in titles
