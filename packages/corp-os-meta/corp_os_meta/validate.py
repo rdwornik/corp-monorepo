@@ -4,8 +4,11 @@ Validation and quarantine routing for note frontmatter.
 
 import logging
 from enum import Enum
+from functools import lru_cache
 from pathlib import Path
+from typing import Any
 
+import yaml
 from pydantic import ValidationError
 
 from .models import Confidentiality, NoteFrontmatter
@@ -17,6 +20,59 @@ class ValidationResult(str, Enum):
     VALID = "valid"  # write to vault
     WARNINGS = "warnings"  # write to vault with warnings logged
     QUARANTINE = "quarantine"  # write to _quarantine/
+
+
+_SCHEMA_PATH = Path(__file__).parent / "data" / "schema.yaml"
+
+
+@lru_cache(maxsize=1)
+def _load_schema() -> dict[str, Any]:
+    with open(_SCHEMA_PATH, encoding="utf-8") as fh:
+        return yaml.safe_load(fh)
+
+
+def validate_against_schema(data: dict[str, Any]) -> list[str]:
+    """Warn-only check against schema.yaml contract.
+
+    Never blocks — returns a list of warning strings (empty if clean).
+    Complements Pydantic validation: catches unknown fields, cardinality
+    violations, and allowed-value mismatches that Pydantic would silently
+    coerce or ignore.
+    """
+    schema = _load_schema()
+    warnings: list[str] = []
+
+    required = set(schema.get("required_fields", []))
+    optional = set(schema.get("optional_fields", []))
+    known_fields = required | optional
+    allowed_values: dict[str, list[str]] = schema.get("allowed_values", {})
+    cardinality: dict[str, dict[str, int]] = schema.get("cardinality", {})
+
+    # Missing required fields
+    for field in required:
+        if not data.get(field):
+            warnings.append(f"missing required field: {field!r}")
+
+    # Unknown fields (not in required + optional) — helps catch schema drift
+    for key in data:
+        if key not in known_fields:
+            warnings.append(f"unknown field: {key!r}")
+
+    # Allowed-value checks
+    for field, allowed in allowed_values.items():
+        val = data.get(field)
+        if val is not None and str(val) not in allowed:
+            warnings.append(f"field {field!r} has unexpected value {val!r} (allowed: {allowed})")
+
+    # Cardinality checks
+    for field, limits in cardinality.items():
+        val = data.get(field)
+        if isinstance(val, list):
+            max_len = limits.get("max")
+            if max_len is not None and len(val) > max_len:
+                warnings.append(f"field {field!r} has {len(val)} items (max {max_len})")
+
+    return warnings
 
 
 def validate_frontmatter(

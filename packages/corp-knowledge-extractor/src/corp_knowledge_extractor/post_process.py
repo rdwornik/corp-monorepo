@@ -17,6 +17,7 @@ from corp_os_meta import (
     generate_links_line,
     ValidationResult,
 )
+from corp_os_meta.validate import validate_against_schema
 from corp_os_meta.models import NoteFrontmatter
 from corp_os_meta.normalize import load_taxonomy
 from corp_knowledge_extractor.utils import normalize_string_list
@@ -370,6 +371,11 @@ def post_process_extraction(
     # Enforce type from file extension (overrides LLM classification)
     if source_file:
         normalized_data = enforce_type_from_extension(normalized_data, source_file)
+
+    # Warn-only schema contract check (never blocks extraction)
+    schema_warnings = validate_against_schema(normalized_data)
+    if schema_warnings:
+        logger.warning("Schema contract warnings: %s", schema_warnings)
 
     # Validate using corp-os-meta
     validation_result, validated_note, issues = validate_frontmatter(normalized_data)
