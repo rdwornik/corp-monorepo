@@ -33,3 +33,21 @@ generic_terms:
   - Machine Learning
   - AI
   - GenAI
+
+client_products:
+  # Lenzing fiber products (Lenzing is a client, not a BY product)
+  - Lenzing
+  - Ecovero
+  - Lenzing Ecovero
+  - Lenzing Ecovero Eco-Viscose
+  - Lenzing Ecovero Viscose Fibers
+  - Lenzing B2B Specialty Fibers
+  - Dissolving Wood Pulp
+  - Acetic Acid Biobased
+  # Lenzing fiber brands (Tencel, Veocel, Refibra are all Lenzing brands)
+  - Tencel
+  - Veocel
+  - Refibra
+  # Third-party DMS products (not BY, not competitors)
+  - D360
+  - Doxis4
