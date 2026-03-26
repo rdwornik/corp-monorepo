@@ -549,35 +549,7 @@
     ]
   },
   {
-    "tag": "product/veocel-nonwoven-fibers",
-    "count": 3,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/tencel",
-    "count": 3,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
     "tag": "topic/cost-management",
-    "count": 3,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/tencel-brand-fibers",
-    "count": 3,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/veocel-brand-fibers",
     "count": 3,
     "batches": [
       "_outputs"
@@ -676,20 +648,6 @@
     ]
   },
   {
-    "tag": "product/tencel-lyocell-and-modal-fibers",
-    "count": 2,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/lenzing-ecovero-eco-viscose",
-    "count": 2,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
     "tag": "topic/digital-transformation",
     "count": 2,
     "batches": [
@@ -697,28 +655,7 @@
     ]
   },
   {
-    "tag": "product/veocel",
-    "count": 2,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/lenzing-ecovero",
-    "count": 2,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
     "tag": "product/ibp",
-    "count": 2,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/lenzing-ecovero-viscose-fibers",
     "count": 2,
     "batches": [
       "_outputs"
@@ -775,20 +712,6 @@
   },
   {
     "tag": "topic/sales-and-operations-planning",
-    "count": 2,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/d360",
-    "count": 2,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/refibra",
     "count": 2,
     "batches": [
       "_outputs"
@@ -942,13 +865,6 @@
     ]
   },
   {
-    "tag": "product/doxis4",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
     "tag": "product/platform-sop",
     "count": 1,
     "batches": [
@@ -957,13 +873,6 @@
   },
   {
     "tag": "topic/operational-excellence",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/lenzing",
     "count": 1,
     "batches": [
       "_outputs"
@@ -1033,41 +942,6 @@
     ]
   },
   {
-    "tag": "product/tencel-lyocell-fibers-for-textiles",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/veocel-lyocell-fibers-for-nonwovens",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/tencel-modal-modal-fibers",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/tencel-lyocell-fibers",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/tencel-modal-fibers",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
     "tag": "topic/sustainability-leadership",
     "count": 1,
     "batches": [
@@ -1124,49 +998,7 @@
     ]
   },
   {
-    "tag": "product/tencel-lyocell-and-modal-fibers-for-textiles",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/lenzing-ecovero-viscose-fibers-with-eco-care-technology",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/veocel-lyocell-and-viscose-fibers-for-nonwovens",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/lenzing-b2b-specialty-fibers-and-technical-applications",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
     "tag": "topic/capital-management",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/lenzing-ecovero-fibers",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/lenzing-lyocell-dry-fibers",
     "count": 1,
     "batches": [
       "_outputs"
@@ -1391,20 +1223,6 @@
   },
   {
     "tag": "topic/product-innovation",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/ecovero-brand-fibers",
-    "count": 1,
-    "batches": [
-      "_outputs"
-    ]
-  },
-  {
-    "tag": "product/refibra-recycled-content-lyocell",
     "count": 1,
     "batches": [
       "_outputs"
