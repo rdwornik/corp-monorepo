@@ -118,11 +118,12 @@ def eval_tag_coverage() -> dict:
 
 
 def eval_product_jaccard() -> dict:
-    """normalize_product_names() Jaccard between raw input and normalised output.
+    """normalize_product_names() idempotency: normalize(normalize(x)) == normalize(x).
 
-    Jaccard = 1.0 means the normaliser left the name unchanged (already canonical
-    or unrecognised third-party). Jaccard = 0.0 means it was remapped to a
-    different string -- expected for aliases like "WMS" -> "Blue Yonder WMS".
+    Canonical is defined as the first-pass output. Idempotency score = 1.0 means
+    the normaliser is stable -- aliases like "WMS" -> "Blue Yonder WMS" score 1.0
+    because the second pass leaves the canonical form unchanged. Score < 1.0 means
+    the normaliser is remapping its own output, which is a bug.
     """
     data = json.loads((FIXTURES / "product_normalization.json").read_text(encoding="utf-8"))
     scores: list[float] = []
@@ -130,10 +131,11 @@ def eval_product_jaccard() -> dict:
 
     for item in data:
         raw = item["product"]
-        normalised = normalize_product_names([raw])
-        score = _jaccard({raw.lower()}, {p.lower() for p in normalised})
+        canonical = normalize_product_names([raw])
+        stable = normalize_product_names(canonical) if canonical else []
+        score = _jaccard({p.lower() for p in canonical}, {p.lower() for p in stable})
         scores.append(score)
-        worst.append((score, raw, normalised))
+        worst.append((score, raw, canonical))
 
     worst.sort()
     return {
@@ -196,6 +198,7 @@ def _print_report(clf: dict, tags: dict, prod: dict, ppl: dict) -> None:
 
     print(f"\n[1] Classifier Accuracy  ({clf['total']} filenames)")
     print(f"    Accuracy : {clf['accuracy']:.1%}  ({clf['correct']}/{clf['total']})")
+    print("    Note: filename-only patterns. LLM classifier not evaluated.")
     if clf["top_errors"]:
         print("    Top confusion pairs  (predicted -> expected  count):")
         for (pred, exp), n in clf["top_errors"]:
@@ -212,13 +215,15 @@ def _print_report(clf: dict, tags: dict, prod: dict, ppl: dict) -> None:
     else:
         print("    All 200 golden tags fully recognised.")
 
-    print(f"\n[3] Product Normalizer Jaccard  ({prod['n']} products)")
+    print(f"\n[3] Product Normalizer Idempotency  ({prod['n']} products)")
     print(f"    Mean : {prod['mean']:.3f}   Median : {prod['median']:.1f}")
-    remapped = [(s, r, n) for s, r, n in prod["worst10"] if s < 1.0]
-    if remapped:
-        print("    Worst 10 (remapped aliases -- expected behaviour):")
-        for score, raw, norm in remapped:
+    unstable = [(s, r, n) for s, r, n in prod["worst10"] if s < 1.0]
+    if unstable:
+        print("    Unstable (normalizer remaps its own output -- bug):")
+        for score, raw, norm in unstable:
             print(f"      {score:.1f}  {raw!r:35} -> {norm}")
+    else:
+        print("    All products normalise stably (idempotent).")
 
     print(f"\n[4] People Filter F1  ({ppl['total']} entries)")
     print(f"    Precision : {ppl['precision']:.3f}   Recall : {ppl['recall']:.3f}   F1 : {ppl['f1']:.3f}")
