@@ -14,15 +14,16 @@ from datetime import datetime
 from pathlib import Path
 
 import click
+from rich.console import Console
+from rich.panel import Panel
+from rich.prompt import Prompt
+from rich.table import Table
+
 from corp_by_os.ingest.classifier import Classification, classify
 from corp_by_os.ingest.renamer import RenameProposal, propose_name
 from corp_by_os.ingest.router import _SKIP_EXTENSIONS, _SKIP_NAMES, compute_file_hash
 from corp_by_os.ops.database import OpsDB
 from corp_by_os.ops.registry import ContentRegistry
-from rich.console import Console
-from rich.panel import Panel
-from rich.prompt import Prompt
-from rich.table import Table
 
 logger = logging.getLogger(__name__)
 console = Console()
@@ -110,9 +111,7 @@ def _prompt_action(
     After [d] sets a destination, default flips to [a].
     """
     if needs_human and not has_destination:
-        console.print(
-            "[yellow]No match — set a destination with [d] or add [c]ontext.[/yellow]"
-        )
+        console.print("[yellow]No match — set a destination with [d] or add [c]ontext.[/yellow]")
         console.print(
             "  [green]\\[d][/green]estination  "
             "[blue]\\[c][/blue]ontext  "
@@ -122,9 +121,7 @@ def _prompt_action(
         return Prompt.ask(">", choices=["d", "c", "s", "q"], default="d")
 
     if needs_human:
-        console.print(
-            "[yellow]Low confidence — please confirm or override.[/yellow]"
-        )
+        console.print("[yellow]Low confidence — please confirm or override.[/yellow]")
 
     console.print(
         "  [green]\\[a][/green]ccept  "
@@ -150,9 +147,7 @@ def _prompt_action(
 
 def _get_user_context() -> str:
     """Prompt for extraction context."""
-    console.print(
-        "\n[bold]Context for extraction[/bold] (what is this file about?):"
-    )
+    console.print("\n[bold]Context for extraction[/bold] (what is this file about?):")
     context = Prompt.ask(">")
     console.print("[green]Context saved as extraction hint.[/green]")
     return context
@@ -367,22 +362,14 @@ def _check_dedup(
     if latest:
         # Known + extracted
         if auto:
-            console.print(
-                f"  [dim]Already extracted, skipping: "
-                f"{latest.vault_note_path}[/dim]"
-            )
+            console.print(f"  [dim]Already extracted, skipping: {latest.vault_note_path}[/dim]")
             _log_dedup_skip(
                 ops, file_path, content_hash, "already_extracted_auto", latest.vault_note_path
             )
             return "skip"
 
-        console.print(
-            f"  [yellow]Already extracted:[/yellow] {latest.vault_note_path}"
-        )
-        console.print(
-            f"  [dim]Model: {latest.model} | "
-            f"Date: {latest.extracted_at}[/dim]"
-        )
+        console.print(f"  [yellow]Already extracted:[/yellow] {latest.vault_note_path}")
+        console.print(f"  [dim]Model: {latest.model} | Date: {latest.extracted_at}[/dim]")
         console.print("  [bold][s][/bold]kip  [bold][r][/bold]e-extract")
         answer = Prompt.ask(">", choices=["s", "r"], default="s")
 
@@ -403,18 +390,12 @@ def _check_dedup(
         # Known + NOT extracted (routed with --skip-extract previously)
         dest = file_record.current_path or "unknown"
         if auto:
-            console.print(
-                f"  [dim]File already routed to {dest}, skipping.[/dim]"
-            )
+            console.print(f"  [dim]File already routed to {dest}, skipping.[/dim]")
             _log_dedup_skip(ops, file_path, content_hash, "already_routed_auto", dest)
             return "skip"
 
-        console.print(
-            f"  [yellow]File already routed:[/yellow] {dest}"
-        )
-        console.print(
-            "  [bold][s][/bold]kip  [bold][e][/bold]xtract now"
-        )
+        console.print(f"  [yellow]File already routed:[/yellow] {dest}")
+        console.print("  [bold][s][/bold]kip  [bold][e][/bold]xtract now")
         answer = Prompt.ask(">", choices=["s", "e"], default="s")
 
         if answer == "s":
@@ -518,13 +499,9 @@ def _trigger_extraction(
         from corp_by_os.ingest.router import _run_extraction
 
         content_hash = compute_file_hash(file_path)
-        mtime_str = datetime.fromtimestamp(
-            file_path.stat().st_mtime
-        ).isoformat(timespec="seconds")
+        mtime_str = datetime.fromtimestamp(file_path.stat().st_mtime).isoformat(timespec="seconds")
 
-        rel_path = str(
-            file_path.relative_to(mywork_root.resolve())
-        ).replace("\\", "/")
+        rel_path = str(file_path.relative_to(mywork_root.resolve())).replace("\\", "/")
         asset = ops.get_asset(rel_path)
         asset_id = asset["id"] if asset else None
 
@@ -534,7 +511,12 @@ def _trigger_extraction(
             config = PipelineConfig.production()
 
         vault_note, cost = _run_extraction(
-            file_path, mywork_root, ops, asset_id, content_hash, mtime_str,
+            file_path,
+            mywork_root,
+            ops,
+            asset_id,
+            content_hash,
+            mtime_str,
             user_context=user_context,
             config=config,
         )
@@ -543,10 +525,7 @@ def _trigger_extraction(
             console.print(f"  [green]Extracted → {vault_note}[/green]")
 
             # Record extraction in registry
-            model = (
-                _read_model_from_vault_note(vault_note, config.vault_path)
-                or "unknown"
-            )
+            model = _read_model_from_vault_note(vault_note, config.vault_path) or "unknown"
             cost_cents = int(cost * 100) if cost else None
             registry = FileRegistry(ops.conn)
             file_record = registry.get_by_hash(content_hash)
@@ -628,8 +607,7 @@ def _list_events(ops: OpsDB, limit: int = 20) -> None:
 
     console.print(table)
     console.print(
-        f"\n[dim]Total: {len(rows)} events "
-        f"({active_count} active, {undone_count} undone)[/dim]"
+        f"\n[dim]Total: {len(rows)} events ({active_count} active, {undone_count} undone)[/dim]"
     )
 
 
@@ -670,8 +648,7 @@ def _undo_event(
 
     if event["action"] != "ingest_inbox_route":
         console.print(
-            f"[red]Event {event_id} is not an ingest-inbox event "
-            f"(action={event['action']}).[/red]"
+            f"[red]Event {event_id} is not an ingest-inbox event (action={event['action']}).[/red]"
         )
         return False
 
@@ -711,9 +688,7 @@ def _undo_event(
         restore_rel = str(restore_path.relative_to(mywork_root.resolve())).replace("\\", "/")
         ops.update_asset_path(dest_path, restore_rel)
 
-        console.print(
-            f"[green]Undone:[/green] {dest_abs.name} → 00_Inbox/{restore_path.name}"
-        )
+        console.print(f"[green]Undone:[/green] {dest_abs.name} → 00_Inbox/{restore_path.name}")
     except OSError as exc:
         console.print(f"[red]Undo failed: {exc}[/red]")
         return False
@@ -721,8 +696,10 @@ def _undo_event(
     # Full revert: remove vault package + staging + rebuild index
     if full:
         _full_revert(
-            event, mywork_root,
-            vault_path=vault_path, app_data_path=app_data_path,
+            event,
+            mywork_root,
+            vault_path=vault_path,
+            app_data_path=app_data_path,
         )
 
     return True
@@ -774,9 +751,7 @@ def _full_revert(
             for pkg_dir in staging_base.iterdir():
                 if pkg_dir.is_dir() and norm_stem[:20] in pkg_dir.name.lower():
                     shutil.rmtree(pkg_dir)
-                    console.print(
-                        f"  [yellow]Removed staging: {pkg_dir.name}[/yellow]"
-                    )
+                    console.print(f"  [yellow]Removed staging: {pkg_dir.name}[/yellow]")
                     break
 
     # Step 3: Rebuild index
@@ -785,9 +760,7 @@ def _full_revert(
 
         console.print("  [dim]Rebuilding index...[/dim]")
         stats = rebuild_index()
-        console.print(
-            f"  [green]Index rebuilt: {stats.notes_indexed} notes[/green]"
-        )
+        console.print(f"  [green]Index rebuilt: {stats.notes_indexed} notes[/green]")
     except Exception as exc:
         console.print(f"  [red]Index rebuild failed: {exc}[/red]")
         logger.error("Index rebuild during full undo failed: %s", exc)
@@ -846,23 +819,27 @@ def process_file(
         final_path = _move_file(file_path, dest, rename.proposed_name, mywork_root)
         _register_file(final_path, ops)
         event_id = _log_ingest_event(
-            ops, file_path, final_path, mywork_root,
-            classification, file_path.name, rename.proposed_name,
-            None, not skip_extract,
+            ops,
+            file_path,
+            final_path,
+            mywork_root,
+            classification,
+            file_path.name,
+            rename.proposed_name,
+            None,
+            not skip_extract,
         )
         _log_routing_feedback(
-            ops, file_path, classification,
+            ops,
+            file_path,
+            classification,
             final_destination=dest,
             was_overridden=bool(override_dest),
             routing_method="batch_flag" if default_destination else "classifier_auto",
         )
-        console.print(
-            f"[green]AUTO:[/green] {file_path.name} → {dest}/{rename.proposed_name}"
-        )
+        console.print(f"[green]AUTO:[/green] {file_path.name} → {dest}/{rename.proposed_name}")
         if not skip_extract:
-            _trigger_extraction(
-                final_path, mywork_root, ops, None, event_id=event_id
-            )
+            _trigger_extraction(final_path, mywork_root, ops, None, event_id=event_id)
         return "routed"
 
     # Step 4: Present to user
@@ -900,8 +877,7 @@ def process_file(
                 client_match = registry._match_client(user_context)
                 if client_match.matched and client_match.destination:
                     console.print(
-                        f"  [cyan]Suggested destination:[/cyan] "
-                        f"{client_match.destination}"
+                        f"  [cyan]Suggested destination:[/cyan] {client_match.destination}"
                     )
                     use_it = Prompt.ask(
                         "  Use this destination?",
@@ -938,9 +914,7 @@ def process_file(
 
             # Execute: move + register + log + extract
             try:
-                final_path = _move_file(
-                    file_path, current_dest, current_name, mywork_root
-                )
+                final_path = _move_file(file_path, current_dest, current_name, mywork_root)
             except OSError as exc:
                 console.print(f"[red]Move failed: {exc}[/red]")
                 continue
@@ -948,18 +922,26 @@ def process_file(
             _register_file(final_path, ops)
 
             event_id = _log_ingest_event(
-                ops, file_path, final_path, mywork_root,
-                classification, file_path.name, current_name,
-                user_context, not skip_extract,
+                ops,
+                file_path,
+                final_path,
+                mywork_root,
+                classification,
+                file_path.name,
+                current_name,
+                user_context,
+                not skip_extract,
             )
 
             _log_routing_feedback(
-                ops, file_path, classification,
+                ops,
+                file_path,
+                classification,
                 final_destination=current_dest,
                 was_overridden=dest_was_set,
-                routing_method="manual_override" if dest_was_set else (
-                    "batch_flag" if default_destination else "classifier_auto"
-                ),
+                routing_method="manual_override"
+                if dest_was_set
+                else ("batch_flag" if default_destination else "classifier_auto"),
                 user_context=user_context,
             )
 
@@ -969,9 +951,7 @@ def process_file(
             )
 
             if not skip_extract:
-                _trigger_extraction(
-                    final_path, mywork_root, ops, user_context, event_id=event_id
-                )
+                _trigger_extraction(final_path, mywork_root, ops, user_context, event_id=event_id)
 
             return "routed"
 
@@ -1012,8 +992,9 @@ def ingest_inbox(
     Processes one file at a time with Rich UI: classify, confirm
     destination, rename, move, then trigger CKE extraction.
     """
-    from corp_by_os.ops.registry import get_content_registry_path
     from corp_os_meta.pipeline_config import PipelineConfig
+
+    from corp_by_os.ops.registry import get_content_registry_path
 
     cfg = PipelineConfig.production()
     ops = OpsDB()

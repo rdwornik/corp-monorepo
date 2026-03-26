@@ -20,9 +20,11 @@ class TestEstimateGeminiCost:
 class TestCostOnExtractionResult:
     def test_default_zero(self):
         from corp_knowledge_extractor.inventory import SourceFile, FileType
+
         result = ExtractionResult(
             source_file=SourceFile(path=Path("t.pdf"), type=FileType.DOCUMENT, size_bytes=100, name="t"),
-            title="T", summary="S",
+            title="T",
+            summary="S",
         )
         assert result.extraction_cost_usd == 0.0
 
@@ -43,18 +45,26 @@ class TestCostInExtractFromText:
             def extract(self, request):
                 return ExtractionResponse(
                     text='{"title":"T","summary":"S","topics":[],"products":[],"people":[]}',
-                    input_tokens=5000, output_tokens=1000,
-                    model="gemini-3-flash-preview", provider="google",
+                    input_tokens=5000,
+                    output_tokens=1000,
+                    model="gemini-3-flash-preview",
+                    provider="google",
                     cost_estimate=0.0055,
                 )
 
         with (
-            patch("corp_knowledge_extractor.providers.router.route_model", return_value=("gemini-3-flash-preview", "text_default")),
+            patch(
+                "corp_knowledge_extractor.providers.router.route_model",
+                return_value=("gemini-3-flash-preview", "text_default"),
+            ),
             patch("corp_knowledge_extractor.providers.router.get_provider", return_value=FakeProvider()),
             patch("corp_knowledge_extractor.providers.router.has_anthropic_key", return_value=False),
-            patch("corp_knowledge_extractor.providers.validator.validate_and_retry", side_effect=lambda r, req: (r, False)),
+            patch(
+                "corp_knowledge_extractor.providers.validator.validate_and_retry", side_effect=lambda r, req: (r, False)
+            ),
         ):
             from corp_knowledge_extractor.extract import extract_from_text
+
             source = SourceFile(path=Path("t.docx"), type=FileType.DOCUMENT, size_bytes=1000, name="t")
             text_result = TextExtractionResult(text="content", char_count=7, extractor="python-docx")
             result = extract_from_text(source, {"prompts": {"extract": "Extract."}}, text_result)
@@ -69,11 +79,24 @@ class TestCostInFrontmatter:
         env.filters["tojson_raw"] = lambda v: json.dumps(v, ensure_ascii=False)
         tmpl = env.get_template("extract.md.j2")
         return tmpl.render(
-            source_file="C:/test/f.pdf", content_type="document", title="T",
-            date="2026-03-23", summary="S.", key_points=[], topics=["X"],
-            people=[], products=[], slides=[], language="en", quality="full",
-            duration_min=None, transcript_excerpt="", model="gemini-3-flash-preview",
-            tokens_used=100, links_line="", source_tool="knowledge-extractor",
+            source_file="C:/test/f.pdf",
+            content_type="document",
+            title="T",
+            date="2026-03-23",
+            summary="S.",
+            key_points=[],
+            topics=["X"],
+            people=[],
+            products=[],
+            slides=[],
+            language="en",
+            quality="full",
+            duration_min=None,
+            transcript_excerpt="",
+            model="gemini-3-flash-preview",
+            tokens_used=100,
+            links_line="",
+            source_tool="knowledge-extractor",
             extraction_cost_usd=cost,
         )
 

@@ -216,17 +216,11 @@ def test_reliability_unknown():
 
 
 def test_classify_architecture_doc():
-    assert (
-        classify_source_tier("BYPlatform-Architecture.pdf")
-        == "official_architecture_doc"
-    )
+    assert classify_source_tier("BYPlatform-Architecture.pdf") == "official_architecture_doc"
 
 
 def test_classify_training():
-    assert (
-        classify_source_tier("Module_1.pptx", source_type="training")
-        == "training_material"
-    )
+    assert classify_source_tier("Module_1.pptx", source_type="training") == "training_material"
 
 
 def test_classify_release_notes():
@@ -234,15 +228,9 @@ def test_classify_release_notes():
 
 
 def test_classify_sales_deck():
-    assert (
-        classify_source_tier("Q4_Sales_Deck.pptx", source_type="presentation")
-        == "sales_deck"
-    )
+    assert classify_source_tier("Q4_Sales_Deck.pptx", source_type="presentation") == "sales_deck"
 
 
 def test_classify_fallback_source_type():
     """source_type mapping used when no filename pattern matches."""
-    assert (
-        classify_source_tier("random_file.pdf", source_type="training")
-        == "training_material"
-    )
+    assert classify_source_tier("random_file.pdf", source_type="training") == "training_material"

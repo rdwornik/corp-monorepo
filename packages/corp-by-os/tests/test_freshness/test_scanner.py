@@ -3,18 +3,12 @@
 from __future__ import annotations
 
 import hashlib
-import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from unittest.mock import patch
-
-import pytest
 
 from corp_by_os.freshness.scanner import (
     REVIEW_AGE_DAYS,
     SKIP_FILENAMES,
-    FreshnessResult,
-    FreshnessSummary,
     compute_hash,
     parse_frontmatter,
     scan_note_freshness,

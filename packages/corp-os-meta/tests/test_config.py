@@ -1,8 +1,6 @@
 """Tests for centralized path configuration."""
 
-import os
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 

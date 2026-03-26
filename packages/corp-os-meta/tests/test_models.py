@@ -67,9 +67,7 @@ def test_frontmatter_with_v21_fields():
     )
     assert fm.content_origin == "mywork"
     assert fm.source_category == "template"
-    assert (
-        fm.source_locator == "30_Templates/01_Presentation_Decks/Platform_Overview.pptx"
-    )
+    assert fm.source_locator == "30_Templates/01_Presentation_Decks/Platform_Overview.pptx"
     assert fm.routing_confidence == 1.0
 
 
@@ -141,11 +139,14 @@ def test_caps_not_exceeded():
     assert len(note.topics) == 8
 
 
-@pytest.mark.parametrize("doc_type", [
-    DocumentType.SPREADSHEET,
-    DocumentType.VENDOR_ASSESSMENT,
-    DocumentType.DISCOVERY,
-])
+@pytest.mark.parametrize(
+    "doc_type",
+    [
+        DocumentType.SPREADSHEET,
+        DocumentType.VENDOR_ASSESSMENT,
+        DocumentType.DISCOVERY,
+    ],
+)
 def test_new_document_types(doc_type):
     """New document types added for CKE v0.6.0 are valid."""
     note = NoteFrontmatter(

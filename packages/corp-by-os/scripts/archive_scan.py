@@ -1,7 +1,6 @@
 """Archive scan — local metadata only, no API calls."""
 
 import json
-import sys
 from collections import Counter
 from datetime import datetime
 from pathlib import Path

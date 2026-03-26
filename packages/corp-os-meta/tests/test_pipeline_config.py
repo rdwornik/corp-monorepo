@@ -11,13 +11,20 @@ class TestSandbox:
     def test_all_paths_under_tmp(self, tmp_path):
         """sandbox() puts every path under tmp_root."""
         cfg = PipelineConfig.sandbox(tmp_path)
-        for attr in ("vault_path", "mywork_root", "projects_root",
-                     "templates_root", "archive_root", "app_data_path",
-                     "inbox_path", "index_db_path", "ops_db_path", "state_db_path"):
+        for attr in (
+            "vault_path",
+            "mywork_root",
+            "projects_root",
+            "templates_root",
+            "archive_root",
+            "app_data_path",
+            "inbox_path",
+            "index_db_path",
+            "ops_db_path",
+            "state_db_path",
+        ):
             p = getattr(cfg, attr)
-            assert str(p).startswith(str(tmp_path)), (
-                f"{attr}={p!r} is not under tmp_root={tmp_path!r}"
-            )
+            assert str(p).startswith(str(tmp_path)), f"{attr}={p!r} is not under tmp_root={tmp_path!r}"
 
     def test_inbox_is_derived_from_mywork(self, tmp_path):
         """inbox_path == mywork_root / '00_Inbox'."""

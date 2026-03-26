@@ -5,7 +5,6 @@ from __future__ import annotations
 import pytest
 
 from corp_by_os.extraction.non_project.routing import (
-    RouteInfo,
     RoutingError,
     resolve_route,
 )

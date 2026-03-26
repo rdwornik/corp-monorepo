@@ -16,9 +16,10 @@ from datetime import datetime
 from pathlib import Path
 
 import yaml
+from corp_os_meta.pipeline_config import PipelineConfig
+
 from corp_by_os.config import get_config
 from corp_by_os.models import IndexStats
-from corp_os_meta.pipeline_config import PipelineConfig
 
 logger = logging.getLogger(__name__)
 
@@ -565,7 +566,10 @@ def _parse_frontmatter(filepath: Path) -> dict | None:
 
 _RFP_VISIBLE_SOURCE_TYPES = {"documentation", "rfp"}
 _RFP_VISIBLE_DOC_TYPES = {
-    "product_doc", "architecture", "rfp_response", "security_questionnaire",
+    "product_doc",
+    "architecture",
+    "rfp_response",
+    "security_questionnaire",
 }
 
 

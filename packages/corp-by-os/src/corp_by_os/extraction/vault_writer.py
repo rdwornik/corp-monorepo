@@ -26,7 +26,9 @@ def _read_trust_level(path: Path) -> str | None:
     try:
         text = path.read_text(encoding="utf-8")
     except Exception as e:
-        log.warning("Cannot read trust_level from %s: %s. Defaulting to 'verified' (safe).", path.name, e)
+        log.warning(
+            "Cannot read trust_level from %s: %s. Defaulting to 'verified' (safe).", path.name, e
+        )
         return "verified"
     if not text.startswith("---"):
         return None
@@ -37,7 +39,9 @@ def _read_trust_level(path: Path) -> str | None:
         fm = yaml.safe_load(text[3:end])
         return fm.get("trust_level") if isinstance(fm, dict) else None
     except Exception as e:
-        log.warning("Cannot parse frontmatter in %s: %s. Defaulting to 'verified' (safe).", path.name, e)
+        log.warning(
+            "Cannot parse frontmatter in %s: %s. Defaulting to 'verified' (safe).", path.name, e
+        )
         return "verified"
 
 
@@ -100,7 +104,9 @@ def move_to_vault(
                     try:
                         shutil.move(str(src_file), str(conflict))
                     except OSError as e:
-                        log.error("Failed to move conflict %s -> %s: %s", src_file.name, conflict, e)
+                        log.error(
+                            "Failed to move conflict %s -> %s: %s", src_file.name, conflict, e
+                        )
                         raise
                     log.warning(
                         "CONFLICT: %s is verified. New extraction saved as %s",

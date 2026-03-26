@@ -5,6 +5,35 @@ Claude Code: read last 5 entries before starting work.
 
 ---
 
+## 2026-03-26 early morning (continued)
+- **Did:** v2 bulk ingest (387 notes, 493 total indexed, 25 projects). Vault now has real data. corp retrieve returns 30 results across topics.
+- **Failed:** 2 Cognitive Friday YAML parse errors (unquoted hyphen in session_id)
+- **Next:** Git hygiene (179 uncommitted ruff files). RFP KB + vault merge (Council). Obsidian optimization. 30-day eval (2026-04-25).
+
+## 2026-03-26 v2 bulk ingest
+
+- **Did:** Ran v2 bulk ingest (387 notes ingested, 2 YAML errors, 0 quarantined). Index rebuild: 583 vault notes found → 90 deduped by source_hash → 493 unique notes indexed (25 projects). Net new unique v2 notes: ~292. `corp retrieve "demand planning"` → 30 results, Sufficient (unchanged from v3-only — engine caps at 30). Vault now fully populated with v3 + v2 extractions.
+- **Errors:** 2 YAML parse failures (`Cognitive Friday Season 2` files — `session_id: "cognitive-friday-season-2` unquoted hyphen truncates string). Notes skipped, not quarantined.
+- **Next:** Re-extract the 2 failing Cognitive Friday notes (fix YAML), re-extract low-quality JLR notes (score 28–29), run `scripts/extract_training_data.py` to refresh fixtures, RFP KB + vault merge decision (Council).
+
+## 2026-03-26 v3 bulk ingest, IndexStats fix, gotcha added
+
+- **Did:** Fixed `IndexStats.total_facts` AttributeError in cli.py:3099 (was `total_facts`, correct attr is `facts_indexed`). 39/39 ingest tests pass. Added CKE path structure gotcha to `~/.claude/skills/gotchas/gotchas.md`. Ran v3 bulk ingest: 203 notes ingested (2 deduped identical source_hash → 201 unique), 0 quarantined, 0 skipped, index rebuilt in 2.0s (201 notes, 25 projects, 0 facts). `corp retrieve "demand planning"` → 30 results, Sufficient. `corp retrieve "WMS picking methodologies"` → 28 results, Sufficient (was 2 JLR-only before).
+- **Quality distribution:** Only 3/203 notes have quality_score (the 3 JLR pilot notes at 28/29/85). All 200 pre-quality-era notes pass gate by design (None → pass). Vault now has 210 total notes (203 v3 + 7 pre-existing).
+- **Next:** Run `scripts/extract_training_data.py` to refresh fixtures from new v3 extractions. Consider re-extracting low-quality JLR notes (score 28–29) with deeper prompt.
+
+## 2026-03-26 JLR pilot end-to-end ingest
+
+- **Did:** Ran JLR pilot ingest — diagnosed path structure mismatch (`jlr_pilot/` is flat, `ingest-extractions` expects `scope/client/pkg/extract/` hierarchy). Created `jlr_staged/projects/Jaguar_Land_Rover_TMS_WMS_OMS/` with 3 packages. Dry-run confirmed 3→01_Knowledge, 0 quarantined. Live ingest succeeded. Index rebuilt. `corp retrieve "JLR TMS"` returns 3/3. `corp retrieve "WMS picking methodologies"` returns 2/2 (Sufficient: No — needs more WMS depth coverage). Minor display bug: `IndexStats.total_facts` AttributeError post-rebuild (cosmetic only).
+- **Issues:** `jlr_pilot/` flat structure incompatible with `ingest-extractions` — requires wrapping in `projects/CLIENT/` scope. Two low-quality notes (score 28–29) passed because DEFAULT_QUALITY_THRESHOLD=25. Full v3 ingest (203 notes) pending — would address health check finding of empty 01_Knowledge vault.
+- **Next:** Run full v3 ingest to populate vault. Fix `IndexStats.total_facts` display bug in CLI. Consider re-extracting the 2 low-quality JLR notes with a deeper prompt.
+
+## 2026-03-26 ecosystem health check
+
+- **Did:** Read-only comprehensive health audit across 8 phases: test results (2,291/2,298 pass, 7 skip), CLI ops (7 agents OK), sandbox E2E (5/5 pass), CKE outputs (749 notes, 613 JSON, 20.2GB), databases (ops.db 1,116 rows, index.db 2,677 rows), vault (1,325 indexed notes but 01_Knowledge empty — investigate), git history (438 commits, main clean, 6 active branches), MyWork (794 files). Generated `.ecosystem/archive/2026-03-26_HEALTH_CHECK.md` report.
+- **Issues:** 277 ruff linting errors found (213 auto-fixed, 64 remaining E402/E501 formatting); vault 01_Knowledge empty despite index.db showing 1,325 notes (routing mismatch?); live E2E test timeout expected (real API calls).
+- **Next:** Investigate vault note storage paths. Fix E402 imports. Update training fixtures. Monitor live test performance.
+
 ## 2026-03-25 night session
 - **Did:** Monorepo complete (6 packages, 2,153 tests). Naming convention v2 (19 type codes, 15 client aliases). Code review fixes (2 critical, 4 high). Training data fixtures from 690 extractions. Routing feedback table. Trust_level protection. Vault ingest pipeline.
 - **Failed:** Standalone repo folder rename blocked by Windows file locks. CKE had 6 pre-existing test failures (fixed).
@@ -43,3 +72,8 @@ Claude Code: read last 5 entries before starting work.
 - **Did:** Added `--record` flag to `corp test-pipeline`. `--record` implies `--live`, calls real CKE API per corpus file, saves `{hash[:12]}_{tier}.json` fixtures + `manifest.json` to `tests/fixtures/pipeline/recorded/`. Future fixture runs replay from these JSONs. PipelineTestReport gains `recorded_fixtures`/`recording_cost` fields. CLI prints "Recorded N fixtures, total cost $X.XX". 2 new tests (fields default + graceful CKE-unavailable skip). 936 passed, 1 skipped. Merged feat/test-pipeline-record to main.
 - **Failed:** Nothing new — "file modified since read" on test_pipeline.py due to ruff auto-format between sessions (existing gotcha).
 - **Next:** Live pilots (corp test-pipeline --live → verify against real CKE). Migrate existing monkeypatching to sandbox fixture. Integration tests for ingest → OpsDB roundtrip.
+
+## 2026-03-26 early morning
+- **Did:** Health check (HEALTHY), JLR pilot (3 notes ingested, retrieve works), v3 bulk ingest (201 notes, 0 quarantined), IndexStats bug fixed, gotcha added
+- **Failed:** jlr_pilot flat structure required manual staging (gotcha added)
+- **Next:** v2 bulk ingest (763 notes), RFP KB + vault merge decision (Council), Obsidian optimization, 30-day eval

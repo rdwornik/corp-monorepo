@@ -1,11 +1,8 @@
 """Tests for source_date extraction — extended with MP4 mtime and fallback."""
 
-import os
-import time
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
-import pytest
 
 from corp_knowledge_extractor.text_extract import extract_source_date
 
@@ -37,6 +34,7 @@ class TestSourceDateExtended:
     def test_source_date_pptx(self, tmp_path):
         """PPTX with modified date → returns ISO date."""
         from datetime import datetime
+
         pptx = tmp_path / "test.pptx"
         pptx.write_bytes(b"PK")  # Will fail to open as real pptx
 
@@ -55,6 +53,7 @@ class TestSourceDateExtended:
     def test_source_date_pdf(self, tmp_path):
         """PDF with CreationDate → returns year-month."""
         import fitz
+
         pdf = tmp_path / "test.pdf"
         doc = fitz.open()
         doc.new_page()

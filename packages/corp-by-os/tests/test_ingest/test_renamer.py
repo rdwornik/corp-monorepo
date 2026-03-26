@@ -17,7 +17,6 @@ from corp_by_os.ingest.naming_config import (
     get_type_code,
 )
 from corp_by_os.ingest.renamer import (
-    RenameProposal,
     _infer_client,
     _infer_type,
     _sanitize,
@@ -158,33 +157,25 @@ class TestGetTypeCode:
 
 
 class TestInferType:
-    def test_training_from_metadata(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_training_from_metadata(self, tmp_path: Path, registry: ContentRegistry) -> None:
         f = tmp_path / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"x" * 100)
         c = classify(f, registry)
         assert _infer_type(c) == "TRAIN"
 
-    def test_rfp_from_metadata(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_rfp_from_metadata(self, tmp_path: Path, registry: ContentRegistry) -> None:
         f = tmp_path / "RFP_Database_WMS.xlsx"
         f.write_bytes(b"x" * 100)
         c = classify(f, registry)
         assert _infer_type(c) == "RFP"
 
-    def test_competitive_from_metadata(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_competitive_from_metadata(self, tmp_path: Path, registry: ContentRegistry) -> None:
         f = tmp_path / "Competitive_Analysis.pptx"
         f.write_bytes(b"x" * 100)
         c = classify(f, registry)
         assert _infer_type(c) == "COMP"
 
-    def test_misc_for_no_match(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_misc_for_no_match(self, tmp_path: Path, registry: ContentRegistry) -> None:
         f = tmp_path / "random_file.txt"
         f.write_bytes(b"x" * 100)
         c = classify(f, registry)
@@ -221,17 +212,13 @@ class TestGetClientAlias:
 
 
 class TestInferClient:
-    def test_client_from_classification(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_client_from_classification(self, tmp_path: Path, registry: ContentRegistry) -> None:
         f = tmp_path / "Lenzing_Discovery.docx"
         f.write_bytes(b"x" * 100)
         c = classify(f, registry)
         assert _infer_client(c) == "LENZ"
 
-    def test_no_client_gets_fallback(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_no_client_gets_fallback(self, tmp_path: Path, registry: ContentRegistry) -> None:
         f = tmp_path / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"x" * 100)
         c = classify(f, registry)
@@ -273,9 +260,7 @@ class TestCleanDescription:
 
 
 class TestProposeName:
-    def test_full_rename_series(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_full_rename_series(self, tmp_path: Path, registry: ContentRegistry) -> None:
         """Series file gets proper convention name."""
         f = tmp_path / "Cognitive_Friday_S4E1_Tag_Changes.pptx"
         f.write_bytes(b"x" * 100)
@@ -289,9 +274,7 @@ class TestProposeName:
         assert result.proposed_name[:4].isdigit()
         assert result.proposed_name[4] == "-"
 
-    def test_rename_with_client(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_rename_with_client(self, tmp_path: Path, registry: ContentRegistry) -> None:
         """Client file includes client alias in name."""
         f = tmp_path / "Lenzing_Discovery_Workshop.docx"
         f.write_bytes(b"x" * 100)
@@ -299,9 +282,7 @@ class TestProposeName:
         result = propose_name(f, c)
         assert "LENZ" in result.proposed_name
 
-    def test_rename_ignores_user_context(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_rename_ignores_user_context(self, tmp_path: Path, registry: ContentRegistry) -> None:
         """Proposed name uses original filename, not user context."""
         f = tmp_path / "slide_deck.pptx"
         f.write_bytes(b"x" * 100)
@@ -311,9 +292,7 @@ class TestProposeName:
         assert "warehouse" not in result.proposed_name.lower()
         assert "slide_deck" in result.proposed_name
 
-    def test_long_name_truncated(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_long_name_truncated(self, tmp_path: Path, registry: ContentRegistry) -> None:
         """Long filename truncated to max length."""
         long_name = "A" * 200 + ".pptx"
         f = tmp_path / long_name
@@ -322,9 +301,7 @@ class TestProposeName:
         result = propose_name(f, c)
         assert len(result.proposed_name) <= 125  # 120 stem + 5 ext
 
-    def test_preserves_extension(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_preserves_extension(self, tmp_path: Path, registry: ContentRegistry) -> None:
         """Original extension preserved in rename."""
         f = tmp_path / "test.xlsx"
         f.write_bytes(b"x" * 100)
@@ -332,9 +309,7 @@ class TestProposeName:
         result = propose_name(f, c)
         assert result.proposed_name.endswith(".xlsx")
 
-    def test_components_populated(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_components_populated(self, tmp_path: Path, registry: ContentRegistry) -> None:
         """RenameProposal components dict is populated."""
         f = tmp_path / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"x" * 100)
@@ -345,9 +320,7 @@ class TestProposeName:
         assert "client" in result.components
         assert result.components["type"] == "TRAIN"
 
-    def test_no_topic_in_pattern(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_no_topic_in_pattern(self, tmp_path: Path, registry: ContentRegistry) -> None:
         """Decision #14 removes TOPIC from pattern (was GEN in 80% of cases)."""
         f = tmp_path / "random_file.txt"
         f.write_bytes(b"x" * 100)
@@ -356,7 +329,7 @@ class TestProposeName:
         # Pattern is now DATE_TYPE_CLIENT_DESC, no TOPIC segment
         parts = result.proposed_name.split("_", 3)
         assert parts[1] == "MISC"  # type code
-        assert parts[2] == "GEN"   # client (not topic)
+        assert parts[2] == "GEN"  # client (not topic)
 
     def test_filename_hint_overrides_source_category(
         self, tmp_path: Path, registry: ContentRegistry

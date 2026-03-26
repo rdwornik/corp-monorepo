@@ -9,8 +9,6 @@ import pytest
 import os
 import sys
 import json
-import tempfile
-import shutil
 from pathlib import Path
 
 # Add project root to path

@@ -49,6 +49,7 @@ class TestDedupWithDicts:
     def test_dedup_with_dicts_no_crash(self):
         """Synthesize dedup should not crash on dict items."""
         from corp_knowledge_extractor.synthesize import normalize_string_list as nsl
+
         items = [{"name": "A"}, "B", {"name": "A"}]
         normalized = nsl(items)
         seen = set()
@@ -101,6 +102,7 @@ class TestUploadMemoryError:
         with patch.object(Path, "stat") as mock_stat:
             mock_stat.return_value = MagicMock(st_size=400 * 1024 * 1024)
             import logging
+
             with caplog.at_level(logging.WARNING):
                 result = _upload_and_wait(mock_client, video, config)
 

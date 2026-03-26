@@ -8,18 +8,15 @@ from pathlib import Path
 import pytest
 import yaml
 
-from corp_by_os.config import get_config
 from corp_by_os.models import TaskPriority, TaskStatus
 from corp_by_os.task_manager import (
     _parse_task_file,
     _slugify_title,
-    _tasks_root,
     add_task,
     complete_task,
     list_tasks,
     task_dashboard_md,
 )
-
 
 # --- Fixtures ---
 

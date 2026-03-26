@@ -120,7 +120,16 @@ def _retrieve_via_cli(
     limit: int = 10,
 ) -> list[dict]:
     """Call ``corp retrieve --format json`` and parse output."""
-    cmd = ["corp", "retrieve", query, "--format", "json", "--rfp-only", "--top", str(limit)]
+    cmd = [
+        "corp",
+        "retrieve",
+        query,
+        "--format",
+        "json",
+        "--rfp-only",
+        "--top",
+        str(limit),
+    ]
 
     if products:
         for prod in products:

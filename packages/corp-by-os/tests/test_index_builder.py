@@ -19,7 +19,6 @@ from corp_by_os.index_builder import (
     update_project,
 )
 
-
 # --- Fixtures ---
 
 
@@ -500,9 +499,7 @@ Blue Yonder provides 99.97% SLA with multi-region deployment.
         finally:
             get_config.cache_clear()
 
-    def test_rfp_kb_frontmatter_parsed(
-        self, app_config, db_path: Path, tmp_path: Path
-    ) -> None:
+    def test_rfp_kb_frontmatter_parsed(self, app_config, db_path: Path, tmp_path: Path) -> None:
         """rfp_kb markdown with trust_level maps to confidence column."""
         rfp_kb = tmp_path / "rfp_kb"
         rfp_kb.mkdir()
@@ -537,9 +534,7 @@ Content about WMS integration.
         assert "Blue Yonder WMS" in row[1]
         assert "WMS" in row[2]
 
-    def test_id_only_frontmatter_indexed(
-        self, app_config, db_path: Path, tmp_path: Path
-    ) -> None:
+    def test_id_only_frontmatter_indexed(self, app_config, db_path: Path, tmp_path: Path) -> None:
         """rfp_kb entries with 'id' but no 'title' get title synthesised from id."""
         rfp_kb = tmp_path / "rfp_kb"
         rfp_kb.mkdir()
@@ -577,9 +572,7 @@ Blue Yonder provides 99.97% SLA.
         assert row[1] == "verified"
         assert "High Availability" in row[2]
 
-    def test_no_title_no_id_skipped(
-        self, app_config, db_path: Path, tmp_path: Path
-    ) -> None:
+    def test_no_title_no_id_skipped(self, app_config, db_path: Path, tmp_path: Path) -> None:
         """Markdown with neither title nor id is skipped."""
         rfp_kb = tmp_path / "rfp_kb"
         rfp_kb.mkdir()
@@ -677,15 +670,11 @@ class TestRfpVisible:
         fm = {"trust_level": "verified", "confidentiality": "confidential"}
         assert _compute_rfp_visible(fm) is False
 
-    def test_rfp_visible_column_in_rebuild(
-        self, notes_env, db_path: Path
-    ) -> None:
+    def test_rfp_visible_column_in_rebuild(self, notes_env, db_path: Path) -> None:
         """rebuild_index populates rfp_visible column."""
         rebuild_index(db_path)
         conn = _connect(db_path)
-        rows = conn.execute(
-            "SELECT title, rfp_visible FROM notes"
-        ).fetchall()
+        rows = conn.execute("SELECT title, rfp_visible FROM notes").fetchall()
         conn.close()
         assert len(rows) >= 3
         # All test notes have source_type=internal or no source_type,
@@ -700,9 +689,7 @@ class TestRfpVisible:
 class TestIndexDedup:
     """Index-level dedup uses source_hash (content identity), not path."""
 
-    def test_dedup_by_source_hash(
-        self, app_config, db_path: Path, tmp_path: Path
-    ) -> None:
+    def test_dedup_by_source_hash(self, app_config, db_path: Path, tmp_path: Path) -> None:
         """Notes with same source_hash are deduped — only latest kept."""
         vault = tmp_path / "dedup_vault"
         vault.mkdir()
@@ -735,7 +722,6 @@ Second extraction (newer, same content hash).
 
         # _index_cke_notes inserts both; dedup happens in rebuild_index
         # Call dedup manually here
-        from corp_by_os.index_builder import _dedup_notes_by_hash
 
         dupes = _dedup_notes_by_hash(conn)
         count -= dupes
@@ -747,9 +733,7 @@ Second extraction (newer, same content hash).
         assert len(rows) == 1
         assert rows[0][0] == "Second Version"
 
-    def test_different_hash_kept(
-        self, app_config, db_path: Path, tmp_path: Path
-    ) -> None:
+    def test_different_hash_kept(self, app_config, db_path: Path, tmp_path: Path) -> None:
         """Notes with different source_hash are both kept."""
         vault = tmp_path / "diff_hash_vault"
         vault.mkdir()
@@ -775,7 +759,6 @@ Content B.
         _ensure_schema(conn)
         count = _index_cke_notes(conn, vault)
 
-        from corp_by_os.index_builder import _dedup_notes_by_hash
 
         dupes = _dedup_notes_by_hash(conn)
         count -= dupes
@@ -786,9 +769,7 @@ Content B.
         conn.close()
         assert len(rows) == 2
 
-    def test_no_dedup_for_empty_hash(
-        self, app_config, db_path: Path, tmp_path: Path
-    ) -> None:
+    def test_no_dedup_for_empty_hash(self, app_config, db_path: Path, tmp_path: Path) -> None:
         """Notes without source_hash are NOT deduped."""
         vault = tmp_path / "no_dedup_vault"
         vault.mkdir()
@@ -806,7 +787,6 @@ Content {i}.
         _ensure_schema(conn)
         count = _index_cke_notes(conn, vault)
 
-        from corp_by_os.index_builder import _dedup_notes_by_hash
 
         dupes = _dedup_notes_by_hash(conn)
         count -= dupes

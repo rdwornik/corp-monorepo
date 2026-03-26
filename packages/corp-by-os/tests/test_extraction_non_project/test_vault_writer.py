@@ -173,7 +173,9 @@ def test_move_to_vault_merge_raises_on_move_failure(tmp_path):
     staging = tmp_path / "staging"
     _make_package(staging, "pkg-001", {"extract/note.md": b"new content"})
 
-    with patch("corp_by_os.extraction.vault_writer.shutil.move", side_effect=OSError("permission denied")):
+    with patch(
+        "corp_by_os.extraction.vault_writer.shutil.move", side_effect=OSError("permission denied")
+    ):
         with pytest.raises(OSError, match="permission denied"):
             move_to_vault(staging, vault, "target")
 

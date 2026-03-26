@@ -5,7 +5,6 @@ from __future__ import annotations
 import pytest
 
 from corp_by_os.extraction.non_project.folder_policy import (
-    ExtractionPolicy,
     PolicyError,
     load_policy,
 )

@@ -8,11 +8,9 @@ import logging
 import re
 import shutil
 import subprocess
-import tempfile
 from pathlib import Path
 
 import cv2
-import numpy as np
 
 from corp_knowledge_extractor.frames.sampler import SampledFrame
 
@@ -38,10 +36,14 @@ def _run_ffmpeg_scene_detect(video_path: Path, threshold: float = SCENE_THRESHOL
 
     cmd = [
         ffmpeg,
-        "-i", str(video_path),
-        "-filter:v", f"select=gt(scene\\,{threshold}),showinfo",
-        "-vsync", "vfr",
-        "-f", "null",
+        "-i",
+        str(video_path),
+        "-filter:v",
+        f"select=gt(scene\\,{threshold}),showinfo",
+        "-vsync",
+        "vfr",
+        "-f",
+        "null",
         "-",
     ]
 

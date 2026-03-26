@@ -24,10 +24,13 @@ def get_audio_duration(audio_path: str) -> float:
     """
     cmd = [
         "ffprobe",
-        "-v", "error",
-        "-show_entries", "format=duration",
-        "-of", "default=noprint_wrappers=1:nokey=1",
-        audio_path
+        "-v",
+        "error",
+        "-show_entries",
+        "format=duration",
+        "-of",
+        "default=noprint_wrappers=1:nokey=1",
+        audio_path,
     ]
 
     result = subprocess.run(cmd, capture_output=True, text=True, check=True)
@@ -44,7 +47,7 @@ def remove_silence(
     output_path: Optional[str] = None,
     threshold_db: int = -40,
     min_silence_duration: float = 2.0,
-    verbose: bool = True
+    verbose: bool = True,
 ) -> str:
     """
     Remove silence from audio using FFmpeg silenceremove filter.
@@ -70,24 +73,25 @@ def remove_silence(
         >>> # Result: 45MB file with same content
     """
     if output_path is None:
-        output_path = os.path.join(
-            tempfile.gettempdir(),
-            f"silence_removed_{os.path.basename(input_path)}"
-        )
+        output_path = os.path.join(tempfile.gettempdir(), f"silence_removed_{os.path.basename(input_path)}")
 
     original_size = get_file_size_mb(input_path)
     original_duration = get_audio_duration(input_path)
 
     if verbose:
-        print(f"  Original audio: {original_size:.1f}MB, {original_duration/60:.1f} min")
+        print(f"  Original audio: {original_size:.1f}MB, {original_duration / 60:.1f} min")
         print(f"  Removing silence (threshold: {threshold_db}dB, min duration: {min_silence_duration}s)...")
 
     # FFmpeg silenceremove filter
     # Format: silenceremove=start_periods=1:start_duration=1:start_threshold=-40dB:
     #         detection=peak:stop_periods=-1:stop_duration=2:stop_threshold=-40dB
     cmd = [
-        "ffmpeg", "-y", "-i", input_path,
-        "-af", (
+        "ffmpeg",
+        "-y",
+        "-i",
+        input_path,
+        "-af",
+        (
             f"silenceremove="
             f"start_periods=1:"
             f"start_duration=0.5:"
@@ -97,10 +101,13 @@ def remove_silence(
             f"stop_duration={min_silence_duration}:"
             f"stop_threshold={threshold_db}dB"
         ),
-        "-ac", "1",  # Mono
-        "-ar", "16000",  # 16kHz sample rate (Whisper optimized)
-        "-b:a", "32k",  # 32kbps bitrate
-        output_path
+        "-ac",
+        "1",  # Mono
+        "-ar",
+        "16000",  # 16kHz sample rate (Whisper optimized)
+        "-b:a",
+        "32k",  # 32kbps bitrate
+        output_path,
     ]
 
     subprocess.run(cmd, check=True, capture_output=True)
@@ -113,7 +120,7 @@ def remove_silence(
 
     if verbose:
         print(f"  ✓ After silence removal: {new_size:.1f}MB ({reduction_percent:.1f}% reduction)")
-        print(f"  ✓ Duration: {new_duration/60:.1f} min ({silence_removed:.0f}s silence removed)")
+        print(f"  ✓ Duration: {new_duration / 60:.1f} min ({silence_removed:.0f}s silence removed)")
 
     return output_path
 
@@ -124,7 +131,7 @@ def optimize_audio(
     target_bitrate: str = "32k",
     sample_rate: int = 16000,
     channels: int = 1,
-    verbose: bool = True
+    verbose: bool = True,
 ) -> str:
     """
     Optimize audio for transcription (mono, low bitrate, Whisper-optimized sample rate).
@@ -141,10 +148,7 @@ def optimize_audio(
         Path to optimized audio file
     """
     if output_path is None:
-        output_path = os.path.join(
-            tempfile.gettempdir(),
-            f"optimized_{Path(input_path).stem}.mp3"
-        )
+        output_path = os.path.join(tempfile.gettempdir(), f"optimized_{Path(input_path).stem}.mp3")
 
     original_size = get_file_size_mb(input_path)
 
@@ -153,12 +157,18 @@ def optimize_audio(
         print(f"  Target: {channels} channel(s), {sample_rate}Hz, {target_bitrate}")
 
     cmd = [
-        "ffmpeg", "-y", "-i", input_path,
+        "ffmpeg",
+        "-y",
+        "-i",
+        input_path,
         "-vn",  # No video
-        "-ac", str(channels),
-        "-ar", str(sample_rate),
-        "-b:a", target_bitrate,
-        output_path
+        "-ac",
+        str(channels),
+        "-ar",
+        str(sample_rate),
+        "-b:a",
+        target_bitrate,
+        output_path,
     ]
 
     subprocess.run(cmd, check=True, capture_output=True)
@@ -177,7 +187,7 @@ def preprocess_for_transcription(
     remove_silence_enabled: bool = True,
     threshold_db: int = -40,
     min_silence_duration: float = 2.0,
-    verbose: bool = True
+    verbose: bool = True,
 ) -> tuple[str, dict]:
     """
     Complete preprocessing pipeline for transcription.
@@ -199,54 +209,38 @@ def preprocess_for_transcription(
         >>> output, stats = preprocess_for_transcription("meeting.mp4")
         >>> print(f"Reduced from {stats['original_size_mb']:.1f}MB to {stats['final_size_mb']:.1f}MB")
     """
-    stats = {
-        "original_size_mb": get_file_size_mb(input_path),
-        "original_path": input_path,
-        "steps": []
-    }
+    stats = {"original_size_mb": get_file_size_mb(input_path), "original_path": input_path, "steps": []}
 
     if verbose:
-        print(f"\n=== Audio Preprocessing ===")
+        print("\n=== Audio Preprocessing ===")
         print(f"Input: {input_path}")
         print(f"Size: {stats['original_size_mb']:.1f}MB\n")
 
     # Step 1: Extract and optimize audio
-    temp_optimized = os.path.join(
-        tempfile.gettempdir(),
-        f"optimized_{Path(input_path).stem}.mp3"
-    )
+    temp_optimized = os.path.join(tempfile.gettempdir(), f"optimized_{Path(input_path).stem}.mp3")
 
     optimized_path = optimize_audio(input_path, temp_optimized, verbose=verbose)
     optimized_size = get_file_size_mb(optimized_path)
 
-    stats["steps"].append({
-        "name": "optimization",
-        "size_mb": optimized_size
-    })
+    stats["steps"].append({"name": "optimization", "size_mb": optimized_size})
 
     current_path = optimized_path
 
     # Step 2: Remove silence if enabled
     if remove_silence_enabled:
-        temp_silence_removed = os.path.join(
-            tempfile.gettempdir(),
-            f"silence_removed_{Path(input_path).stem}.mp3"
-        )
+        temp_silence_removed = os.path.join(tempfile.gettempdir(), f"silence_removed_{Path(input_path).stem}.mp3")
 
         silence_removed_path = remove_silence(
             current_path,
             temp_silence_removed,
             threshold_db=threshold_db,
             min_silence_duration=min_silence_duration,
-            verbose=verbose
+            verbose=verbose,
         )
 
         silence_removed_size = get_file_size_mb(silence_removed_path)
 
-        stats["steps"].append({
-            "name": "silence_removal",
-            "size_mb": silence_removed_size
-        })
+        stats["steps"].append({"name": "silence_removal", "size_mb": silence_removed_size})
 
         current_path = silence_removed_path
 
@@ -256,7 +250,7 @@ def preprocess_for_transcription(
     ) * 100
 
     if verbose:
-        print(f"\n=== Preprocessing Complete ===")
+        print("\n=== Preprocessing Complete ===")
         print(f"Original: {stats['original_size_mb']:.1f}MB")
         print(f"Final: {stats['final_size_mb']:.1f}MB")
         print(f"Reduction: {stats['total_reduction_percent']:.1f}%\n")
@@ -281,13 +275,10 @@ if __name__ == "__main__":
         print(f"Error: File not found: {input_file}")
         sys.exit(1)
 
-    output_file, stats = preprocess_for_transcription(
-        input_file,
-        remove_silence_enabled=remove_silence_flag
-    )
+    output_file, stats = preprocess_for_transcription(input_file, remove_silence_enabled=remove_silence_flag)
 
     print(f"Output saved to: {output_file}")
-    print(f"\nStatistics:")
+    print("\nStatistics:")
     print(f"  Original size: {stats['original_size_mb']:.1f}MB")
     print(f"  Final size: {stats['final_size_mb']:.1f}MB")
     print(f"  Total reduction: {stats['total_reduction_percent']:.1f}%")

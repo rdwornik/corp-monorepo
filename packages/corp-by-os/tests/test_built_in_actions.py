@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
 import yaml
 
 from corp_by_os.built_in_actions import (
@@ -20,7 +19,6 @@ from corp_by_os.built_in_actions import (
 )
 from corp_by_os.config import get_config
 from corp_by_os.models import VaultZone
-
 
 # --- Test: Action Registry ---
 

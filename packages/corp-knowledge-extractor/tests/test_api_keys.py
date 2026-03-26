@@ -21,10 +21,7 @@ def test_api_key_available(key):
     """API key is set in environment (loaded by PS profile from global .env)."""
     value = os.environ.get(key)
     if value is None:
-        pytest.skip(
-            f"{key} not found — run 'keys list' in PowerShell. "
-            f"Keys should be in Documents/.secrets/.env"
-        )
+        pytest.skip(f"{key} not found — run 'keys list' in PowerShell. Keys should be in Documents/.secrets/.env")
     assert len(value) > 10, f"{key} too short ({len(value)} chars)"
 
 

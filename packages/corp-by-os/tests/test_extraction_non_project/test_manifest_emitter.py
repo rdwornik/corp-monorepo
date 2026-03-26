@@ -6,13 +6,13 @@ import json
 
 import pytest
 
+from corp_by_os.extraction.non_project.folder_policy import ExtractionPolicy
 from corp_by_os.extraction.non_project.manifest_emitter import (
+    _make_entry_id,
     build_manifest,
     write_manifest,
-    _make_entry_id,
 )
 from corp_by_os.extraction.non_project.routing import RouteInfo
-from corp_by_os.extraction.non_project.folder_policy import ExtractionPolicy
 from corp_by_os.extraction.non_project.scanner import ScanResult, scan_folder
 
 

@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+
 from corp_by_os.config import get_config
 from corp_by_os.sandbox import SandboxManager
 
@@ -15,8 +16,16 @@ def tmp_vault(tmp_path: Path) -> Path:
     """Create a temporary vault structure mimicking Obsidian."""
     vault = tmp_path / "vault"
     # Create zone directories (new semantic structure + legacy for compat)
-    for zone in ["knowledge", "projects", "guides", "dashboards", "templates", "system",
-                  "02_sources", "04_evergreen"]:
+    for zone in [
+        "knowledge",
+        "projects",
+        "guides",
+        "dashboards",
+        "templates",
+        "system",
+        "02_sources",
+        "04_evergreen",
+    ]:
         (vault / zone).mkdir(parents=True)
 
     # Create a sample project

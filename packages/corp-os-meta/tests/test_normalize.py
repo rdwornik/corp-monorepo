@@ -13,9 +13,7 @@ def test_alias_resolution():
 
 def test_deduplication():
     taxonomy = load_taxonomy()
-    result = normalize_terms(
-        ["DR", "Disaster Recovery", "disaster recovery planning"], taxonomy, "topics"
-    )
+    result = normalize_terms(["DR", "Disaster Recovery", "disaster recovery planning"], taxonomy, "topics")
     assert result.normalized.count("Disaster Recovery") == 1
     assert result.duplicates_removed == 2
 

@@ -1,6 +1,5 @@
 """Tests for deep prompt builder."""
 
-import pytest
 from corp_knowledge_extractor.deep_prompt import build_deep_prompt
 
 

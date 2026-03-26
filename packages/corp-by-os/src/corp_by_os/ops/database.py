@@ -182,13 +182,9 @@ class OpsDB:
         self.conn.executescript(_SCHEMA)
         # Migrate: add vault_note_path if missing (pre-existing DBs)
         try:
-            self.conn.execute(
-                "SELECT vault_note_path FROM ingest_events LIMIT 0"
-            )
+            self.conn.execute("SELECT vault_note_path FROM ingest_events LIMIT 0")
         except Exception:
-            self.conn.execute(
-                "ALTER TABLE ingest_events ADD COLUMN vault_note_path TEXT"
-            )
+            self.conn.execute("ALTER TABLE ingest_events ADD COLUMN vault_note_path TEXT")
             self.conn.commit()
 
     def close(self) -> None:
@@ -692,8 +688,6 @@ class OpsDB:
 
     def mark_routing_reviewed(self) -> int:
         """Mark all unreviewed routing feedback as reviewed. Returns count."""
-        cur = self.conn.execute(
-            "UPDATE routing_feedback SET reviewed = 1 WHERE reviewed = 0"
-        )
+        cur = self.conn.execute("UPDATE routing_feedback SET reviewed = 1 WHERE reviewed = 0")
         self.conn.commit()
         return cur.rowcount

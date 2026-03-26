@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-import os
-
 import pytest
 
-from corp_by_os.extraction.non_project.scanner import ScanResult, scan_folder
+from corp_by_os.extraction.non_project.scanner import scan_folder
 
 
 def test_scan_finds_allowed_extensions(mywork_tree):

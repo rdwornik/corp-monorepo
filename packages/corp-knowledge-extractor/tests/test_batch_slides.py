@@ -1,10 +1,7 @@
 """Tests for batch processor slide_image_paths propagation."""
 
 import shutil
-from pathlib import Path
-from unittest.mock import MagicMock, patch
 
-import pytest
 
 
 def _make_extraction_result(tmp_path, with_slides=True):
@@ -39,7 +36,7 @@ def _make_extraction_result(tmp_path, with_slides=True):
         temp_slides.mkdir(parents=True)
         slide_paths = []
         for i in range(3):
-            png = temp_slides / f"cover_{i+1:03d}.png"
+            png = temp_slides / f"cover_{i + 1:03d}.png"
             png.write_bytes(b"\x89PNG fake image data")
             slide_paths.append(png)
         result.slide_image_paths = slide_paths

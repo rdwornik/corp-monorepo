@@ -74,8 +74,7 @@ class FileRegistry:
         existing = self.get_by_hash(content_hash)
         if existing:
             self.conn.execute(
-                "UPDATE files SET current_path = ?, last_seen_at = ? "
-                "WHERE file_id = ?",
+                "UPDATE files SET current_path = ?, last_seen_at = ? WHERE file_id = ?",
                 (path, now, existing.file_id),
             )
             self.conn.commit()
@@ -120,8 +119,7 @@ class FileRegistry:
     def get_extractions(self, file_id: int) -> list[ExtractionRecord]:
         """Get all extractions for a file, newest first."""
         rows = self.conn.execute(
-            "SELECT * FROM extractions WHERE file_id = ? "
-            "ORDER BY extraction_id DESC",
+            "SELECT * FROM extractions WHERE file_id = ? ORDER BY extraction_id DESC",
             (file_id,),
         ).fetchall()
         return [self._row_to_extraction(r) for r in rows]
@@ -129,8 +127,7 @@ class FileRegistry:
     def latest_extraction(self, file_id: int) -> ExtractionRecord | None:
         """Get most recent extraction for a file."""
         row = self.conn.execute(
-            "SELECT * FROM extractions WHERE file_id = ? "
-            "ORDER BY extraction_id DESC LIMIT 1",
+            "SELECT * FROM extractions WHERE file_id = ? ORDER BY extraction_id DESC LIMIT 1",
             (file_id,),
         ).fetchone()
         if row is None:
@@ -168,8 +165,7 @@ class FileRegistry:
         """Update current_path when a file moves."""
         new_path = new_path.replace("\\", "/")
         self.conn.execute(
-            "UPDATE files SET current_path = ?, last_seen_at = ? "
-            "WHERE content_hash = ?",
+            "UPDATE files SET current_path = ?, last_seen_at = ? WHERE content_hash = ?",
             (new_path, self._now(), content_hash),
         )
         self.conn.commit()

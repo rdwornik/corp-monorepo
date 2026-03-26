@@ -4,7 +4,6 @@ import json
 import hashlib
 from pathlib import Path
 
-import pytest
 
 
 def _compute_hash(filepath: Path) -> str:
@@ -20,17 +19,22 @@ def _setup_existing_output(tmp_path, source_path: Path, hash_value: str):
     extract_dir = tmp_path / "extract"
     extract_dir.mkdir(parents=True, exist_ok=True)
     json_path = extract_dir / f"{source_path.stem}.json"
-    json_path.write_text(json.dumps({
-        "title": "Existing Extraction",
-        "summary": "Already done",
-        "facts": [],
-        "freshness": {
-            "source_path": str(source_path),
-            "source_hash": hash_value,
-            "source_mtime": "2026-03-20T10:00:00",
-            "extracted_at": "2026-03-20T10:05:00",
-        },
-    }), encoding="utf-8")
+    json_path.write_text(
+        json.dumps(
+            {
+                "title": "Existing Extraction",
+                "summary": "Already done",
+                "facts": [],
+                "freshness": {
+                    "source_path": str(source_path),
+                    "source_hash": hash_value,
+                    "source_mtime": "2026-03-20T10:00:00",
+                    "extracted_at": "2026-03-20T10:05:00",
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
     return json_path
 
 

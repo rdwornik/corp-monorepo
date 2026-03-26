@@ -1,7 +1,6 @@
 """Tests for per-file error handling in the extraction loop."""
 
-from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 
 from corp_knowledge_extractor.extract import ExtractionError
 
@@ -24,8 +23,12 @@ class TestUnexpectedErrorContinues:
         text_result.extractor = "pdfplumber"
         text_result.slide_count = 0
 
-        decision_a = TierDecision(tier=Tier.TEXT_AI, reason="test", estimated_cost=0.001, model=None, text_result=text_result)
-        decision_b = TierDecision(tier=Tier.TEXT_AI, reason="test", estimated_cost=0.001, model=None, text_result=text_result)
+        decision_a = TierDecision(
+            tier=Tier.TEXT_AI, reason="test", estimated_cost=0.001, model=None, text_result=text_result
+        )
+        decision_b = TierDecision(
+            tier=Tier.TEXT_AI, reason="test", estimated_cost=0.001, model=None, text_result=text_result
+        )
 
         # File A throws TypeError, file B succeeds
         mock_result_b = MagicMock()
@@ -55,9 +58,9 @@ class TestUnexpectedErrorContinues:
                     result = fake_extract(f, {}, decision.text_result)
                 extracts[f.name] = result
                 cost_total += decision.estimated_cost
-            except ExtractionError as exc:
+            except ExtractionError:
                 failed.append(f.path.name)
-            except Exception as exc:
+            except Exception:
                 failed.append(f.path.name)
 
         # File A should be in failed, file B should be extracted

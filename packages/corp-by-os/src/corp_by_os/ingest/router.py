@@ -720,9 +720,7 @@ def _run_extraction(
         "name": file_path.stem,
         "content_origin": "mywork_ingest",
         "source_category": "ingest",
-        "source_locator": str(file_path.relative_to(mywork_root.resolve())).replace(
-            "\\", "/"
-        ),
+        "source_locator": str(file_path.relative_to(mywork_root.resolve())).replace("\\", "/"),
     }
     if user_context:
         file_entry["user_context"] = user_context

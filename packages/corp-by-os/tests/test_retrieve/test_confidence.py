@@ -6,16 +6,12 @@ import json
 import sqlite3
 from pathlib import Path
 
-import pytest
-
 from corp_by_os.retrieve.engine import (
     CONFIDENCE_BOOST,
-    RetrievalFilter,
     RetrievedNote,
     _apply_confidence_ranking,
     retrieve,
 )
-
 
 _TEST_SCHEMA = """\
 CREATE TABLE IF NOT EXISTS notes (

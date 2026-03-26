@@ -492,7 +492,9 @@ class BatchJobRunner:
                     temp_dir = pkg_dir / "temp_frames" / source_file.name
                     sampled_frames = sample_frames(source_file.path, temp_dir, self.config)
 
-                result = extract_knowledge(source_file, self.config, sampled_frames=sampled_frames, user_context=entry.user_context)
+                result = extract_knowledge(
+                    source_file, self.config, sampled_frames=sampled_frames, user_context=entry.user_context
+                )
 
                 # Keep slide frames
                 if result.slides and sampled_frames:

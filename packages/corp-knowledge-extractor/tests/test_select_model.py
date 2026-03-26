@@ -58,9 +58,7 @@ class TestSelectModel:
         assert reason == "manual_override"
 
     def test_select_model_override_full_name(self):
-        model, reason = select_model(
-            Path("any.txt"), 50000, model_override="gemini-3.1-pro-preview"
-        )
+        model, reason = select_model(Path("any.txt"), 50000, model_override="gemini-3.1-pro-preview")
         assert model == "gemini-3.1-pro-preview"
         assert reason == "manual_override"
 

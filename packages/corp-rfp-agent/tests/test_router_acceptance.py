@@ -5,7 +5,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from corp_rfp_agent.llm_router import retry_with_backoff, extract_question, extract_answer
+from corp_rfp_agent.llm_router import (
+    retry_with_backoff,
+    extract_question,
+    extract_answer,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -276,7 +280,10 @@ def test_get_context_fallback_to_chromadb():
 
     with (
         patch("corp_rfp_agent.llm_router.LLMRouter.__init__", return_value=None),
-        patch("corp_rfp_agent.llm_router.vault_retrieve", side_effect=Exception("vault down")),
+        patch(
+            "corp_rfp_agent.llm_router.vault_retrieve",
+            side_effect=Exception("vault down"),
+        ),
     ):
         from corp_rfp_agent.llm_router import LLMRouter
 

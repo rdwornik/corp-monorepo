@@ -3,7 +3,6 @@
 import yaml
 from pathlib import Path
 
-import pytest
 
 from eval_extraction import evaluate_package
 

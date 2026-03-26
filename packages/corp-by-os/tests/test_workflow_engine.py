@@ -12,18 +12,15 @@ from corp_by_os.models import (
     StepResult,
     Workflow,
     WorkflowParam,
-    WorkflowResult,
     WorkflowStep,
 )
 from corp_by_os.workflow_engine import (
     _build_agent_command,
     _interpolate,
-    _parse_workflow,
     execute_workflow,
     load_workflows,
     preview_workflow,
 )
-
 
 # --- Fixtures ---
 
@@ -318,6 +315,7 @@ class TestAgentStep:
     @patch("subprocess.run")
     def test_timeout(self, mock_run) -> None:
         import subprocess as sp
+
         from corp_by_os.workflow_engine import _execute_agent_step
 
         mock_run.side_effect = sp.TimeoutExpired(cmd="test", timeout=300)

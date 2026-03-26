@@ -15,7 +15,6 @@ from corp_by_os.query_engine import (
     search_projects,
 )
 
-
 # --- Fixtures ---
 
 

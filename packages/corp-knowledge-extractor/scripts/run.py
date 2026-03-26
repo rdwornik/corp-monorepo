@@ -34,12 +34,18 @@ load_dotenv(override=False)
 
 from config.config_loader import load_config
 from corp_knowledge_extractor.inventory import scan_input, FileType
-from corp_knowledge_extractor.extract import extract_knowledge, extract_from_text, extract_local, extract_pptx_multimodal, ExtractionError
+from corp_knowledge_extractor.extract import (
+    extract_knowledge,
+    extract_from_text,
+    extract_local,
+    extract_pptx_multimodal,
+    ExtractionError,
+)
 from corp_knowledge_extractor.correlate import correlate_files
 from corp_knowledge_extractor.synthesize import build_package, write_transcript_note
 from corp_knowledge_extractor.transcript import generate_transcript, TranscriptResult
 from corp_knowledge_extractor.reextract import reextract_package
-from corp_knowledge_extractor.frames.sampler import sample_frames, SampledFrame
+from corp_knowledge_extractor.frames.sampler import SampledFrame
 from corp_knowledge_extractor.frames.scene_detect import scene_detect
 from corp_knowledge_extractor.compress import compress_video
 
@@ -52,6 +58,7 @@ log = logging.getLogger(__name__)
 
 try:
     from rich.console import Console
+
     console = Console()
     HAS_RICH = True
 except ImportError:
@@ -65,6 +72,7 @@ def _print(msg: str) -> None:
     else:
         # Strip Rich markup for plain output
         import re
+
         print(re.sub(r"\[/?[a-z/ ]+\]", "", msg))
 
 
@@ -106,7 +114,8 @@ def keep_slide_frames(
         else:
             log.warning(
                 "Slide %d references frame_index=%d but no matching sample found",
-                slide.slide_number, frame_idx,
+                slide.slide_number,
+                frame_idx,
             )
 
     # Cleanup temp frames
@@ -167,8 +176,8 @@ def _propagate_session_id(extract_dir: Path, stem: str, session_id: str):
                     fm_text = text[3:end]
                     if "session_id:" not in fm_text:
                         # Insert session_id before closing ---
-                        new_fm = fm_text.rstrip() + f"\nsession_id: \"{session_id}\"\n"
-                        md_path.write_text(f"---\n{new_fm}---{text[end+3:]}", encoding="utf-8")
+                        new_fm = fm_text.rstrip() + f'\nsession_id: "{session_id}"\n'
+                        md_path.write_text(f"---\n{new_fm}---{text[end + 3 :]}", encoding="utf-8")
         except Exception as exc:
             log.warning("Failed to add session_id to %s: %s", md_path.name, exc)
 
@@ -227,11 +236,15 @@ def _try_session_merge(files, extracts, extract_dir, _print_fn):
 
                 # Write session note as YAML frontmatter + markdown
                 session_md_path = extract_dir / f"session_{merged['session_id']}.md"
-                fm_yaml = _yaml.dump(merged["frontmatter"], default_flow_style=False, allow_unicode=True, sort_keys=False)
+                fm_yaml = _yaml.dump(
+                    merged["frontmatter"], default_flow_style=False, allow_unicode=True, sort_keys=False
+                )
                 session_content = f"---\n{fm_yaml}---\n\n# {merged['frontmatter']['title']}\n\n{merged['markdown']}"
                 session_md_path.write_text(session_content, encoding="utf-8")
 
-                _print_fn(f"  Merged: {candidate.pptx_path.name} + {candidate.video_path.name} -> {session_md_path.name}")
+                _print_fn(
+                    f"  Merged: {candidate.pptx_path.name} + {candidate.video_path.name} -> {session_md_path.name}"
+                )
                 log.info("Merged session: %s", merged["session_id"])
 
                 # Propagate session_id to individual extraction files
@@ -242,8 +255,9 @@ def _try_session_merge(files, extracts, extract_dir, _print_fn):
                 _print_fn(f"  Crosslinked (low confidence): {candidate.pptx_path.name} <-> {candidate.video_path.name}")
 
         except Exception as exc:
-            log.warning("Session merge failed for %s <-> %s: %s",
-                        candidate.pptx_path.name, candidate.video_path.name, exc)
+            log.warning(
+                "Session merge failed for %s <-> %s: %s", candidate.pptx_path.name, candidate.video_path.name, exc
+            )
             _print_fn(f"  [WARN] Merge failed: {exc}")
 
 
@@ -263,17 +277,42 @@ def cli(ctx):
 @click.argument("input_path", type=click.Path(exists=True), default=None, required=False)
 @click.option("--output", default="output", show_default=True, help="Output directory")
 @click.option("--name", default=None, help="Package name (defaults to input name)")
-@click.option("--tier", type=click.IntRange(1, 3), default=None,
-              help="Force extraction tier: 1=local, 2=text-AI, 3=multimodal (default: auto)")
+@click.option(
+    "--tier",
+    type=click.IntRange(1, 3),
+    default=None,
+    help="Force extraction tier: 1=local, 2=text-AI, 3=multimodal (default: auto)",
+)
 @click.option("--dry-run-tiers", is_flag=True, help="Show tier routing + cost estimate without processing")
-@click.option("--prompt-file", type=click.Path(exists=True), default=None,
-              help="Custom extraction prompt file (replaces default prompt)")
-@click.option("--model", type=click.Choice(["flash", "pro"], case_sensitive=False), default=None,
-              help="Override LLM model. 'pro' uses Gemini 3.1 Pro for highest quality extraction.")
-@click.option("--no-compress", is_flag=True, help="Skip FFmpeg compression (fast testing; may cause h264 decode errors)")
+@click.option(
+    "--prompt-file",
+    type=click.Path(exists=True),
+    default=None,
+    help="Custom extraction prompt file (replaces default prompt)",
+)
+@click.option(
+    "--model",
+    type=click.Choice(["flash", "pro"], case_sensitive=False),
+    default=None,
+    help="Override LLM model. 'pro' uses Gemini 3.1 Pro for highest quality extraction.",
+)
+@click.option(
+    "--no-compress", is_flag=True, help="Skip FFmpeg compression (fast testing; may cause h264 decode errors)"
+)
 @click.option("--force", is_flag=True, help="Force re-extraction even if output exists with matching hash")
 @click.option("--context", default="", help="Additional context for extraction (e.g., 'JLR TMS RFP response')")
-def process(input_path: str | None, output: str, name: str | None, tier: int | None, dry_run_tiers: bool, prompt_file: str | None, model: str | None, no_compress: bool, force: bool, context: str):
+def process(
+    input_path: str | None,
+    output: str,
+    name: str | None,
+    tier: int | None,
+    dry_run_tiers: bool,
+    prompt_file: str | None,
+    model: str | None,
+    no_compress: bool,
+    force: bool,
+    context: str,
+):
     """Process a file or folder into a knowledge package.
 
     INPUT_PATH defaults to the data/input/ directory from config if not given.
@@ -297,6 +336,7 @@ def process(input_path: str | None, output: str, name: str | None, tier: int | N
 
     # Resolve input path — fall back to configured input directory
     from datetime import datetime
+
     using_default_input = input_path is None
     if using_default_input:
         input_path = config.get("input", {}).get("directory", "data/input")
@@ -316,8 +356,7 @@ def process(input_path: str | None, output: str, name: str | None, tier: int | N
         package_name = input_p.stem or "package"
     output_frames_dir = output_p / package_name / "source" / "frames"
 
-    _print(f"\n[bold]Corporate Knowledge Extractor[/bold]" if HAS_RICH
-           else "\nCorporate Knowledge Extractor")
+    _print("\n[bold]Corporate Knowledge Extractor[/bold]" if HAS_RICH else "\nCorporate Knowledge Extractor")
     _print(f"Input:   {input_p}")
     _print(f"Output:  {output_p / package_name}")
     _print("")
@@ -411,12 +450,14 @@ def process(input_path: str | None, output: str, name: str | None, tier: int | N
                     existing_hash = (existing.get("freshness") or {}).get("source_hash")
                     if existing_hash:
                         from corp_knowledge_extractor.freshness import compute_source_hash
+
                         current_hash = compute_source_hash(f.path)
                         if existing_hash == current_hash:
-                            _print(f"    [SKIP] Already extracted (hash match)")
+                            _print("    [SKIP] Already extracted (hash match)")
                             log.info("Skipping %s — already extracted (hash match)", f.path.name)
                             # Load existing result for downstream steps
                             from corp_knowledge_extractor.extract import ExtractionResult
+
                             extracts[f.name] = ExtractionResult(
                                 source_file=f,
                                 title=existing.get("title", f.path.stem),
@@ -432,17 +473,22 @@ def process(input_path: str | None, output: str, name: str | None, tier: int | N
             if decision.tier == Tier.LOCAL and decision.text_result:
                 result = extract_local(f, decision.text_result)
             elif decision.tier == Tier.TEXT_AI and decision.text_result:
-                result = extract_from_text(f, config, decision.text_result, custom_prompt=custom_prompt, user_context=context)
+                result = extract_from_text(
+                    f, config, decision.text_result, custom_prompt=custom_prompt, user_context=context
+                )
             elif f.path.suffix.lower() == ".pptx" and decision.tier == Tier.MULTIMODAL:
                 # PPTX multimodal: render slides as PNG, send to Gemini
                 from corp_knowledge_extractor.slides.renderer import render_slides
+
                 temp_slides_dir = output_p / package_name / "temp_slides" / f.name
                 rendered = render_slides(f.path, temp_slides_dir)
                 rendered_pptx_slides[f.name] = rendered
                 _print(f"    Rendered {len(rendered)} slide images")
                 result = extract_pptx_multimodal(f, config, rendered, custom_prompt=custom_prompt, user_context=context)
             else:
-                result = extract_knowledge(f, config, sampled_frames=frames, custom_prompt=custom_prompt, user_context=context)
+                result = extract_knowledge(
+                    f, config, sampled_frames=frames, custom_prompt=custom_prompt, user_context=context
+                )
             extracts[f.name] = result
             cost_total += decision.estimated_cost
             slide_info = f" | {len(result.slides)} slides identified" if result.slides else ""
@@ -457,13 +503,17 @@ def process(input_path: str | None, output: str, name: str | None, tier: int | N
             _print(f"    [FAIL] Unexpected {type(exc).__name__}: {exc}")
 
     if not extracts:
-        _print("[red]No files were successfully extracted.[/red]" if HAS_RICH
-               else "No files were successfully extracted.")
+        _print(
+            "[red]No files were successfully extracted.[/red]" if HAS_RICH else "No files were successfully extracted."
+        )
         sys.exit(1)
 
     if failed:
-        _print(f"\n[yellow]Warning: {len(failed)} file(s) failed.[/yellow]" if HAS_RICH
-               else f"\nWarning: {len(failed)} file(s) failed.")
+        _print(
+            f"\n[yellow]Warning: {len(failed)} file(s) failed.[/yellow]"
+            if HAS_RICH
+            else f"\nWarning: {len(failed)} file(s) failed."
+        )
 
     # --- 4b. Generate transcripts for video files ---
     transcripts: dict[str, TranscriptResult] = {}
@@ -479,7 +529,7 @@ def process(input_path: str | None, output: str, name: str | None, tier: int | N
                     if tr.status == "complete":
                         _print(f"    [OK] {tr.word_count} words")
                     else:
-                        _print(f"    [WARN] Transcript generation failed")
+                        _print("    [WARN] Transcript generation failed")
                 except Exception as exc:
                     log.warning("Transcript generation failed for %s: %s", f.path.name, exc)
                     _print(f"    [WARN] Transcript error: {exc}")
@@ -531,6 +581,7 @@ def process(input_path: str | None, output: str, name: str | None, tier: int | N
 
     # --- 8. Write machine-readable extract.json per file ---
     from datetime import datetime as _dt
+
     extract_dir = pkg_path / "extract"
     for stem, result in extracts.items():
         json_stem = result.output_stem or stem
@@ -538,7 +589,7 @@ def process(input_path: str | None, output: str, name: str | None, tier: int | N
         if custom_prompt:
             # Custom prompt: save raw Gemini JSON as-is (structure differs from standard)
             extract_data = {
-                "source_file": str(result.source_file.path).replace('\\', '/'),
+                "source_file": str(result.source_file.path).replace("\\", "/"),
                 "processed_at": _dt.now().isoformat(),
                 **result.raw_json,
             }
@@ -546,7 +597,7 @@ def process(input_path: str | None, output: str, name: str | None, tier: int | N
             extract_data = {
                 "schema_version": 2,
                 "id": json_stem,
-                "source_file": str(result.source_file.path).replace('\\', '/'),
+                "source_file": str(result.source_file.path).replace("\\", "/"),
                 "title": result.title,
                 "summary": result.summary,
                 "topics": result.topics,
@@ -577,7 +628,9 @@ def process(input_path: str | None, output: str, name: str | None, tier: int | N
                 "overlay": result.overlay,
                 "freshness": result.freshness,
             }
-        extract_json_path.write_text(json.dumps(extract_data, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
+        extract_json_path.write_text(
+            json.dumps(extract_data, indent=2, ensure_ascii=False, default=str), encoding="utf-8"
+        )
 
     # --- 8b. Write transcript notes ---
     for stem, tr in transcripts.items():
@@ -602,20 +655,33 @@ def process(input_path: str | None, output: str, name: str | None, tier: int | N
 @click.argument("manifest_path", type=click.Path(exists=True))
 @click.option("--resume", is_flag=True, help="Skip already-completed files")
 @click.option("--max-rpm", default=100, show_default=True, help="Max requests per minute to Gemini API")
-@click.option("--tier", type=click.IntRange(1, 3), default=None,
-              help="Force extraction tier: 1=local, 2=text-AI, 3=multimodal (default: auto)")
-@click.option("--batch", is_flag=True,
-              help="Use Gemini Batch API (50% cheaper, async processing)")
-@click.option("--batch-poll-interval", default=60, show_default=True,
-              help="Seconds between batch status checks")
-@click.option("--batch-timeout", default=86400, show_default=True,
-              help="Max seconds to wait for batch completion")
-@click.option("--model", type=click.Choice(["flash", "pro"], case_sensitive=False), default=None,
-              help="Override LLM model. 'pro' uses Gemini 3.1 Pro for highest quality extraction.")
+@click.option(
+    "--tier",
+    type=click.IntRange(1, 3),
+    default=None,
+    help="Force extraction tier: 1=local, 2=text-AI, 3=multimodal (default: auto)",
+)
+@click.option("--batch", is_flag=True, help="Use Gemini Batch API (50% cheaper, async processing)")
+@click.option("--batch-poll-interval", default=60, show_default=True, help="Seconds between batch status checks")
+@click.option("--batch-timeout", default=86400, show_default=True, help="Max seconds to wait for batch completion")
+@click.option(
+    "--model",
+    type=click.Choice(["flash", "pro"], case_sensitive=False),
+    default=None,
+    help="Override LLM model. 'pro' uses Gemini 3.1 Pro for highest quality extraction.",
+)
 @click.option("--force", is_flag=True, help="Force re-extraction even if files are already done (overrides --resume)")
-def process_manifest(manifest_path: str, resume: bool, max_rpm: int, tier: int | None,
-                     batch: bool, batch_poll_interval: int, batch_timeout: int, model: str | None,
-                     force: bool):
+def process_manifest(
+    manifest_path: str,
+    resume: bool,
+    max_rpm: int,
+    tier: int | None,
+    batch: bool,
+    batch_poll_interval: int,
+    batch_timeout: int,
+    model: str | None,
+    force: bool,
+):
     """Process multiple files from a JSON manifest.
 
     Used by corp-project-extractor for batch extraction.
@@ -650,23 +716,30 @@ def process_manifest(manifest_path: str, resume: bool, max_rpm: int, tier: int |
     else:
         _print(f"Batch poll: every {batch_poll_interval}s (timeout: {batch_timeout}s)")
     if resume:
-        _print("[yellow]Resume mode: skipping completed files[/yellow]" if HAS_RICH
-               else "Resume mode: skipping completed files")
+        _print(
+            "[yellow]Resume mode: skipping completed files[/yellow]"
+            if HAS_RICH
+            else "Resume mode: skipping completed files"
+        )
     _print("")
 
     if batch:
         from corp_knowledge_extractor.batch_api import BatchJobRunner
+
         runner = BatchJobRunner(manifest, config, force_tier=tier, resume=resume, force=force)
         summary = runner.run(poll_interval=batch_poll_interval, timeout=batch_timeout)
     else:
         from corp_knowledge_extractor.batch import BatchProcessor
+
         processor = BatchProcessor(manifest, config, max_rpm=max_rpm, resume=resume, force_tier=tier, force=force)
         summary = processor.process_all()
 
     _print("")
     done_str = f"[bold green]Done:[/bold green] {summary['done']}" if HAS_RICH else f"Done: {summary['done']}"
     err_str = f"[bold red]Errors:[/bold red] {summary['error']}" if HAS_RICH else f"Errors: {summary['error']}"
-    skip_str = f"[bold yellow]Skipped:[/bold yellow] {summary['skipped']}" if HAS_RICH else f"Skipped: {summary['skipped']}"
+    skip_str = (
+        f"[bold yellow]Skipped:[/bold yellow] {summary['skipped']}" if HAS_RICH else f"Skipped: {summary['skipped']}"
+    )
     _print(done_str)
     _print(err_str)
     _print(skip_str)
@@ -674,7 +747,7 @@ def process_manifest(manifest_path: str, resume: bool, max_rpm: int, tier: int |
     tiers = summary.get("tiers", {})
     if any(tiers.values()):
         _print(f"\nTiers: local={tiers.get(1, 0)}, text-AI={tiers.get(2, 0)}, multimodal={tiers.get(3, 0)}")
-        cost = summary.get('cost', 0)
+        cost = summary.get("cost", 0)
         cost_label = f"${cost:.4f}"
         if batch:
             cost_label += " (50% batch discount applied to Tier 2)"
@@ -694,7 +767,7 @@ def reextract(package_path: str):
     _print(f"\nRe-extracting: {pkg}")
     try:
         reextract_package(pkg, config)
-        _print(f"\n[green]Done.[/green]" if HAS_RICH else "\nDone.")
+        _print("\n[green]Done.[/green]" if HAS_RICH else "\nDone.")
         _print(f"Package: {pkg}")
     except Exception as exc:
         _print(f"[red]Error: {exc}[/red]" if HAS_RICH else f"Error: {exc}")
@@ -747,7 +820,8 @@ def info(package_path: str):
 @click.option("--recursive/--no-recursive", default=True, help="Scan subfolders")
 @click.option("--output", "-o", default=None, help="Output JSON path (default: stdout)")
 @click.option(
-    "--exclude", multiple=True,
+    "--exclude",
+    multiple=True,
     default=["80_Archive", ".corp", "_knowledge", ".venv", "__pycache__", ".git"],
     help="Folders to skip",
 )

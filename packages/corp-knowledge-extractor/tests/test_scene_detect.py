@@ -1,19 +1,13 @@
 """Tests for FFmpeg scene detection frame sampling."""
 
-import subprocess
-from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 import pytest
 
 from corp_knowledge_extractor.frames.sampler import SampledFrame
 from corp_knowledge_extractor.frames.scene_detect import (
     scene_detect,
-    _run_ffmpeg_scene_detect,
-    CIRCUIT_BREAKER_MAX,
-    CIRCUIT_BREAKER_TARGET,
     DYNAMIC_CAP_MAX,
-    DYNAMIC_CAP_EXTRA,
     MIN_FRAMES_FLOOR,
 )
 
@@ -52,6 +46,7 @@ class TestSceneDetectCreatesFrames:
                 out.parent.mkdir(parents=True, exist_ok=True)
                 out.write_bytes(b"PNG_FAKE")
                 return True
+
             mock_extract.side_effect = fake_extract
 
             frames = scene_detect(video, out_dir, config)
@@ -77,10 +72,12 @@ class TestSceneDetectFloor:
             patch("corp_knowledge_extractor.frames.scene_detect._extract_frame_at") as mock_extract,
             patch("corp_knowledge_extractor.frames.scene_detect._histogram_correlation", return_value=0.3),
         ):
+
             def fake_extract(vp, ts, out):
                 out.parent.mkdir(parents=True, exist_ok=True)
                 out.write_bytes(b"PNG_FAKE")
                 return True
+
             mock_extract.side_effect = fake_extract
 
             frames = scene_detect(video, out_dir, config)
@@ -103,10 +100,12 @@ class TestSceneDetectCircuitBreaker:
             patch("corp_knowledge_extractor.frames.scene_detect._extract_frame_at") as mock_extract,
             patch("corp_knowledge_extractor.frames.scene_detect._histogram_correlation", return_value=0.3),
         ):
+
             def fake_extract(vp, ts, out):
                 out.parent.mkdir(parents=True, exist_ok=True)
                 out.write_bytes(b"PNG_FAKE")
                 return True
+
             mock_extract.side_effect = fake_extract
 
             frames = scene_detect(video, out_dir, config)
@@ -138,10 +137,12 @@ class TestSceneDetectDedup:
             patch("corp_knowledge_extractor.frames.scene_detect._extract_frame_at") as mock_extract,
             patch("corp_knowledge_extractor.frames.scene_detect._histogram_correlation", side_effect=fake_corr),
         ):
+
             def fake_extract(vp, ts, out):
                 out.parent.mkdir(parents=True, exist_ok=True)
                 out.write_bytes(b"PNG_FAKE")
                 return True
+
             mock_extract.side_effect = fake_extract
 
             frames = scene_detect(video, out_dir, config)
@@ -165,10 +166,12 @@ class TestSceneDetectDynamicCap:
             patch("corp_knowledge_extractor.frames.scene_detect._extract_frame_at") as mock_extract,
             patch("corp_knowledge_extractor.frames.scene_detect._histogram_correlation", return_value=0.3),
         ):
+
             def fake_extract(vp, ts, out):
                 out.parent.mkdir(parents=True, exist_ok=True)
                 out.write_bytes(b"PNG_FAKE")
                 return True
+
             mock_extract.side_effect = fake_extract
 
             frames = scene_detect(video, out_dir, config)
@@ -187,7 +190,10 @@ class TestSceneDetectFallback:
         mock_frames = [SampledFrame(path=tmp_path / "f.png", index=0, timestamp_sec=0.0)]
 
         with (
-            patch("corp_knowledge_extractor.frames.scene_detect._run_ffmpeg_scene_detect", side_effect=FileNotFoundError("ffmpeg not found")),
+            patch(
+                "corp_knowledge_extractor.frames.scene_detect._run_ffmpeg_scene_detect",
+                side_effect=FileNotFoundError("ffmpeg not found"),
+            ),
             patch("corp_knowledge_extractor.frames.sampler.sample_frames", return_value=mock_frames) as mock_sampler,
         ):
             frames = scene_detect(video, out_dir, config)

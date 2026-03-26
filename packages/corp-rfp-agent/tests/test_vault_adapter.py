@@ -56,7 +56,9 @@ def test_retrieve_parses_json():
     fake_result.stdout = stdout
     fake_result.stderr = ""
 
-    with patch("corp_rfp_agent.vault_adapter.subprocess.run", return_value=fake_result) as mock_run:
+    with patch(
+        "corp_rfp_agent.vault_adapter.subprocess.run", return_value=fake_result
+    ) as mock_run:
         result = vault_adapter.retrieve("warehouse API", limit=5)
 
     # Verify CLI was called correctly
@@ -107,7 +109,9 @@ def test_retrieve_filters_by_product():
     fake_result.stdout = stdout
     fake_result.stderr = ""
 
-    with patch("corp_rfp_agent.vault_adapter.subprocess.run", return_value=fake_result) as mock_run:
+    with patch(
+        "corp_rfp_agent.vault_adapter.subprocess.run", return_value=fake_result
+    ) as mock_run:
         vault_adapter.retrieve("API integration", products=["wms", "planning"])
 
     cmd = mock_run.call_args[0][0]
@@ -183,7 +187,8 @@ def test_fallback_when_cli_unavailable():
             side_effect=FileNotFoundError("corp not found"),
         ),
         patch(
-            "corp_rfp_agent.vault_adapter._retrieve_via_sqlite", return_value=[_sample_note()]
+            "corp_rfp_agent.vault_adapter._retrieve_via_sqlite",
+            return_value=[_sample_note()],
         ) as mock_sql,
     ):
         result = vault_adapter.retrieve("test query")

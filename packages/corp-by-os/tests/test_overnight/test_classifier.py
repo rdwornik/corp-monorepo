@@ -2,17 +2,13 @@
 
 from __future__ import annotations
 
-import pytest
-
 from corp_by_os.overnight.classifier import (
-    ClassificationResult,
-    classify_from_metadata,
-    classify_batch,
-    generate_filename,
-    _slugify,
-    _propose_rename,
     _clean_spaces,
-    _enrich_generic_name,
+    _propose_rename,
+    _slugify,
+    classify_batch,
+    classify_from_metadata,
+    generate_filename,
 )
 
 

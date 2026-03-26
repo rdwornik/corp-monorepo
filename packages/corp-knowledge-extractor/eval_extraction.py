@@ -8,11 +8,9 @@ Usage:
 Produces a concise scorecard you can paste into chat for feedback.
 """
 
-import json
 import sys
 import yaml
 from pathlib import Path
-from datetime import datetime
 
 
 def load_frontmatter(md_path: Path) -> dict:
@@ -36,7 +34,7 @@ def count_content(md_path: Path) -> dict:
     if text.startswith("---"):
         end = text.find("---", 3)
         if end != -1:
-            text = text[end + 3:]
+            text = text[end + 3 :]
 
     lines = text.strip().split("\n")
     sections = [l for l in lines if l.startswith("## ")]
@@ -77,10 +75,17 @@ def assess_fact_quality(key_facts: list) -> dict:
 def assess_enrichment(key_facts: list) -> dict:
     """Check RFP enrichment fields (polarity, locator, source_date) on facts."""
     if not key_facts or not isinstance(key_facts[0], dict):
-        return {"has_polarity": False, "has_locator": False, "has_source_date": False,
-                "polarity_count": 0, "locator_count": 0}
+        return {
+            "has_polarity": False,
+            "has_locator": False,
+            "has_source_date": False,
+            "polarity_count": 0,
+            "locator_count": 0,
+        }
 
-    polarity_count = sum(1 for f in key_facts if isinstance(f, dict) and f.get("polarity") and f["polarity"] != "unknown")
+    polarity_count = sum(
+        1 for f in key_facts if isinstance(f, dict) and f.get("polarity") and f["polarity"] != "unknown"
+    )
     locator_count = sum(1 for f in key_facts if isinstance(f, dict) and f.get("locator"))
 
     return {
@@ -250,9 +255,9 @@ def evaluate_package(package_dir: Path) -> dict:
 
 def print_scorecard(result: dict):
     """Print concise scorecard for pasting."""
-    print(f"\n{'='*70}")
+    print(f"\n{'=' * 70}")
     print(f"EXTRACTION QUALITY: {result['package']}")
-    print(f"{'='*70}")
+    print(f"{'=' * 70}")
     print(f"Package score: {result['score']}/100")
 
     for fname, feval in result["files"].items():
@@ -262,10 +267,18 @@ def print_scorecard(result: dict):
         print(f"\n--- {feval['title'][:60]} ---")
         print(f"  Model: {feval['model']} | v{feval['extraction_version']} | {feval['depth']} | {feval['doc_type']}")
         print(f"  Score: {feval['score']}/100 | Quality: {feval['quality']}")
-        print(f"  Key facts: {fq['count']} ({fq['specific_count']} specific, {fq['generic_count']} generic, avg {fq['avg_length']} chars)")
-        print(f"  Entities: {feval['entities_count']} | Topics: {feval['topics_count']} | Products: {feval['products_count']}")
-        print(f"  Content: {feval['content']['total_chars']} chars, {feval['content']['sections']} sections, {feval['content']['images']} images")
-        print(f"  Overlay: {'YES (' + feval['overlay_type'] + ', ' + str(feval['overlay_fields_populated']) + '/' + str(feval['overlay_fields_total']) + ' fields)' if feval['has_overlay'] else 'NO'}")
+        print(
+            f"  Key facts: {fq['count']} ({fq['specific_count']} specific, {fq['generic_count']} generic, avg {fq['avg_length']} chars)"
+        )
+        print(
+            f"  Entities: {feval['entities_count']} | Topics: {feval['topics_count']} | Products: {feval['products_count']}"
+        )
+        print(
+            f"  Content: {feval['content']['total_chars']} chars, {feval['content']['sections']} sections, {feval['content']['images']} images"
+        )
+        print(
+            f"  Overlay: {'YES (' + feval['overlay_type'] + ', ' + str(feval['overlay_fields_populated']) + '/' + str(feval['overlay_fields_total']) + ' fields)' if feval['has_overlay'] else 'NO'}"
+        )
         print(f"  Freshness: {'YES' if feval['has_freshness'] else 'NO'}")
         print(f"  Slides: {feval['slides_count']} | Frames: {feval['frames_count']} | Images: {feval['images_count']}")
         if feval["slide_coverage"] is not None:
@@ -275,21 +288,25 @@ def print_scorecard(result: dict):
 
         # Issues
         if fq["count"] == 0:
-            print(f"  !! No key_facts extracted")
+            print("  !! No key_facts extracted")
         elif fq["quality_ratio"] < 0.5:
             print(f"  !! {fq['generic_count']}/{fq['count']} facts are generic (<30 chars)")
         if feval.get("low_content"):
-            print(f"  !! Low content source ({feval['content']['total_chars']} chars) — score reflects limited material")
+            print(
+                f"  !! Low content source ({feval['content']['total_chars']} chars) — score reflects limited material"
+            )
         elif feval["content"]["total_chars"] < 500:
             print(f"  !! Very short content ({feval['content']['total_chars']} chars)")
         if feval.get("is_static_doc"):
-            print(f"  (static doc — overlay scored on present fields, not meeting fields)")
+            print("  (static doc — overlay scored on present fields, not meeting fields)")
         if not feval["has_overlay"] and feval["depth"] == "deep":
-            print(f"  !! Deep extraction but no overlay")
+            print("  !! Deep extraction but no overlay")
         if feval["quality"] == "fragment":
-            print(f"  !! Fragment quality — incomplete extraction")
+            print("  !! Fragment quality — incomplete extraction")
         if feval["slide_coverage"] is not None and feval["slide_coverage"] < 0.5:
-            print(f"  !! Low slide coverage — {feval['content']['sections']} sections for {feval['slides_count'] or feval['content']['images']} slides")
+            print(
+                f"  !! Low slide coverage — {feval['content']['sections']} sections for {feval['slides_count'] or feval['content']['images']} slides"
+            )
 
     if result["issues"]:
         print(f"\nPackage issues: {', '.join(result['issues'])}")
@@ -300,9 +317,9 @@ def compare_packages(old_dir: Path, new_dir: Path):
     old = evaluate_package(old_dir)
     new = evaluate_package(new_dir)
 
-    print(f"\n{'='*70}")
+    print(f"\n{'=' * 70}")
     print(f"COMPARISON: {old['package']} -> {new['package']}")
-    print(f"{'='*70}")
+    print(f"{'=' * 70}")
     delta = new["score"] - old["score"]
     arrow = "+" if delta > 0 else "" if delta < 0 else "="
     print(f"Score: {old['score']}/100 -> {new['score']}/100 ({arrow}{delta} pts)")
@@ -328,19 +345,24 @@ def compare_packages(old_dir: Path, new_dir: Path):
 
         print(f"\n  {n['title'][:55]}")
         if o:
+
             def delta_str(old_val, new_val, fmt="{:>5}"):
                 d = new_val - old_val if isinstance(new_val, (int, float)) else 0
                 arrow = "+" if d > 0 else "" if d < 0 else " "
                 return f"{fmt.format(old_val)} -> {fmt.format(new_val)} ({arrow}{d})"
 
-            print(f"    Score:      {delta_str(o.get('score',0), n['score'])}")
+            print(f"    Score:      {delta_str(o.get('score', 0), n['score'])}")
             print(f"    Key facts:  {delta_str(o['key_facts_count'], n['key_facts_count'])}")
             print(f"    Entities:   {delta_str(o['entities_count'], n['entities_count'])}")
             print(f"    Content:    {delta_str(o['content']['total_chars'], n['content']['total_chars'])}")
-            print(f"    Overlay:    {'NO' if not o['has_overlay'] else 'YES'} -> {'NO' if not n['has_overlay'] else 'YES'}")
-            print(f"    Slides:     {delta_str(o.get('slides_count',0), n.get('slides_count',0))}")
-            print(f"    Freshness:  {'NO' if not o['has_freshness'] else 'YES'} -> {'NO' if not n['has_freshness'] else 'YES'}")
-            print(f"    Version:    v{o.get('extraction_version',1)} -> v{n.get('extraction_version',1)}")
+            print(
+                f"    Overlay:    {'NO' if not o['has_overlay'] else 'YES'} -> {'NO' if not n['has_overlay'] else 'YES'}"
+            )
+            print(f"    Slides:     {delta_str(o.get('slides_count', 0), n.get('slides_count', 0))}")
+            print(
+                f"    Freshness:  {'NO' if not o['has_freshness'] else 'YES'} -> {'NO' if not n['has_freshness'] else 'YES'}"
+            )
+            print(f"    Version:    v{o.get('extraction_version', 1)} -> v{n.get('extraction_version', 1)}")
 
 
 if __name__ == "__main__":
@@ -373,6 +395,6 @@ if __name__ == "__main__":
             total_score += result["score"]
 
         avg = round(total_score / len(packages)) if packages else 0
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print(f"OVERALL: {len(packages)} packages, average score {avg}/100")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")

@@ -7,19 +7,17 @@ from datetime import date, timedelta
 import pytest
 
 from corp_by_os.intent_router import (
-    Intent,
     _extract_date,
     _extract_priority,
     _extract_product,
     _extract_reason,
+    _keyword_match,
     _next_weekday,
     _normalize,
     _strip_diacritics,
-    _keyword_match,
     route,
 )
-from corp_by_os.models import Workflow, WorkflowParam, WorkflowStep
-
+from corp_by_os.models import Workflow, WorkflowParam
 
 # --- Fixtures ---
 

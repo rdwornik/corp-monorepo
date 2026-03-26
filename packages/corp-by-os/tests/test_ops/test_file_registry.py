@@ -47,9 +47,7 @@ class TestRegisterFile:
         rec = registry.register_file("hash1", "v1.pptx", "C:/new/path.pptx", 100)
         assert rec.current_path == "C:/new/path.pptx"
 
-    def test_register_existing_updates_last_seen(
-        self, registry: FileRegistry
-    ) -> None:
+    def test_register_existing_updates_last_seen(self, registry: FileRegistry) -> None:
         """Same hash, same path → last_seen_at updated."""
         rec1 = registry.register_file("hash1", "f.pptx", "C:/p.pptx", 100)
         rec2 = registry.register_file("hash1", "f.pptx", "C:/p.pptx", 100)
@@ -57,9 +55,7 @@ class TestRegisterFile:
         # last_seen_at >= first_seen_at (may be equal if same second)
         assert rec2.last_seen_at >= rec1.first_seen_at
 
-    def test_register_preserves_original_name(
-        self, registry: FileRegistry
-    ) -> None:
+    def test_register_preserves_original_name(self, registry: FileRegistry) -> None:
         """Re-registration with different filename keeps original_name."""
         rec1 = registry.register_file("hash1", "original.pptx", "C:/a.pptx", 100)
         rec2 = registry.register_file("hash1", "renamed.pptx", "C:/b.pptx", 100)
@@ -67,9 +63,7 @@ class TestRegisterFile:
 
     def test_register_normalizes_backslashes(self, registry: FileRegistry) -> None:
         """Windows backslashes in path are normalized to forward slashes."""
-        rec = registry.register_file(
-            "hash1", "f.pptx", "C:\\Users\\test\\f.pptx", 100
-        )
+        rec = registry.register_file("hash1", "f.pptx", "C:\\Users\\test\\f.pptx", 100)
         assert "\\" not in rec.current_path
 
 
@@ -141,14 +135,10 @@ class TestExtractions:
         assert registry.get_extractions(rec.file_id) == []
         assert registry.latest_extraction(rec.file_id) is None
 
-    def test_extraction_normalizes_vault_path(
-        self, registry: FileRegistry
-    ) -> None:
+    def test_extraction_normalizes_vault_path(self, registry: FileRegistry) -> None:
         """Windows backslashes in vault_note_path are normalized."""
         rec = registry.register_file("h1", "f.pptx", "C:/f.pptx", 100)
-        ext = registry.record_extraction(
-            rec.file_id, "model", "01_Knowledge\\test\\pkg"
-        )
+        ext = registry.record_extraction(rec.file_id, "model", "01_Knowledge\\test\\pkg")
         assert "\\" not in ext.vault_note_path
 
     def test_extraction_cost_optional(self, registry: FileRegistry) -> None:

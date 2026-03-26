@@ -39,8 +39,10 @@ def get_video_info(video_path: str) -> dict:
         result = subprocess.run(
             [
                 "ffprobe",
-                "-v", "quiet",
-                "-print_format", "json",
+                "-v",
+                "quiet",
+                "-print_format",
+                "json",
                 "-show_format",
                 "-show_streams",
                 video_path,
@@ -67,9 +69,7 @@ def get_video_info(video_path: str) -> dict:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Compress training videos for knowledge extraction"
-    )
+    parser = argparse.ArgumentParser(description="Compress training videos for knowledge extraction")
     parser.add_argument("input", help="Input video file path")
     parser.add_argument("-o", "--output", help="Output file path")
     parser.add_argument(

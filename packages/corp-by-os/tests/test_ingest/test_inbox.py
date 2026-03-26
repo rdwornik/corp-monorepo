@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
+
 from corp_by_os.ingest.inbox import (
     _get_custom_destination,
     _list_events,
@@ -172,9 +173,7 @@ class TestMoveFile:
 
 
 class TestLogIngestEvent:
-    def test_logs_event(
-        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
-    ) -> None:
+    def test_logs_event(self, mywork: Path, registry: ContentRegistry, ops: OpsDB) -> None:
         inbox = mywork / "00_Inbox"
         f = inbox / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"x" * 100)
@@ -192,9 +191,15 @@ class TestLogIngestEvent:
         shutil.copy2(str(f), str(dest_file))
 
         event_id = _log_ingest_event(
-            ops, f, dest_file, mywork,
-            classification, f.name, "renamed.pptx",
-            "test context", True,
+            ops,
+            f,
+            dest_file,
+            mywork,
+            classification,
+            f.name,
+            "renamed.pptx",
+            "test context",
+            True,
         )
         assert event_id > 0
 
@@ -215,8 +220,12 @@ class TestProcessFile:
         f.write_bytes(b"x" * 100)
 
         action = process_file(
-            f, mywork, registry, ops,
-            auto=True, skip_extract=True,
+            f,
+            mywork,
+            registry,
+            ops,
+            auto=True,
+            skip_extract=True,
         )
         assert action == "routed"
         assert not f.exists()  # file moved
@@ -232,29 +241,34 @@ class TestProcessFile:
         # Mock the interactive prompt to return 's' (skip)
         with patch("corp_by_os.ingest.inbox._prompt_action", return_value="s"):
             action = process_file(
-                f, mywork, registry, ops,
-                auto=True, skip_extract=True,
+                f,
+                mywork,
+                registry,
+                ops,
+                auto=True,
+                skip_extract=True,
             )
         assert action == "skipped"
 
-    def test_dry_run_no_move(
-        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
-    ) -> None:
+    def test_dry_run_no_move(self, mywork: Path, registry: ContentRegistry, ops: OpsDB) -> None:
         """Dry run doesn't move files."""
         inbox = mywork / "00_Inbox"
         f = inbox / "Cognitive_Friday_S4_Test.pptx"
         f.write_bytes(b"x" * 100)
 
         action = process_file(
-            f, mywork, registry, ops,
-            auto=True, dry_run=True, skip_extract=True,
+            f,
+            mywork,
+            registry,
+            ops,
+            auto=True,
+            dry_run=True,
+            skip_extract=True,
         )
         assert action == "routed"
         assert f.exists()  # file NOT moved in dry run
 
-    def test_interactive_accept(
-        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
-    ) -> None:
+    def test_interactive_accept(self, mywork: Path, registry: ContentRegistry, ops: OpsDB) -> None:
         """Interactive mode: user accepts suggestion."""
         inbox = mywork / "00_Inbox"
         f = inbox / "RFP_Database_WMS.xlsx"
@@ -262,15 +276,16 @@ class TestProcessFile:
 
         with patch("corp_by_os.ingest.inbox._prompt_action", return_value="a"):
             action = process_file(
-                f, mywork, registry, ops,
+                f,
+                mywork,
+                registry,
+                ops,
                 skip_extract=True,
             )
         assert action == "routed"
         assert not f.exists()
 
-    def test_interactive_skip(
-        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
-    ) -> None:
+    def test_interactive_skip(self, mywork: Path, registry: ContentRegistry, ops: OpsDB) -> None:
         """Interactive mode: user skips file."""
         inbox = mywork / "00_Inbox"
         f = inbox / "test.pdf"
@@ -278,15 +293,16 @@ class TestProcessFile:
 
         with patch("corp_by_os.ingest.inbox._prompt_action", return_value="s"):
             action = process_file(
-                f, mywork, registry, ops,
+                f,
+                mywork,
+                registry,
+                ops,
                 skip_extract=True,
             )
         assert action == "skipped"
         assert f.exists()
 
-    def test_interactive_quit(
-        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
-    ) -> None:
+    def test_interactive_quit(self, mywork: Path, registry: ContentRegistry, ops: OpsDB) -> None:
         """Interactive mode: user quits."""
         inbox = mywork / "00_Inbox"
         f = inbox / "test.pdf"
@@ -294,7 +310,10 @@ class TestProcessFile:
 
         with patch("corp_by_os.ingest.inbox._prompt_action", return_value="q"):
             action = process_file(
-                f, mywork, registry, ops,
+                f,
+                mywork,
+                registry,
+                ops,
                 skip_extract=True,
             )
         assert action == "quit"
@@ -311,8 +330,12 @@ class TestUndoEvent:
 
         # Route the file via auto mode
         action = process_file(
-            f, mywork, registry, ops,
-            auto=True, skip_extract=True,
+            f,
+            mywork,
+            registry,
+            ops,
+            auto=True,
+            skip_extract=True,
         )
         assert action == "routed"
         assert not f.exists()
@@ -371,8 +394,14 @@ class TestUserContext:
         captured_context: list[str | None] = []
 
         def mock_run_extraction(
-            file_path, mywork_root, ops_db, asset_id, content_hash, mtime_str,
-            user_context=None, config=None,
+            file_path,
+            mywork_root,
+            ops_db,
+            asset_id,
+            content_hash,
+            mtime_str,
+            user_context=None,
+            config=None,
         ):
             captured_context.append(user_context)
             return None, 0.0
@@ -392,7 +421,9 @@ class TestUserContext:
             shutil.copy2(str(f), str(dest_file))
 
             _trigger_extraction(
-                dest_file, mywork, ops,
+                dest_file,
+                mywork,
+                ops,
                 user_context="Cognitive Friday S4E1, tag changes in platform",
             )
 
@@ -410,8 +441,14 @@ class TestUserContext:
         captured_context: list[str | None] = []
 
         def mock_run_extraction(
-            file_path, mywork_root, ops_db, asset_id, content_hash, mtime_str,
-            user_context=None, config=None,
+            file_path,
+            mywork_root,
+            ops_db,
+            asset_id,
+            content_hash,
+            mtime_str,
+            user_context=None,
+            config=None,
         ):
             captured_context.append(user_context)
             return None, 0.0
@@ -478,9 +515,7 @@ class TestListEvents:
         # Should not raise — just prints "No ingest-inbox events found."
         _list_events(ops)
 
-    def test_list_respects_limit(
-        self, mywork: Path, registry: ContentRegistry, ops: OpsDB
-    ) -> None:
+    def test_list_respects_limit(self, mywork: Path, registry: ContentRegistry, ops: OpsDB) -> None:
         """--list with limit returns at most N events."""
         inbox = mywork / "00_Inbox"
         for i in range(5):
@@ -526,8 +561,12 @@ class TestFullUndo:
         with patch("corp_by_os.index_builder.rebuild_index") as mock_rebuild:
             mock_rebuild.return_value = MagicMock(notes_indexed=0)
             _undo_event(
-                event_id, ops, mywork, full=True,
-                vault_path=vault_dir, app_data_path=tmp_path / "appdata",
+                event_id,
+                ops,
+                mywork,
+                full=True,
+                vault_path=vault_dir,
+                app_data_path=tmp_path / "appdata",
             )
 
         assert not vault_pkg.exists(), "Vault package should be removed"
@@ -549,7 +588,10 @@ class TestFullUndo:
         with patch("corp_by_os.index_builder.rebuild_index") as mock_rebuild:
             mock_rebuild.return_value = MagicMock(notes_indexed=42)
             _undo_event(
-                event_id, ops, mywork, full=True,
+                event_id,
+                ops,
+                mywork,
+                full=True,
                 vault_path=tmp_path / "vault",
                 app_data_path=tmp_path / "appdata",
             )
@@ -574,7 +616,10 @@ class TestFullUndo:
         with patch("corp_by_os.index_builder.rebuild_index") as mock_rebuild:
             mock_rebuild.return_value = MagicMock(notes_indexed=0)
             result = _undo_event(
-                event_id, ops, mywork, full=True,
+                event_id,
+                ops,
+                mywork,
+                full=True,
                 vault_path=tmp_path / "vault",
                 app_data_path=tmp_path / "appdata",
             )
@@ -602,9 +647,7 @@ class TestFullUndo:
 class TestVaultNotePathStored:
     def test_vault_note_path_column_exists(self, ops: OpsDB) -> None:
         """ingest_events table has vault_note_path column."""
-        row = ops.conn.execute(
-            "PRAGMA table_info(ingest_events)"
-        ).fetchall()
+        row = ops.conn.execute("PRAGMA table_info(ingest_events)").fetchall()
         col_names = [r[1] for r in row]
         assert "vault_note_path" in col_names
 
@@ -649,7 +692,12 @@ class TestRegistrationAtRouteTime:
         f.write_bytes(b"x" * 100)
 
         action = process_file(
-            f, mywork, registry, ops, auto=True, skip_extract=True,
+            f,
+            mywork,
+            registry,
+            ops,
+            auto=True,
+            skip_extract=True,
         )
         assert action == "routed"
 
@@ -668,7 +716,12 @@ class TestRegistrationAtRouteTime:
         f1 = inbox / "Cognitive_Friday_S4.pptx"
         f1.write_bytes(content)
         action1 = process_file(
-            f1, mywork, registry, ops, auto=True, skip_extract=True,
+            f1,
+            mywork,
+            registry,
+            ops,
+            auto=True,
+            skip_extract=True,
         )
         assert action1 == "routed"
 
@@ -676,7 +729,12 @@ class TestRegistrationAtRouteTime:
         f2 = inbox / "Cognitive_Friday_S4_copy.pptx"
         f2.write_bytes(content)
         action2 = process_file(
-            f2, mywork, registry, ops, auto=True, skip_extract=True,
+            f2,
+            mywork,
+            registry,
+            ops,
+            auto=True,
+            skip_extract=True,
         )
         assert action2 == "skipped"
         assert f2.exists(), "Dedup-skipped file should stay in Inbox"
@@ -700,7 +758,12 @@ class TestRegistrationAtRouteTime:
         f2 = inbox / "Cognitive_Friday_S4_copy.pptx"
         f2.write_bytes(content)
         action = process_file(
-            f2, mywork, registry, ops, auto=True, skip_extract=True,
+            f2,
+            mywork,
+            registry,
+            ops,
+            auto=True,
+            skip_extract=True,
         )
         assert action == "skipped"
 
@@ -737,7 +800,12 @@ class TestRegistrationAtRouteTime:
         f.write_bytes(b"brand_new_content")
 
         action = process_file(
-            f, mywork, registry, ops, auto=True, skip_extract=True,
+            f,
+            mywork,
+            registry,
+            ops,
+            auto=True,
+            skip_extract=True,
         )
         assert action == "routed"
         assert not f.exists()  # File was moved
@@ -763,10 +831,13 @@ class TestRegistrationAtRouteTime:
         with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
             mock_prompt.ask.return_value = "s"
             action = process_file(
-                f2, mywork, registry, ops, skip_extract=True,
+                f2,
+                mywork,
+                registry,
+                ops,
+                skip_extract=True,
             )
         assert action == "skipped"
-
 
     def test_dedup_skip_logged_to_ops(
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
@@ -789,9 +860,7 @@ class TestRegistrationAtRouteTime:
         process_file(f2, mywork, registry, ops, auto=True, skip_extract=True)
 
         # Verify dedup_skip event was logged
-        row = ops.conn.execute(
-            "SELECT * FROM ingest_events WHERE action = 'dedup_skip'"
-        ).fetchone()
+        row = ops.conn.execute("SELECT * FROM ingest_events WHERE action = 'dedup_skip'").fetchone()
         assert row is not None, "dedup_skip event should be logged to ops.db"
         assert "hash=" in row["reasoning"]
 
@@ -820,7 +889,11 @@ class TestContextBehavior:
                 return_value="This is an RFI from the client",
             ):
                 action = process_file(
-                    f, mywork, registry, ops, skip_extract=True,
+                    f,
+                    mywork,
+                    registry,
+                    ops,
+                    skip_extract=True,
                 )
 
         assert action == "routed"
@@ -853,7 +926,11 @@ class TestContextBehavior:
         with patch("corp_by_os.ingest.inbox._prompt_action", side_effect=mock_prompt_action):
             with patch("corp_by_os.ingest.inbox._get_user_context", return_value="test context"):
                 action = process_file(
-                    f, mywork, registry, ops, skip_extract=True,
+                    f,
+                    mywork,
+                    registry,
+                    ops,
+                    skip_extract=True,
                 )
 
         assert action == "routed"
@@ -949,8 +1026,12 @@ class TestDefaultDestination:
         dest_dir.mkdir(parents=True)
 
         action = process_file(
-            f, mywork, registry, ops,
-            auto=True, skip_extract=True,
+            f,
+            mywork,
+            registry,
+            ops,
+            auto=True,
+            skip_extract=True,
             default_destination="10_Projects/JLR",
         )
         assert action == "routed"
@@ -976,7 +1057,10 @@ class TestDefaultDestination:
         with patch("corp_by_os.ingest.inbox._prompt_action") as mock_prompt:
             mock_prompt.return_value = "a"
             action = process_file(
-                f, mywork, registry, ops,
+                f,
+                mywork,
+                registry,
+                ops,
                 skip_extract=True,
                 default_destination="10_Projects/JLR",
             )
@@ -1005,7 +1089,10 @@ class TestDefaultDestination:
         with patch("corp_by_os.ingest.inbox._prompt_action", side_effect=mock_prompt):
             with patch("corp_by_os.ingest.inbox._get_custom_destination", return_value="50_RFP"):
                 action = process_file(
-                    f, mywork, registry, ops,
+                    f,
+                    mywork,
+                    registry,
+                    ops,
                     skip_extract=True,
                     default_destination="10_Projects/JLR",
                 )
@@ -1027,8 +1114,12 @@ class TestDefaultDestination:
         (mywork / "10_Projects" / "JLR").mkdir(parents=True)
 
         action = process_file(
-            f, mywork, registry, ops,
-            auto=True, skip_extract=True,
+            f,
+            mywork,
+            registry,
+            ops,
+            auto=True,
+            skip_extract=True,
             default_destination="10_Projects/JLR",
         )
         assert action == "routed"

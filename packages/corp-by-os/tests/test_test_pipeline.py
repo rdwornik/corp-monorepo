@@ -12,13 +12,14 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from corp_os_meta.pipeline_config import PipelineConfig
+
 from corp_by_os.test_pipeline import (
     PipelineTestReport,
     StepResult,
     format_report,
     run_pipeline_test,
 )
-from corp_os_meta.pipeline_config import PipelineConfig
 
 
 @pytest.fixture()

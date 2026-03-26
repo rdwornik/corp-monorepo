@@ -17,7 +17,6 @@ from corp_by_os.template_manager import (
     select_template,
 )
 
-
 # --- Fixtures ---
 
 

@@ -1,6 +1,5 @@
 """Tests for deterministic polarity detection."""
 
-import pytest
 from corp_knowledge_extractor.polarity import detect_polarity
 
 

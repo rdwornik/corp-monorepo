@@ -28,21 +28,20 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from config.settings import get_settings
 
-
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
 
 COPY_MAP = [
-    ("Projects/_Academy 2020 TC",      "Archive_SalesAcademy/Academy_2020_TC"),
-    ("Projects/_Academy 2021 Mentor",  "Archive_SalesAcademy/Academy_2021_Mentor"),
-    ("Projects/_Academy 2022 Sales",   "Archive_SalesAcademy/Academy_2022_Sales"),
-    ("Projects/_Inbound BDR",          "Archive_BDR"),
+    ("Projects/_Academy 2020 TC", "Archive_SalesAcademy/Academy_2020_TC"),
+    ("Projects/_Academy 2021 Mentor", "Archive_SalesAcademy/Academy_2021_Mentor"),
+    ("Projects/_Academy 2022 Sales", "Archive_SalesAcademy/Academy_2022_Sales"),
+    ("Projects/_Inbound BDR", "Archive_BDR"),
     ("Projects/_Technical Consultant", "Archive_TechnicalConsultant"),
     ("Projects/_BY Extra Initiatives", "Archive_ExtraInitiatives"),
-    ("Projects/_BY Admin",             "Archive_Admin"),
-    ("Projects/Marketing",             "Archive_ExtraInitiatives/Marketing"),
-    ("Pictures/Camera Roll",           "Camera_Roll"),
+    ("Projects/_BY Admin", "Archive_Admin"),
+    ("Projects/Marketing", "Archive_ExtraInitiatives/Marketing"),
+    ("Pictures/Camera Roll", "Camera_Roll"),
 ]
 
 ACADEMY_FOLDERS = {
@@ -78,6 +77,7 @@ FOLDERS_WITH_ZIP_EXCLUSIONS = {
 # Stats
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Stats:
     copied: int = 0
@@ -91,6 +91,7 @@ class Stats:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def count_files(path: Path) -> int:
     if not path.exists():
@@ -141,6 +142,7 @@ def safe_copy(src: Path, dst: Path, stats: Stats) -> str:
 # Copy
 # ---------------------------------------------------------------------------
 
+
 def copy_tree(
     src: Path,
     dst: Path,
@@ -167,7 +169,7 @@ def copy_tree(
             continue
 
         relative = src_file.relative_to(src)
-        dst_file  = dst / relative
+        dst_file = dst / relative
 
         if dst_file.exists() and dst_file.stat().st_size == src_file.stat().st_size:
             to_skip += 1
@@ -179,7 +181,7 @@ def copy_tree(
     else:
         for src_file, dst_file, relative in to_copy:
             dst_rel = rel(dst_file, mywork)
-            result  = safe_copy(src_file, dst_file, stats)
+            result = safe_copy(src_file, dst_file, stats)
             if result == "ok":
                 print(f"  [COPY]  {src_file.name}  ->  MyWork/{dst_rel}")
             elif result == "cloud":
@@ -187,13 +189,14 @@ def copy_tree(
             else:
                 print(f"  [FAIL]  {src_file.name}  (see WARNINGS)")
 
-    stats.copied  += len(to_copy)
+    stats.copied += len(to_copy)
     stats.skipped += to_skip
 
 
 # ---------------------------------------------------------------------------
 # ZIP
 # ---------------------------------------------------------------------------
+
 
 def zip_folder(
     src: Path,
@@ -204,7 +207,7 @@ def zip_folder(
     stats: Stats,
 ) -> None:
     """ZIP src directory into dst_zip."""
-    n       = count_files(src)
+    n = count_files(src)
     src_rel = rel(src, onedrive)
     dst_rel = rel(dst_zip, mywork)
 
@@ -214,7 +217,7 @@ def zip_folder(
         return
 
     print(f"  [ZIP]  {src_rel}  ({n} files)  ->  MyWork/{dst_rel}")
-    stats.zips_done    += 1
+    stats.zips_done += 1
     stats.zipped_files += n
 
     if not dry_run:
@@ -229,6 +232,7 @@ def zip_folder(
 # Recordings split
 # ---------------------------------------------------------------------------
 
+
 def copy_recordings(
     src: Path,
     mywork: Path,
@@ -241,10 +245,10 @@ def copy_recordings(
       >= 2024  ->  00_Tech_PreSales/00_Inbox/recordings/
     """
     dst_archive = mywork / "Archive_TechnicalConsultant" / "Recordings"
-    dst_inbox   = mywork / "00_Tech_PreSales" / "00_Inbox" / "recordings"
+    dst_inbox = mywork / "00_Tech_PreSales" / "00_Inbox" / "recordings"
 
     archive_files = []
-    inbox_files   = []
+    inbox_files = []
 
     for src_file in sorted(src.rglob("*")):
         if not src_file.is_file():
@@ -254,10 +258,10 @@ def copy_recordings(
 
         if year <= 2022:
             dst_file = dst_archive / src_file.name
-            bucket   = archive_files
+            bucket = archive_files
         else:
             dst_file = dst_inbox / src_file.name
-            bucket   = inbox_files
+            bucket = inbox_files
 
         if dst_file.exists() and dst_file.stat().st_size == src_file.stat().st_size:
             stats.skipped += 1
@@ -273,7 +277,7 @@ def copy_recordings(
             print(f"      [COPY] {yr}  {f.name}  ->  00_Tech_PreSales/00_Inbox/recordings/")
     else:
         for src_file, dst_file, yr in archive_files + inbox_files:
-            label  = rel(dst_file, mywork)
+            label = rel(dst_file, mywork)
             result = safe_copy(src_file, dst_file, stats)
             if result == "ok":
                 print(f"  [COPY]  {src_file.name}  ({yr})  ->  MyWork/{label}")
@@ -289,18 +293,19 @@ def copy_recordings(
 # Main runner
 # ---------------------------------------------------------------------------
 
+
 def run(dry_run: bool) -> None:
     settings = get_settings()
     onedrive = settings.onedrive_path
-    mywork   = onedrive / "MyWork"
-    stats    = Stats()
+    mywork = onedrive / "MyWork"
+    stats = Stats()
 
     mode = "DRY-RUN" if dry_run else "EXECUTE"
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Phase 1: Archive Copy  [{mode}]")
     print(f"OneDrive : {onedrive}")
     print(f"MyWork   : {mywork}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     if not onedrive.exists():
         print(f"\nERROR: OneDrive path not found: {onedrive}")
@@ -313,11 +318,11 @@ def run(dry_run: bool) -> None:
     # ------------------------------------------------------------------
     # ZIP operations
     # ------------------------------------------------------------------
-    print(f"\n{'-'*60}")
+    print(f"\n{'-' * 60}")
     print("=== ZIP OPERATIONS ===\n")
 
     for src_rel, dst_rel in ZIP_MAP:
-        src     = onedrive / src_rel
+        src = onedrive / src_rel
         dst_zip = mywork / dst_rel
 
         if not src.exists():
@@ -331,19 +336,21 @@ def run(dry_run: bool) -> None:
     # ------------------------------------------------------------------
     # Copy operations
     # ------------------------------------------------------------------
-    print(f"\n{'-'*60}")
+    print(f"\n{'-' * 60}")
     print("=== COPY OPERATIONS ===\n")
 
     for src_rel, dst_rel in COPY_MAP:
-        src    = onedrive / src_rel
-        dst    = mywork / dst_rel
+        src = onedrive / src_rel
+        dst = mywork / dst_rel
         has_exclusions = src_rel in FOLDERS_WITH_ZIP_EXCLUSIONS
 
         # Academy cloud-only check
         if src_rel in ACADEMY_FOLDERS:
             n = count_files(src)
             if n == 0:
-                msg = f"[WARN] {src_rel} -- 0 files, skipping (cloud-only?). Open in Explorer first."
+                msg = (
+                    f"[WARN] {src_rel} -- 0 files, skipping (cloud-only?). Open in Explorer first."
+                )
                 print(f"  {msg}")
                 stats.warnings.append(msg)
                 continue
@@ -356,8 +363,8 @@ def run(dry_run: bool) -> None:
 
         # Effective file count (minus files going to ZIP)
         total_n = count_files(src)
-        zip_n   = sum(count_files(onedrive / zs) for zs, _ in ZIP_MAP if zs.startswith(src_rel))
-        eff_n   = total_n - zip_n
+        zip_n = sum(count_files(onedrive / zs) for zs, _ in ZIP_MAP if zs.startswith(src_rel))
+        eff_n = total_n - zip_n
 
         print(f"  {src_rel}  ({eff_n} files)  ->  MyWork/{dst_rel}")
         copy_tree(src, dst, onedrive, mywork, dry_run, stats, exclude_zip_subtrees=has_exclusions)
@@ -365,7 +372,7 @@ def run(dry_run: bool) -> None:
     # ------------------------------------------------------------------
     # Recordings
     # ------------------------------------------------------------------
-    print(f"\n{'-'*60}")
+    print(f"\n{'-' * 60}")
     print("=== RECORDINGS (split by year) ===\n")
 
     rec_src = onedrive / "Recordings"
@@ -380,7 +387,7 @@ def run(dry_run: bool) -> None:
     # Cloud-only report
     # ------------------------------------------------------------------
     if stats.cloud_only:
-        print(f"\n{'-'*60}")
+        print(f"\n{'-' * 60}")
         print("=== CLOUD-ONLY FILES (not downloaded) ===\n")
         for name in stats.cloud_only:
             print(f"  [CLOUD] {name}")
@@ -391,7 +398,7 @@ def run(dry_run: bool) -> None:
     # Warnings
     # ------------------------------------------------------------------
     if stats.warnings:
-        print(f"\n{'-'*60}")
+        print(f"\n{'-' * 60}")
         print("=== WARNINGS ===\n")
         for w in stats.warnings:
             print(f"  {w}")
@@ -399,14 +406,14 @@ def run(dry_run: bool) -> None:
     # ------------------------------------------------------------------
     # Summary
     # ------------------------------------------------------------------
-    print(f"\n{'-'*60}")
+    print(f"\n{'-' * 60}")
     print(f"=== SUMMARY [{mode}] ===\n")
     print(f"  Files copied     : {stats.copied}")
     print(f"  Already present  : {stats.skipped}")
     print(f"  Cloud-only skip  : {len(stats.cloud_only)}")
     print(f"  ZIPs to create   : {stats.zips_done}  ({stats.zipped_files} files inside)")
     print(f"  Warnings         : {len(stats.warnings)}")
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
 
     if dry_run:
         print("\nDry-run complete. No files were modified.")
@@ -416,6 +423,7 @@ def run(dry_run: bool) -> None:
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
+
 
 def main():
     parser = argparse.ArgumentParser(

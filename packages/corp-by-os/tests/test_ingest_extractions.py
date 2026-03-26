@@ -7,8 +7,6 @@ from pathlib import Path
 import yaml
 
 from corp_by_os.ingest.extractions import (
-    DEFAULT_QUALITY_THRESHOLD,
-    IngestResult,
     _collect_packages,
     _find_cover_slide,
     _quality_gate,
@@ -317,9 +315,7 @@ class TestQualityGate:
         """Full pipeline: low quality note goes to _quarantine/."""
         out = tmp_path / "output_v2"
         vault = tmp_path / "vault"
-        _make_output_v2(
-            out, "source_library", "Docs", {"low.md": "x"}, quality_score=10
-        )
+        _make_output_v2(out, "source_library", "Docs", {"low.md": "x"}, quality_score=10)
 
         result = ingest_extractions(out, vault, quality_threshold=25)
 
@@ -331,9 +327,7 @@ class TestQualityGate:
         """High quality note passes gate."""
         out = tmp_path / "output_v2"
         vault = tmp_path / "vault"
-        _make_output_v2(
-            out, "source_library", "Docs", {"good.md": "x"}, quality_score=50
-        )
+        _make_output_v2(out, "source_library", "Docs", {"good.md": "x"}, quality_score=50)
 
         result = ingest_extractions(out, vault, quality_threshold=25)
 
@@ -365,7 +359,9 @@ class TestValidation:
         pkg = out / "source_library" / "Docs" / "Docs"
         extract = pkg / "extract"
         extract.mkdir(parents=True, exist_ok=True)
-        (extract / "bad.md").write_text("---\nquality_score: 50\n---\nNo title.\n", encoding="utf-8")
+        (extract / "bad.md").write_text(
+            "---\nquality_score: 50\n---\nNo title.\n", encoding="utf-8"
+        )
 
         result = ingest_extractions(out, vault)
 

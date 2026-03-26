@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from corp_by_os.overnight.safety import is_safe_for_upload, filter_safe_files
+from corp_by_os.overnight.safety import filter_safe_files, is_safe_for_upload
 
 
 class TestBlockedExtension:

@@ -1,12 +1,11 @@
 """Tests for user_context wiring from manifest/CLI to LLM prompt."""
 
 import json
-import pytest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
-from corp_knowledge_extractor.manifest import Manifest, ManifestEntry
-from corp_knowledge_extractor.extract import _prepend_user_context, ExtractionResult
+from corp_knowledge_extractor.manifest import Manifest
+from corp_knowledge_extractor.extract import _prepend_user_context
 
 
 # ---------------------------------------------------------------------------
@@ -113,6 +112,7 @@ class TestUserContextInPrompt:
             def extract(self, request):
                 captured_prompt["user_prompt"] = request.user_prompt
                 from corp_knowledge_extractor.providers.base import ExtractionResponse
+
                 return ExtractionResponse(
                     text='{"title": "Test", "summary": "Test summary", "topics": [], "products": [], "people": []}',
                     input_tokens=100,
@@ -125,10 +125,15 @@ class TestUserContextInPrompt:
         fake_provider = FakeProvider()
 
         with (
-            patch("corp_knowledge_extractor.providers.router.route_model", return_value=("gemini-3-flash-preview", "text_default")),
+            patch(
+                "corp_knowledge_extractor.providers.router.route_model",
+                return_value=("gemini-3-flash-preview", "text_default"),
+            ),
             patch("corp_knowledge_extractor.providers.router.get_provider", return_value=fake_provider),
             patch("corp_knowledge_extractor.providers.router.has_anthropic_key", return_value=False),
-            patch("corp_knowledge_extractor.providers.validator.validate_and_retry", side_effect=lambda r, req: (r, False)),
+            patch(
+                "corp_knowledge_extractor.providers.validator.validate_and_retry", side_effect=lambda r, req: (r, False)
+            ),
         ):
             from corp_knowledge_extractor.extract import extract_from_text
 
@@ -176,6 +181,7 @@ class TestUserContextInPrompt:
             def extract(self, request):
                 captured_prompt["user_prompt"] = request.user_prompt
                 from corp_knowledge_extractor.providers.base import ExtractionResponse
+
                 return ExtractionResponse(
                     text='{"title": "Test", "summary": "Test summary", "topics": [], "products": [], "people": []}',
                     input_tokens=100,
@@ -188,10 +194,15 @@ class TestUserContextInPrompt:
         fake_provider = FakeProvider()
 
         with (
-            patch("corp_knowledge_extractor.providers.router.route_model", return_value=("gemini-3-flash-preview", "text_default")),
+            patch(
+                "corp_knowledge_extractor.providers.router.route_model",
+                return_value=("gemini-3-flash-preview", "text_default"),
+            ),
             patch("corp_knowledge_extractor.providers.router.get_provider", return_value=fake_provider),
             patch("corp_knowledge_extractor.providers.router.has_anthropic_key", return_value=False),
-            patch("corp_knowledge_extractor.providers.validator.validate_and_retry", side_effect=lambda r, req: (r, False)),
+            patch(
+                "corp_knowledge_extractor.providers.validator.validate_and_retry", side_effect=lambda r, req: (r, False)
+            ),
         ):
             from corp_knowledge_extractor.extract import extract_from_text
 
@@ -222,12 +233,14 @@ class TestUserContextCLIFlag:
     def test_context_option_exists(self):
         """The process command accepts --context."""
         from scripts.run import process
+
         param_names = [p.name for p in process.params]
         assert "context" in param_names
 
     def test_context_option_default_empty(self):
         """--context defaults to empty string."""
         from scripts.run import process
+
         ctx_param = next(p for p in process.params if p.name == "context")
         assert ctx_param.default == ""
 
@@ -287,10 +300,15 @@ class TestEscalationModelUsed:
             return sonnet_response, True
 
         with (
-            patch("corp_knowledge_extractor.providers.router.route_model", return_value=("claude-haiku-4-5-20251001", "text_default")),
+            patch(
+                "corp_knowledge_extractor.providers.router.route_model",
+                return_value=("claude-haiku-4-5-20251001", "text_default"),
+            ),
             patch("corp_knowledge_extractor.providers.router.get_provider", return_value=fake_provider),
             patch("corp_knowledge_extractor.providers.router.has_anthropic_key", return_value=True),
-            patch("corp_knowledge_extractor.providers.validator.validate_and_retry", side_effect=mock_validate_and_retry),
+            patch(
+                "corp_knowledge_extractor.providers.validator.validate_and_retry", side_effect=mock_validate_and_retry
+            ),
         ):
             from corp_knowledge_extractor.extract import extract_from_text
 

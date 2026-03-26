@@ -1,11 +1,9 @@
 """Tests for PPTX → PDF converter cascade and multimodal routing."""
 
 import subprocess
-from pathlib import Path
-from unittest.mock import patch, MagicMock, ANY
+from unittest.mock import patch, MagicMock
 
 import fitz
-import pytest
 
 from corp_knowledge_extractor.slides.pdf_converter import convert_pptx_to_pdf, _convert_via_com
 from corp_knowledge_extractor.extract import _render_pdf_to_slides
@@ -16,22 +14,22 @@ class TestComScriptContent:
 
     def test_com_script_has_with_window_false(self, tmp_path):
         """Inline script must open without window (PowerPoint rejects Visible=0)."""
-        from corp_knowledge_extractor.slides.pdf_converter import _convert_via_com
         import inspect
+
         source = inspect.getsource(_convert_via_com)
         assert "WithWindow=False" in source
 
     def test_com_script_has_display_alerts_0(self, tmp_path):
         """Inline script must suppress dialogs."""
-        from corp_knowledge_extractor.slides.pdf_converter import _convert_via_com
         import inspect
+
         source = inspect.getsource(_convert_via_com)
         assert "DisplayAlerts = 0" in source
 
     def test_com_script_has_quit(self, tmp_path):
         """Inline script must call ppt.Quit()."""
-        from corp_knowledge_extractor.slides.pdf_converter import _convert_via_com
         import inspect
+
         source = inspect.getsource(_convert_via_com)
         assert "Quit()" in source
 
@@ -68,7 +66,10 @@ class TestConverterCascade:
             return pdf
 
         with (
-            patch("corp_knowledge_extractor.slides.pdf_converter._convert_via_com", side_effect=subprocess.TimeoutExpired("cmd", 30)),
+            patch(
+                "corp_knowledge_extractor.slides.pdf_converter._convert_via_com",
+                side_effect=subprocess.TimeoutExpired("cmd", 30),
+            ),
             patch("corp_knowledge_extractor.slides.pdf_converter._convert_via_libreoffice", side_effect=fake_lo),
         ):
             result = convert_pptx_to_pdf(pptx, out_dir)
@@ -89,7 +90,9 @@ class TestConverterCascade:
             return pdf
 
         with (
-            patch("corp_knowledge_extractor.slides.pdf_converter._convert_via_com", side_effect=ImportError("No comtypes")),
+            patch(
+                "corp_knowledge_extractor.slides.pdf_converter._convert_via_com", side_effect=ImportError("No comtypes")
+            ),
             patch("corp_knowledge_extractor.slides.pdf_converter._convert_via_libreoffice", side_effect=fake_lo),
         ):
             result = convert_pptx_to_pdf(pptx, out_dir)
@@ -103,8 +106,13 @@ class TestConverterCascade:
         out_dir = tmp_path / "pdf_out"
 
         with (
-            patch("corp_knowledge_extractor.slides.pdf_converter._convert_via_com", side_effect=ImportError("No comtypes")),
-            patch("corp_knowledge_extractor.slides.pdf_converter._convert_via_libreoffice", side_effect=FileNotFoundError("No LO")),
+            patch(
+                "corp_knowledge_extractor.slides.pdf_converter._convert_via_com", side_effect=ImportError("No comtypes")
+            ),
+            patch(
+                "corp_knowledge_extractor.slides.pdf_converter._convert_via_libreoffice",
+                side_effect=FileNotFoundError("No LO"),
+            ),
         ):
             result = convert_pptx_to_pdf(pptx, out_dir)
 
@@ -116,7 +124,7 @@ class TestPptxMultimodalRouting:
 
     def test_pptx_routes_multimodal_with_pdf(self, tmp_path):
         """PDF available → Tier 3 multimodal extraction used."""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import patch
         from corp_knowledge_extractor.inventory import SourceFile, FileType
         from corp_knowledge_extractor.text_extract import TextExtractionResult
         from corp_knowledge_extractor.extract import ExtractionResult
@@ -124,13 +132,16 @@ class TestPptxMultimodalRouting:
         pptx = tmp_path / "deck.pptx"
         pptx.write_bytes(b"PK\x03\x04fake")
         sf = SourceFile(path=pptx, name="deck.pptx", type=FileType.SLIDES, size_bytes=1000)
-        text_result = TextExtractionResult(text="Slide content here", char_count=18, extractor="python-pptx", slide_count=10)
+        text_result = TextExtractionResult(
+            text="Slide content here", char_count=18, extractor="python-pptx", slide_count=10
+        )
 
         fake_result = MagicMock(spec=ExtractionResult)
         fake_result.title = "Test Deck"
 
         with patch("corp_knowledge_extractor.extract._try_pptx_pdf_multimodal", return_value=fake_result) as mock_multi:
             from corp_knowledge_extractor.extract import extract_from_text
+
             result = extract_from_text(sf, {"gemini": {"model": "test"}}, text_result)
 
         mock_multi.assert_called_once()
@@ -138,7 +149,7 @@ class TestPptxMultimodalRouting:
 
     def test_pptx_falls_back_text_only(self, tmp_path):
         """No PDF → Tier 2 text-only with warning."""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import patch
         from corp_knowledge_extractor.inventory import SourceFile, FileType
         from corp_knowledge_extractor.text_extract import TextExtractionResult
 
@@ -172,7 +183,15 @@ class TestPptxMultimodalRouting:
 
             # Set up post_process mock
             mock_pp_result = MagicMock()
-            mock_pp_result.data = {"title": "Test", "summary": "Test summary", "topics": [], "type": "presentation", "date": "2026-03-01", "source_tool": "knowledge-extractor", "source_file": str(pptx)}
+            mock_pp_result.data = {
+                "title": "Test",
+                "summary": "Test summary",
+                "topics": [],
+                "type": "presentation",
+                "date": "2026-03-01",
+                "source_tool": "knowledge-extractor",
+                "source_file": str(pptx),
+            }
             mock_pp_result.links_line = ""
             mock_pp_result.validation_result = MagicMock()
             mock_pp_result.validation_result.value = "valid"
@@ -180,7 +199,10 @@ class TestPptxMultimodalRouting:
             mock_pp.return_value = mock_pp_result
 
             from corp_knowledge_extractor.extract import extract_from_text
-            result = extract_from_text(sf, {"gemini": {"model": "test"}, "prompts": {"extract": "Extract knowledge"}}, text_result)
+
+            result = extract_from_text(
+                sf, {"gemini": {"model": "test"}, "prompts": {"extract": "Extract knowledge"}}, text_result
+            )
 
         # Should still produce a result via text-only path
         assert result is not None

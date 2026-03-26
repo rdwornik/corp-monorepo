@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 # Data file loading (cached)
 # ---------------------------------------------------------------------------
 
+
 def _data_dir() -> Path:
     """Data files live alongside the package source code."""
     return Path(__file__).parent / "data"
@@ -74,6 +75,7 @@ def _load_client_aliases() -> dict[str, str]:
 # Type enforcement
 # ---------------------------------------------------------------------------
 
+
 def enforce_type_from_extension(result: dict, source_path: str) -> dict:
     """Override content type based on file extension.
 
@@ -102,13 +104,14 @@ def normalize_company_names(text: str) -> str:
     """Fix known LLM company name duplications."""
     if not text:
         return text
-    text = re.sub(r'(?i)\b(Blue\s+){2,}Yonder\b', 'Blue Yonder', text)
+    text = re.sub(r"(?i)\b(Blue\s+){2,}Yonder\b", "Blue Yonder", text)
     return text
 
 
 # ---------------------------------------------------------------------------
 # Fix 1: Product exclusion (competitors, infrastructure, generic)
 # ---------------------------------------------------------------------------
+
 
 def filter_products(products: list[str]) -> tuple[list[str], list[str]]:
     """Split products into real BY products and excluded entities.
@@ -166,7 +169,9 @@ def normalize_product_names(products: list[str]) -> list[str]:
 
 ROLE_PATTERNS = [
     re.compile(r"(?i)^(technical |senior |chief |lead |head of |director |manager |vp |vice president)"),
-    re.compile(r"(?i)(manager|director|officer|engineer|architect|consultant|analyst|specialist|coordinator|executive|administrator)$"),
+    re.compile(
+        r"(?i)(manager|director|officer|engineer|architect|consultant|analyst|specialist|coordinator|executive|administrator)$"
+    ),
     re.compile(r"(?i)^(customer |project |account |solution |support |sales )"),
 ]
 
@@ -177,9 +182,26 @@ ORG_PATTERNS = [
 
 # Words that look like names but are actually role/modifier words
 _ROLE_WORDS = {
-    "technical", "senior", "chief", "lead", "head", "director", "manager",
-    "vice", "president", "customer", "project", "account", "solution",
-    "support", "sales", "supply", "chain", "global", "regional", "general",
+    "technical",
+    "senior",
+    "chief",
+    "lead",
+    "head",
+    "director",
+    "manager",
+    "vice",
+    "president",
+    "customer",
+    "project",
+    "account",
+    "solution",
+    "support",
+    "sales",
+    "supply",
+    "chain",
+    "global",
+    "regional",
+    "general",
 }
 
 # Short uppercase tokens that are org suffixes, not name parts
@@ -196,10 +218,7 @@ def _has_person_name(text: str) -> bool:
     cap_words = [w for w in words if w[0:1].isupper() and len(w) > 1]
     if len(cap_words) < 2:
         return False
-    non_role = [
-        w for w in cap_words
-        if w.lower() not in _ROLE_WORDS and w.lower().rstrip(".") not in _ORG_SUFFIXES
-    ]
+    non_role = [w for w in cap_words if w.lower() not in _ROLE_WORDS and w.lower().rstrip(".") not in _ORG_SUFFIXES]
     return len(non_role) >= 2
 
 
@@ -228,6 +247,7 @@ def filter_people(people: list[str]) -> tuple[list[str], list[str]]:
 # ---------------------------------------------------------------------------
 # Fix 4: Client alias normalization
 # ---------------------------------------------------------------------------
+
 
 def normalize_client(client: str) -> str:
     """Normalize client name using alias mapping."""
@@ -388,8 +408,8 @@ def _normalize_tag(value: str) -> str:
     """Normalize tag value: lowercase, hyphens, strip special chars."""
     tag = value.lower()
     tag = tag.replace("&", "").replace("_", "-").replace(" ", "-")
-    tag = re.sub(r'[^a-z0-9\-/]', '', tag)
-    tag = re.sub(r'-+', '-', tag).strip('-')
+    tag = re.sub(r"[^a-z0-9\-/]", "", tag)
+    tag = re.sub(r"-+", "-", tag).strip("-")
     return tag
 
 
@@ -409,13 +429,13 @@ def generate_tags(frontmatter: dict, max_tags: int = MAX_TAGS) -> list[str]:
     if client:
         tags.append(f"client/{_normalize_tag(client)}")
 
-    for product in (frontmatter.get("products") or []):
+    for product in frontmatter.get("products") or []:
         tags.append(f"product/{_normalize_tag(product)}")
 
-    for topic in (frontmatter.get("topics") or []):
+    for topic in frontmatter.get("topics") or []:
         tags.append(f"topic/{_normalize_tag(topic)}")
 
-    for domain in (frontmatter.get("domains") or []):
+    for domain in frontmatter.get("domains") or []:
         tags.append(f"domain/{_normalize_tag(domain)}")
 
     doc_type = frontmatter.get("doc_type")
@@ -504,6 +524,7 @@ def _get_known_values(taxonomy: dict, prefix: str) -> set:
 def _log_unknown_terms(terms: list[str]):
     """Append unknown terms to local review file for batch approval."""
     from corp_knowledge_extractor._paths import CONFIG_DIR
+
     review_path = CONFIG_DIR / "taxonomy_review.yaml"
     data = {"pending": []}
     if review_path.exists():

@@ -5,8 +5,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
-
 from corp_by_os.cleanup.disk import (
     CleanupItem,
     CleanupPlan,
@@ -16,7 +14,6 @@ from corp_by_os.cleanup.disk import (
     find_onedrive_overlap,
     find_staging_artifacts,
 )
-
 
 # === OneDrive overlap ===
 

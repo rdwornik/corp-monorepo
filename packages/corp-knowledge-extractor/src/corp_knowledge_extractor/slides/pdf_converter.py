@@ -9,7 +9,6 @@ Converter cascade:
 import logging
 import shutil
 import subprocess
-import tempfile
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -91,8 +90,10 @@ def _convert_via_libreoffice(pptx_path: Path, output_dir: Path) -> Path | None:
             "--headless",
             "--norestore",
             "--macro-security-level=4",
-            "--convert-to", "pdf",
-            "--outdir", str(output_dir),
+            "--convert-to",
+            "pdf",
+            "--outdir",
+            str(output_dir),
             str(pptx_path),
         ],
         timeout=LIBREOFFICE_TIMEOUT,

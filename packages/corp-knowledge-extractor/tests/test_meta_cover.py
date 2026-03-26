@@ -1,7 +1,6 @@
 """Tests for cover_slide/cover_frame in _meta.yaml."""
 
 import yaml
-from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 

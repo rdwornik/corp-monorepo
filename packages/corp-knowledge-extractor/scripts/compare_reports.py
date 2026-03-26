@@ -25,7 +25,7 @@ import json
 import argparse
 import re
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import List
 from datetime import datetime
 
 # Add project root to path
@@ -52,7 +52,7 @@ def load_report_data(report_dir: str) -> dict:
         "markdown_path": os.path.join(report_dir, "report.md"),
         "jsonl_path": os.path.join(report_dir, "knowledge.jsonl"),
         "metadata_path": os.path.join(report_dir, "metadata.json"),
-        "frames_dir": os.path.join(report_dir, "frames")
+        "frames_dir": os.path.join(report_dir, "frames"),
     }
 
     # Load markdown
@@ -79,10 +79,7 @@ def load_report_data(report_dir: str) -> dict:
     # Count frames
     data["frame_count"] = 0
     if os.path.exists(data["frames_dir"]):
-        data["frame_count"] = len([
-            f for f in os.listdir(data["frames_dir"])
-            if f.endswith(".png")
-        ])
+        data["frame_count"] = len([f for f in os.listdir(data["frames_dir"]) if f.endswith(".png")])
 
     # Extract slide data from markdown
     data["slides"] = extract_slides_from_markdown(data["markdown_content"])
@@ -93,7 +90,7 @@ def load_report_data(report_dir: str) -> dict:
         "speaker_explanation": checker.check_speaker_explanation_quality(),
         "junk_frames": checker.check_no_junk_frames(),
         "categories": checker.check_categories_balanced(),
-        "qa_pairs": checker.check_qa_pairs_quality()
+        "qa_pairs": checker.check_qa_pairs_quality(),
     }
 
     return data
@@ -109,7 +106,7 @@ def extract_slides_from_markdown(markdown: str) -> List[dict]:
     slides = []
 
     # Split by ## headers (slide titles)
-    pattern = r'^## (.+?)$'
+    pattern = r"^## (.+?)$"
     parts = re.split(pattern, markdown, flags=re.MULTILINE)
 
     # parts[0] is content before first ##, then alternates title/content
@@ -119,19 +116,12 @@ def extract_slides_from_markdown(markdown: str) -> List[dict]:
             content = parts[i + 1].strip()
 
             # Extract speaker explanation
-            explanation_match = re.search(
-                r'\*\*Speaker Explanation:\*\* (.+?)(?:\n\n|\*\*|$)',
-                content,
-                re.DOTALL
-            )
+            explanation_match = re.search(r"\*\*Speaker Explanation:\*\* (.+?)(?:\n\n|\*\*|$)", content, re.DOTALL)
             explanation = explanation_match.group(1).strip() if explanation_match else ""
 
-            slides.append({
-                "title": title,
-                "content": content,
-                "explanation": explanation,
-                "explanation_length": len(explanation)
-            })
+            slides.append(
+                {"title": title, "content": content, "explanation": explanation, "explanation_length": len(explanation)}
+            )
 
     return slides
 
@@ -161,7 +151,7 @@ def compare_reports(old_dir: str, new_dir: str) -> dict:
         "slides": compare_slides(old, new),
         "qa_pairs": compare_qa_pairs(old, new),
         "quality": compare_quality(old, new),
-        "content_changes": compare_content_changes(old, new)
+        "content_changes": compare_content_changes(old, new),
     }
 
     # Determine overall verdict
@@ -181,7 +171,7 @@ def compare_frames(old: dict, new: dict) -> dict:
         "old_count": old_count,
         "new_count": new_count,
         "change": change,
-        "change_percent": round(change_percent, 1)
+        "change_percent": round(change_percent, 1),
     }
 
 
@@ -203,7 +193,7 @@ def compare_slides(old: dict, new: dict) -> dict:
         "removed_titles": removed[:10],  # Limit to 10
         "added_titles": added[:10],
         "total_removed": len(removed),
-        "total_added": len(added)
+        "total_added": len(added),
     }
 
 
@@ -218,19 +208,20 @@ def compare_qa_pairs(old: dict, new: dict) -> dict:
         "old_count": old_count,
         "new_count": new_count,
         "change": change,
-        "change_percent": round(change_percent, 1)
+        "change_percent": round(change_percent, 1),
     }
 
 
 def compare_quality(old: dict, new: dict) -> dict:
     """Compare quality metrics."""
+
     def get_metrics(quality_data):
         return {
             "avg_explanation_length": quality_data["speaker_explanation"][2].get("avg_length", 0),
             "empty_explanations": quality_data["speaker_explanation"][2].get("empty", 0),
             "junk_slides": quality_data["junk_frames"][2].get("junk_slides", 0),
             "general_category_count": quality_data["categories"][2].get("general_count", 0),
-            "total_slides": quality_data["categories"][2].get("total_slides", 1)
+            "total_slides": quality_data["categories"][2].get("total_slides", 1),
         }
 
     old_metrics = get_metrics(old["quality"])
@@ -266,12 +257,7 @@ def compare_quality(old: dict, new: dict) -> dict:
     elif cat_change > 10:
         regressions.append(f"Worse categorization (+{cat_change:.0f}% in general)")
 
-    return {
-        "old": old_metrics,
-        "new": new_metrics,
-        "improvements": improvements,
-        "regressions": regressions
-    }
+    return {"old": old_metrics, "new": new_metrics, "improvements": improvements, "regressions": regressions}
 
 
 def compare_content_changes(old: dict, new: dict) -> dict:
@@ -299,19 +285,21 @@ def compare_content_changes(old: dict, new: dict) -> dict:
             else:
                 change_type = "rewritten"
 
-            changed_explanations.append({
-                "title": title,
-                "old_explanation": old_slide["explanation"][:200] + "...",
-                "new_explanation": new_slide["explanation"][:200] + "...",
-                "old_length": old_len,
-                "new_length": new_len,
-                "change_type": change_type
-            })
+            changed_explanations.append(
+                {
+                    "title": title,
+                    "old_explanation": old_slide["explanation"][:200] + "...",
+                    "new_explanation": new_slide["explanation"][:200] + "...",
+                    "old_length": old_len,
+                    "new_length": new_len,
+                    "change_type": change_type,
+                }
+            )
 
     return {
         "total_common_slides": len(common_titles),
         "changed_explanations": len(changed_explanations),
-        "examples": changed_explanations[:5]  # First 5 examples
+        "examples": changed_explanations[:5],  # First 5 examples
     }
 
 
@@ -338,11 +326,7 @@ def determine_verdict(comparison: dict) -> dict:
         verdict = "unchanged"
         summary = "No significant quality changes detected"
 
-    return {
-        "verdict": verdict,
-        "summary": summary,
-        "has_regressions": len(regressions) > 0
-    }
+    return {"verdict": verdict, "summary": summary, "has_regressions": len(regressions) > 0}
 
 
 def generate_markdown_report(comparison: dict, output_path: str):
@@ -374,7 +358,7 @@ def generate_markdown_report(comparison: dict, output_path: str):
     old_q = quality["old"]
     new_q = quality["new"]
     md += f"| Avg explanation length | {old_q['avg_explanation_length']:.0f} | {new_q['avg_explanation_length']:.0f} | "
-    length_change = new_q['avg_explanation_length'] - old_q['avg_explanation_length']
+    length_change = new_q["avg_explanation_length"] - old_q["avg_explanation_length"]
     md += f"{length_change:+.0f} |\n"
 
     md += f"| Junk frames | {old_q['junk_slides']} | {new_q['junk_slides']} | "
@@ -384,12 +368,7 @@ def generate_markdown_report(comparison: dict, output_path: str):
 
     # Verdict
     verdict = comparison["verdict"]
-    emoji = {
-        "improved": "✅",
-        "degraded": "❌",
-        "mixed": "⚠️",
-        "unchanged": "➖"
-    }.get(verdict["verdict"], "")
+    emoji = {"improved": "✅", "degraded": "❌", "mixed": "⚠️", "unchanged": "➖"}.get(verdict["verdict"], "")
 
     md += f"## Overall Verdict {emoji}\n\n"
     md += f"**{verdict['summary']}**\n\n"
@@ -412,7 +391,7 @@ def generate_markdown_report(comparison: dict, output_path: str):
     if slides["removed_titles"]:
         md += "## Removed Slides\n\n"
         for i, title in enumerate(slides["removed_titles"][:10], 1):
-            md += f"{i}. \"{title}\"\n"
+            md += f'{i}. "{title}"\n'
         if slides["total_removed"] > 10:
             md += f"\n... and {slides['total_removed'] - 10} more\n"
         md += "\n"
@@ -421,7 +400,7 @@ def generate_markdown_report(comparison: dict, output_path: str):
     if slides["added_titles"]:
         md += "## Added Slides\n\n"
         for i, title in enumerate(slides["added_titles"][:10], 1):
-            md += f"{i}. \"{title}\"\n"
+            md += f'{i}. "{title}"\n'
         if slides["total_added"] > 10:
             md += f"\n... and {slides['total_added'] - 10} more\n"
         md += "\n"
@@ -455,39 +434,27 @@ def generate_json_metrics(comparison: dict, output_path: str):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Compare two knowledge extraction reports"
+    parser = argparse.ArgumentParser(description="Compare two knowledge extraction reports")
+
+    parser.add_argument("old_report", help="Path to old report directory")
+
+    parser.add_argument("new_report", help="Path to new report directory")
+
+    parser.add_argument(
+        "--output", default=".", help="Output directory for comparison files (default: current directory)"
     )
 
     parser.add_argument(
-        "old_report",
-        help="Path to old report directory"
-    )
-
-    parser.add_argument(
-        "new_report",
-        help="Path to new report directory"
-    )
-
-    parser.add_argument(
-        "--output",
-        default=".",
-        help="Output directory for comparison files (default: current directory)"
-    )
-
-    parser.add_argument(
-        "--fail-on-regression",
-        action="store_true",
-        help="Exit with non-zero code if regressions detected (for CI/CD)"
+        "--fail-on-regression", action="store_true", help="Exit with non-zero code if regressions detected (for CI/CD)"
     )
 
     args = parser.parse_args()
 
     try:
         # Run comparison
-        print("="*60)
+        print("=" * 60)
         print("REPORT COMPARISON")
-        print("="*60)
+        print("=" * 60)
 
         comparison = compare_reports(args.old_report, args.new_report)
 
@@ -501,12 +468,12 @@ def main():
         generate_json_metrics(comparison, json_path)
 
         # Print summary
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("COMPARISON SUMMARY")
-        print("="*60)
+        print("=" * 60)
         print(f"Verdict: {comparison['verdict']['verdict'].upper()}")
         print(f"Summary: {comparison['verdict']['summary']}")
-        print("="*60 + "\n")
+        print("=" * 60 + "\n")
 
         # Check fail-on-regression
         if args.fail_on_regression and comparison["verdict"]["has_regressions"]:
@@ -520,6 +487,7 @@ def main():
     except Exception as e:
         print(f"✗ Error: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 

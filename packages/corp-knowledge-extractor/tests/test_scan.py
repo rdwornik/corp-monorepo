@@ -13,7 +13,6 @@ from corp_knowledge_extractor.scan import (
     _scan_csv,
     _scan_text,
     _determine_tier,
-    FileScanResult,
 )
 
 

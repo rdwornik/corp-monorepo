@@ -50,10 +50,7 @@ def test_filter_people_keeps_most_entries() -> None:
     kept, filtered = filter_people(all_names)
     keep_rate = len(kept) / len(all_names) if all_names else 0
     # Expect at least 60% are real people (not roles/orgs)
-    assert keep_rate >= 0.60, (
-        f"Too many filtered: {len(filtered)}/{len(all_names)} "
-        f"({1 - keep_rate:.0%} filtered)"
-    )
+    assert keep_rate >= 0.60, f"Too many filtered: {len(filtered)}/{len(all_names)} ({1 - keep_rate:.0%} filtered)"
 
 
 def test_pure_role_titles_filtered() -> None:
@@ -69,9 +66,7 @@ def test_pure_role_titles_filtered() -> None:
     ]
     kept, filtered = filter_people(pure_roles)
     # At least most pure roles should be filtered
-    assert len(filtered) >= 3, (
-        f"Expected most pure roles filtered, got {len(filtered)}/{len(pure_roles)}"
-    )
+    assert len(filtered) >= 3, f"Expected most pure roles filtered, got {len(filtered)}/{len(pure_roles)}"
 
 
 def test_named_people_with_roles_kept() -> None:
@@ -86,10 +81,7 @@ def test_named_people_with_roles_kept() -> None:
     ]
     kept, filtered = filter_people(named_people)
     # At least most named people should be kept
-    assert len(kept) >= 3, (
-        f"Expected most named people kept, got {len(kept)}/{len(named_people)}: "
-        f"filtered={filtered}"
-    )
+    assert len(kept) >= 3, f"Expected most named people kept, got {len(kept)}/{len(named_people)}: filtered={filtered}"
 
 
 def test_high_frequency_people_are_real() -> None:
@@ -102,6 +94,4 @@ def test_high_frequency_people_are_real() -> None:
 
     kept, filtered = filter_people(frequent)
     keep_rate = len(kept) / len(frequent)
-    assert keep_rate >= 0.70, (
-        f"Too many frequent people filtered: {len(filtered)}/{len(frequent)}"
-    )
+    assert keep_rate >= 0.70, f"Too many frequent people filtered: {len(filtered)}/{len(frequent)}"

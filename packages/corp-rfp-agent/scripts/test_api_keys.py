@@ -22,12 +22,14 @@ load_dotenv(PROJECT_ROOT / ".env", override=False)
 # Optional imports with graceful fallback
 try:
     import anthropic
+
     ANTHROPIC_AVAILABLE = True
 except ImportError:
     ANTHROPIC_AVAILABLE = False
 
 try:
     from openai import OpenAI
+
     OPENAI_AVAILABLE = True
 except ImportError:
     OPENAI_AVAILABLE = False
@@ -35,6 +37,7 @@ except ImportError:
 try:
     from google import genai
     from google.genai import types
+
     GOOGLE_AVAILABLE = True
 except ImportError:
     GOOGLE_AVAILABLE = False
@@ -57,7 +60,7 @@ def test_claude():
         message = client.messages.create(
             model="claude-sonnet-4-6",
             max_tokens=10,
-            messages=[{"role": "user", "content": "Say hello"}]
+            messages=[{"role": "user", "content": "Say hello"}],
         )
         response_text = message.content[0].text.strip()
         print(f"[ OK ] Claude: '{response_text}'")
@@ -86,7 +89,7 @@ def test_openai():
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": "Say hello"}],
-            max_tokens=10
+            max_tokens=10,
         )
         response_text = response.choices[0].message.content.strip()
         print(f"[ OK ] OpenAI: '{response_text}'")
@@ -114,7 +117,7 @@ def test_gemini():
         response = client.models.generate_content(
             model="gemini-3-flash-preview",
             contents=[{"role": "user", "parts": [{"text": "Say hello"}]}],
-            config=types.GenerateContentConfig(max_output_tokens=10)
+            config=types.GenerateContentConfig(max_output_tokens=10),
         )
         response_text = response.text.strip() if response.text else "Empty response"
         print(f"[ OK ] Gemini: '{response_text}'")
@@ -127,17 +130,17 @@ def test_gemini():
 
 def main():
     """Run all API tests."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("API Key Test - Sending 'Say hello' to each provider")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     test_claude()
     test_openai()
     test_gemini()
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Legend: [OK] = Success | [FAIL] = Error | [SKIP] = No key")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
 
 if __name__ == "__main__":

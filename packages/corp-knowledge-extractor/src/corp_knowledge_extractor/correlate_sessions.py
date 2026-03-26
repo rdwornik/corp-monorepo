@@ -26,6 +26,7 @@ def word_jaccard(a: str, b: str) -> float:
     union = words_a | words_b
     return len(intersection) / len(union)
 
+
 VIDEO_EXTENSIONS = {".mp4", ".mkv", ".avi", ".mov"}
 
 
@@ -187,9 +188,7 @@ def confirm_stage2(
     confirmed = len(signals_passed) >= 2
 
     if confirmed:
-        combined_confidence = min(
-            100, int((candidate.stage1_confidence + len(signals_passed) * 25) / 2)
-        )
+        combined_confidence = min(100, int((candidate.stage1_confidence + len(signals_passed) * 25) / 2))
         candidate.stage2_confirmed = True
         candidate.stage2_confidence = combined_confidence
         candidate.merge_decision = "merge"

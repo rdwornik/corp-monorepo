@@ -1,10 +1,9 @@
 """Unit tests for src/correlate.py — file grouping logic."""
 
-import pytest
 from pathlib import Path
 
 from corp_knowledge_extractor.inventory import SourceFile, FileType
-from corp_knowledge_extractor.correlate import correlate_files, FileGroup, _stem_prefix
+from corp_knowledge_extractor.correlate import correlate_files, _stem_prefix
 
 
 def _sf(name: str, ft: FileType, size: int = 1000) -> SourceFile:

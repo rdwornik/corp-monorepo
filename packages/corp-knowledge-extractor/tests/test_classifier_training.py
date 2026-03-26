@@ -9,7 +9,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
 
 FIXTURES_PATH = Path(__file__).parent / "fixtures" / "classifier_training.json"
 
@@ -79,16 +78,14 @@ def test_rfp_keywords_classified_correctly() -> None:
     from corp_knowledge_extractor.doc_type_classifier import classify_from_filename
 
     rfp_fixtures = [
-        f for f in ALL_FIXTURES
-        if f["doc_type"] == "rfp_response"
-        and any(kw in f["filename"].lower() for kw in ["rfp", "rfi", "request for"])
+        f
+        for f in ALL_FIXTURES
+        if f["doc_type"] == "rfp_response" and any(kw in f["filename"].lower() for kw in ["rfp", "rfi", "request for"])
     ]
 
     for fixture in rfp_fixtures:
         result = classify_from_filename(fixture["filename"])
-        assert result == "rfp_response", (
-            f"RFP file misclassified: {fixture['filename']!r} → {result}"
-        )
+        assert result == "rfp_response", f"RFP file misclassified: {fixture['filename']!r} → {result}"
 
 
 def test_training_keywords_classified() -> None:
@@ -96,16 +93,15 @@ def test_training_keywords_classified() -> None:
     from corp_knowledge_extractor.doc_type_classifier import classify_from_filename
 
     training_fixtures = [
-        f for f in ALL_FIXTURES
+        f
+        for f in ALL_FIXTURES
         if f["doc_type"] == "training"
         and any(kw in f["filename"].lower() for kw in ["training", "enablement", "course"])
     ]
 
     for fixture in training_fixtures:
         result = classify_from_filename(fixture["filename"])
-        assert result == "training", (
-            f"Training file misclassified: {fixture['filename']!r} → {result}"
-        )
+        assert result == "training", f"Training file misclassified: {fixture['filename']!r} → {result}"
 
 
 def test_security_assessment_keywords_classified() -> None:
@@ -116,15 +112,18 @@ def test_security_assessment_keywords_classified() -> None:
     # vendor_assessment. Other security keywords are handled by
     # classify_doc_type's filename rules (not tested here).
     security_fixtures = [
-        f for f in ALL_FIXTURES
+        f
+        for f in ALL_FIXTURES
         if f["doc_type"] == "security"
-        and any(kw in f["filename"].lower() for kw in [
-            "security assessment", "security questionnaire",
-        ])
+        and any(
+            kw in f["filename"].lower()
+            for kw in [
+                "security assessment",
+                "security questionnaire",
+            ]
+        )
     ]
 
     for fixture in security_fixtures:
         result = classify_from_filename(fixture["filename"])
-        assert result is not None, (
-            f"Security assessment file not classified: {fixture['filename']!r}"
-        )
+        assert result is not None, f"Security assessment file not classified: {fixture['filename']!r}"

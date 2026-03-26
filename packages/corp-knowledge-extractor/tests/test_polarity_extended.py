@@ -24,18 +24,24 @@ class TestClassifyNotePolarity:
     def test_note_polarity_dominant(self):
         """5 positive + 1 negative → positive (ratio > 2:1)."""
         facts = [
-            {"polarity": "positive"}, {"polarity": "positive"},
-            {"polarity": "positive"}, {"polarity": "positive"},
-            {"polarity": "positive"}, {"polarity": "negative"},
+            {"polarity": "positive"},
+            {"polarity": "positive"},
+            {"polarity": "positive"},
+            {"polarity": "positive"},
+            {"polarity": "positive"},
+            {"polarity": "negative"},
         ]
         assert classify_note_polarity(facts) == "positive"
 
     def test_note_polarity_mixed(self):
         """3 positive + 3 negative → mixed."""
         facts = [
-            {"polarity": "positive"}, {"polarity": "positive"},
-            {"polarity": "positive"}, {"polarity": "negative"},
-            {"polarity": "negative"}, {"polarity": "negative"},
+            {"polarity": "positive"},
+            {"polarity": "positive"},
+            {"polarity": "positive"},
+            {"polarity": "negative"},
+            {"polarity": "negative"},
+            {"polarity": "negative"},
         ]
         assert classify_note_polarity(facts) == "mixed"
 

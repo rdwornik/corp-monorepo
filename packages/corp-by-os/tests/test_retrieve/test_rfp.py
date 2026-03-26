@@ -9,9 +9,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from corp_by_os.retrieve.engine import RetrievalFilter, RetrievedNote
 from corp_by_os.retrieve.rfp import RFPAnswer, answer_rfp
-
 
 # --- Schema (same as test_prep.py) ---
 

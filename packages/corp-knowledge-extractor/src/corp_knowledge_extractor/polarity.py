@@ -84,14 +84,41 @@ def detect_polarity(fact_text: str) -> str:
 
 # Extended keyword lists for richer classification
 _POSITIVE_KEYWORDS = [
-    "improvement", "increase", "growth", "reduction in cost", "faster",
-    "better", "success", "achieved", "optimized", "streamlined", "automated",
-    "enhanced", "enabled", "efficient", "savings", "benefit",
+    "improvement",
+    "increase",
+    "growth",
+    "reduction in cost",
+    "faster",
+    "better",
+    "success",
+    "achieved",
+    "optimized",
+    "streamlined",
+    "automated",
+    "enhanced",
+    "enabled",
+    "efficient",
+    "savings",
+    "benefit",
 ]
 _NEGATIVE_KEYWORDS = [
-    "risk", "concern", "fear", "barrier", "limitation", "does not",
-    "cannot", "failure", "degradation", "challenge", "delay", "expensive",
-    "complex", "issue", "problem", "downtime", "outage",
+    "risk",
+    "concern",
+    "fear",
+    "barrier",
+    "limitation",
+    "does not",
+    "cannot",
+    "failure",
+    "degradation",
+    "challenge",
+    "delay",
+    "expensive",
+    "complex",
+    "issue",
+    "problem",
+    "downtime",
+    "outage",
 ]
 
 

@@ -38,8 +38,9 @@ def _patch(blocklist: list[str], session: dict | None = None):
 def test_anonymize_empty_string_returns_unchanged():
     from corp_rfp_agent.anonymization.core import anonymize
 
-    with patch(CORE_BLOCKLIST, return_value=["Acme"]), patch(
-        CORE_SESSION, return_value=DEFAULT_SESSION
+    with (
+        patch(CORE_BLOCKLIST, return_value=["Acme"]),
+        patch(CORE_SESSION, return_value=DEFAULT_SESSION),
     ):
         text, mapping = anonymize("")
     assert text == ""

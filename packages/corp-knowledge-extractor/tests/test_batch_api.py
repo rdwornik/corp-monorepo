@@ -2,8 +2,7 @@
 
 import json
 import pytest
-from pathlib import Path
-from unittest.mock import MagicMock, patch, PropertyMock
+from unittest.mock import MagicMock
 
 from corp_knowledge_extractor.batch_api import (
     build_batch_jsonl,

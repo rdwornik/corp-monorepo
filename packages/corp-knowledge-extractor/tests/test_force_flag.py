@@ -1,7 +1,5 @@
 """Tests for --force flag propagation in batch processor and manifest CLI."""
 
-import json
-import pytest
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
@@ -16,14 +14,19 @@ class TestBatchProcessorForce:
         output_dir = tmp_path / "output"
         output_dir.mkdir()
         return Manifest(
-            schema_version=1, project="test", output_dir=output_dir,
+            schema_version=1,
+            project="test",
+            output_dir=output_dir,
             files=[ManifestEntry(id="file-1", path=test_file, doc_type="document", name="test.txt")],
         )
 
     def _mark_done(self, output_dir: Path, entry_id: str):
-        save_status(output_dir, {
-            entry_id: {"status": FileStatus.DONE.value, "processed_at": "2026-03-23T00:00:00"},
-        })
+        save_status(
+            output_dir,
+            {
+                entry_id: {"status": FileStatus.DONE.value, "processed_at": "2026-03-23T00:00:00"},
+            },
+        )
 
     def test_force_true_reprocesses_done(self, tmp_path):
         """force=True + existing DONE → re-extracts anyway."""
@@ -55,6 +58,7 @@ class TestBatchProcessorForce:
 class TestBatchJobRunnerForce:
     def test_runner_accepts_force(self):
         from corp_knowledge_extractor.batch_api import BatchJobRunner
+
         manifest = MagicMock()
         manifest.files = []
         manifest.output_dir = Path("/tmp/test")
@@ -63,6 +67,7 @@ class TestBatchJobRunnerForce:
 
     def test_runner_default_no_force(self):
         from corp_knowledge_extractor.batch_api import BatchJobRunner
+
         manifest = MagicMock()
         manifest.files = []
         manifest.output_dir = Path("/tmp/test")
@@ -73,10 +78,12 @@ class TestBatchJobRunnerForce:
 class TestProcessManifestCLI:
     def test_force_flag_exists(self):
         from scripts.run import process_manifest
+
         param_names = [p.name for p in process_manifest.params]
         assert "force" in param_names
 
     def test_force_is_flag(self):
         from scripts.run import process_manifest
+
         force_param = next(p for p in process_manifest.params if p.name == "force")
         assert force_param.is_flag is True

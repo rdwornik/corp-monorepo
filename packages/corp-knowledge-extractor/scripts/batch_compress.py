@@ -45,7 +45,7 @@ class BatchCompressor:
         preset: str = "medium",
         resolution: str = "1280x720",
         audio_bitrate: str = "96k",
-        skip_existing: bool = False
+        skip_existing: bool = False,
     ):
         """
         Initialize batch compressor.
@@ -79,11 +79,7 @@ class BatchCompressor:
         Returns:
             List of video file paths
         """
-        video_extensions = tuple(get(
-            "settings",
-            "input.video_extensions",
-            [".mp4", ".mkv", ".avi", ".mov"]
-        ))
+        video_extensions = tuple(get("settings", "input.video_extensions", [".mp4", ".mkv", ".avi", ".mov"]))
 
         videos = []
         for filename in os.listdir(self.input_dir):
@@ -150,9 +146,9 @@ class BatchCompressor:
             print(f"No videos found in {self.input_dir}")
             return {}
 
-        print(f"{'='*60}")
-        print(f"BATCH VIDEO COMPRESSION")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
+        print("BATCH VIDEO COMPRESSION")
+        print(f"{'=' * 60}")
         print(f"Input directory:  {self.input_dir}")
         print(f"Output directory: {self.output_dir}")
         print(f"Files found:      {len(videos)}")
@@ -160,7 +156,7 @@ class BatchCompressor:
         print(f"Preset:           {self.preset}")
         print(f"Resolution:       {self.resolution}")
         print(f"Skip existing:    {self.skip_existing}")
-        print(f"{'='*60}\n")
+        print(f"{'=' * 60}\n")
 
         if dry_run:
             print("DRY RUN MODE - No files will be compressed\n")
@@ -173,7 +169,7 @@ class BatchCompressor:
             "total_size_before_mb": 0,
             "total_size_after_mb": 0,
             "start_time": datetime.now(),
-            "results": []
+            "results": [],
         }
 
         for i, video_path in enumerate(videos, 1):
@@ -185,11 +181,7 @@ class BatchCompressor:
             # Check if should skip
             if self.should_skip(video_path, output_path):
                 stats["skipped"] += 1
-                stats["results"].append({
-                    "file": filename,
-                    "status": "skipped",
-                    "reason": "already exists"
-                })
+                stats["results"].append({"file": filename, "status": "skipped", "reason": "already exists"})
                 print()
                 continue
 
@@ -211,7 +203,7 @@ class BatchCompressor:
                     crf=self.crf,
                     preset=self.preset,
                     resolution=self.resolution,
-                    audio_bitrate=self.audio_bitrate
+                    audio_bitrate=self.audio_bitrate,
                 )
 
                 # Get output size
@@ -220,22 +212,20 @@ class BatchCompressor:
                 stats["total_size_after_mb"] += output_size
 
                 stats["compressed"] += 1
-                stats["results"].append({
-                    "file": filename,
-                    "status": "success",
-                    "input_size_mb": input_size,
-                    "output_size_mb": output_size,
-                    "reduction_pct": round((1 - output_size/max(input_size, 0.1)) * 100, 1)
-                })
+                stats["results"].append(
+                    {
+                        "file": filename,
+                        "status": "success",
+                        "input_size_mb": input_size,
+                        "output_size_mb": output_size,
+                        "reduction_pct": round((1 - output_size / max(input_size, 0.1)) * 100, 1),
+                    }
+                )
 
             except Exception as e:
                 print(f"  ✗ Error: {e}")
                 stats["failed"] += 1
-                stats["results"].append({
-                    "file": filename,
-                    "status": "failed",
-                    "error": str(e)
-                })
+                stats["results"].append({"file": filename, "status": "failed", "error": str(e)})
 
             print()
 
@@ -251,9 +241,9 @@ class BatchCompressor:
         Args:
             stats: Statistics from compress_batch()
         """
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print("BATCH COMPRESSION SUMMARY")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
         print(f"Total files:       {stats['total_files']}")
         print(f"Compressed:        {stats['compressed']}")
         print(f"Skipped:           {stats['skipped']}")
@@ -262,24 +252,22 @@ class BatchCompressor:
         print(f"Total size before: {stats['total_size_before_mb']:.1f} MB")
         print(f"Total size after:  {stats['total_size_after_mb']:.1f} MB")
 
-        if stats['total_size_before_mb'] > 0:
-            reduction = (
-                1 - stats['total_size_after_mb'] / stats['total_size_before_mb']
-            ) * 100
+        if stats["total_size_before_mb"] > 0:
+            reduction = (1 - stats["total_size_after_mb"] / stats["total_size_before_mb"]) * 100
             print(f"Total reduction:   {reduction:.1f}%")
 
         print(f"Duration:          {stats['duration_seconds']:.1f} seconds")
-        print(f"{'='*60}\n")
+        print(f"{'=' * 60}\n")
 
         # Show individual results
-        if stats['results']:
+        if stats["results"]:
             print("Individual Results:")
             print(f"{'File':<40} {'Status':<12} {'Size Reduction':<15}")
             print("-" * 70)
 
-            for result in stats['results']:
-                file = result['file'][:38]
-                status = result['status']
+            for result in stats["results"]:
+                file = result["file"][:38]
+                status = result["status"]
 
                 if status == "success":
                     reduction = f"{result['reduction_pct']}%"
@@ -302,10 +290,7 @@ class BatchCompressor:
         """
         if report_path is None:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            report_path = os.path.join(
-                self.output_dir,
-                f"compression_report_{timestamp}.json"
-            )
+            report_path = os.path.join(self.output_dir, f"compression_report_{timestamp}.json")
 
         # Convert datetime to string for JSON serialization
         stats_copy = stats.copy()
@@ -319,54 +304,23 @@ class BatchCompressor:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Batch compress videos in directory"
-    )
-    parser.add_argument(
-        "input_dir",
-        help="Directory containing videos to compress"
-    )
-    parser.add_argument(
-        "-o", "--output-dir",
-        help="Output directory (default: same as input)"
-    )
-    parser.add_argument(
-        "--crf",
-        type=int,
-        default=28,
-        help="Quality factor (18-28, lower=better, default=28)"
-    )
+    parser = argparse.ArgumentParser(description="Batch compress videos in directory")
+    parser.add_argument("input_dir", help="Directory containing videos to compress")
+    parser.add_argument("-o", "--output-dir", help="Output directory (default: same as input)")
+    parser.add_argument("--crf", type=int, default=28, help="Quality factor (18-28, lower=better, default=28)")
     parser.add_argument(
         "--preset",
         default="medium",
         choices=["ultrafast", "fast", "medium", "slow", "veryslow"],
-        help="Encoding speed preset (default: medium)"
+        help="Encoding speed preset (default: medium)",
     )
+    parser.add_argument("--resolution", default="1280x720", help="Target resolution (default: 1280x720)")
+    parser.add_argument("--audio-bitrate", default="96k", help="Audio bitrate (default: 96k)")
+    parser.add_argument("--skip-existing", action="store_true", help="Skip files that already have compressed versions")
     parser.add_argument(
-        "--resolution",
-        default="1280x720",
-        help="Target resolution (default: 1280x720)"
+        "--dry-run", action="store_true", help="Show what would be compressed without actually compressing"
     )
-    parser.add_argument(
-        "--audio-bitrate",
-        default="96k",
-        help="Audio bitrate (default: 96k)"
-    )
-    parser.add_argument(
-        "--skip-existing",
-        action="store_true",
-        help="Skip files that already have compressed versions"
-    )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Show what would be compressed without actually compressing"
-    )
-    parser.add_argument(
-        "--save-report",
-        action="store_true",
-        help="Save compression report to JSON"
-    )
+    parser.add_argument("--save-report", action="store_true", help="Save compression report to JSON")
 
     args = parser.parse_args()
 
@@ -378,7 +332,7 @@ def main():
             preset=args.preset,
             resolution=args.resolution,
             audio_bitrate=args.audio_bitrate,
-            skip_existing=args.skip_existing
+            skip_existing=args.skip_existing,
         )
 
         stats = batch.compress_batch(dry_run=args.dry_run)

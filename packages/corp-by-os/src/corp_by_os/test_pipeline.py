@@ -44,9 +44,7 @@ CROSS = "[bold red]FAIL[/bold red]"
 
 # Path to recorded-fixture directory, relative to this source file.
 # src/corp_by_os/test_pipeline.py  ->  ../../tests/fixtures/pipeline/recorded
-_RECORDED_DIR = (
-    Path(__file__).parent.parent.parent / "tests" / "fixtures" / "pipeline" / "recorded"
-)
+_RECORDED_DIR = Path(__file__).parent.parent.parent / "tests" / "fixtures" / "pipeline" / "recorded"
 _CORPUS_DIR = _RECORDED_DIR.parent / "corpus"
 
 
@@ -149,9 +147,7 @@ def run_pipeline_test(
             except Exception as exc:
                 detail = str(exc)
                 passed = False
-                logger.warning(
-                    "Step %s failed: %s", step_fn.__name__, exc, exc_info=verbose
-                )
+                logger.warning("Step %s failed: %s", step_fn.__name__, exc, exc_info=verbose)
             duration = time.perf_counter() - t0
             report.steps.append(
                 StepResult(
@@ -197,9 +193,7 @@ def format_report(report: PipelineTestReport) -> None:
 
     for step in report.steps:
         status_text = (
-            Text("PASS", style="bold green")
-            if step.passed
-            else Text("FAIL", style="bold red")
+            Text("PASS", style="bold green") if step.passed else Text("FAIL", style="bold red")
         )
         table.add_row(
             step.name,
@@ -216,9 +210,7 @@ def format_report(report: PipelineTestReport) -> None:
         summary = f"[bold red]{passed}/{total} passed[/bold red]"
 
     title = f"Pipeline Smoke Test  {summary}"
-    _console.print(
-        Panel(table, title=title, border_style="green" if report.all_passed else "red")
-    )
+    _console.print(Panel(table, title=title, border_style="green" if report.all_passed else "red"))
 
     if report.sandbox_path:
         _console.print(f"[dim]Sandbox: {report.sandbox_path}[/dim]")
@@ -400,9 +392,7 @@ def _test_extract(
     if not _CORPUS_DIR.exists():
         return "skipped (corpus dir not found)"
 
-    corpus_files = sorted(
-        f for f in _CORPUS_DIR.iterdir() if f.is_file() and f.suffix != ".json"
-    )
+    corpus_files = sorted(f for f in _CORPUS_DIR.iterdir() if f.is_file() and f.suffix != ".json")
     if not corpus_files:
         return "no corpus files to extract"
 
@@ -483,9 +473,7 @@ def _test_extract(
         if file_done > 0:
             ingest_result = ingest_extractions(staging_dir, sb.config.vault_path)
             if ingest_result.errors:
-                logger.warning(
-                    "Ingest errors for %s: %s", f_path.name, ingest_result.errors
-                )
+                logger.warning("Ingest errors for %s: %s", f_path.name, ingest_result.errors)
 
     if record and recorded_entries:
         rec_manifest = {
@@ -533,9 +521,7 @@ def _replay_recorded_fixtures(sb, manifest_path: Path) -> str:
         extract_dir.mkdir(parents=True, exist_ok=True)
 
         for note in fixture_data.get("notes", []):
-            (extract_dir / note["filename"]).write_text(
-                note["content"], encoding="utf-8"
-            )
+            (extract_dir / note["filename"]).write_text(note["content"], encoding="utf-8")
             total_notes += 1
 
     result = ingest_extractions(cke_out, sb.config.vault_path)
@@ -557,11 +543,6 @@ def _get_cke_model() -> str:
         from corp_by_os.overnight.cke_client import load_cke_config
 
         cfg = load_cke_config()
-        return (
-            cfg.get("model_override")
-            or cfg.get("default_model")
-            or cfg.get("model")
-            or "gemini"
-        )
+        return cfg.get("model_override") or cfg.get("default_model") or cfg.get("model") or "gemini"
     except Exception:
         return "gemini"

@@ -44,9 +44,7 @@ def _resolve_cke_python(cke: Path) -> tuple[str, ...]:
     if run_script.exists():
         return (sys.executable, str(run_script))
 
-    raise FileNotFoundError(
-        f"CKE not found. Checked: {cke_python}, PATH, {run_script}"
-    )
+    raise FileNotFoundError(f"CKE not found. Checked: {cke_python}, PATH, {run_script}")
 
 
 def invoke_cke_batch(

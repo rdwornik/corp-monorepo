@@ -132,7 +132,7 @@ def _estimate_gemini_cost(model: str, total_tokens: int) -> float:
     Uses a blended rate (input-heavy assumption: ~80% input, ~20% output).
     """
     rates = {
-        "gemini-3-flash-preview": 1.00,     # blended $/1M tokens
+        "gemini-3-flash-preview": 1.00,  # blended $/1M tokens
         "gemini-3.1-flash-lite": 0.50,
         "gemini-3.1-pro-preview": 4.00,
     }
@@ -182,7 +182,8 @@ def _upload_and_wait(client, path: Path, config: dict):
     if size_mb > 300:
         log.warning(
             "File %s is %.0f MB — compression is recommended to avoid memory issues",
-            path.name, size_mb,
+            path.name,
+            size_mb,
         )
 
     log.info("Uploading %s to Gemini File API...", path.name)
@@ -490,7 +491,10 @@ def extract_knowledge(
     model_override = config.get("model_override")
     has_images = file.type in (FileType.VIDEO, FileType.SLIDES)
     model, routing_reason = select_model(
-        file.path, file.size_bytes, has_images=has_images, model_override=model_override,
+        file.path,
+        file.size_bytes,
+        has_images=has_images,
+        model_override=model_override,
     )
     # "free" means Tier 1 — shouldn't reach here, but fall back to flash
     if model == "free":
@@ -538,9 +542,11 @@ def extract_knowledge(
                 mime = mimetypes.guess_type(str(sf.path))[0] or "image/png"
                 contents.append(types.Part.from_bytes(data=sf.path.read_bytes(), mime_type=mime))
 
-            contents.append(types.Part.from_text(
-                text=f"[{len(selected)} sampled frame(s) provided above, sample_0000 through sample_{len(selected) - 1:04d}.]\n\n{unified_prompt}"
-            ))
+            contents.append(
+                types.Part.from_text(
+                    text=f"[{len(selected)} sampled frame(s) provided above, sample_0000 through sample_{len(selected) - 1:04d}.]\n\n{unified_prompt}"
+                )
+            )
         else:
             # Standard extract_with_slides prompt
             contents = _build_sampled_frame_contents(client, file, sampled_frames, config, custom_prompt=custom_prompt)
@@ -791,7 +797,9 @@ def _try_pdf_multimodal(
     client = _get_client(config)
     model_override = config.get("model_override")
     model, routing_reason = select_model(
-        file.path, file.size_bytes, model_override=model_override,
+        file.path,
+        file.size_bytes,
+        model_override=model_override,
     )
 
     doc_type = classify_doc_type(str(file.path))
@@ -804,6 +812,7 @@ def _try_pdf_multimodal(
 
     try:
         import fitz
+
         doc = fitz.open(str(file.path))
         page_count = len(doc)
         doc.close()
@@ -813,10 +822,12 @@ def _try_pdf_multimodal(
     if page_count > 50 or file.size_bytes > 30 * 1024 * 1024:
         log.info(
             "Large PDF: %d pages, %.1f MB — truncating to 50 pages for multimodal",
-            page_count, file.size_bytes / (1024 * 1024),
+            page_count,
+            file.size_bytes / (1024 * 1024),
         )
         try:
             import fitz
+
             temp_dir = Path(tempfile.mkdtemp(prefix="cke_pdf_trunc_"))
             doc = fitz.open(str(file.path))
             truncated = fitz.open()
@@ -918,6 +929,7 @@ def _try_pdf_multimodal(
     # --- Render cover page PNG ---
     try:
         import fitz
+
         cover_dir = Path(tempfile.mkdtemp(prefix="cke_pdf_cover_"))
         doc = fitz.open(str(file.path))
         mat = fitz.Matrix(2, 2)  # 2x zoom for quality
@@ -950,7 +962,13 @@ def _try_pdf_multimodal(
 
     log.info(
         "PDF multimodal extracted: '%s' | pages=%d | truncated=%s | doc_type=%s | deep=%s | tokens=%d | model=%s",
-        result.title, page_count, multimodal_truncated, doc_type, use_deep, tokens, model,
+        result.title,
+        page_count,
+        multimodal_truncated,
+        doc_type,
+        use_deep,
+        tokens,
+        model,
     )
     return result
 
@@ -975,6 +993,7 @@ def _try_pptx_pdf_multimodal(
 
     # Convert PPTX to PDF
     import tempfile
+
     pdf_dir = Path(tempfile.mkdtemp(prefix="cke_pptx_pdf_"))
     pdf_path = convert_pptx_to_pdf(file.path, pdf_dir)
 
@@ -986,7 +1005,10 @@ def _try_pptx_pdf_multimodal(
     client = _get_client(config)
     model_override = config.get("model_override")
     model, routing_reason = select_model(
-        file.path, file.size_bytes, has_images=True, model_override=model_override,
+        file.path,
+        file.size_bytes,
+        has_images=True,
+        model_override=model_override,
     )
 
     doc_type = classify_doc_type(str(file.path))
@@ -1102,7 +1124,11 @@ def _try_pptx_pdf_multimodal(
 
     log.info(
         "PPTX PDF multimodal extracted: '%s' | doc_type=%s | deep=%s | tokens=%d | model=%s",
-        result.title, doc_type, use_deep, tokens, model,
+        result.title,
+        doc_type,
+        use_deep,
+        tokens,
+        model,
     )
     return result
 
@@ -1137,7 +1163,12 @@ def extract_from_text(
     """
     from corp_knowledge_extractor.doc_type_classifier import classify_doc_type, should_extract_deep
     from corp_knowledge_extractor.deep_prompt import build_deep_prompt
-    from corp_knowledge_extractor.providers.router import route_model, get_provider, DEFAULT_LARGE_CONTEXT_MODEL, has_anthropic_key
+    from corp_knowledge_extractor.providers.router import (
+        route_model,
+        get_provider,
+        DEFAULT_LARGE_CONTEXT_MODEL,
+        has_anthropic_key,
+    )
     from corp_knowledge_extractor.providers.base import ExtractionRequest
     from corp_knowledge_extractor.providers.validator import validate_and_retry
     from corp_knowledge_extractor.freshness import compute_freshness_fields
@@ -1334,7 +1365,10 @@ def extract_pptx_multimodal(
     client = _get_client(config)
     model_override = config.get("model_override")
     model, routing_reason = select_model(
-        file.path, file.size_bytes, has_images=True, model_override=model_override,
+        file.path,
+        file.size_bytes,
+        has_images=True,
+        model_override=model_override,
     )
 
     # --- Classify doc type BEFORE Gemini call ---

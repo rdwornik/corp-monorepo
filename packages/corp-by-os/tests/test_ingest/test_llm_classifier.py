@@ -9,7 +9,6 @@ import pytest
 import yaml
 
 from corp_by_os.ingest.llm_classifier import (
-    LLMClassification,
     _get_all_destinations,
     _parse_llm_json,
     classify_file_llm,

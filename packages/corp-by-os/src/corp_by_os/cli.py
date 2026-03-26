@@ -45,13 +45,14 @@ from datetime import datetime
 from pathlib import Path
 
 import click
-from corp_by_os.config import get_config
-from corp_by_os.project_resolver import resolve_project
-from corp_by_os.vault_io import list_projects, read_project_info, validate_vault
 from corp_os_meta.pipeline_config import PipelineConfig
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
+
+from corp_by_os.config import get_config
+from corp_by_os.project_resolver import resolve_project
+from corp_by_os.vault_io import list_projects, read_project_info, validate_vault
 
 # Use ASCII-safe markers for Windows legacy console compatibility
 CHECK = "Y"
@@ -1300,6 +1301,7 @@ def _run_folder_extraction(
 
     # Build per-folder manifests and extract
     import yaml
+
     from corp_by_os.extraction.non_project.folder_policy import PolicyError, load_policy
     from corp_by_os.extraction.non_project.manifest_emitter import build_manifest, write_manifest
     from corp_by_os.extraction.non_project.routing import resolve_route
@@ -1511,6 +1513,7 @@ def _run_full_reshape(
     classifications: list = []
     try:
         import yaml
+
         from corp_by_os.overnight.classifier import classify_batch as reshape_classify
 
         routing_map_path = mywork_root / "90_System" / "routing_map.yaml"
@@ -2306,18 +2309,27 @@ def ingest_command(
 
 
 @cli.command("ingest-inbox")
-@click.option("--path", type=click.Path(exists=True), default=None,
-              help="Process a specific file instead of scanning Inbox.")
+@click.option(
+    "--path",
+    type=click.Path(exists=True),
+    default=None,
+    help="Process a specific file instead of scanning Inbox.",
+)
 @click.option("--dry-run", is_flag=True, help="Show what would happen without moving files.")
 @click.option("--auto", is_flag=True, help="Auto-accept high-confidence matches (>=0.90).")
 @click.option("--undo", type=int, default=None, help="Undo a previous ingest by event ID.")
-@click.option("--full", is_flag=True,
-              help="With --undo: also remove vault package and rebuild index.")
+@click.option(
+    "--full", is_flag=True, help="With --undo: also remove vault package and rebuild index."
+)
 @click.option("--skip-extract", is_flag=True, help="Route file but skip CKE extraction.")
 @click.option("--list", "list_events", is_flag=True, help="Show ingest history.")
 @click.option("--list-all", is_flag=True, help="Show all ingest history (no limit).")
-@click.option("--destination", type=str, default=None,
-              help="Default destination for all files (e.g. 10_Projects/JLR).")
+@click.option(
+    "--destination",
+    type=str,
+    default=None,
+    help="Default destination for all files (e.g. 10_Projects/JLR).",
+)
 @click.pass_obj
 def ingest_inbox_command(
     obj: dict,
@@ -2424,16 +2436,10 @@ def files_stats_command(obj: dict) -> None:
     conn = ops.conn
 
     total_files = conn.execute("SELECT COUNT(*) FROM files").fetchone()[0]
-    total_extractions = conn.execute(
-        "SELECT COUNT(*) FROM extractions"
-    ).fetchone()[0]
-    extracted = conn.execute(
-        "SELECT COUNT(DISTINCT file_id) FROM extractions"
-    ).fetchone()[0]
+    total_extractions = conn.execute("SELECT COUNT(*) FROM extractions").fetchone()[0]
+    extracted = conn.execute("SELECT COUNT(DISTINCT file_id) FROM extractions").fetchone()[0]
     never_extracted = total_files - extracted
-    total_cost = conn.execute(
-        "SELECT COALESCE(SUM(cost_cents), 0) FROM extractions"
-    ).fetchone()[0]
+    total_cost = conn.execute("SELECT COALESCE(SUM(cost_cents), 0) FROM extractions").fetchone()[0]
 
     table = Table(title="File Registry")
     table.add_column("Metric", style="bold")
@@ -3088,8 +3094,9 @@ def ingest_extractions_cmd(
         console.print("\n[dim]Rebuilding search index...[/dim]")
         try:
             from corp_by_os.index_builder import rebuild_index as do_rebuild
+
             stats = do_rebuild(config=config)
-            console.print(f"[green]Index rebuilt: {stats.total_facts} facts indexed.[/green]")
+            console.print(f"[green]Index rebuilt: {stats.facts_indexed} facts indexed.[/green]")
         except Exception as e:
             console.print(f"[red]Index rebuild failed: {e}[/red]")
     elif result.notes_ingested > 0 and not dry_run:
@@ -3176,8 +3183,7 @@ def test_pipeline_command(
 
     if record:
         console.print(
-            f"Recorded {report.recorded_fixtures} fixtures, "
-            f"total cost ${report.recording_cost:.2f}"
+            f"Recorded {report.recorded_fixtures} fixtures, total cost ${report.recording_cost:.2f}"
         )
 
     if output:

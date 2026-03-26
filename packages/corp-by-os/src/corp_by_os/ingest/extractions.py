@@ -38,7 +38,6 @@ _SKIP_PATTERNS = [
 _SKIP_DIRS = {"source", "frames", "docs", "video"}
 
 
-
 DEFAULT_QUALITY_THRESHOLD = 25
 
 
@@ -270,7 +269,7 @@ def ingest_extractions(
                     end = content.find("---", 3)
                     if end != -1:
                         fm_text = content[3:end]
-                        body = content[end + 4:]
+                        body = content[end + 4 :]
                         note_fm = yaml.safe_load(fm_text) or {}
                     else:
                         note_fm, body = {}, content

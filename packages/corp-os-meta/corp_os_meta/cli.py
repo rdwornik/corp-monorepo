@@ -56,9 +56,7 @@ def main():
 
 @main.command()
 @click.argument("path", type=click.Path(exists=True))
-@click.option(
-    "--recursive", "-r", is_flag=True, help="Process all .md files in directory"
-)
+@click.option("--recursive", "-r", is_flag=True, help="Process all .md files in directory")
 @click.option("--strict", is_flag=True, help="Fail on any validation issue")
 def validate(path: str, recursive: bool, strict: bool):
     """Validate note frontmatter against schema."""
@@ -91,9 +89,7 @@ def validate(path: str, recursive: bool, strict: bool):
 
 @main.command()
 @click.argument("path", type=click.Path(exists=True))
-@click.option(
-    "--in-place", "-i", is_flag=True, help="Overwrite file with normalized version"
-)
+@click.option("--in-place", "-i", is_flag=True, help="Overwrite file with normalized version")
 def normalize(path: str, in_place: bool):
     """Normalize taxonomy terms in note frontmatter."""
     target = Path(path)
@@ -114,9 +110,7 @@ def normalize(path: str, in_place: bool):
         console.print("[dim]Nothing to normalize[/]")
 
     if in_place and changes:
-        frontmatter_str = yaml.dump(
-            normalized, default_flow_style=False, allow_unicode=True, sort_keys=False
-        )
+        frontmatter_str = yaml.dump(normalized, default_flow_style=False, allow_unicode=True, sort_keys=False)
         output = f"---\n{frontmatter_str}---\n{body}"
         target.write_text(output, encoding="utf-8")
         console.print(f"[green]Written:[/] {target}")

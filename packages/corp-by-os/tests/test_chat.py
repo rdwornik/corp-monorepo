@@ -2,18 +2,15 @@
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
 from corp_by_os.chat import (
     QUIT_COMMANDS,
     _handle_special_command,
-    _show_help,
-    _show_status,
 )
-from corp_by_os.models import Workflow, WorkflowParam
-
+from corp_by_os.models import Workflow
 
 # --- Fixtures ---
 
@@ -112,7 +109,7 @@ class TestChatLoop:
     def test_workflow_execution(self, mock_load, mock_exec, mock_route, mock_console) -> None:
         from corp_by_os.chat import chat_loop
         from corp_by_os.intent_router import Intent
-        from corp_by_os.models import WorkflowResult, StepResult
+        from corp_by_os.models import StepResult, WorkflowResult
 
         mock_load.return_value = {
             "attention_scan": Workflow(

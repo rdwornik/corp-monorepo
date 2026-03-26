@@ -1,11 +1,9 @@
 """Tests for synthesis prompt enrichment — key_facts, action_items, entities."""
 
-import json
 import os
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
-import pytest
 
 from corp_knowledge_extractor.extract import ExtractionResult
 from corp_knowledge_extractor.inventory import SourceFile, FileType

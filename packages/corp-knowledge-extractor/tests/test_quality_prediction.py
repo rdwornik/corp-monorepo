@@ -31,18 +31,14 @@ def test_quality_values_valid() -> None:
     # "medium" and "local" appear in older extractions as legacy values
     valid = {"full", "partial", "fragment", "medium", "local", None}
     for entry in QUALITY_DATA:
-        assert entry["quality"] in valid, (
-            f"Invalid quality: {entry['quality']!r} for {entry.get('doc_type')}"
-        )
+        assert entry["quality"] in valid, f"Invalid quality: {entry['quality']!r} for {entry.get('doc_type')}"
 
 
 def test_quality_score_range() -> None:
     """Quality scores are within expected range [0, 100]."""
     for entry in QUALITY_DATA:
         score = entry.get("quality_score", 0) or 0
-        assert 0 <= score <= 100, (
-            f"Quality score out of range: {score} for {entry.get('doc_type')}"
-        )
+        assert 0 <= score <= 100, f"Quality score out of range: {score} for {entry.get('doc_type')}"
 
 
 def test_deep_extraction_has_more_facts() -> None:
@@ -56,9 +52,7 @@ def test_deep_extraction_has_more_facts() -> None:
     avg_deep = sum(e["fact_count"] for e in deep) / len(deep)
     avg_standard = sum(e["fact_count"] for e in standard) / len(standard)
 
-    assert avg_deep >= avg_standard, (
-        f"Deep extraction avg facts ({avg_deep:.1f}) < standard ({avg_standard:.1f})"
-    )
+    assert avg_deep >= avg_standard, f"Deep extraction avg facts ({avg_deep:.1f}) < standard ({avg_standard:.1f})"
 
 
 def test_topic_count_reasonable() -> None:
@@ -66,10 +60,7 @@ def test_topic_count_reasonable() -> None:
     over_cap = [e for e in QUALITY_DATA if e["topic_count"] > 8]
     ratio = len(over_cap) / len(QUALITY_DATA) if QUALITY_DATA else 0
     # Allow up to 10% exceeding cap (older extractions before cap enforcement)
-    assert ratio < 0.10, (
-        f"Too many notes exceed topic cap: {len(over_cap)}/{len(QUALITY_DATA)} "
-        f"({ratio:.0%})"
-    )
+    assert ratio < 0.10, f"Too many notes exceed topic cap: {len(over_cap)}/{len(QUALITY_DATA)} ({ratio:.0%})"
 
 
 def test_product_count_reasonable() -> None:
@@ -86,6 +77,4 @@ def test_extension_coverage() -> None:
     # At least some of these should be present
     expected_any = {".pptx", ".docx", ".pdf", ".xlsx", ".mp4"}
     present = extensions & expected_any
-    assert len(present) >= 2, (
-        f"Only found extensions: {extensions}, expected some of {expected_any}"
-    )
+    assert len(present) >= 2, f"Only found extensions: {extensions}, expected some of {expected_any}"

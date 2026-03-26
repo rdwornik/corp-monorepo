@@ -30,19 +30,12 @@ def merge_correlated(
 
     session_id = _generate_session_id(pptx_path, video_path)
 
-    topics = _dedupe_list(
-        (pptx_extraction.get("topics") or []) + (video_extraction.get("topics") or [])
-    )
-    products = _dedupe_list(
-        (pptx_extraction.get("products") or []) + (video_extraction.get("products") or [])
-    )
+    topics = _dedupe_list((pptx_extraction.get("topics") or []) + (video_extraction.get("topics") or []))
+    products = _dedupe_list((pptx_extraction.get("products") or []) + (video_extraction.get("products") or []))
     entities = _dedupe_list(
-        (pptx_extraction.get("entities_mentioned") or [])
-        + (video_extraction.get("entities_mentioned") or [])
+        (pptx_extraction.get("entities_mentioned") or []) + (video_extraction.get("entities_mentioned") or [])
     )
-    people = _dedupe_list(
-        (pptx_extraction.get("people") or []) + (video_extraction.get("people") or [])
-    )
+    people = _dedupe_list((pptx_extraction.get("people") or []) + (video_extraction.get("people") or []))
 
     # Merge key facts from both sources with conservative dedup
     pptx_facts = _tag_facts(pptx_extraction.get("key_facts") or [], "pptx")
@@ -110,10 +103,7 @@ def merge_correlated(
         "entities_mentioned": entities,
         "people": people,
         "key_facts": key_facts,
-        "domains": _dedupe_list(
-            (pptx_extraction.get("domains") or [])
-            + (video_extraction.get("domains") or [])
-        ),
+        "domains": _dedupe_list((pptx_extraction.get("domains") or []) + (video_extraction.get("domains") or [])),
         "confidentiality": "internal",
         "authority": "approved",
         "language": "en",
@@ -126,9 +116,7 @@ def merge_correlated(
     if overlay and overlay_type:
         frontmatter[overlay_type] = overlay
 
-    markdown = _build_markdown(
-        title, key_facts, overlay, overlay_type, video_extraction, pptx_path, video_path
-    )
+    markdown = _build_markdown(title, key_facts, overlay, overlay_type, video_extraction, pptx_path, video_path)
 
     return {
         "frontmatter": frontmatter,
@@ -154,8 +142,12 @@ def merge_training_overlays(pptx_overlay: dict, mp4_overlay: dict) -> dict:
 
     # List fields: deduplicate by string content
     list_fields = [
-        "attendees", "decisions_made", "action_items",
-        "questions_raised", "concerns_expressed", "next_steps",
+        "attendees",
+        "decisions_made",
+        "action_items",
+        "questions_raised",
+        "concerns_expressed",
+        "next_steps",
     ]
     for field in list_fields:
         pptx_items = pptx_overlay.get(field) or []
@@ -179,10 +171,17 @@ def _dedupe_overlay_items(items: list) -> list:
         if isinstance(item, dict):
             # Dedup by primary text field (action, decision, question, etc.)
             key_text = (
-                item.get("action") or item.get("decision") or
-                item.get("question") or item.get("concern") or
-                item.get("name") or str(item)
-            ).lower().strip()
+                (
+                    item.get("action")
+                    or item.get("decision")
+                    or item.get("question")
+                    or item.get("concern")
+                    or item.get("name")
+                    or str(item)
+                )
+                .lower()
+                .strip()
+            )
         else:
             key_text = str(item).lower().strip()
         if key_text not in seen:
@@ -216,10 +215,33 @@ def _meaningful_numbers(nums: set[float]) -> set[float]:
 
 def _fact_words(text: str) -> set[str]:
     """Extract meaningful words for overlap comparison."""
-    stop_words = {"the", "a", "an", "is", "are", "was", "were", "in", "on", "at",
-                  "to", "for", "of", "with", "and", "or", "by", "from", "has", "had"}
-    return {w.lower().strip(".,;:!?()") for w in text.split()
-            if w.lower() not in stop_words and len(w) > 2 and not w.replace(",", "").isdigit()}
+    stop_words = {
+        "the",
+        "a",
+        "an",
+        "is",
+        "are",
+        "was",
+        "were",
+        "in",
+        "on",
+        "at",
+        "to",
+        "for",
+        "of",
+        "with",
+        "and",
+        "or",
+        "by",
+        "from",
+        "has",
+        "had",
+    }
+    return {
+        w.lower().strip(".,;:!?()")
+        for w in text.split()
+        if w.lower() not in stop_words and len(w) > 2 and not w.replace(",", "").isdigit()
+    }
 
 
 def _facts_match(a: dict, b: dict) -> bool:
@@ -236,11 +258,7 @@ def _facts_match(a: dict, b: dict) -> bool:
 
     # If both have meaningful numbers, require at least one match
     if a_nums and b_nums:
-        has_number_match = any(
-            _numbers_match(an, bn)
-            for an in a_nums
-            for bn in b_nums
-        )
+        has_number_match = any(_numbers_match(an, bn) for an in a_nums for bn in b_nums)
         if not has_number_match:
             return False
         # Also require some text overlap (entity similarity)
@@ -276,9 +294,7 @@ def _facts_conflict(a: dict, b: dict) -> bool:
         return False
 
     # Has entity overlap but no number match → conflict
-    has_number_match = any(
-        _numbers_match(an, bn) for an in a_nums for bn in b_nums
-    )
+    has_number_match = any(_numbers_match(an, bn) for an in a_nums for bn in b_nums)
     return not has_number_match
 
 
@@ -349,9 +365,7 @@ def _build_markdown(
         sections.append(f"## Executive Summary\n\n{video_summary}")
 
     if key_facts:
-        facts_md = "\n".join(
-            f"- {f['fact'] if isinstance(f, dict) else f}" for f in key_facts
-        )
+        facts_md = "\n".join(f"- {f['fact'] if isinstance(f, dict) else f}" for f in key_facts)
         sections.append(f"## Key Facts\n\n{facts_md}")
 
     if overlay and overlay_type:
@@ -381,10 +395,7 @@ def _build_markdown(
                 slide_md += f"\n**So what:** {so_what}\n"
 
             slide_facts = [
-                f
-                for f in key_facts
-                if isinstance(f, dict)
-                and str(f.get("slide_ref", "")) == str(slide_num)
+                f for f in key_facts if isinstance(f, dict) and str(f.get("slide_ref", "")) == str(slide_num)
             ]
             if slide_facts:
                 facts_list = "\n".join(f"- {f['fact']}" for f in slide_facts)
@@ -396,9 +407,7 @@ def _build_markdown(
 
             slide_sections.append(slide_md)
 
-        sections.append(
-            "## Slide-by-Slide Walkthrough\n\n" + "\n---\n".join(slide_sections)
-        )
+        sections.append("## Slide-by-Slide Walkthrough\n\n" + "\n---\n".join(slide_sections))
 
     quotes = video_extraction.get("notable_quotes", "")
     if quotes:

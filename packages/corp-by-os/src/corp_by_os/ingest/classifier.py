@@ -7,7 +7,7 @@ to produce rich Classification results for the interactive UI.
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 from corp_by_os.ops.registry import ContentRegistry, RegistryMatch

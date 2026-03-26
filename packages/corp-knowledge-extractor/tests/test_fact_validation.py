@@ -1,8 +1,6 @@
 """Tests for fact validation — number normalizer, source cross-reference, anomaly detection."""
 
-from unittest.mock import patch, MagicMock
 
-import pytest
 
 from corp_knowledge_extractor.fact_validation import (
     normalize_number,
@@ -167,12 +165,16 @@ class TestValidationWired:
         from pathlib import Path
 
         sf = SourceFile(
-            path=Path("test.pptx"), name="test.pptx",
-            type=FileType.SLIDES, size_bytes=100,
+            path=Path("test.pptx"),
+            name="test.pptx",
+            type=FileType.SLIDES,
+            size_bytes=100,
         )
         text_result = TextExtractionResult(
             text="The platform serves 1,706 customers across 15 regions.",
-            char_count=55, extractor="python-pptx", slide_count=5,
+            char_count=55,
+            extractor="python-pptx",
+            slide_count=5,
         )
         data = {
             "facts": [
@@ -194,12 +196,16 @@ class TestValidationWired:
         from pathlib import Path
 
         sf = SourceFile(
-            path=Path("test.pptx"), name="test.pptx",
-            type=FileType.SLIDES, size_bytes=100,
+            path=Path("test.pptx"),
+            name="test.pptx",
+            type=FileType.SLIDES,
+            size_bytes=100,
         )
         text_result = TextExtractionResult(
             text="Achieved $950K in annual savings.",
-            char_count=32, extractor="python-pptx", slide_count=3,
+            char_count=32,
+            extractor="python-pptx",
+            slide_count=3,
         )
         data = {
             "facts": [
@@ -229,11 +235,22 @@ class TestValidationWired:
             }
         ]
         output = tmpl.render(
-            source_file="test.pptx", content_type="presentation",
-            title="Test", date="2026-01-01", topics=[], people=[],
-            products=[], language="en", quality="full", tokens_used=0,
-            summary="Test summary", links_line="", slides=[],
-            key_points=[], transcript_excerpt="", model="test",
+            source_file="test.pptx",
+            content_type="presentation",
+            title="Test",
+            date="2026-01-01",
+            topics=[],
+            people=[],
+            products=[],
+            language="en",
+            quality="full",
+            tokens_used=0,
+            summary="Test summary",
+            links_line="",
+            slides=[],
+            key_points=[],
+            transcript_excerpt="",
+            model="test",
             flagged_facts=flagged,
         )
 

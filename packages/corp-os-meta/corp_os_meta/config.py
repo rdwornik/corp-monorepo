@@ -68,6 +68,7 @@ def get_excluded_paths() -> list[str]:
 
 # Convenience accessors
 
+
 def vault_path() -> Path:
     """Obsidian vault root."""
     return get_path("vault", "VAULT_PATH", "~/Documents/ObsidianVault")

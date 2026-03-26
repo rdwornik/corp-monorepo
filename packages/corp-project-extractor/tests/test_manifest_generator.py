@@ -9,7 +9,6 @@ import pytest
 
 from corp_project_extractor.manifest_generator import (
     CATEGORY_TO_DOC_TYPE,
-    EXTENSION_TO_DOC_TYPE,
     _resolve_client,
     _slugify,
     generate_cke_manifest,

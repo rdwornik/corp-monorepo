@@ -8,8 +8,6 @@ import pytest
 import yaml
 
 from corp_by_os.ingest.classifier import (
-    Classification,
-    FileInfo,
     _human_size,
     classify,
     detect_file_info,
@@ -121,9 +119,7 @@ class TestDetectFileInfo:
 
 
 class TestClassify:
-    def test_series_match_high_confidence(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_series_match_high_confidence(self, tmp_path: Path, registry: ContentRegistry) -> None:
         """Cognitive Friday file classified with high confidence."""
         f = tmp_path / "Cognitive_Friday_S4E1_Tag_Changes.pptx"
         f.write_bytes(b"x" * 1024)
@@ -144,9 +140,7 @@ class TestClassify:
             "60_Source_Library/02_Training_Enablement/Lighthouse"
         )
 
-    def test_client_detected(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_client_detected(self, tmp_path: Path, registry: ContentRegistry) -> None:
         """Client name detected from filename."""
         f = tmp_path / "Lenzing_Discovery_Notes.docx"
         f.write_bytes(b"x" * 1024)
@@ -165,9 +159,7 @@ class TestClassify:
         assert result.best_match.method == "series"
         assert result.detected_client == "Lenzing_Planning"
 
-    def test_rule_match(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_rule_match(self, tmp_path: Path, registry: ContentRegistry) -> None:
         """Destination rule match."""
         f = tmp_path / "WMS_RFP_Database_v3.xlsx"
         f.write_bytes(b"x" * 1024)
@@ -176,9 +168,7 @@ class TestClassify:
         assert result.best_match.rule_name == "RFP databases"
         assert result.best_match.destination == "50_RFP/_databases"
 
-    def test_no_match_needs_human(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_no_match_needs_human(self, tmp_path: Path, registry: ContentRegistry) -> None:
         """Unknown file needs human review."""
         f = tmp_path / "random_notes_v2.txt"
         f.write_bytes(b"x" * 1024)
@@ -186,9 +176,7 @@ class TestClassify:
         assert result.best_match is None
         assert result.needs_human is True
 
-    def test_low_confidence_needs_human(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_low_confidence_needs_human(self, tmp_path: Path, registry: ContentRegistry) -> None:
         """Low-confidence rule match still needs human."""
         # SOC_2 doc as .docx won't match (rule requires .pdf)
         f = tmp_path / "SOC_2_Report.docx"
@@ -197,9 +185,7 @@ class TestClassify:
         # No rule match for .docx — should need human
         assert result.needs_human is True
 
-    def test_file_info_populated(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_file_info_populated(self, tmp_path: Path, registry: ContentRegistry) -> None:
         """Classification includes file info."""
         f = tmp_path / "test.pdf"
         f.write_bytes(b"x" * 2048)
@@ -207,9 +193,7 @@ class TestClassify:
         assert result.file_info.filename == "test.pdf"
         assert result.file_info.size_bytes == 2048
 
-    def test_custom_threshold(
-        self, tmp_path: Path, registry: ContentRegistry
-    ) -> None:
+    def test_custom_threshold(self, tmp_path: Path, registry: ContentRegistry) -> None:
         """Custom confidence threshold changes needs_human."""
         f = tmp_path / "ISO_27001_Certificate_BY.pdf"
         f.write_bytes(b"x" * 1024)

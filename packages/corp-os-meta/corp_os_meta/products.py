@@ -104,9 +104,7 @@ def resolve_product_key(display_name: str) -> str | None:
             best_score = score
             best_key = key
     if best_score >= _FUZZY_THRESHOLD:
-        logger.debug(
-            "Fuzzy matched '%s' -> '%s' (%.2f)", display_name, best_key, best_score
-        )
+        logger.debug("Fuzzy matched '%s' -> '%s' (%.2f)", display_name, best_key, best_score)
         return best_key
 
     return None
@@ -124,9 +122,7 @@ def get_parent(key: str) -> str | None:
 def get_children(key: str) -> list[str]:
     """Return list of sub-product keys whose parent is `key`."""
     sub_products = _load_sub_products()
-    return sorted(
-        sub_key for sub_key, info in sub_products.items() if info["parent"] == key
-    )
+    return sorted(sub_key for sub_key, info in sub_products.items() if info["parent"] == key)
 
 
 def expand_product_query(key: str) -> list[str]:

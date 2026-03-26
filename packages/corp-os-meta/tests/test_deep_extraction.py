@@ -2,18 +2,16 @@
 
 from datetime import date
 
-
 from corp_os_meta import (
-    DocumentType,
-    NoteFrontmatter,
-    ArchitectureOverlay,
-    SecurityOverlay,
-    CommercialOverlay,
-    RFPOverlay,
-    MeetingOverlay,
     OVERLAY_MAP,
+    ArchitectureOverlay,
+    CommercialOverlay,
+    DocumentType,
+    MeetingOverlay,
+    NoteFrontmatter,
+    RFPOverlay,
+    SecurityOverlay,
 )
-
 
 # ── Base schema backward compat ──────────────────────────────────
 
@@ -150,9 +148,7 @@ def test_commercial_overlay_populated():
     """Commercial overlay validates with realistic data."""
     overlay = CommercialOverlay(
         pricing_model="Per-user, tiered",
-        pricing_metrics=[
-            {"metric": "Named Users", "description": "Active users per month"}
-        ],
+        pricing_metrics=[{"metric": "Named Users", "description": "Active users per month"}],
         sla_tiers=[{"tier_name": "Gold", "uptime": "99.9%", "penalty": "5% credit"}],
         contract_terms="3-year minimum, annual billing",
         support_tiers=[{"tier": "Premium", "response_time": "1 hour", "scope": "24/7"}],
@@ -185,9 +181,7 @@ def test_meeting_overlay_populated():
     overlay = MeetingOverlay(
         attendees=["John Smith", "Jane Doe"],
         decisions_made=["Go with Option B"],
-        action_items=[
-            {"owner": "John", "action": "Draft proposal", "deadline": "2026-03-20"}
-        ],
+        action_items=[{"owner": "John", "action": "Draft proposal", "deadline": "2026-03-20"}],
         questions_raised=["What is the budget?"],
         concerns_expressed=["Timeline is tight"],
         next_steps=["Schedule follow-up"],

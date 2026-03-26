@@ -72,8 +72,8 @@ def normalize_output_filename(source_filename: str, extracted_at: str, source_ha
     date = extracted_at[:10] if extracted_at else datetime.now().strftime("%Y-%m-%d")
 
     stem = Path(source_filename).stem.lower()
-    stem = re.sub(r'[^a-z0-9\s]', '', stem)
-    stem = re.sub(r'\s+', '_', stem).strip('_')
+    stem = re.sub(r"[^a-z0-9\s]", "", stem)
+    stem = re.sub(r"\s+", "_", stem).strip("_")
     stem = stem[:64]
 
     hash4 = source_hash[:4] if source_hash else "0000"
@@ -100,9 +100,7 @@ def compute_quality_score(
     specific_from_kf = [f for f in key_facts if len(str(f)) >= 30]
     specific_from_facts = []
     if facts_with_status:
-        specific_from_facts = [
-            f for f in facts_with_status if len(str(f.get("fact", ""))) >= 30
-        ]
+        specific_from_facts = [f for f in facts_with_status if len(str(f.get("fact", ""))) >= 30]
     fact_count = max(len(specific_from_kf), len(specific_from_facts))
     score += min(30, fact_count * 2)
 
@@ -126,6 +124,7 @@ def compute_quality_score(
 
 def _get_jinja_env() -> Environment:
     from corp_knowledge_extractor._paths import TEMPLATES_DIR
+
     templates_dir = TEMPLATES_DIR
     env = Environment(
         loader=FileSystemLoader(str(templates_dir)),
@@ -266,7 +265,7 @@ def write_transcript_note(
         f"---\n"
         f"type: transcript\n"
         f"source: {source_path}\n"
-        f"title: \"{title} — Full Transcript\"\n"
+        f'title: "{title} — Full Transcript"\n'
         f"duration_min: {transcript.duration_min}\n"
         f"word_count: {transcript.word_count}\n"
         f"linked_extraction: {extraction_note_filename}\n"
@@ -344,9 +343,7 @@ def build_package(
 
         # Validate tags against taxonomy
         tag_results = validate_tags(tags)
-        tag_validation_warnings = sum(
-            1 for r in tag_results if r["reason"] in ("unknown_prefix", "unvalidated")
-        )
+        tag_validation_warnings = sum(1 for r in tag_results if r["reason"] in ("unknown_prefix", "unvalidated"))
 
         # Compute quality score from assembled data
         # Fall back to key_points when key_facts is empty (standard extractions)
@@ -402,9 +399,9 @@ def build_package(
             freshness=result.freshness,
             # Fact validation — only show flagged/mismatched facts
             flagged_facts=[
-                f for f in result.facts
-                if f.get("verification_status") in ("flagged_mismatch", "unverified")
-                and f.get("anomalies")
+                f
+                for f in result.facts
+                if f.get("verification_status") in ("flagged_mismatch", "unverified") and f.get("anomalies")
             ],
             # Tags
             tags=tags,
@@ -419,7 +416,9 @@ def build_package(
         extracted_at = (result.freshness or {}).get("extracted_at", now.isoformat())
         source_hash = (result.freshness or {}).get("source_hash", "")
         out_stem = normalize_output_filename(
-            result.source_file.path.name, extracted_at, source_hash,
+            result.source_file.path.name,
+            extracted_at,
+            source_hash,
         )
         result.output_stem = out_stem
         out_path = extract_dir / f"{out_stem}.md"

@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import patch, MagicMock
 
 import pytest
 
-from corp_by_os.overnight.dedup import deduplicate
-from corp_by_os.overnight.classifier import classify_batch, ClassificationResult
 from corp_by_os.cli import _execute_reshape_actions
+from corp_by_os.overnight.classifier import ClassificationResult, classify_batch
+from corp_by_os.overnight.dedup import deduplicate
 
 
 def _make_files(n: int, prefix: str = "file") -> list[dict]:
@@ -77,7 +76,6 @@ class TestFullReshapeDryRun:
 class TestReshapePlan:
     def test_plan_includes_all_sections(self) -> None:
         """Reshape plan should have all required sections."""
-        from corp_by_os.overnight.classifier import classify_from_metadata
 
         files = _make_files(5)
         unique, groups = deduplicate(files)

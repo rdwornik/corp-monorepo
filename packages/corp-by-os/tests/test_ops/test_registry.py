@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from corp_by_os.ops.registry import ContentRegistry, RegistryMatch
+from corp_by_os.ops.registry import ContentRegistry
 
 
 @pytest.fixture()

@@ -144,9 +144,7 @@ def validate_fact_against_source(fact: str, source_text: str) -> dict:
             )
             if best_ratio is not None and best_ratio > 100:
                 missing.append(fn)
-                anomalies.append(
-                    f"Magnitude error: {fn} not in source (closest is {best_ratio:.0f}x off)"
-                )
+                anomalies.append(f"Magnitude error: {fn} not in source (closest is {best_ratio:.0f}x off)")
             else:
                 missing.append(fn)
 
@@ -178,9 +176,21 @@ def check_anomalies(fact: str) -> list[str]:
             # Valid if context mentions growth/increase/improvement/return
             context = fact.lower()
             valid_contexts = (
-                "growth", "increase", "improvement", "return", "roi",
-                "rise", "gain", "surge", "jump", "boost", "up",
-                "over", "exceed", "above", "more than",
+                "growth",
+                "increase",
+                "improvement",
+                "return",
+                "roi",
+                "rise",
+                "gain",
+                "surge",
+                "jump",
+                "boost",
+                "up",
+                "over",
+                "exceed",
+                "above",
+                "more than",
             )
             if not any(ctx in context for ctx in valid_contexts):
                 anomalies.append(f"Percentage over 100%: {val}%")
@@ -194,9 +204,7 @@ def check_anomalies(fact: str) -> list[str]:
             for j in range(i + 1, len(numbers)):
                 ratio = _magnitude_ratio(numbers[i], numbers[j])
                 if ratio > 400:
-                    anomalies.append(
-                        f"Suspicious magnitude spread: {numbers[i]} vs {numbers[j]} ({ratio:.0f}x)"
-                    )
+                    anomalies.append(f"Suspicious magnitude spread: {numbers[i]} vs {numbers[j]} ({ratio:.0f}x)")
 
     # Check for future dates (> current year + 1)
     current_year = date.today().year

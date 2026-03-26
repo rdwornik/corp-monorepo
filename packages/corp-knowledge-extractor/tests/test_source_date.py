@@ -1,7 +1,5 @@
 """Tests for source date extraction from file metadata."""
 
-import pytest
-from pathlib import Path
 from unittest.mock import patch, MagicMock
 from corp_knowledge_extractor.text_extract import extract_source_date
 

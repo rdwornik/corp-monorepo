@@ -26,8 +26,8 @@ class TestNormalizeOutputFilename:
         long_name = "a b " * 30 + ".pdf"  # spaces → underscores, very long
         result = normalize_output_filename(long_name, "2026-03-22T10:00:00", "b3c4d5e6")
         # Extract stem part between date_ and _hash
-        after_date = result[len("2026-03-22_"):]
-        stem_part = after_date[:after_date.rfind("_")]
+        after_date = result[len("2026-03-22_") :]
+        stem_part = after_date[: after_date.rfind("_")]
         assert len(stem_part) <= 64
 
     def test_normalize_filename_special_chars(self):

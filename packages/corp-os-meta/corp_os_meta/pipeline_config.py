@@ -73,11 +73,7 @@ class PipelineConfig:
         local_appdata = Path(os.environ.get("LOCALAPPDATA", str(Path.home() / "AppData" / "Local")))
 
         extra_roots_raw = os.environ.get("INDEX_EXTRA_ROOTS", "")
-        extra_roots = tuple(
-            Path(os.path.expandvars(p.strip()))
-            for p in extra_roots_raw.split(";")
-            if p.strip()
-        )
+        extra_roots = tuple(Path(os.path.expandvars(p.strip())) for p in extra_roots_raw.split(";") if p.strip())
 
         return cls(
             vault_path=vault,

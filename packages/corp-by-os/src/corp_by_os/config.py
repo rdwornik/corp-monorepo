@@ -96,11 +96,7 @@ def get_config() -> AppConfig:
 
     # Extra index roots (e.g. rfp_kb) — semicolon-separated paths
     extra_roots_raw = os.environ.get("INDEX_EXTRA_ROOTS", "")
-    extra_roots = tuple(
-        _expand_path(p.strip())
-        for p in extra_roots_raw.split(";")
-        if p.strip()
-    )
+    extra_roots = tuple(_expand_path(p.strip()) for p in extra_roots_raw.split(";") if p.strip())
 
     return AppConfig(
         vault_path=_expand_path(vault_path),

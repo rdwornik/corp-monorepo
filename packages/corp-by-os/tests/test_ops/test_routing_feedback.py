@@ -77,7 +77,9 @@ class TestLogRoutingDecision:
     def test_manual_override_method(self, db: OpsDB) -> None:
         """User [d] override logged as manual_override."""
         _log(db, routing_method="manual_override", was_overridden=True)
-        row = db.conn.execute("SELECT routing_method, was_overridden FROM routing_feedback").fetchone()
+        row = db.conn.execute(
+            "SELECT routing_method, was_overridden FROM routing_feedback"
+        ).fetchone()
         assert row["routing_method"] == "manual_override"
         assert row["was_overridden"]
 
@@ -93,7 +95,9 @@ class TestReviewTrigger:
     def test_trigger_fires_at_15(self, db: OpsDB) -> None:
         """Trigger fires when 15+ unreviewed overrides."""
         for i in range(15):
-            _log(db, filename=f"file_{i}.pdf", routing_method="manual_override", was_overridden=True)
+            _log(
+                db, filename=f"file_{i}.pdf", routing_method="manual_override", was_overridden=True
+            )
         msg = db.check_review_trigger()
         assert msg is not None
         assert "15" in msg
@@ -101,7 +105,9 @@ class TestReviewTrigger:
     def test_trigger_silent_below_15(self, db: OpsDB) -> None:
         """No trigger with fewer than 15 overrides."""
         for i in range(10):
-            _log(db, filename=f"file_{i}.pdf", routing_method="manual_override", was_overridden=True)
+            _log(
+                db, filename=f"file_{i}.pdf", routing_method="manual_override", was_overridden=True
+            )
         assert db.check_review_trigger() is None
 
     def test_trigger_ignores_batch(self, db: OpsDB) -> None:
@@ -113,7 +119,9 @@ class TestReviewTrigger:
     def test_trigger_ignores_reviewed(self, db: OpsDB) -> None:
         """Already-reviewed overrides don't trigger."""
         for i in range(20):
-            _log(db, filename=f"file_{i}.pdf", routing_method="manual_override", was_overridden=True)
+            _log(
+                db, filename=f"file_{i}.pdf", routing_method="manual_override", was_overridden=True
+            )
         db.mark_routing_reviewed()
         assert db.check_review_trigger() is None
 
@@ -134,9 +142,27 @@ class TestRoutingStats:
 
     def test_overrides_grouped_by_destination(self, db: OpsDB) -> None:
         """Override report groups by final destination."""
-        _log(db, filename="a.pdf", final_destination="50_RFP", routing_method="manual_override", was_overridden=True)
-        _log(db, filename="b.pdf", final_destination="50_RFP", routing_method="manual_override", was_overridden=True)
-        _log(db, filename="c.pdf", final_destination="10_Projects/JLR", routing_method="manual_override", was_overridden=True)
+        _log(
+            db,
+            filename="a.pdf",
+            final_destination="50_RFP",
+            routing_method="manual_override",
+            was_overridden=True,
+        )
+        _log(
+            db,
+            filename="b.pdf",
+            final_destination="50_RFP",
+            routing_method="manual_override",
+            was_overridden=True,
+        )
+        _log(
+            db,
+            filename="c.pdf",
+            final_destination="10_Projects/JLR",
+            routing_method="manual_override",
+            was_overridden=True,
+        )
 
         overrides = db.get_routing_overrides()
         assert len(overrides) == 2
@@ -170,8 +196,6 @@ class TestMarkReviewed:
 class TestSchemaCreation:
     def test_routing_feedback_table_exists(self, db: OpsDB) -> None:
         """Schema includes routing_feedback table."""
-        tables = db.conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table'"
-        ).fetchall()
+        tables = db.conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
         table_names = {t[0] for t in tables}
         assert "routing_feedback" in table_names

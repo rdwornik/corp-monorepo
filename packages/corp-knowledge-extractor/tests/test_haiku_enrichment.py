@@ -4,7 +4,6 @@ import json
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
-import pytest
 
 from corp_knowledge_extractor.extract import _haiku_enrichment
 from corp_knowledge_extractor.inventory import SourceFile, FileType

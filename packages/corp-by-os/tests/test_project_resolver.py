@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from corp_by_os.project_resolver import (
     _score_match,
     get_onedrive_path,

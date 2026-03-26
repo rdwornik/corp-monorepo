@@ -78,7 +78,10 @@ def sample_frames(
         except Exception as exc:
             log.warning(
                 "cap.read() failed at frame %d for %s: %s — stopping with %d frames collected",
-                frame_number, video_path.name, exc, len(frames),
+                frame_number,
+                video_path.name,
+                exc,
+                len(frames),
             )
             break
 

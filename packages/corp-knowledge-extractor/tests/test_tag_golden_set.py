@@ -30,8 +30,14 @@ def test_tag_is_well_formed(tag_entry: dict) -> None:
     assert "/" in tag, f"Tag missing prefix: {tag!r}"
     prefix, slug = tag.split("/", 1)
     assert prefix in {
-        "topic", "product", "domain", "type", "source", "client",
-        "layer", "depth",
+        "topic",
+        "product",
+        "domain",
+        "type",
+        "source",
+        "client",
+        "layer",
+        "depth",
     }, f"Unknown tag prefix: {prefix!r} in {tag!r}"
     assert slug, f"Empty slug in tag: {tag!r}"
 
@@ -67,9 +73,7 @@ def test_high_frequency_tags_stable() -> None:
     for entry in top_tags:
         tag = entry["tag"]
         _, slug = tag.split("/", 1)
-        assert _normalize_tag(slug) == slug, (
-            f"High-frequency tag not canonical: {tag!r} (count={entry['count']})"
-        )
+        assert _normalize_tag(slug) == slug, f"High-frequency tag not canonical: {tag!r} (count={entry['count']})"
 
 
 def test_no_duplicate_tags_in_golden_set() -> None:

@@ -67,8 +67,11 @@ def generate_transcript(
     if not api_key:
         log.warning("No Gemini API key for transcript generation")
         return TranscriptResult(
-            text="", word_count=0, duration_min=0,
-            status="failed", source_path=str(video_path),
+            text="",
+            word_count=0,
+            duration_min=0,
+            status="failed",
+            source_path=str(video_path),
         )
 
     client = genai.Client(api_key=api_key)
@@ -95,7 +98,9 @@ def generate_transcript(
 
             log.info(
                 "Transcript generated for %s: %d words (attempt %d)",
-                video_path.name, word_count, attempt,
+                video_path.name,
+                word_count,
+                attempt,
             )
             return TranscriptResult(
                 text=clean_text,
@@ -107,17 +112,23 @@ def generate_transcript(
 
         except Exception as exc:
             last_error = exc
-            wait = RETRY_BASE_SEC ** attempt
+            wait = RETRY_BASE_SEC**attempt
             log.warning(
                 "Transcript attempt %d/%d failed for %s: %s — retrying in %ds",
-                attempt, MAX_RETRIES, video_path.name, exc, wait,
+                attempt,
+                MAX_RETRIES,
+                video_path.name,
+                exc,
+                wait,
             )
             if attempt < MAX_RETRIES:
                 time.sleep(wait)
 
-    log.error("Transcript generation failed after %d attempts for %s: %s",
-              MAX_RETRIES, video_path.name, last_error)
+    log.error("Transcript generation failed after %d attempts for %s: %s", MAX_RETRIES, video_path.name, last_error)
     return TranscriptResult(
-        text="", word_count=0, duration_min=0,
-        status="failed", source_path=str(video_path),
+        text="",
+        word_count=0,
+        duration_min=0,
+        status="failed",
+        source_path=str(video_path),
     )

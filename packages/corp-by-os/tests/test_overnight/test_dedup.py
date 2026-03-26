@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import pytest
-
-from corp_by_os.overnight.dedup import deduplicate, _select_canonical, DuplicateGroup
+from corp_by_os.overnight.dedup import DuplicateGroup, _select_canonical, deduplicate
 
 
 def _make_scan_result(

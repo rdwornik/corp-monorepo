@@ -10,11 +10,13 @@ from corp_knowledge_extractor.synthesize import compute_quality_score
 class TestComputeQualityScore:
     def test_rich_extraction(self):
         """15 specific facts, 90% verified, 5 overlay fields, 10k chars, 20 entities → 90+."""
-        key_facts = [f"This is a detailed fact number {i} with enough length to pass the 30-char filter easily" for i in range(15)]
-        facts = (
-            [{"fact": f"v{i}", "verification_status": "verified"} for i in range(9)]
-            + [{"fact": "u0", "verification_status": "unverified"}]
-        )
+        key_facts = [
+            f"This is a detailed fact number {i} with enough length to pass the 30-char filter easily"
+            for i in range(15)
+        ]
+        facts = [{"fact": f"v{i}", "verification_status": "verified"} for i in range(9)] + [
+            {"fact": "u0", "verification_status": "unverified"}
+        ]
         score = compute_quality_score(
             key_facts=key_facts,
             facts_with_status=facts,
@@ -26,7 +28,10 @@ class TestComputeQualityScore:
 
     def test_poor_extraction(self):
         """2 short facts, 0 verified, 0 overlay, 500 chars, 1 entity → < 30."""
-        key_facts = ["Short fact A that is at least thirty characters long", "Another short fact B at least thirty chars"]
+        key_facts = [
+            "Short fact A that is at least thirty characters long",
+            "Another short fact B at least thirty chars",
+        ]
         facts = [
             {"fact": "a", "verification_status": "unverified"},
             {"fact": "b", "verification_status": "unverified"},
@@ -42,7 +47,10 @@ class TestComputeQualityScore:
 
     def test_max_100(self):
         """Extreme values don't exceed 100."""
-        key_facts = [f"Extremely detailed fact {i} that exceeds thirty characters easily and is very specific" for i in range(100)]
+        key_facts = [
+            f"Extremely detailed fact {i} that exceeds thirty characters easily and is very specific"
+            for i in range(100)
+        ]
         facts = [{"fact": f"f{i}", "verification_status": "verified"} for i in range(100)]
         score = compute_quality_score(
             key_facts=key_facts,
@@ -85,7 +93,13 @@ class TestComputeQualityScore:
 class TestQualityScoreFactSources:
     def test_quality_score_uses_facts(self):
         """24 facts in JSON dicts, 0 key_facts → score uses 24."""
-        facts = [{"fact": f"Detailed fact number {i} with enough content to pass the 30-char filter", "verification_status": "verified"} for i in range(24)]
+        facts = [
+            {
+                "fact": f"Detailed fact number {i} with enough content to pass the 30-char filter",
+                "verification_status": "verified",
+            }
+            for i in range(24)
+        ]
         score = compute_quality_score(
             key_facts=[],
             facts_with_status=facts,
@@ -99,7 +113,10 @@ class TestQualityScoreFactSources:
     def test_quality_score_uses_key_facts(self):
         """15 key_facts, 10 facts → score uses 15 (the larger source)."""
         key_facts = [f"This is key fact number {i} with enough length to pass thirty chars" for i in range(15)]
-        facts = [{"fact": f"Short fact {i} that is long enough to pass thirty characters", "verification_status": "verified"} for i in range(10)]
+        facts = [
+            {"fact": f"Short fact {i} that is long enough to pass thirty characters", "verification_status": "verified"}
+            for i in range(10)
+        ]
         score = compute_quality_score(
             key_facts=key_facts,
             facts_with_status=facts,
@@ -112,10 +129,9 @@ class TestQualityScoreFactSources:
 
     def test_quality_score_verified_from_facts(self):
         """facts with verification_status → verified ratio counted."""
-        facts = (
-            [{"fact": "Verified fact", "verification_status": "verified"} for _ in range(8)]
-            + [{"fact": "Unverified fact", "verification_status": "unverified"} for _ in range(2)]
-        )
+        facts = [{"fact": "Verified fact", "verification_status": "verified"} for _ in range(8)] + [
+            {"fact": "Unverified fact", "verification_status": "unverified"} for _ in range(2)
+        ]
         score = compute_quality_score(
             key_facts=[],
             facts_with_status=facts,

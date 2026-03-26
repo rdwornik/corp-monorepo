@@ -1,6 +1,5 @@
 """Tests for local text extraction (Tier 1)."""
 
-import pytest
 from pathlib import Path
 from corp_knowledge_extractor.text_extract import extract_text, TextExtractionResult, _assess_quality
 

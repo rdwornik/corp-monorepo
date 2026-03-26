@@ -1,10 +1,9 @@
 """Tests for post-processing wrapper around corp-os-meta."""
 
-import pytest
 import yaml
 from pathlib import Path
 from unittest.mock import patch
-from corp_knowledge_extractor.post_process import post_process_extraction, _log_unknown_terms
+from corp_knowledge_extractor.post_process import post_process_extraction
 from corp_os_meta import ValidationResult
 
 
@@ -474,7 +473,6 @@ def test_quality_passthrough_valid_value():
 
 def test_no_unicode_escape_in_frontmatter():
     """Domains with & should not be escaped to \\u0026 in tojson_raw."""
-    import json
     from corp_knowledge_extractor.synthesize import _tojson_raw
 
     result = _tojson_raw(["Platform & Architecture"])
@@ -630,6 +628,7 @@ def test_validate_tags_unknown_prefix():
 def test_validate_tags_no_taxonomy():
     """If taxonomy loading fails, all tags return unvalidated, no crash."""
     from unittest.mock import patch
+
     with patch("corp_knowledge_extractor.post_process.load_taxonomy", side_effect=Exception("no taxonomy")):
         results = validate_tags(["product/test", "topic/test"])
     assert len(results) == 2

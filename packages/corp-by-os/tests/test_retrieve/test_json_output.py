@@ -11,7 +11,6 @@ from click.testing import CliRunner
 
 from corp_by_os.cli import cli
 
-
 _TEST_SCHEMA = """\
 CREATE TABLE IF NOT EXISTS notes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

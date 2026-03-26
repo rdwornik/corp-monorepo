@@ -59,9 +59,7 @@ def preprocess(term: str) -> str:
     return result
 
 
-def build_alias_map(
-    taxonomy: dict, section: str
-) -> tuple[dict[str, str], dict[str, str]]:
+def build_alias_map(taxonomy: dict, section: str) -> tuple[dict[str, str], dict[str, str]]:
     """Build lookup maps: exact (lowered) and preprocessed."""
     exact_map = {}
     preprocessed_map = {}
@@ -78,9 +76,7 @@ def build_alias_map(
     return exact_map, preprocessed_map
 
 
-def normalize_terms(
-    values: list[str], taxonomy: dict, section: str
-) -> NormalizationResult:
+def normalize_terms(values: list[str], taxonomy: dict, section: str) -> NormalizationResult:
     """Normalize terms: exact match first, then preprocessed fallback."""
     exact_map, preprocessed_map = build_alias_map(taxonomy, section)
 
@@ -126,9 +122,7 @@ def apply_term_normalization(text: str, taxonomy: dict) -> str:
     return text
 
 
-def calculate_valid_to(
-    domains: list[str], base_date: date, taxonomy: dict
-) -> date | None:
+def calculate_valid_to(domains: list[str], base_date: date, taxonomy: dict) -> date | None:
     """Auto-calculate valid_to from domain + validity matrix.
 
     Uses the SHORTEST validity period among all domains.
@@ -141,9 +135,7 @@ def calculate_valid_to(
     return base_date + timedelta(days=min(periods))
 
 
-def normalize_frontmatter(
-    data: dict, taxonomy: dict | None = None
-) -> tuple[dict, list[str], list[str]]:
+def normalize_frontmatter(data: dict, taxonomy: dict | None = None) -> tuple[dict, list[str], list[str]]:
     """Normalize all taxonomy-controlled fields in frontmatter dict.
 
     Returns: (normalized_data, all_changes, all_unknown_terms)

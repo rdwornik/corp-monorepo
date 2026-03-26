@@ -1,11 +1,10 @@
 """Tests for tier routing logic."""
 
-import pytest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from corp_knowledge_extractor.inventory import SourceFile, FileType
-from corp_knowledge_extractor.tier_router import route_tier, Tier, TierDecision, estimate_batch_cost, TIER_COSTS
+from corp_knowledge_extractor.tier_router import route_tier, Tier, estimate_batch_cost, TIER_COSTS
 from corp_knowledge_extractor.text_extract import TextExtractionResult
 
 

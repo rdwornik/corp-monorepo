@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from corp_by_os.retrieve.engine import RetrievalFilter, RetrievedNote
+from corp_by_os.retrieve.engine import RetrievedNote
 from corp_by_os.retrieve.prep import (
     PrepBriefing,
     build_notes_context,

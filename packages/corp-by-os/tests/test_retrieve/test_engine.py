@@ -20,7 +20,6 @@ from corp_by_os.retrieve.engine import (
     retrieve,
 )
 
-
 # --- Schema for test index.db ---
 
 _TEST_SCHEMA = """\
@@ -437,9 +436,7 @@ class TestFallbackSearch:
 
 
 class TestProductExpansion:
-    def test_expand_product_query_used(
-        self, test_db: Path, vault_root: Path, monkeypatch
-    ) -> None:
+    def test_expand_product_query_used(self, test_db: Path, vault_root: Path, monkeypatch) -> None:
         """Product filters are expanded via corp-os-meta taxonomy."""
         expanded_calls: list[str] = []
 
@@ -462,6 +459,7 @@ class TestProductExpansion:
 
     def test_expand_deduplicates(self, monkeypatch) -> None:
         """Product expansion removes duplicates."""
+
         def mock_expand(product: str) -> list[str]:
             return ["wms", "wms", "wms_billing"]
 
@@ -510,10 +508,18 @@ class TestRfpOnlyFilter:
                (project_id, client, title, type, source_type,
                 topics, products, domains, note_path, rfp_visible)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            ("gen", "", "Platform Architecture Guide", "doc", "documentation",
-             json.dumps(["Architecture"]), json.dumps(["Platform"]),
-             json.dumps(["Platform"]),
-             str(vault / "platform_arch.md"), 1),
+            (
+                "gen",
+                "",
+                "Platform Architecture Guide",
+                "doc",
+                "documentation",
+                json.dumps(["Architecture"]),
+                json.dumps(["Platform"]),
+                json.dumps(["Platform"]),
+                str(vault / "platform_arch.md"),
+                1,
+            ),
         )
 
         # Note 2: rfp_visible=0 (meeting notes)
@@ -522,11 +528,18 @@ class TestRfpOnlyFilter:
                (project_id, client, title, type, source_type,
                 topics, products, domains, note_path, rfp_visible)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            ("lenzing", "Lenzing", "Lenzing Architecture Workshop", "meeting",
-             "meeting",
-             json.dumps(["Architecture"]), json.dumps(["Platform"]),
-             json.dumps(["Planning"]),
-             str(vault / "lenzing_meeting.md"), 0),
+            (
+                "lenzing",
+                "Lenzing",
+                "Lenzing Architecture Workshop",
+                "meeting",
+                "meeting",
+                json.dumps(["Architecture"]),
+                json.dumps(["Platform"]),
+                json.dumps(["Planning"]),
+                str(vault / "lenzing_meeting.md"),
+                0,
+            ),
         )
 
         conn.commit()
@@ -546,9 +559,7 @@ class TestRfpOnlyFilter:
 
         return db_path
 
-    def test_rfp_only_filters_non_visible(
-        self, rfp_db: Path, tmp_path: Path
-    ) -> None:
+    def test_rfp_only_filters_non_visible(self, rfp_db: Path, tmp_path: Path) -> None:
         """--rfp-only returns only rfp_visible=1 notes."""
         vault = tmp_path / "vault"
         filters = RetrievalFilter(rfp_only=True)
@@ -558,9 +569,7 @@ class TestRfpOnlyFilter:
         assert "Platform Architecture Guide" in titles
         assert "Lenzing Architecture Workshop" not in titles
 
-    def test_without_rfp_only_returns_all(
-        self, rfp_db: Path, tmp_path: Path
-    ) -> None:
+    def test_without_rfp_only_returns_all(self, rfp_db: Path, tmp_path: Path) -> None:
         """Without --rfp-only, both notes are returned."""
         vault = tmp_path / "vault"
         filters = RetrievalFilter(rfp_only=False)
@@ -569,18 +578,14 @@ class TestRfpOnlyFilter:
 
 
 class TestRetrieveLogging:
-    def test_retrieve_logs_query(
-        self, test_db: Path, vault_root: Path, caplog
-    ) -> None:
+    def test_retrieve_logs_query(self, test_db: Path, vault_root: Path, caplog) -> None:
         """Retrieve query is logged with result count for audit trail."""
         with caplog.at_level(logging.INFO, logger="corp_by_os.retrieve.engine"):
             retrieve("Lenzing", test_db, vault_root)
         assert "retrieve query=" in caplog.text
         assert "results=" in caplog.text
 
-    def test_retrieve_logs_filters(
-        self, test_db: Path, vault_root: Path, caplog
-    ) -> None:
+    def test_retrieve_logs_filters(self, test_db: Path, vault_root: Path, caplog) -> None:
         """Retrieve log includes filter details."""
         with caplog.at_level(logging.INFO, logger="corp_by_os.retrieve.engine"):
             retrieve(

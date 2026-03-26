@@ -271,7 +271,9 @@ def main() -> None:
         post_count = sum(1 for _ in VAULT.rglob("*.md") if ".obsidian" not in str(_))
         # Post count includes tombstone READMEs (+6) and the log file (+1)
         print(f"\nPost-migration note count: {post_count}")
-        print(f"  (includes {post_count - pre_count + stats['moved'] - stats['skipped_conflict']} tombstone/log files)")
+        print(
+            f"  (includes {post_count - pre_count + stats['moved'] - stats['skipped_conflict']} tombstone/log files)"
+        )
     else:
         print("\nThis was a dry run. Run with --execute to perform migration.")
 

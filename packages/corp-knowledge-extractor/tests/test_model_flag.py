@@ -1,10 +1,10 @@
 """Tests for --model pro/flash CLI flag."""
 
 from click.testing import CliRunner
-from unittest.mock import patch
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 from run import cli

@@ -21,6 +21,8 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from corp_os_meta.pipeline_config import PipelineConfig
+
 from corp_by_os.models import (
     ZONE_MUTABILITY,
     Mutability,
@@ -31,7 +33,6 @@ from corp_by_os.models import (
     VaultPath,
     VaultZone,
 )
-from corp_os_meta.pipeline_config import PipelineConfig
 
 logger = logging.getLogger(__name__)
 

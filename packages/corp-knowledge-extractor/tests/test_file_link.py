@@ -9,11 +9,22 @@ class TestFileLink:
         env.filters["tojson_raw"] = lambda v: str(v)
         tmpl = env.get_template("extract.md.j2")
         return tmpl.render(
-            source_file=source_file, content_type="document",
-            title="Test", date="2026-01-01", topics=[], people=[],
-            products=[], language="en", quality="full", tokens_used=0,
-            summary="Summary.", links_line="", slides=[],
-            key_points=[], transcript_excerpt="", model="test",
+            source_file=source_file,
+            content_type="document",
+            title="Test",
+            date="2026-01-01",
+            topics=[],
+            people=[],
+            products=[],
+            language="en",
+            quality="full",
+            tokens_used=0,
+            summary="Summary.",
+            links_line="",
+            slides=[],
+            key_points=[],
+            transcript_excerpt="",
+            model="test",
             flagged_facts=[],
         )
 

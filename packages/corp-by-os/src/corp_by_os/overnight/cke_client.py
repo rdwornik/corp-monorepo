@@ -36,9 +36,14 @@ def estimate_cost(manifest_path: Path) -> dict[str, Any]:
 
     Returns: {total_cost, tier_breakdown: {1: n, 2: n, 3: n}, file_count}
     """
-    from corp_knowledge_extractor.inventory import FileType, SourceFile  # type: ignore[import-untyped]
+    from corp_knowledge_extractor.inventory import (  # type: ignore[import-untyped]
+        FileType,
+        SourceFile,
+    )
     from corp_knowledge_extractor.manifest import Manifest  # type: ignore[import-untyped]
-    from corp_knowledge_extractor.tier_router import estimate_batch_cost  # type: ignore[import-untyped]
+    from corp_knowledge_extractor.tier_router import (
+        estimate_batch_cost,  # type: ignore[import-untyped]
+    )
 
     m = Manifest.from_file(manifest_path)
     source_files = []

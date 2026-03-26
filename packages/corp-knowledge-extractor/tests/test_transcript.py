@@ -1,6 +1,5 @@
 """Tests for transcript generation and note writing."""
 
-from pathlib import Path
 from unittest.mock import patch, MagicMock
 
 import pytest
@@ -107,7 +106,10 @@ class TestTranscriptNoteWriting:
         extract_dir = tmp_path / "extract"
 
         result = write_transcript_note(
-            tr, "My Talk Title", "talk.md", extract_dir,
+            tr,
+            "My Talk Title",
+            "talk.md",
+            extract_dir,
         )
 
         assert result is not None
@@ -125,13 +127,19 @@ class TestTranscriptNoteWriting:
     def test_transcript_not_written_on_failure(self, tmp_path):
         """status=failed → no file created."""
         tr = TranscriptResult(
-            text="", word_count=0, duration_min=0,
-            status="failed", source_path=str(tmp_path / "talk.mp4"),
+            text="",
+            word_count=0,
+            duration_min=0,
+            status="failed",
+            source_path=str(tmp_path / "talk.mp4"),
         )
         extract_dir = tmp_path / "extract"
 
         result = write_transcript_note(
-            tr, "Title", "talk.md", extract_dir,
+            tr,
+            "Title",
+            "talk.md",
+            extract_dir,
         )
 
         assert result is None

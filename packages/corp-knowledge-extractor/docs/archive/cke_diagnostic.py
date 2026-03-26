@@ -1,12 +1,13 @@
 """CKE Diagnostic — run from corp-knowledge-extractor folder."""
+
 import os
-import sys
 
 print("=== CKE DIAGNOSTIC ===\n")
 
 # 1. doc_type classifier
 try:
     from src.doc_type_classifier import classify_doc_type, should_extract_deep
+
     dtype = classify_doc_type("60_Source_Library/02_Training_Enablement/test.pptx")
     deep = should_extract_deep(dtype)
     print(f"1. doc_type classifier: OK (type={dtype}, deep={deep})")
@@ -16,6 +17,7 @@ except Exception as e:
 # 2. Provider router
 try:
     from src.providers.router import route_model
+
     model = route_model(tier=2, text_length=5000)
     print(f"2. Provider router: OK (model={model})")
 except Exception as e:
@@ -31,19 +33,21 @@ else:
 # 4. Slide renderer
 try:
     from src.slides.renderer import can_render
+
     print(f"4. Slide renderer: can_render={can_render()}")
 except Exception as e:
     print(f"4. Slide renderer: FAILED ({e})")
 
 # 5. Freshness module
 try:
-    from src.freshness import compute_source_hash
+
     print("5. Freshness module: OK")
 except Exception as e:
     print(f"5. Freshness module: FAILED ({e})")
 
 # 6. Deep prompt
 from pathlib import Path
+
 dp = Path("config/prompts/deep_prompt.txt")
 print(f"6. Deep prompt file: {'EXISTS' if dp.exists() else 'MISSING'}")
 

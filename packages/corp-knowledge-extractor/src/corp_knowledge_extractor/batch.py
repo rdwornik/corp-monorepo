@@ -32,8 +32,13 @@ class BatchProcessor:
     """Process a manifest of files through the extraction pipeline."""
 
     def __init__(
-        self, manifest: Manifest, config: dict, max_rpm: int = 100, resume: bool = False,
-        force_tier: int | None = None, force: bool = False,
+        self,
+        manifest: Manifest,
+        config: dict,
+        max_rpm: int = 100,
+        resume: bool = False,
+        force_tier: int | None = None,
+        force: bool = False,
     ):
         self.manifest = manifest
         self.config = config
@@ -49,7 +54,12 @@ class BatchProcessor:
     def process_all(self) -> dict:
         """Process all files in manifest. Returns summary dict."""
         from corp_knowledge_extractor.inventory import SourceFile, FileType
-        from corp_knowledge_extractor.extract import extract_knowledge, extract_from_text, extract_local, extract_pptx_multimodal
+        from corp_knowledge_extractor.extract import (
+            extract_knowledge,
+            extract_from_text,
+            extract_local,
+            extract_pptx_multimodal,
+        )
         from corp_knowledge_extractor.correlate import correlate_files
         from corp_knowledge_extractor.synthesize import build_package
         from corp_knowledge_extractor.frames.sampler import sample_frames
@@ -222,7 +232,9 @@ class BatchProcessor:
                     shutil.copy2(rs.image_path, slides_dir / rs.image_path.name)
                     rs.image_path.unlink()
         else:
-            result = extract_knowledge(source_file, self.config, sampled_frames=sampled_frames, user_context=entry.user_context)
+            result = extract_knowledge(
+                source_file, self.config, sampled_frames=sampled_frames, user_context=entry.user_context
+            )
 
         # Keep slide frames, cleanup temp
         if result.slides and sampled_frames:

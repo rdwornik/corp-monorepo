@@ -134,7 +134,12 @@ class TestReadWriteNote:
     def test_verified_note_creates_conflict_file(self, app_config, tmp_path):
         """When verified note is skipped, a _conflict_ file is created."""
         path = tmp_path / "verified_note.md"
-        write_note(path, {"title": "Original", "trust_level": "verified"}, "Original body.\n", mode="create")
+        write_note(
+            path,
+            {"title": "Original", "trust_level": "verified"},
+            "Original body.\n",
+            mode="create",
+        )
 
         result = write_note(path, {"title": "Replaced"}, "New body.\n")
         assert result is False
@@ -164,7 +169,9 @@ class TestReadWriteNote:
     def test_no_conflict_for_extracted_notes(self, app_config, tmp_path):
         """Extracted notes get overwritten, no conflict file."""
         path = tmp_path / "note.md"
-        write_note(path, {"title": "Original", "trust_level": "extracted"}, "Body.\n", mode="create")
+        write_note(
+            path, {"title": "Original", "trust_level": "extracted"}, "Body.\n", mode="create"
+        )
         write_note(path, {"title": "Updated"}, "New.\n")
 
         conflicts = list(tmp_path.glob("*_conflict_*.md"))

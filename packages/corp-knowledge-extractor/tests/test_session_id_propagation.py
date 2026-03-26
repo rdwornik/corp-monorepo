@@ -1,10 +1,10 @@
 """Tests for session_id propagation to individual notes."""
 
 import json
-import yaml
 from pathlib import Path
 
 import sys
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 from run import _propagate_session_id

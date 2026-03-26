@@ -1,11 +1,10 @@
 """Tests for locator building and fact enrichment."""
 
-import pytest
 from unittest.mock import MagicMock
 from pathlib import Path
 
 from corp_knowledge_extractor.extract import _build_locator, _enrich_facts
-from corp_knowledge_extractor.inventory import SourceFile, FileType
+from corp_knowledge_extractor.inventory import SourceFile
 from corp_knowledge_extractor.text_extract import TextExtractionResult
 
 
