@@ -952,3 +952,99 @@ def test_generate_tags_priority_order():
     }
     tags = generate_tags(fm)
     assert tags[0] == "client/sgdbf"
+
+
+# ---------------------------------------------------------------------------
+# Fix 1 (extended): Client/third-party product exclusions
+# ---------------------------------------------------------------------------
+
+
+def test_lenzing_excluded_from_products():
+    """Lenzing is a client — should be entity, not product."""
+    real, excluded = filter_products(["Lenzing", "Blue Yonder WMS"])
+    assert "Lenzing" not in real
+    assert "Lenzing" in excluded
+    assert "Blue Yonder WMS" in real
+
+
+def test_d360_excluded_from_products():
+    """D360 is a third-party DMS product — should be entity, not product."""
+    real, excluded = filter_products(["D360", "Blue Yonder Platform"])
+    assert "D360" not in real
+    assert "D360" in excluded
+    assert "Blue Yonder Platform" in real
+
+
+def test_doxis4_excluded_from_products():
+    """Doxis4 is a third-party DMS product — should be entity, not product."""
+    real, excluded = filter_products(["Doxis4"])
+    assert "Doxis4" in excluded
+    assert real == []
+
+
+# ---------------------------------------------------------------------------
+# Fix 2 (extended): filter_product_tags — slug-level non-BY tag removal
+# ---------------------------------------------------------------------------
+
+from corp_knowledge_extractor.post_process import filter_product_tags  # noqa: E402
+
+
+def test_filter_product_tags_removes_lenzing():
+    """product/lenzing* tags are filtered."""
+    tags = ["product/lenzing", "product/lenzing-ecovero", "topic/supply-chain"]
+    result = filter_product_tags(tags)
+    assert "product/lenzing" not in result
+    assert "product/lenzing-ecovero" not in result
+    assert "topic/supply-chain" in result
+
+
+def test_filter_product_tags_removes_ecovero_variants():
+    """product/ecovero-* tags filtered via 'ecovero' slug match."""
+    tags = ["product/ecovero-brand-fibers", "product/lenzing-ecovero-eco-viscose"]
+    result = filter_product_tags(tags)
+    assert result == []
+
+
+def test_filter_product_tags_removes_tencel_veocel_refibra():
+    """Lenzing fiber brand tags filtered."""
+    tags = [
+        "product/tencel-brand-fibers",
+        "product/veocel-nonwoven-fibers",
+        "product/refibra-recycled-content-lyocell",
+        "product/blue-yonder-wms",
+    ]
+    result = filter_product_tags(tags)
+    assert result == ["product/blue-yonder-wms"]
+
+
+def test_filter_product_tags_removes_d360_doxis4():
+    """Third-party DMS product tags filtered."""
+    tags = ["product/d360", "product/doxis4", "product/blue-yonder-platform"]
+    result = filter_product_tags(tags)
+    assert "product/d360" not in result
+    assert "product/doxis4" not in result
+    assert "product/blue-yonder-platform" in result
+
+
+def test_filter_product_tags_keeps_by_products():
+    """BY products are never filtered."""
+    tags = [
+        "product/blue-yonder-demand-planning",
+        "product/blue-yonder-wms",
+        "product/blue-yonder-control-tower",
+        "product/inventory-ops-agent",
+        "product/supply-assist-agent",
+    ]
+    result = filter_product_tags(tags)
+    assert result == tags
+
+
+def test_generate_tags_filters_client_products():
+    """generate_tags drops non-BY product tags automatically."""
+    fm = {
+        "products": ["Lenzing", "Blue Yonder WMS"],
+        "topics": ["Supply Chain"],
+    }
+    tags = generate_tags(fm)
+    assert "product/lenzing" not in tags
+    assert "product/blue-yonder-wms" in tags

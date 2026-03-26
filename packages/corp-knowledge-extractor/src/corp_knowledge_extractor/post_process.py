@@ -422,6 +422,27 @@ def _normalize_tag(value: str) -> str:
 MAX_TAGS = 12
 
 
+def filter_product_tags(tags: list[str]) -> list[str]:
+    """Remove product/ tags that match client/third-party products (non-BY).
+
+    Uses slug substring matching so partial names like 'lenzing' catch all
+    variants ('lenzing-ecovero', 'lenzing-b2b-*', etc.) without needing an
+    exhaustive list of every possible LLM-generated variant.
+    """
+    exclusions = _load_product_exclusions()
+    excluded_slugs = {_normalize_tag(name) for name in exclusions}
+
+    filtered = []
+    for tag in tags:
+        if tag.startswith("product/"):
+            product_slug = tag[len("product/"):]
+            if any(exc in product_slug for exc in excluded_slugs):
+                logger.debug("Filtered non-BY product tag: %s", tag)
+                continue
+        filtered.append(tag)
+    return filtered
+
+
 def generate_tags(frontmatter: dict, max_tags: int = MAX_TAGS) -> list[str]:
     """Generate hierarchical tags from frontmatter fields.
 
@@ -451,6 +472,10 @@ def generate_tags(frontmatter: dict, max_tags: int = MAX_TAGS) -> list[str]:
     source_type = frontmatter.get("source_type")
     if source_type:
         tags.append(f"source/{_normalize_tag(source_type)}")
+
+    # Filter non-BY product tags (defense-in-depth — upstream filter_products()
+    # removes them from frontmatter, but this catches any that slip through)
+    tags = filter_product_tags(tags)
 
     # Deduplicate preserving order
     seen: set[str] = set()
