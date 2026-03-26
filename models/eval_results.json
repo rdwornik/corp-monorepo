@@ -1,0 +1,10 @@
+{
+  "test_size": 62,
+  "hybrid_accuracy": 0.8548387096774194,
+  "regex_accuracy": 0.532258064516129,
+  "uplift_vs_regex": 0.32258064516129037,
+  "cv_accuracy_combined": 0.8550204081632653,
+  "cv_accuracy_filename_only": 0.8225306122448979,
+  "n_with_content": 14,
+  "high_confidence_errors": 0
+}
