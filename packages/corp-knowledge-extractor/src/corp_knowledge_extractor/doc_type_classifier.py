@@ -10,8 +10,17 @@ doc_type determines extraction depth:
 - "general" -> standard extraction (base only)
 """
 
+import logging
 import re
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
+
+# Feature flag — set False to disable hybrid TF-IDF and fall back to regex only
+USE_TFIDF: bool = True
+
+# Minimum softmax confidence to accept TF-IDF prediction; below this → LLM fallback
+TFIDF_CONFIDENCE: float = 0.5
 
 DEEP_DOC_TYPES = {
     "architecture",
@@ -50,15 +59,21 @@ FILENAME_DOC_TYPE_PATTERNS = [
     # Master data / catalogs (standard depth — no deep extraction)
     (r"(?i)(product.catalog|hierarchy|master.data|item.master|price.list)", "master_data"),
     # Product documentation / technical specs
-    (r"(?i)(datasheet|user.guide|admin.guide|release.notes|spec.sheet|sizing.guide|brand.guide|mapping.matrix|reference.material)", "product_doc"),
+    (r"(?i)(datasheet|user.guide|user.manual|admin.guide|config.guide|release.notes?|changelog|api.reference|technical.reference|spec.sheet|sizing.guide|brand.guide|mapping.matrix|reference.material)", "product_doc"),
+    # Cognitive content — must precede architecture (Cognitive Shorts/Friday meeting recordings)
+    (r"(?i)(cognitive.shorts|cognitive.friday|cognitive.demand)", "training"),
+    # Demo-to-Win training packets — must precede demo→presentation rule
+    (r"(?i)(demo.?2.?win)", "training"),
+    # Security — extended certs/whitepaper (must precede architecture)
+    (r"(?i)(iso.?22\d{3}|cyber.?security|security.whitepaper)", "security"),
     # Architecture / technical
-    (r"(?i)(architecture|technical.overview|system.design)", "architecture"),
+    (r"(?i)(architecture|technical.overview|system.design|integration.pattern|data.flow|deployment|infrastructure|topology)", "architecture"),
     # Competitive
     (r"(?i)(competitive|battlecard|comparison|vs\.)", "competitive"),
     # Training / enablement (expanded)
-    (r"(?i)(training|enablement|curriculum|course|certification|academy|learning|onboarding|meeting.recording|cognitive.shorts)", "training"),
-    # Workshop / hands-on → meeting (workshops are a type of facilitated meeting)
-    (r"(?i)(workshop|hands.on|lab\b)", "meeting"),
+    (r"(?i)(training|enablement|curriculum|course|certification|academy|learning|onboarding|meeting.recording|cognitive.shorts|how.to|guide.for|tutorial|hands.on|lab.exercise|exam\b|quiz\b)", "training"),
+    # Workshop → meeting (workshops are a type of facilitated meeting)
+    (r"(?i)(workshop|lab\b)", "meeting"),
     # Demo / showcase → presentation
     (r"(?i)(demo|demonstration|showcase)", "presentation"),
     # Meeting / debrief (expanded)
@@ -79,6 +94,44 @@ def classify_from_filename(filename: str) -> str | None:
         if re.search(pattern, filename):
             return doc_type
     return None
+
+
+def classify_doc_type_hybrid(
+    filename: str,
+    content: str = "",
+) -> tuple[str | None, float, str]:
+    """Classify doc_type using hybrid TF-IDF → regex pipeline.
+
+    Args:
+        filename: Bare filename or filename_text feature string.
+        content:  Pre-extracted text content (injected by caller — no light_scan import here).
+                  Empty string → filename-only prediction.
+
+    Returns:
+        (doc_type, confidence, method) where method is "tfidf", "regex", or "none".
+        doc_type is None when no classifier fires above threshold (→ caller uses LLM).
+    """
+    # --- TF-IDF hybrid (primary) ---
+    if USE_TFIDF:
+        try:
+            from corp_knowledge_extractor.hybrid_loader import get_cached_model, predict_hybrid
+
+            tfidf_fn, tfidf_ct, clf, _meta = get_cached_model()
+            pred, conf = predict_hybrid(tfidf_fn, tfidf_ct, clf, filename, content)
+            if conf >= TFIDF_CONFIDENCE:
+                logger.debug("TF-IDF: %s (conf=%.2f) for %s", pred, conf, filename)
+                return pred, conf, "tfidf"
+        except FileNotFoundError:
+            logger.debug("Hybrid classifier model not found — falling back to regex")
+        except Exception as exc:  # pragma: no cover — unexpected sklearn issues
+            logger.warning("Hybrid classifier failed (%s) — falling back to regex", exc)
+
+    # --- Regex fallback ---
+    regex_pred = classify_from_filename(filename)
+    if regex_pred is not None:
+        return regex_pred, 1.0, "regex"
+
+    return None, 0.0, "none"
 
 
 def classify_doc_type(filepath: str, folder_context: str | None = None) -> str:
