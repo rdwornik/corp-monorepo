@@ -315,7 +315,7 @@ class TestPdfTextGrounding:
             p.start()
         fitz_patch.start()
         try:
-            result = _try_pdf_multimodal(source, {"prompts": {"extract": "Extract."}}, text_result)
+            _try_pdf_multimodal(source, {"prompts": {"extract": "Extract."}}, text_result)
         finally:
             fitz_patch.stop()
             for p in reversed(patch_stack):
@@ -455,7 +455,7 @@ class TestPdfHaikuEnrichment:
             p.start()
         fitz_patch.start()
         try:
-            result = _try_pdf_multimodal(source, {"prompts": {"extract": "Extract."}}, text_result)
+            _try_pdf_multimodal(source, {"prompts": {"extract": "Extract."}}, text_result)
         finally:
             fitz_patch.stop()
             for p in reversed(patch_stack):

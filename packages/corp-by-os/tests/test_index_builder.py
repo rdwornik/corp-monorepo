@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pytest
 import yaml
-
 from corp_by_os.index_builder import (
     _compute_rfp_visible,
     _connect,
@@ -759,7 +758,6 @@ Content B.
         _ensure_schema(conn)
         count = _index_cke_notes(conn, vault)
 
-
         dupes = _dedup_notes_by_hash(conn)
         count -= dupes
 
@@ -786,7 +784,6 @@ Content {i}.
         conn = _connect(db_path)
         _ensure_schema(conn)
         count = _index_cke_notes(conn, vault)
-
 
         dupes = _dedup_notes_by_hash(conn)
         count -= dupes

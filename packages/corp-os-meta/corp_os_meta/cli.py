@@ -21,12 +21,12 @@ if _global_env.exists():
 # Local .env (project-specific vars only)
 load_dotenv(override=False)
 
-import click
-import yaml
-from rich.console import Console
-from rich.table import Table
+import click  # noqa: E402
+import yaml  # noqa: E402
+from rich.console import Console  # noqa: E402
+from rich.table import Table  # noqa: E402
 
-from corp_os_meta import (
+from corp_os_meta import (  # noqa: E402
     load_taxonomy,
     normalize_frontmatter,
     validate_frontmatter,

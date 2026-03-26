@@ -3,7 +3,8 @@
 Usage:
     python src/kb_to_markdown.py --dry-run
     python src/kb_to_markdown.py
-    python src/kb_to_markdown.py --source-dir data/kb/verified --output-dir "C:\\path\\to\\output"
+    python src/kb_to_markdown.py --source-dir data/kb/verified  # noqa: E501
+        --output-dir "C:\\path\\to\\output"
 """
 
 import argparse
@@ -93,7 +94,7 @@ def json_to_markdown(entry: dict, family: str, trust_level: str = "verified") ->
         "doc_type: rfp_response",
         f"trust_level: {trust_level}",
         f"products: {_yaml_list(products)}",
-        f"topics: {_yaml_list([entry.get('subcategory', '')] if entry.get('subcategory') else [])}",
+        f"topics: {_yaml_list([entry.get('subcategory', '')] if entry.get('subcategory') else [])}",  # noqa: E501
         f"category: {category}",
         f"tags: {_yaml_list(tags)}",
         f"source_rfps: {_yaml_list(source_rfps)}",
@@ -235,8 +236,9 @@ def print_summary(result: dict):
         for family, count in sorted(result["drafts"].items()):
             print(f"  {family:.<30} {count:>5}")
 
-    print(
-        f"\nMigrated: {result['total_verified']} verified + {result['total_drafts']} drafts"
+    print(  # noqa: E501
+        f"\nMigrated: {result['total_verified']} verified + "
+        f"{result['total_drafts']} drafts"
     )
     print(f"Output:   {result['output_dir']}")
 

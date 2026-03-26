@@ -235,7 +235,7 @@ def test_get_context_from_vault():
     vault_notes = [
         {
             "note_id": 42,
-            "content": "## Question\nHow does WMS work?\n\n## Answer\nWMS handles warehouse ops.",
+            "content": "## Question\nHow does WMS work?\n\n## Answer\nWMS handles warehouse ops.",  # noqa: E501
             "topics": ["WMS"],
             "products": ["wms"],
             "relevance_score": 0.9,

@@ -8,7 +8,6 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from corp_by_os.retrieve.rfp import RFPAnswer, answer_rfp
 
 # --- Schema (same as test_prep.py) ---
@@ -220,7 +219,10 @@ class TestConfidenceLevels:
         try:
             # Broad query should hit many notes
             result = answer_rfp(
-                question="Blue Yonder platform SaaS architecture demand planning WMS integration data",
+                question=(
+                    "Blue Yonder platform SaaS architecture demand planning "
+                    "WMS integration data"
+                ),
                 db_path=db_path,
                 vault_root=vault,
             )

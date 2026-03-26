@@ -45,7 +45,8 @@ RED_FLAG_PATTERNS = [
     for p in [
         r"see attached",
         r"refer to (?:the )?(?:attached|appendix|document|section)",
-        r"as (?:discussed|mentioned|agreed) (?:in |during )?(?:our |the )?(?:meeting|call|session)",
+        r"as (?:discussed|mentioned|agreed) (?:in |during )?(?:our |the )?"  # noqa: E501
+        r"(?:meeting|call|session)",
         r"please see (?:the )?(?:attached|appendix|separate)",
         r"attached herewith",
         r"per our (?:earlier |previous )?(?:discussion|conversation)",
@@ -340,7 +341,8 @@ Return JSON only:
 Rules:
 - "Same topic" means a single KB answer could address both
 - Related but distinct questions = NOT same topic
-- Example SAME: "What database do you use?" vs "Which DB technology powers the platform?"
+- Example SAME: "What database do you use?" vs "Which DB technology  # noqa: E501
+  powers the platform?"
 - Example NOT SAME: "What database do you use?" vs "How do you handle database backups?"
 """
 
@@ -512,8 +514,9 @@ def select_answer(
             if not topic_result.get("same_topic", False):
                 result["decision"] = "ADD_NEW"
                 result["stage"] = "topic_guard"
-                result["reason"] = (
-                    f"Different topic (LLM confidence: {topic_result.get('confidence', 0)})"
+                result["reason"] = (  # noqa: E501
+                    f"Different topic (LLM confidence: "
+                    f"{topic_result.get('confidence', 0)})"
                 )
                 result.pop("needs_topic_check", None)
                 return result
@@ -551,8 +554,9 @@ def select_answer(
             else:
                 result["decision"] = "KEEP_EXISTING"
                 result["stage"] = "llm_judge"
-                result["reason"] = (
-                    f"LLM chose existing (confidence: {judge_result.get('confidence', 0)}): "
+                result["reason"] = (  # noqa: E501
+                    f"LLM chose existing (confidence: "
+                    f"{judge_result.get('confidence', 0)}): "
                     f"{judge_result.get('reason', '')}"
                 )
         else:

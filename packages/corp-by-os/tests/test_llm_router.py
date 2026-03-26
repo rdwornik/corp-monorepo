@@ -7,7 +7,6 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from corp_by_os.llm_router import (
     _build_workflows_summary,
     _check_daily_cap,
@@ -73,7 +72,11 @@ class TestParseLLMResponse:
         assert "contact" not in intent.parameters  # null filtered out
 
     def test_json_in_code_fence(self) -> None:
-        response = '```json\n{"workflow_id": "attention_scan", "parameters": {}, "confidence": 0.8, "response_text": null}\n```'
+        response = (  # noqa: E501
+            '```json\n{"workflow_id": "attention_scan", '
+            '"parameters": {}, "confidence": 0.8, "response_text": null}'
+            '\n```'
+        )
         intent = _parse_llm_response(response)
         assert intent.workflow_id == "attention_scan"
 
@@ -95,7 +98,11 @@ class TestParseLLMResponse:
         assert intent.confidence == 0.0
 
     def test_json_embedded_in_text(self) -> None:
-        response = 'Here is the result: {"workflow_id": "attention_scan", "parameters": {}, "confidence": 0.7, "response_text": null} done.'
+        response = (  # noqa: E501
+            'Here is the result: {"workflow_id": "attention_scan", '
+            '"parameters": {}, "confidence": 0.7, "response_text": null} '
+            'done.'
+        )
         intent = _parse_llm_response(response)
         assert intent.workflow_id == "attention_scan"
 

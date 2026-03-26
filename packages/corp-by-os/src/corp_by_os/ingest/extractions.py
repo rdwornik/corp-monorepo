@@ -21,7 +21,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
-
 from corp_by_os.vault_io import read_frontmatter, write_note
 
 logger = logging.getLogger(__name__)
@@ -171,7 +170,7 @@ def _quality_gate(note_fm: dict, threshold: int) -> tuple[bool, str]:
     score = note_fm.get("quality_score")
     if score is None:
         return True, "OK"
-    if isinstance(score, (int, float)) and score < threshold and score > 0:
+    if isinstance(score, int | float) and score < threshold and score > 0:
         return False, f"quality_score {score} < {threshold}"
     return True, "OK"
 

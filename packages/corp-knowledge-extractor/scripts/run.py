@@ -21,9 +21,9 @@ _repo_root = Path(__file__).parent.parent
 sys.path.insert(0, str(_repo_root))
 sys.path.insert(0, str(_repo_root / "src"))
 
-import json
-import click
-from dotenv import load_dotenv
+import json  # noqa: E402
+import click  # noqa: E402
+from dotenv import load_dotenv  # noqa: E402
 
 # Global API keys (Documents/.secrets/.env)
 _global_env = Path.home() / "Documents" / ".secrets" / ".env"
@@ -32,22 +32,26 @@ if _global_env.exists():
 # Local .env (project-specific vars only)
 load_dotenv(override=False)
 
-from config.config_loader import load_config
-from corp_knowledge_extractor.inventory import scan_input, FileType
-from corp_knowledge_extractor.extract import (
+from config.config_loader import load_config  # noqa: E402
+from corp_knowledge_extractor.inventory import scan_input, FileType  # noqa: E402
+from corp_knowledge_extractor.extract import (  # noqa: E402
     extract_knowledge,
     extract_from_text,
     extract_local,
     extract_pptx_multimodal,
     ExtractionError,
 )
-from corp_knowledge_extractor.correlate import correlate_files
-from corp_knowledge_extractor.synthesize import build_package, write_transcript_note
-from corp_knowledge_extractor.transcript import generate_transcript, TranscriptResult
-from corp_knowledge_extractor.reextract import reextract_package
-from corp_knowledge_extractor.frames.sampler import SampledFrame
-from corp_knowledge_extractor.frames.scene_detect import scene_detect
-from corp_knowledge_extractor.compress import compress_video
+from corp_knowledge_extractor.correlate import correlate_files  # noqa: E402
+from corp_knowledge_extractor.synthesize import (  # noqa: E402
+    build_package, write_transcript_note
+)
+from corp_knowledge_extractor.transcript import (  # noqa: E402
+    generate_transcript, TranscriptResult
+)
+from corp_knowledge_extractor.reextract import reextract_package  # noqa: E402
+from corp_knowledge_extractor.frames.sampler import SampledFrame  # noqa: E402
+from corp_knowledge_extractor.frames.scene_detect import scene_detect  # noqa: E402
+from corp_knowledge_extractor.compress import compress_video  # noqa: E402
 
 logging.basicConfig(
     level=logging.INFO,

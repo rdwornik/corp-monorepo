@@ -385,7 +385,10 @@ def _build_sampled_frame_contents(
     # Append prompt with frame count hint
     parts.append(
         types.Part.from_text(
-            text=f"[{len(selected)} sampled frame(s) provided above, sample_0000 through sample_{len(selected) - 1:04d}.]\n\n{prompt}"
+            text=(
+                    f"[{len(selected)} sampled frame(s) provided above, "
+                    f"sample_0000 through sample_{len(selected) - 1:04d}.]\n\n{prompt}"
+                )
         )
     )
 
@@ -544,7 +547,10 @@ def extract_knowledge(
 
             contents.append(
                 types.Part.from_text(
-                    text=f"[{len(selected)} sampled frame(s) provided above, sample_0000 through sample_{len(selected) - 1:04d}.]\n\n{unified_prompt}"
+                    text=(
+                    f"[{len(selected)} sampled frame(s) provided above, "
+                    f"sample_0000 through sample_{len(selected) - 1:04d}.]\n\n{unified_prompt}"
+                )
                 )
             )
         else:
@@ -661,7 +667,8 @@ def extract_knowledge(
     result.user_context = user_context
 
     log.info(
-        "Extracted: '%s' | slides=%d | doc_type=%s | deep=%s | overlay=%s | key_facts=%d | topics=%s | tokens=%d | model=%s | routing=%s",
+        "Extracted: '%s' | slides=%d | doc_type=%s | deep=%s"
+        " | overlay=%s | key_facts=%d | topics=%s | tokens=%d | model=%s | routing=%s",
         result.title,
         len(result.slides),
         doc_type,
@@ -1402,7 +1409,10 @@ def extract_pptx_multimodal(
 
     parts.append(
         types.Part.from_text(
-            text=f"[{len(rendered_slides)} slide image(s) provided above, slides 1 through {len(rendered_slides)}.]\n\n{prompt}"
+            text=(
+                    f"[{len(rendered_slides)} slide image(s) provided above, "
+                    f"slides 1 through {len(rendered_slides)}.]\n\n{prompt}"
+                )
         )
     )
 
@@ -1474,7 +1484,8 @@ def extract_pptx_multimodal(
     result.user_context = user_context
 
     log.info(
-        "PPTX multimodal extracted: '%s' | %d slides | doc_type=%s | deep=%s | overlay=%s | key_facts=%d | topics=%s | tokens=%d | model=%s",
+        "PPTX multimodal extracted: '%s' | %d slides | doc_type=%s | deep=%s"
+        " | overlay=%s | key_facts=%d | topics=%s | tokens=%d | model=%s",
         result.title,
         len(result.slides),
         doc_type,

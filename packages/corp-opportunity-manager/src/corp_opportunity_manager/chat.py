@@ -173,7 +173,8 @@ def _handle_prep_deck(session: ChatSession, result: IntentResult) -> None:
     dest = project_dir / dest_name
     shutil.copy2(source, dest)
     session.console.print(
-        f"[green]Agent:[/green] [cyan]{dest_name}[/cyan] created in [cyan]{project_dir.name}/[/cyan]"
+        f"[green]Agent:[/green] [cyan]{dest_name}[/cyan] created in "
+        f"[cyan]{project_dir.name}/[/cyan]"
     )
 
 

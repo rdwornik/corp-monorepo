@@ -48,7 +48,8 @@ Respond in the SAME LANGUAGE the user uses (Polish or English).
 
 Return ONLY valid JSON (no markdown, no code fences):
 {
-  "intent": "create_opportunity|prep_deck|show_project|list_projects|create_subfolder|check_structure|chitchat|clarify",
+  "intent": "create_opportunity|prep_deck|show_project|list_projects|  # noqa: E501
+create_subfolder|check_structure|chitchat|clarify",
   "entities": {
     "client": "string or null",
     "product": "normalized product name or null",
@@ -162,7 +163,10 @@ def parse_intent(
         return IntentResult(
             intent="clarify",
             entities={},
-            response_text=f"I had trouble understanding that. Could you rephrase? (parse error: {e})",
+            response_text=(  # noqa: E501
+                f"I had trouble understanding that. Could you rephrase? "
+                f"(parse error: {e})"
+            ),
             needs_confirmation=False,
             confidence=0.0,
         )

@@ -18,8 +18,8 @@ if _global_env.exists():
 # Local .env (project-specific vars only)
 load_dotenv(PROJECT_ROOT / ".env", override=False)
 
-from google import genai
-from google.genai import types
+from google import genai  # noqa: E402
+from google.genai import types  # noqa: E402
 
 # Optional imports
 try:
@@ -45,7 +45,7 @@ try:
 except ImportError:
     CHROMADB_AVAILABLE = False
 
-from corp_rfp_agent.vault_adapter import retrieve as vault_retrieve
+from corp_rfp_agent.vault_adapter import retrieve as vault_retrieve  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -104,7 +104,8 @@ def retry_with_backoff(func, max_retries=5, base_delay=2):
             ):
                 delay = base_delay * (2**attempt) + random.uniform(0, 1)
                 print(
-                    f"   [WARNING] Rate limited. Retry {attempt + 1}/{max_retries} in {delay:.1f}s..."
+                    f"   [WARNING] Rate limited. Retry {attempt + 1}/{max_retries}"
+                    f" in {delay:.1f}s..."
                 )
                 time.sleep(delay)
             else:
@@ -294,7 +295,7 @@ class LLMRouter:
         for item in items:
             parts.append(
                 f"---\n"
-                f"Category: {item.get('category', '')} / {item.get('subcategory', '')}\n"
+                f"Category: {item.get('category', '')} / {item.get('subcategory', '')}\n"  # noqa: E501
                 f"Canonical Question: {item.get('canonical_question', '')}\n"
                 f"Canonical Answer: {item.get('canonical_answer', '')}\n"
                 f"---"

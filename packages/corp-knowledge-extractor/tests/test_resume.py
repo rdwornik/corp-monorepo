@@ -5,7 +5,6 @@ import hashlib
 from pathlib import Path
 
 
-
 def _compute_hash(filepath: Path) -> str:
     h = hashlib.sha256()
     with open(filepath, "rb") as f:

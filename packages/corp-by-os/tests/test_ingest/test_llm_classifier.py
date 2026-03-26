@@ -7,7 +7,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
-
 from corp_by_os.ingest.llm_classifier import (
     _get_all_destinations,
     _parse_llm_json,
@@ -89,7 +88,12 @@ class TestClassifyFileLlm:
     def test_parses_valid_response(self) -> None:
         """classify_file_llm parses valid JSON from mocked Gemini."""
         mock_response = MagicMock()
-        mock_response.text = '{"destination": "60_Source_Library/01_Product_Docs", "series_id": null, "topics": ["WMS"], "source_category": "product_doc", "confidence": 0.75, "reasoning": "Architecture doc"}'
+        mock_response.text = (  # noqa: E501
+            '{"destination": "60_Source_Library/01_Product_Docs", '
+            '"series_id": null, "topics": ["WMS"], '
+            '"source_category": "product_doc", "confidence": 0.75, '
+            '"reasoning": "Architecture doc"}'
+        )
 
         mock_client = MagicMock()
         mock_client.models.generate_content.return_value = mock_response
@@ -252,7 +256,10 @@ class TestClassifyQuarantinedBatch:
         (unmatched / "test.pdf").write_bytes(b"content")
 
         mock_response = MagicMock()
-        mock_response.text = '{"destination": "60_Source_Library/01_Product_Docs", "confidence": 0.7, "reasoning": "looks like product doc"}'
+        mock_response.text = (  # noqa: E501
+            '{"destination": "60_Source_Library/01_Product_Docs", '
+            '"confidence": 0.7, "reasoning": "looks like product doc"}'
+        )
         mock_client = MagicMock()
         mock_client.models.generate_content.return_value = mock_response
 

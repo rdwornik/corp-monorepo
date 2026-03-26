@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pytest
 import yaml
-
 from corp_by_os.ingest.router import (
     compute_file_hash,
     finalize_file,
@@ -182,7 +181,8 @@ class TestScanInbox:
         assert len(items) == 1
 
     def test_skips_triage_and_manifest_files(self, mywork: Path) -> None:
-        """Regression: scan_inbox skips _triage_log.jsonl, _triage_schema.yaml, folder_manifest.yaml."""
+        """Regression: scan_inbox skips _triage_log.jsonl, _triage_schema.yaml,
+        folder_manifest.yaml."""
         inbox = mywork / "00_Inbox"
         (inbox / "real_file.pdf").write_bytes(b"real")
         (inbox / "_triage_log.jsonl").write_bytes(b"log")
@@ -581,7 +581,7 @@ class TestIngestFolder:
         (sub / "deck.pptx").write_bytes(b"deck")
         (sub / "notes.docx").write_bytes(b"notes")
 
-        result = ingest_folder(
+        ingest_folder(
             sub,
             mywork,
             ops,

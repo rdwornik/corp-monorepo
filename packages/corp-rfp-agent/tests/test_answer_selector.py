@@ -144,7 +144,10 @@ class TestScoring:
 
     def test_structured_answer_bonus(self):
         """Answer with bullet points gets +2."""
-        answer = "Key features:\n1. Real-time forecasting\n2. ML optimization\n3. Cloud-native"
+        answer = (
+            "Key features:\n1. Real-time forecasting\n"
+            "2. ML optimization\n3. Cloud-native"
+        )
         scores = score_answer(answer)
         assert scores["structure"] == 2
 
@@ -397,7 +400,7 @@ class TestFullPipeline:
         """Tie with LLM -> LLM decides (replace, high confidence)."""
 
         def mock_llm(prompt):
-            return '{"winner": "B", "confidence": 9, "reason": "new is much more specific"}'
+            return '{"winner": "B", "confidence": 9, "reason": "new is much more specific"}'  # noqa: E501
 
         a = "Blue Yonder provides demand planning on Azure."
         b = "Blue Yonder offers supply planning on Azure."

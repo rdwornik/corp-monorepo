@@ -172,7 +172,7 @@ class TestPptxMultimodalRouting:
         ):
             # Set up provider mock
             mock_response = MagicMock()
-            mock_response.text = '{"title": "Test", "summary": "Test summary", "topics": [], "type": "presentation", "date": "2026-03-01"}'
+            mock_response.text = '{"title": "Test", "summary": "Test summary", "topics": [], "type": "presentation", "date": "2026-03-01"}'  # noqa: E501
             mock_response.input_tokens = 100
             mock_response.output_tokens = 50
             mock_response.cost_estimate = 0.001

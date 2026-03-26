@@ -40,13 +40,12 @@ except Exception as e:
 
 # 5. Freshness module
 try:
-
     print("5. Freshness module: OK")
 except Exception as e:
     print(f"5. Freshness module: FAILED ({e})")
 
 # 6. Deep prompt
-from pathlib import Path
+from pathlib import Path  # noqa: E402
 
 dp = Path("config/prompts/deep_prompt.txt")
 print(f"6. Deep prompt file: {'EXISTS' if dp.exists() else 'MISSING'}")

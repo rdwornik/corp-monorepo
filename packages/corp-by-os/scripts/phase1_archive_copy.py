@@ -179,7 +179,7 @@ def copy_tree(
     if dry_run:
         print(f"    {len(to_copy)} files to copy, {to_skip} already present")
     else:
-        for src_file, dst_file, relative in to_copy:
+        for src_file, dst_file, _relative in to_copy:
             dst_rel = rel(dst_file, mywork)
             result = safe_copy(src_file, dst_file, stats)
             if result == "ok":

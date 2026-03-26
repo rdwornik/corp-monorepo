@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from corp_by_os.overnight.state import OvernightState
 
 
@@ -114,8 +113,8 @@ class TestIdempotentResume:
         """Simulate crash and resume: pending files should still be there."""
         state.create_run("crash_run", "rfp", budget=5.0)
         f1 = state.add_file("crash_run", "/a.pdf", "h1", "tier2")
-        f2 = state.add_file("crash_run", "/b.pdf", "h2", "tier2")
-        f3 = state.add_file("crash_run", "/c.pdf", "h3", "tier2")
+        state.add_file("crash_run", "/b.pdf", "h2", "tier2")
+        state.add_file("crash_run", "/c.pdf", "h3", "tier2")
 
         # Simulate partial progress before "crash"
         state.update_file_status(f1, "done", cost=0.001)
@@ -162,7 +161,7 @@ class TestRunStats:
         state.create_run("stats_run", "all-non-project", budget=3.0)
         f1 = state.add_file("stats_run", "/a.pdf", "h1", "tier2")
         f2 = state.add_file("stats_run", "/b.pdf", "h2", "tier2")
-        f3 = state.add_file("stats_run", "/c.pdf", "h3", "tier2")
+        state.add_file("stats_run", "/c.pdf", "h3", "tier2")
 
         state.update_file_status(f1, "done", cost=0.01)
         state.update_file_status(f2, "error", error="fail")

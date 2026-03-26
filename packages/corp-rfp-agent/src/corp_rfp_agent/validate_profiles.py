@@ -1,4 +1,6 @@
-"""Validate product profiles — detect contradictions, missing data, suspicious inferences.
+"""Validate product profiles.
+
+Detects contradictions, missing data, and suspicious inferences.
 
 Reads effective profiles from config/product_profiles/_effective/ and checks:
   1. CONTRADICTIONS: field value vs forbidden_claims (ERROR)
@@ -143,7 +145,7 @@ def validate_profile(profile: dict) -> list[dict]:
     # --- 3. SUSPICIOUS INFERENCES ---
     if profile.get("cloud_native") is True:
         if "microservice" not in kf_lower and "cloud-native" not in kf_lower:
-            # Only suspicious if there are key_facts at all (otherwise just missing data)
+            # Only suspicious if key_facts exist (otherwise just missing data)
             if key_facts:
                 issues.append(
                     {
@@ -162,7 +164,7 @@ def validate_profile(profile: dict) -> list[dict]:
                 {
                     "level": ERROR,
                     "field": "uses_snowflake",
-                    "message": "uses_snowflake=true but 'Snowflake' appears in a forbidden claim",
+                    "message": "uses_snowflake=true but 'Snowflake' appears in a forbidden claim",  # noqa: E501
                 }
             )
 
@@ -172,7 +174,7 @@ def validate_profile(profile: dict) -> list[dict]:
                 {
                     "level": ERROR,
                     "field": "microservices",
-                    "message": "microservices=true but 'NOT microservice' in a forbidden claim",
+                    "message": "microservices=true but 'NOT microservice' in a forbidden claim",  # noqa: E501
                 }
             )
 
@@ -193,7 +195,7 @@ def validate_profile(profile: dict) -> list[dict]:
             {
                 "level": WARNING,
                 "field": "platform_services",
-                "message": f"'{svc}' in both available AND coming_soon (already shipped?)",
+                "message": f"'{svc}' in both available AND coming_soon (already shipped?)",  # noqa: E501
             }
         )
 
@@ -376,7 +378,7 @@ def validate_all(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Validate product profiles -- detect contradictions and missing data",
+        description="Validate product profiles -- detect contradictions and missing data",  # noqa: E501
     )
     parser.add_argument(
         "--product", type=str, default=None, help="Validate only one product"

@@ -1,7 +1,5 @@
 """Tests for fact validation — number normalizer, source cross-reference, anomaly detection."""
 
-
-
 from corp_knowledge_extractor.fact_validation import (
     normalize_number,
     extract_numbers_from_text,

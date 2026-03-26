@@ -3,7 +3,6 @@
 import shutil
 
 
-
 def _make_extraction_result(tmp_path, with_slides=True):
     """Create a mock ExtractionResult with optional slide_image_paths."""
     from corp_knowledge_extractor.extract import ExtractionResult

@@ -35,6 +35,6 @@ class TestFileLink:
 
     def test_file_link_forward_slashes(self):
         output = self._render("C:\\Users\\test\\file.pptx")
-        link_line = [l for l in output.split("\n") if "file:///" in l][0]
+        link_line = [line for line in output.split("\n") if "file:///" in line][0]
         assert "\\" not in link_line
         assert "C:/Users/test/file.pptx" in link_line

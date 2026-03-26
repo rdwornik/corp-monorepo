@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
-
 from corp_by_os.ingest.extractions import (
     _collect_packages,
     _find_cover_slide,
@@ -46,7 +45,7 @@ def _make_output_v2(
     extract.mkdir(parents=True, exist_ok=True)
 
     if notes:
-        for filename, body in notes.items():
+        for filename, _body in notes.items():
             _make_note(
                 extract / filename,
                 title=filename.replace(".md", ""),
@@ -157,7 +156,7 @@ class TestRouting:
         vault = tmp_path / "vault"
         _make_output_v2(out, "templates", "Decks", {"deck.md": "x"})
 
-        result = ingest_extractions(out, vault)
+        ingest_extractions(out, vault)
 
         assert (vault / "01_Knowledge" / "deck.md").exists()
 
@@ -166,7 +165,7 @@ class TestRouting:
         vault = tmp_path / "vault"
         _make_output_v2(out, "rfp", "RFP_Set", {"rfp_q1.md": "x"})
 
-        result = ingest_extractions(out, vault)
+        ingest_extractions(out, vault)
 
         assert (vault / "01_Knowledge" / "rfp_q1.md").exists()
 
@@ -176,7 +175,7 @@ class TestRouting:
         vault = tmp_path / "vault"
         _make_output_v2(out, "projects", "Lenzing", {"discovery.md": "x"})
 
-        result = ingest_extractions(out, vault)
+        ingest_extractions(out, vault)
 
         assert (vault / "01_Knowledge" / "discovery.md").exists()
         assert not (vault / "02_projects").exists()
@@ -188,7 +187,7 @@ class TestRouting:
         _make_output_v2(out, "projects", "Lenzing", {"note_l.md": "x"})
         _make_output_v2(out, "projects", "SGDBF", {"note_s.md": "x"})
 
-        result = ingest_extractions(out, vault)
+        ingest_extractions(out, vault)
 
         assert (vault / "01_Knowledge" / "note_l.md").exists()
         assert (vault / "01_Knowledge" / "note_s.md").exists()

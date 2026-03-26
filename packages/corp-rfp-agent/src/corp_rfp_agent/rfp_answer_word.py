@@ -7,8 +7,10 @@ Parses the document into a section tree using auto-detected headings
 
 Usage:
   python src/rfp_answer_word.py --input "path/to/file.docx" --family network
-  python src/rfp_answer_word.py --input "path/to/file.docx" --family network --dry-run
-  python src/rfp_answer_word.py --input "path/to/file.docx" --family network --interactive
+  python src/rfp_answer_word.py --input "path/to/file.docx" --family network \
+    --dry-run
+  python src/rfp_answer_word.py --input "path/to/file.docx" --family network \
+    --interactive
   python src/rfp_answer_word.py --input "path/to/file.docx" --family network \
     --answer-model gemini
 """
@@ -31,7 +33,7 @@ from docx.oxml import OxmlElement
 # Project root setup
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # noqa: E402
 
 # Global API keys (Documents/.secrets/.env)
 _global_env = Path.home() / "Documents" / ".secrets" / ".env"
@@ -41,8 +43,8 @@ if _global_env.exists():
 # Local .env (project-specific vars only)
 load_dotenv(PROJECT_ROOT / ".env", override=False)
 
-from google import genai
-from google.genai import types
+from google import genai  # noqa: E402
+from google.genai import types  # noqa: E402
 
 # ChromaDB — optional fallback
 try:
@@ -53,14 +55,14 @@ try:
 except ImportError:
     CHROMADB_AVAILABLE = False
 
-from corp_rfp_agent.llm_router import (
+from corp_rfp_agent.llm_router import (  # noqa: E402
     MODELS,
     clean_bold_markdown,
     retry_with_backoff,
     extract_question,
     extract_answer,
 )
-from corp_rfp_agent.vault_adapter import retrieve as vault_retrieve
+from corp_rfp_agent.vault_adapter import retrieve as vault_retrieve  # noqa: E402
 
 # --- CONFIGURATION ---
 FAMILY_CONFIG_PATH = PROJECT_ROOT / "data/kb/schema/family_config.json"
@@ -321,8 +323,9 @@ class KBRetriever:
             self.collection = client_db.get_collection(
                 name=COLLECTION_NAME, embedding_function=ef
             )
-            print(
-                f"[INFO] ChromaDB fallback: connected ({self.collection.count()} entries)"
+            print(  # noqa: E501
+                f"[INFO] ChromaDB fallback: connected "
+                f"({self.collection.count()} entries)"
             )
 
             if KB_JSON_PATH.exists():
@@ -445,7 +448,8 @@ def generate_answer(
             "(No relevant KB entries found. Answer from general Blue Yonder knowledge.)"
         )
 
-    prompt = f"""You are a Blue Yonder pre-sales engineer responding to a client RFP for {family_display_name}.
+    prompt = f"""You are a Blue Yonder pre-sales engineer responding to a  # noqa: E501
+client RFP for {family_display_name}.
 
 SECTION: {block.breadcrumb}
 
@@ -460,9 +464,12 @@ Write a professional response from Blue Yonder's perspective. Rules:
 - Be specific about product capabilities
 - Reference actual BY product names and features where relevant
 - If KB entries provide relevant info, use that information
-- If the requirement asks for something BY doesn't support, say so honestly: "This specific requirement would need to be addressed during implementation scoping."
+- If the requirement asks for something BY doesn't support, say so  # noqa: E501
+  honestly: "This specific requirement would need to be addressed during
+  implementation scoping."
 - Keep it concise but complete: 2-5 sentences typically
-- Do NOT make up features. If unsure, say "Blue Yonder can discuss this in detail during a technical deep-dive session."
+- Do NOT make up features. If unsure, say "Blue Yonder can discuss  # noqa: E501
+  this in detail during a technical deep-dive session."
 - Write in English
 
 Return ONLY the answer text, no JSON wrapping, no prefix."""
@@ -690,8 +697,9 @@ def main():
     print(f"   {total_sections} sections detected")
 
     if not sections:
-        print(
-            "[ERROR] No sections detected. The document may not have recognizable headings."
+        print(  # noqa: E501
+            "[ERROR] No sections detected. The document may not have"
+            " recognizable headings."
         )
         sys.exit(1)
 
@@ -738,8 +746,9 @@ def main():
         if (i + 1) % 10 == 0 or i == len(blocks) - 1:
             print(f"   {i + 1}/{len(blocks)} sections queried")
 
-    print(
-        f"   KB matches (>={args.kb_threshold} similarity): {kb_used_count}/{len(blocks)}"
+    print(  # noqa: E501
+        f"   KB matches (>={args.kb_threshold} similarity): "
+        f"{kb_used_count}/{len(blocks)}"
     )
 
     # Step 5: Generate answers

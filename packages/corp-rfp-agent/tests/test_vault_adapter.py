@@ -227,15 +227,15 @@ def test_fallback_direct_sqlite(tmp_path):
 
     # Insert a test note
     conn.execute(
-        "INSERT INTO notes (id, title, topics, products, domains, confidence, note_path, project_id) "
-        "VALUES (1, 'WMS REST API Integration', '[\"Integration\"]', '[\"WMS\"]', '[\"logistics\"]', "
+        "INSERT INTO notes (id, title, topics, products, domains, confidence, note_path, project_id) "  # noqa: E501
+        "VALUES (1, 'WMS REST API Integration', '[\"Integration\"]', '[\"WMS\"]', '[\"logistics\"]', "  # noqa: E501
         "'verified', ?, 'PRJ-001')",
         [str(tmp_path / "note.md")],
     )
     # Manually populate FTS (normally done by triggers)
     conn.execute(
-        "INSERT INTO notes_fts (rowid, title, topics, products, domains, client, project_id) "
-        "VALUES (1, 'WMS REST API Integration', '[\"Integration\"]', '[\"WMS\"]', '[\"logistics\"]', "
+        "INSERT INTO notes_fts (rowid, title, topics, products, domains, client, project_id) "  # noqa: E501
+        "VALUES (1, 'WMS REST API Integration', '[\"Integration\"]', '[\"WMS\"]', '[\"logistics\"]', "  # noqa: E501
         "'Acme', 'PRJ-001')"
     )
     conn.commit()
@@ -304,4 +304,4 @@ def test_retrieve_sorts_verified_first():
 
 
 # Need sqlite3 for the FTS5 test
-import sqlite3
+import sqlite3  # noqa: E402

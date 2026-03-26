@@ -20,7 +20,7 @@ _repo_root = Path(__file__).parent.parent
 sys.path.insert(0, str(_repo_root))
 sys.path.insert(0, str(_repo_root / "src"))
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # noqa: E402
 
 # Global API keys (Documents/.secrets/.env)
 _global_env = Path.home() / "Documents" / ".secrets" / ".env"
@@ -29,8 +29,8 @@ if _global_env.exists():
 # Local .env (project-specific vars only)
 load_dotenv(override=False)
 
-from config.config_loader import load_config
-from corp_knowledge_extractor.compress import compress_video, needs_compression
+from config.config_loader import load_config  # noqa: E402
+from corp_knowledge_extractor.compress import compress_video, needs_compression  # noqa: E402
 
 
 def get_video_info(video_path: str) -> dict:

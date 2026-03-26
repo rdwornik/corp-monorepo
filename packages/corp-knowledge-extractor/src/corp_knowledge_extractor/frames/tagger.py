@@ -77,7 +77,8 @@ def _build_tagging_prompt(batch: list[dict], start_index: int) -> str:
 {content}
 
 For EACH frame, provide 3-6 topic tags that describe what the slide is about.
-Tags should be concepts, features, or topics (e.g., "public APIs", "security", "disaster recovery", "pricing", "architecture").
+Tags should be concepts, features, or topics (e.g., "public APIs", "security",
+"disaster recovery", "pricing", "architecture").
 
 Respond in JSON format:
 {{

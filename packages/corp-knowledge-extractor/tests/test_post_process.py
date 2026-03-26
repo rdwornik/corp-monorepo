@@ -493,7 +493,7 @@ def test_backslash_normalized_in_source():
 # ---------------------------------------------------------------------------
 
 
-from corp_knowledge_extractor.post_process import normalize_company_names
+from corp_knowledge_extractor.post_process import normalize_company_names  # noqa: E402
 
 
 def test_normalize_blue_blue():
@@ -537,7 +537,7 @@ def test_normalize_no_false_positive():
 # Type enforcement from file extension (BUG 1: JLR pilot)
 # ---------------------------------------------------------------------------
 
-from corp_knowledge_extractor.post_process import enforce_type_from_extension, validate_tags
+from corp_knowledge_extractor.post_process import enforce_type_from_extension, validate_tags  # noqa: E402
 
 
 def test_docx_always_document():
@@ -647,7 +647,7 @@ def test_validate_tags_empty():
 # ---------------------------------------------------------------------------
 
 
-from corp_knowledge_extractor.post_process import normalize_product_names
+from corp_knowledge_extractor.post_process import normalize_product_names  # noqa: E402
 
 
 def test_normalize_short_product():
@@ -701,7 +701,7 @@ def test_normalize_products_in_post_process():
 # Fix 1: Product exclusion list (competitors, infrastructure, generic)
 # ---------------------------------------------------------------------------
 
-from corp_knowledge_extractor.post_process import filter_products
+from corp_knowledge_extractor.post_process import filter_products  # noqa: E402
 
 
 def test_sap_excluded_from_products():
@@ -762,7 +762,7 @@ def test_normalize_dsp_alias():
     assert normalize_product_names(["DSP"]) == ["Blue Yonder Demand & Supply Planning"]
 
 
-def test_normalize_case_insensitive():
+def test_normalize_product_case_insensitive():
     """Alias lookup is case-insensitive."""
     assert normalize_product_names(["wms"]) == ["Blue Yonder WMS"]
 
@@ -782,7 +782,7 @@ def test_normalize_unknown_product_passes_through():
 # Fix 3: People field cleanup
 # ---------------------------------------------------------------------------
 
-from corp_knowledge_extractor.post_process import filter_people
+from corp_knowledge_extractor.post_process import filter_people  # noqa: E402
 
 
 def test_role_filtered():
@@ -842,7 +842,7 @@ def test_people_filter_in_post_process():
 # Fix 4: Client alias normalization
 # ---------------------------------------------------------------------------
 
-from corp_knowledge_extractor.post_process import normalize_client
+from corp_knowledge_extractor.post_process import normalize_client  # noqa: E402
 
 
 def test_client_alias_lenzing_ag():
@@ -869,7 +869,7 @@ def test_client_alias_empty():
 # Fix 5: Tag ceiling
 # ---------------------------------------------------------------------------
 
-from corp_knowledge_extractor.post_process import cap_tags, generate_tags
+from corp_knowledge_extractor.post_process import cap_tags, generate_tags  # noqa: E402
 
 
 def test_cap_tags_under_limit():

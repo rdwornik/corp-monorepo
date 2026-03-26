@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from corp_by_os.ops.database import OpsDB
 from corp_by_os.ops.file_registry import ExtractionRecord, FileRecord, FileRegistry
 
@@ -57,7 +56,7 @@ class TestRegisterFile:
 
     def test_register_preserves_original_name(self, registry: FileRegistry) -> None:
         """Re-registration with different filename keeps original_name."""
-        rec1 = registry.register_file("hash1", "original.pptx", "C:/a.pptx", 100)
+        registry.register_file("hash1", "original.pptx", "C:/a.pptx", 100)
         rec2 = registry.register_file("hash1", "renamed.pptx", "C:/b.pptx", 100)
         assert rec2.original_name == "original.pptx"
 

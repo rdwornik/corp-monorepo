@@ -37,11 +37,11 @@ def count_content(md_path: Path) -> dict:
             text = text[end + 3 :]
 
     lines = text.strip().split("\n")
-    sections = [l for l in lines if l.startswith("## ")]
-    images = [l for l in lines if l.startswith("![")]
-    quotes = [l for l in lines if l.startswith("> ") and "WARNING" not in l]
-    warnings = [l for l in lines if "> WARNING" in l]
-    bullet_points = [l for l in lines if l.strip().startswith("- ")]
+    sections = [line for line in lines if line.startswith("## ")]
+    images = [line for line in lines if line.startswith("![")]
+    quotes = [line for line in lines if line.startswith("> ") and "WARNING" not in line]
+    warnings = [line for line in lines if "> WARNING" in line]
+    bullet_points = [line for line in lines if line.strip().startswith("- ")]
 
     return {
         "total_chars": len(text),
@@ -186,7 +186,6 @@ def evaluate_package(package_dir: Path) -> dict:
         source_ext = Path(source_path).suffix.lower() if source_path else ""
         content_type = fm.get("type", "")
         is_static_doc = source_ext in (".pdf", ".docx") or content_type in ("document", "documentation")
-        is_video = source_ext in (".mp4", ".mkv", ".avi", ".mov", ".wav")
         file_eval["is_static_doc"] = is_static_doc
 
         # Low content flag
@@ -268,16 +267,16 @@ def print_scorecard(result: dict):
         print(f"  Model: {feval['model']} | v{feval['extraction_version']} | {feval['depth']} | {feval['doc_type']}")
         print(f"  Score: {feval['score']}/100 | Quality: {feval['quality']}")
         print(
-            f"  Key facts: {fq['count']} ({fq['specific_count']} specific, {fq['generic_count']} generic, avg {fq['avg_length']} chars)"
+            f"  Key facts: {fq['count']} ({fq['specific_count']} specific, {fq['generic_count']} generic, avg {fq['avg_length']} chars)"  # noqa: E501
         )
         print(
-            f"  Entities: {feval['entities_count']} | Topics: {feval['topics_count']} | Products: {feval['products_count']}"
+            f"  Entities: {feval['entities_count']} | Topics: {feval['topics_count']} | Products: {feval['products_count']}"  # noqa: E501
         )
         print(
-            f"  Content: {feval['content']['total_chars']} chars, {feval['content']['sections']} sections, {feval['content']['images']} images"
+            f"  Content: {feval['content']['total_chars']} chars, {feval['content']['sections']} sections, {feval['content']['images']} images"  # noqa: E501
         )
         print(
-            f"  Overlay: {'YES (' + feval['overlay_type'] + ', ' + str(feval['overlay_fields_populated']) + '/' + str(feval['overlay_fields_total']) + ' fields)' if feval['has_overlay'] else 'NO'}"
+            f"  Overlay: {'YES (' + feval['overlay_type'] + ', ' + str(feval['overlay_fields_populated']) + '/' + str(feval['overlay_fields_total']) + ' fields)' if feval['has_overlay'] else 'NO'}"  # noqa: E501
         )
         print(f"  Freshness: {'YES' if feval['has_freshness'] else 'NO'}")
         print(f"  Slides: {feval['slides_count']} | Frames: {feval['frames_count']} | Images: {feval['images_count']}")
@@ -305,7 +304,7 @@ def print_scorecard(result: dict):
             print("  !! Fragment quality — incomplete extraction")
         if feval["slide_coverage"] is not None and feval["slide_coverage"] < 0.5:
             print(
-                f"  !! Low slide coverage — {feval['content']['sections']} sections for {feval['slides_count'] or feval['content']['images']} slides"
+                f"  !! Low slide coverage — {feval['content']['sections']} sections for {feval['slides_count'] or feval['content']['images']} slides"  # noqa: E501
             )
 
     if result["issues"]:
@@ -356,11 +355,11 @@ def compare_packages(old_dir: Path, new_dir: Path):
             print(f"    Entities:   {delta_str(o['entities_count'], n['entities_count'])}")
             print(f"    Content:    {delta_str(o['content']['total_chars'], n['content']['total_chars'])}")
             print(
-                f"    Overlay:    {'NO' if not o['has_overlay'] else 'YES'} -> {'NO' if not n['has_overlay'] else 'YES'}"
+                f"    Overlay:    {'NO' if not o['has_overlay'] else 'YES'} -> {'NO' if not n['has_overlay'] else 'YES'}"  # noqa: E501
             )
             print(f"    Slides:     {delta_str(o.get('slides_count', 0), n.get('slides_count', 0))}")
             print(
-                f"    Freshness:  {'NO' if not o['has_freshness'] else 'YES'} -> {'NO' if not n['has_freshness'] else 'YES'}"
+                f"    Freshness:  {'NO' if not o['has_freshness'] else 'YES'} -> {'NO' if not n['has_freshness'] else 'YES'}"  # noqa: E501
             )
             print(f"    Version:    v{o.get('extraction_version', 1)} -> v{n.get('extraction_version', 1)}")
 

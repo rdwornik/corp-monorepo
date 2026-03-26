@@ -32,9 +32,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.core.llm.classifier import AIClassifier
-
 from config.settings import get_settings
+from src.core.llm.classifier import AIClassifier
 
 # ---------------------------------------------------------------------------
 # Config
@@ -107,7 +106,7 @@ def build_plan(
 
     # Build raw entries (dst filled after duplicate resolution)
     raw = []
-    for file, res in zip(files, results):
+    for file, res in zip(files, results, strict=False):
         date = res.date if valid_iso(res.date) else None
         date_src = "filename" if date else "mtime"
         if not date:
@@ -251,9 +250,12 @@ def diff_plans(old_path: Path, new_path: Path) -> None:
     print(f"  Unknown ({old_m:<7}): {unk_old}")
     print(f"  Unknown ({new_m:<7}): {unk_new}")
     delta = unk_old - unk_new
-    print(
-        f"  Delta unknown       : {delta:+d}  ({'new is better' if delta > 0 else 'no improvement' if delta == 0 else 'new is worse'})"
+    verdict = (
+        "new is better" if delta > 0
+        else "no improvement" if delta == 0
+        else "new is worse"
     )
+    print(f"  Delta unknown       : {delta:+d}  ({verdict})")
 
     if diff_rows:
         print(f"\n  {'Filename':<53} {old_m:<23} {new_m}")

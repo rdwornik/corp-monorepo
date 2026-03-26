@@ -48,7 +48,7 @@ def should_skip_file(path: Path) -> bool:
 def collect_moves(vault: Path) -> list[tuple[Path, Path, str]]:
     """Plan all moves. Returns list of (source, destination, category)."""
     moves: list[tuple[Path, Path, str]] = []
-    dest_names: Counter[str] = Counter()
+    Counter()
 
     # Helper to track name collisions for knowledge/ flattening
     knowledge_names: dict[str, Path] = {}  # name -> first source
@@ -271,9 +271,10 @@ def main() -> None:
         post_count = sum(1 for _ in VAULT.rglob("*.md") if ".obsidian" not in str(_))
         # Post count includes tombstone READMEs (+6) and the log file (+1)
         print(f"\nPost-migration note count: {post_count}")
-        print(
-            f"  (includes {post_count - pre_count + stats['moved'] - stats['skipped_conflict']} tombstone/log files)"
+        added_count = (
+            post_count - pre_count + stats["moved"] - stats["skipped_conflict"]
         )
+        print(f"  (includes {added_count} tombstone/log files)")
     else:
         print("\nThis was a dry run. Run with --execute to perform migration.")
 

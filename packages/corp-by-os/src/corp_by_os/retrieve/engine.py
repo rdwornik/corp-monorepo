@@ -290,7 +290,8 @@ def retrieve(
         coverage_gaps = _find_coverage_gaps(query, filters, notes)
 
         logger.info(
-            "retrieve query=%r filters={client=%s, products=%s, rfp_only=%s} results=%d sufficient=%s",
+            "retrieve query=%r filters={client=%s, products=%s, rfp_only=%s} "
+            "results=%d sufficient=%s",
             query,
             filters.client,
             filters.products,

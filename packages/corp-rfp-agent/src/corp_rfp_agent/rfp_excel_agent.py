@@ -1,6 +1,7 @@
 """
 rfp_excel_agent.py
-RFP Excel Agent - Processes Excel files with colored cells (green = questions to answer).
+RFP Excel Agent - Processes Excel files with colored cells
+(green = questions to answer).
 
 This script:
 1. Reads Excel files with multiple tabs
@@ -14,7 +15,8 @@ Usage:
     python rfp_excel_agent.py --input test.xlsx --dry-run
     python rfp_excel_agent.py --input test.xlsx
     python rfp_excel_agent.py --input test.xlsx --solution wms_native --model claude
-    python rfp_excel_agent.py --input "RFP_Customer.xlsx" --solution planning --model claude --anonymize --workers 8
+    python rfp_excel_agent.py --input "RFP.xlsx" --solution planning --model claude
+        --anonymize --workers 8
 """
 
 import argparse
@@ -40,7 +42,7 @@ except ImportError:
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 # No sys.path modification needed - imports are local in src/
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # noqa: E402
 
 # Global API keys (Documents/.secrets/.env)
 _global_env = Path.home() / "Documents" / ".secrets" / ".env"
@@ -50,8 +52,8 @@ if _global_env.exists():
 # Local .env (project-specific vars only)
 load_dotenv(PROJECT_ROOT / ".env", override=False)
 
-from corp_rfp_agent.llm_router import LLMRouter
-from corp_rfp_agent.anonymization import AnonymizationMiddleware
+from corp_rfp_agent.llm_router import LLMRouter  # noqa: E402
+from corp_rfp_agent.anonymization import AnonymizationMiddleware  # noqa: E402
 
 
 def call_llm_with_retry(llm_func, *args, max_retries=3, **kwargs):
@@ -81,7 +83,8 @@ def call_llm_with_retry(llm_func, *args, max_retries=3, **kwargs):
 
                 if attempt < max_retries - 1:
                     print(
-                        f"[RETRY] Rate limited, waiting {wait_time}s before retry {attempt + 1}/{max_retries}..."
+                        f"[RETRY] Rate limited, waiting {wait_time}s "  # noqa: E501
+                        f"before retry {attempt + 1}/{max_retries}..."
                     )
                     time.sleep(wait_time)
                 else:
@@ -345,8 +348,9 @@ def scan_green_cells(workbook) -> List[Dict]:
     """
     Scan all tabs in workbook for green cells (FF00FF00 only).
 
-    SAFETY: Detects ANY green cell (FF00FF00) in a row, then processes that row's question.
-            Only the answer column will be modified, all other cells preserved.
+    SAFETY: Detects ANY green cell (FF00FF00) in a row, then processes  # noqa: E501
+        that row's question. Only the answer column will be modified,
+        all other cells preserved.
 
     Args:
         workbook: openpyxl Workbook object
@@ -400,7 +404,7 @@ def scan_green_cells(workbook) -> List[Dict]:
                             "answer_col": answer_col,
                             "answer_col_name": answer_col_name,
                             "header_row": header_row,
-                            "green_cell_col": green_col,  # Track which cell was actually green
+                            "green_cell_col": green_col,  # noqa: E501
                         }
                     )
 
@@ -562,12 +566,14 @@ def process_excel_file(
     if not green_cells:
         print("[WARNING] No green cells found in the workbook.")
         print(
-            "[INFO] Mark cells with green fill color (FF00FF00) to indicate questions to answer."
+            "[INFO] Mark cells with green fill color (FF00FF00) to"  # noqa: E501
+            " indicate questions to answer."
         )
         return True
 
-    print(
-        f"[INFO] Found {len(green_cells)} green cells across {len(set(c['tab_name'] for c in green_cells))} tabs"
+    print(  # noqa: E501
+        f"[INFO] Found {len(green_cells)} green cells across "
+        f"{len(set(c['tab_name'] for c in green_cells))} tabs"
     )
 
     # Dry run mode - just report
@@ -647,8 +653,9 @@ def process_excel_file(
     preserved_cells = total_cells - modified_cells
 
     # Safety logging
-    print(
-        f"[SAFETY] Modified {modified_cells} cells (answer column in green-highlighted rows only)"
+    print(  # noqa: E501
+        f"[SAFETY] Modified {modified_cells} cells "
+        "(answer column in green-highlighted rows only)"
     )
     print(f"[SAFETY] Preserved {preserved_cells} cells unchanged")
 
@@ -681,8 +688,9 @@ def process_excel_file(
                 if total_images_after == total_images:
                     print(f"[SUCCESS] Preserved all {total_images} images/charts")
                 else:
-                    print(
-                        f"[WARNING] Image count changed: {total_images} -> {total_images_after}"
+                    print(  # noqa: E501
+                        f"[WARNING] Image count changed: "
+                        f"{total_images} -> {total_images_after}"
                     )
                     print("[WARNING] Some images may not have been preserved correctly")
         except Exception as e:
@@ -727,7 +735,8 @@ def parse_args():
 Examples:
   %(prog)s --input test.xlsx --client acme --dry-run
   %(prog)s --input test.xlsx --client acme --solution planning --model gemini
-  %(prog)s --input "RFP.xlsx" --client ifm --solution planning --model claude --anonymize
+  %(prog)s --input "RFP.xlsx" --client ifm --solution planning --model claude
+    --anonymize
 
 Output: output_rfp_universal/{client}_{solution}_{model}_{YYYYMMDD}_{HHMM}.xlsx
 Example: output_rfp_universal/ifm_planning_gemini_20250102_1435.xlsx
@@ -763,9 +772,12 @@ Example: output_rfp_universal/ifm_planning_gemini_20250102_1435.xlsx
         default=None,
         choices=available_solutions if available_solutions else None,
         metavar="CODE",
-        help=f"Solution code for platform-aware responses. Available: {', '.join(available_solutions[:5])}..."
-        if available_solutions
-        else "Solution code (see platform_matrix.json)",
+        help=(  # noqa: E501
+            f"Solution code for platform-aware responses. "
+            f"Available: {', '.join(available_solutions[:5])}..."
+            if available_solutions
+            else "Solution code (see platform_matrix.json)"
+        ),
     )
 
     parser.add_argument(

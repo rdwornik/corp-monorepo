@@ -33,7 +33,7 @@ class TestSceneDetectCreatesFrames:
         out_dir = tmp_path / "frames"
 
         timestamps = [1.0, 5.0, 12.0, 20.0]
-        stderr = _make_ffmpeg_stderr(timestamps)
+        _make_ffmpeg_stderr(timestamps)
 
         with (
             patch("corp_knowledge_extractor.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),

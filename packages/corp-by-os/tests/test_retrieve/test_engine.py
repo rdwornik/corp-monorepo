@@ -8,7 +8,6 @@ import sqlite3
 from pathlib import Path
 
 import pytest
-
 from corp_by_os.retrieve.engine import (
     RetrievalFilter,
     RetrievalResult,
@@ -63,10 +62,15 @@ CREATE TRIGGER IF NOT EXISTS notes_ai AFTER INSERT ON notes BEGIN
 END;
 
 CREATE TRIGGER IF NOT EXISTS notes_ad AFTER DELETE ON notes BEGIN
-    INSERT INTO notes_fts(notes_fts, rowid, title, topics, products, domains, client, project_id)
-    VALUES ('delete', old.id, old.title, old.topics, old.products, old.domains, old.client, old.project_id);
+    INSERT INTO notes_fts(
+        notes_fts, rowid, title, topics, products, domains, client, project_id
+    )
+    VALUES (
+        'delete', old.id, old.title, old.topics, old.products, old.domains,
+        old.client, old.project_id
+    );
 END;
-"""
+"""  # noqa: E501
 
 
 @pytest.fixture()
