@@ -5,6 +5,12 @@ Claude Code: read last 5 entries before starting work.
 
 ---
 
+## 2026-03-27 MinHash near-duplicate detection
+
+- **Did:** Implemented `ingest/dedup.py` — MinHash signatures (128 perms, word 3-grams), `content_signatures` table in ops.db, `check_near_duplicate()` pipeline hook (after light_scan, before CKE), `get_dedup_report()` for `corp dedup-report` CLI command. Installed datasketch 1.9.0. 24 new tests, all pass. Full suite: **992 passed, 1 skipped**.
+- **Design:** Signatures upsert on re-ingest. LSH index is rebuilt in-memory per query (acceptable for current vault size). Never auto-deletes — report only. `check_near_duplicate` is fail-open (ImportError/any exception → empty list, no pipeline disruption). `datasketch` added as optional dep `[dedup]`.
+- **Next:** Wire `check_near_duplicate()` into `inbox.py` process_file() after light_scan call. Consider persisting LSH index if query latency grows with vault size.
+
 ## 2026-03-26 hybrid TF-IDF classifier pipeline
 
 - **Did:** Full dual-vectorizer hybrid classifier — 8 steps: (1) Locked stratified 80/20 train/test split (`create_classifier_split.py` → 248 train, 62 test). (2) Trained `LogisticRegression` with char n-gram filename vectorizer + word n-gram content vectorizer, JSON serialization (no pickle) — CV 85.5% combined, +3.2pp content uplift. (3) JSON loader `hybrid_loader.py` with `lru_cache`, zero pickle risk. (4) One-time test eval: **85.5% hybrid vs 53.2% regex (+32.3pp)**, 0 high-confidence errors; at 0.5 threshold → 100% acc on 45% of files, 18% LLM fallback. (5) `classify_doc_type_hybrid()` integrated into `doc_type_classifier.py` — TF-IDF → regex → None pipeline with `USE_TFIDF` flag. (6) `eval.py` updated with three-way comparison section (1b). (7) 11 tests in `test_hybrid_classifier.py`. (8) Full suite: **863 CKE tests pass**. Merged `feat/hybrid-classifier` to main.

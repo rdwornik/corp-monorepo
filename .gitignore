@@ -38,3 +38,6 @@ packages/corp-knowledge-extractor/_outputs/
 
 # Test output
 output/
+
+# Rebuild staging (large, regenerable)
+.ecosystem/rebuild_staging/

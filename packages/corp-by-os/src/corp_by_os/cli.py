@@ -2422,6 +2422,108 @@ def ingest_inbox_command(
     ops.close()
 
 
+@cli.command("dedup-report")
+@click.option(
+    "--threshold",
+    default=0.6,
+    show_default=True,
+    type=float,
+    help="Minimum Jaccard similarity to report (0–1).",
+)
+@click.option(
+    "--format",
+    "fmt",
+    type=click.Choice(["table", "json"]),
+    default="table",
+    show_default=True,
+)
+@click.pass_obj
+def dedup_report_command(obj: dict, threshold: float, fmt: str) -> None:
+    """Show near-duplicate file pairs detected by MinHash.
+
+    Reads content_signatures stored in ops.db and surfaces candidate
+    pairs above the similarity threshold for human review.
+    No files are deleted — this is a report only.
+    """
+    try:
+        from corp_by_os.ingest.dedup import get_dedup_report
+    except ImportError:
+        console.print(
+            "[red]datasketch not installed.[/red] "
+            'Run: pip install "corp-by-os[dedup]"'
+        )
+        return
+
+    from corp_by_os.ops.database import OpsDB
+
+    config = (obj or {}).get("config") or PipelineConfig.production()
+    db = OpsDB(config=config)
+    try:
+        pairs = get_dedup_report(db, threshold=threshold)
+    except Exception as exc:
+        console.print(f"[red]Error generating dedup report:[/red] {exc}")
+        db.close()
+        return
+    finally:
+        db.close()
+
+    if fmt == "json":
+        data = [
+            {
+                "path_a": p.path_a,
+                "filename_a": p.filename_a,
+                "path_b": p.path_b,
+                "filename_b": p.filename_b,
+                "similarity": p.similarity,
+            }
+            for p in pairs
+        ]
+        console.print_json(json.dumps(data))
+        return
+
+    if not pairs:
+        console.print(
+            f"[green]No near-duplicate pairs found[/green] "
+            f"(threshold={threshold}, {_count_signatures(config)} signatures stored)."
+        )
+        return
+
+    table = Table(
+        title=f"Near-Duplicate Pairs  (threshold={threshold})",
+        show_lines=True,
+    )
+    table.add_column("File A", style="cyan", no_wrap=False, max_width=50)
+    table.add_column("File B", style="cyan", no_wrap=False, max_width=50)
+    table.add_column("Sim", justify="right", width=6)
+
+    for pair in pairs:
+        sim_style = "red bold" if pair.similarity >= 0.9 else "yellow"
+        table.add_row(
+            pair.filename_a,
+            pair.filename_b,
+            f"[{sim_style}]{pair.similarity:.3f}[/{sim_style}]",
+        )
+
+    console.print(table)
+    console.print(
+        f"\n[dim]{len(pairs)} candidate pair(s). "
+        "Review and decide — no auto-deletion.[/dim]"
+    )
+
+
+def _count_signatures(config) -> int:
+    """Return number of stored content signatures (fail-open → 0)."""
+    from corp_by_os.ops.database import OpsDB
+
+    db = OpsDB(config=config)
+    try:
+        return db.conn.execute("SELECT COUNT(*) FROM content_signatures").fetchone()[0]
+    except Exception:
+        return 0
+    finally:
+        db.close()
+
+
 @cli.command("files-stats")
 @click.pass_obj
 def files_stats_command(obj: dict) -> None:

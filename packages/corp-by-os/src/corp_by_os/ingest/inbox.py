@@ -766,6 +766,63 @@ def _full_revert(
         logger.error("Index rebuild during full undo failed: %s", exc)
 
 
+def _check_near_dup(
+    file_path: Path,
+    filename: str,
+    ops: OpsDB,
+    *,
+    auto: bool,
+) -> bool:
+    """Check for near-duplicate content via MinHash. Returns True if file should be skipped.
+
+    Logs warning for similarity >0.8 and prompts (interactive) or auto-skips (batch).
+    Logs info-only for similarity 0.6–0.8. Below 0.6: silent.
+    Fails open — any error returns False so the pipeline continues normally.
+    """
+    from corp_by_os.ingest.dedup import check_near_duplicate
+    from corp_by_os.ingest.light_scan import light_scan
+
+    _HIGH_SIM = 0.8
+
+    try:
+        scan = light_scan(file_path)
+        content = scan.content_text
+    except Exception as exc:
+        logger.debug("light_scan failed for near-dup check on %s: %s", filename, exc)
+        return False
+
+    candidates = check_near_duplicate(content, str(file_path), filename, ops)
+    if not candidates:
+        return False
+
+    high = [c for c in candidates if c.similarity > _HIGH_SIM]
+    medium = [c for c in candidates if c.similarity <= _HIGH_SIM]
+
+    for c in medium:
+        logger.info(
+            "Near-duplicate (%.0f%%): %s ≈ %s", c.similarity * 100, filename, c.filename
+        )
+
+    if not high:
+        return False
+
+    top = high[0]
+    logger.warning(
+        "Near-duplicate of %s (similarity %.2f): %s", top.filename, top.similarity, filename
+    )
+    console.print(
+        f"[yellow]Near-duplicate:[/yellow] {filename} ≈ {top.filename} "
+        f"([bold]{top.similarity:.0%}[/bold] similar)"
+    )
+
+    if auto:
+        console.print(f"[dim]AUTO: skipping near-duplicate {filename}[/dim]")
+        return True
+
+    choice = Prompt.ask("  [s]kip or [e]xtract anyway?", choices=["s", "e"], default="s")
+    return choice == "s"
+
+
 def process_file(
     file_path: Path,
     mywork_root: Path,
@@ -787,6 +844,10 @@ def process_file(
     # Step 0: Dedup check BEFORE classify/move (by content hash)
     dedup = _check_dedup(file_path, ops, auto=auto)
     if dedup == "skip":
+        return "skipped"
+
+    # Step 0.5: Near-duplicate check (MinHash — skips CKE for version duplicates)
+    if _check_near_dup(file_path, file_path.name, ops, auto=auto):
         return "skipped"
 
     # Step 1-2: Detect + Classify

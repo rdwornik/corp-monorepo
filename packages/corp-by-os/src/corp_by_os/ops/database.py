@@ -131,6 +131,18 @@ CREATE TABLE IF NOT EXISTS routing_feedback (
 CREATE INDEX IF NOT EXISTS idx_routing_feedback_reviewed ON routing_feedback(reviewed);
 CREATE INDEX IF NOT EXISTS idx_routing_feedback_method ON routing_feedback(routing_method);
 
+-- MinHash signatures for near-duplicate detection (ingest/dedup.py)
+CREATE TABLE IF NOT EXISTS content_signatures (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    file_path TEXT NOT NULL UNIQUE,
+    filename TEXT NOT NULL,
+    hashvalues BLOB NOT NULL,
+    num_perm INTEGER NOT NULL DEFAULT 128,
+    computed_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_signatures_path ON content_signatures(file_path);
+
 -- Registry suggestions: auto-discovered patterns from scans
 CREATE TABLE IF NOT EXISTS registry_suggestions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

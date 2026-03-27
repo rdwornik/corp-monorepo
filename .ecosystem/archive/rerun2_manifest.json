@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "project": "vault_rebuild",
+  "output_dir": "C:\\Users\\1028120\\Documents\\Scripts\\corp-monorepo\\.ecosystem\\rebuild_staging\\source_library\\rebuild",
+  "files": [
+    {
+      "id": "PepsiCo_BY_Platform_8th_Jan",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/PepsiCo_Planning/PepsiCo_BY_Platform_8th_Jan.pptx",
+      "doc_type": "architecture",
+      "name": "PepsiCo_BY_Platform_8th_Jan",
+      "client": "PepsiCo",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: PepsiCo_BY_Platform_8th_Jan.md"
+    },
+    {
+      "id": "prep_Lenzing_20260314_192225",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Lenzing_Planning/prep_Lenzing_20260314_192225.md",
+      "doc_type": "general",
+      "name": "prep_Lenzing_20260314_192225",
+      "client": "Lenzing",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: prep_Lenzing_20260314_192225.md"
+    },
+    {
+      "id": "prep_SGDBF_20260320_213050",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/SGDBF_Retail/prep_SGDBF_20260320_213050.md",
+      "doc_type": "general",
+      "name": "prep_SGDBF_20260320_213050",
+      "client": "SGDBF",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: prep_SGDBF_20260320_213050.md"
+    },
+    {
+      "id": "QATAR DF",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/QDF_CatMan/QATAR DF.docx",
+      "doc_type": "general",
+      "name": "QATAR DF",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: QATAR DF.md"
+    },
+    {
+      "id": "QATAR_DF",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/QDF_CatMan/QATAR_DF.docx",
+      "doc_type": "general",
+      "name": "QATAR_DF",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: QATAR_DF.md"
+    },
+    {
+      "id": "Redcare-Pharmacy - 21st October",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Redcare_Planning/Redcare-Pharmacy - 21st October.pptx",
+      "doc_type": "general",
+      "name": "Redcare-Pharmacy - 21st October",
+      "client": "Redcare Pharmacy",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Redcare-Pharmacy - 21st October.md"
+    },
+    {
+      "id": "Redcare-Pharmacy_-_21st_October",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Redcare_Planning/Redcare-Pharmacy_-_21st_October.pptx",
+      "doc_type": "general",
+      "name": "Redcare-Pharmacy_-_21st_October",
+      "client": "Redcare Pharmacy",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Redcare-Pharmacy_-_21st_October.md"
+    },
+    {
+      "id": "Security_Questiond",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/LabelVie_TMS/Security_Questiond.xlsx",
+      "doc_type": "security",
+      "name": "Security_Questiond",
+      "client": "LabelVie",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Security_Questiond.md"
+    },
+    {
+      "id": "SGDBF-Architecural requirements",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/SGDBF_Retail/SGDBF-Architecural requirements.docx",
+      "doc_type": "general",
+      "name": "SGDBF-Architecural requirements",
+      "client": "SGDBF",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: SGDBF-Architecural requirements.md"
+    },
+    {
+      "id": "SGDBF-Architecural_requirements",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/SGDBF_Retail/SGDBF-Architecural_requirements.docx",
+      "doc_type": "general",
+      "name": "SGDBF-Architecural_requirements",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: SGDBF-Architecural_requirements.md"
+    },
+    {
+      "id": "SGDBF_Technical_Deep_Dive_20260316",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/SGDBF_Retail/SGDBF_Technical_Deep_Dive_20260316.pptx",
+      "doc_type": "architecture",
+      "name": "SGDBF_Technical_Deep_Dive_20260316",
+      "client": "SGDBF",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: SGDBF_Technical_Deep_Dive_20260316.md"
+    },
+    {
+      "id": "Stellantis_payload",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Stellantis_Mopar_E2E/Stellantis_payload.csv",
+      "doc_type": "general",
+      "name": "Stellantis_payload",
+      "client": "Stellantis",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Stellantis_payload.md"
+    },
+    {
+      "id": "Technical_Requirements_-_Table_Questions",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Stellantis_Mopar_E2E/Technical_Requirements_-_Table_Questions.xlsx",
+      "doc_type": "architecture",
+      "name": "Technical_Requirements_-_Table_Questions",
+      "client": "Stellantis",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Technical_Requirements_-_Table_Questions.md"
+    },
+    {
+      "id": "Veronesi - Minimum Data Requirements",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Veronesi_Planning/Veronesi - Minimum Data Requirements.xlsx",
+      "doc_type": "general",
+      "name": "Veronesi - Minimum Data Requirements",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Veronesi - Minimum Data Requirements.md"
+    },
+    {
+      "id": "Veronesi Template PPT",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Veronesi_Planning/Veronesi Template PPT.pptx",
+      "doc_type": "general",
+      "name": "Veronesi Template PPT",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Veronesi Template PPT.md"
+    },
+    {
+      "id": "Veronesi_-_Minimum_Data_Requirements",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Veronesi_Planning/Veronesi_-_Minimum_Data_Requirements.xlsx",
+      "doc_type": "general",
+      "name": "Veronesi_-_Minimum_Data_Requirements",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Veronesi_-_Minimum_Data_Requirements.md"
+    },
+    {
+      "id": "Veronesi_Template_PPT",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Veronesi_Planning/Veronesi_Template_PPT.pptx",
+      "doc_type": "general",
+      "name": "Veronesi_Template_PPT",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Veronesi_Template_PPT.md"
+    },
+    {
+      "id": "WORKING_FILE_ifm_planning_gemini_20260103_1844",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/IFM_Planning/WORKING_FILE_ifm_planning_gemini_20260103_1844.xlsx",
+      "doc_type": "general",
+      "name": "WORKING_FILE_ifm_planning_gemini_20260103_1844",
+      "client": "IFM Electronics",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: WORKING_FILE_ifm_planning_gemini_20260103_1844.md"
+    },
+    {
+      "id": "Wurth & BY It session 21st of October",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Wurth_Retail/Wurth & BY It session 21st of October.pptx",
+      "doc_type": "general",
+      "name": "Wurth & BY It session 21st of October",
+      "client": "WÃ¼rth",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Wurth & BY It session 21st of October.md"
+    },
+    {
+      "id": "Wurth_&_BY_It_session_21st_of_October",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Wurth_Retail/Wurth_&_BY_It_session_21st_of_October.pptx",
+      "doc_type": "general",
+      "name": "Wurth_&_BY_It_session_21st_of_October",
+      "client": "WÃ¼rth",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Wurth_&_BY_It_session_21st_of_October.md"
+    },
+    {
+      "id": "Wurth_Cloud_Approval_Application_Template",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Wurth_Retail/RFI/Wurth_Cloud_Approval_Application_Template.xlsx",
+      "doc_type": "general",
+      "name": "Wurth_Cloud_Approval_Application_Template",
+      "client": null,
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Wurth_Cloud_Approval_Application_Template.md"
+    },
+    {
+      "id": "Wurth_payload",
+      "path": "C:/Users/1028120/Documents/MyWork/10_Projects/Wurth_Retail/Tech Demo Platform 21st of October/Wurth_payload.csv",
+      "doc_type": "general",
+      "name": "Wurth_payload",
+      "client": "WÃ¼rth",
+      "project": "vault_rebuild",
+      "user_context": "Re-extraction for vault rebuild. Original note: Wurth_payload.md"
+    }
+  ]
+}
