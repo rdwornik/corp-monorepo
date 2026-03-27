@@ -125,6 +125,15 @@ products:
   - name: "Blue Yonder Network Design"
     aliases: ["BY Network", "network optimization tool"]
 
+  - name: "Blue Yonder Logistics Emissions Calculator"
+    aliases: ["Logistics Emissions Calculator", "BY Logistics Emissions Calculator"]
+
+  - name: "Blue Yonder Inventory Ops Agent"
+    aliases: ["Inventory Ops Agent", "BY Inventory Ops Agent"]
+
+  - name: "Blue Yonder Demand Edge"
+    aliases: ["BY Demand Edge", "Luminate Demand Edge", "Demand Edge", "Demand Edge for Retail"]
+
   - name: "Azure"
     aliases: ["Microsoft Azure", "Azure cloud"]
 

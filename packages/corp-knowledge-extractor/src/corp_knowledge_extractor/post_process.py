@@ -521,6 +521,9 @@ _TAG_ALIASES: dict[str, str] = {
     "product/sop-platform": "product/blue-yonder-platform",
     "product/sop-module": "product/blue-yonder-supply-planning",
     "product/network-design": "product/blue-yonder-network-design",
+    "product/logistics-emissions-calculator": "product/blue-yonder-logistics-emissions-calculator",
+    "product/inventory-ops-agent": "product/blue-yonder-inventory-ops-agent",
+    "product/demand-edge": "product/blue-yonder-demand-edge",
     "product/transportation-modeling": "product/blue-yonder-tms",
     # IBP / S&OP platform variants (all refer to BY Platform capability)
     "product/integrated-business-planning": "product/blue-yonder-platform",
