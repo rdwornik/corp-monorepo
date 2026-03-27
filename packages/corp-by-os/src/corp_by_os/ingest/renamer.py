@@ -219,10 +219,16 @@ def _infer_folder_type(files: list[Path]) -> str:
 _BATCH_COPY_MIN_FILES = 6  # span=0 + >5 files = batch copy, not event
 
 
-def propose_folder_name(folder: Path) -> FolderRenameProposal:
-    """Propose a new name for a 10_Projects subfolder.
+def propose_folder_name(folder: Path, depth: int = 1) -> FolderRenameProposal:
+    """Propose a new name for a projects subfolder.
+
+    Args:
+        folder: The folder to analyse.
+        depth:  1 = direct child of 10_Projects/ (always PROJECT).
+                2+ = subfolder within a project (span heuristic applies).
 
     Detection rules:
+    - depth == 1                      → always PROJECT (folder = client project)
     - Files spanning >30 days         → PROJECT folder (no date prefix)
     - Files all within 7 days         → EVENT folder (YYYY-MM_TYPE_CLIENT_Desc)
     - 7–30 days                       → treated as PROJECT (conservative)
@@ -266,9 +272,13 @@ def propose_folder_name(folder: Path) -> FolderRenameProposal:
     mtimes = [f.stat().st_mtime for f in files]
     span_days = (max(mtimes) - min(mtimes)) / 86400
 
-    # Batch copy: all files land on same day but folder has many files — not an event
-    is_batch_copy = span_days < 1 and len(files) > _BATCH_COPY_MIN_FILES
-    is_event = span_days <= 7 and not is_batch_copy
+    # Top-level project folders are never events — the folder IS the project
+    if depth == 1:
+        is_event = False
+    else:
+        # Batch copy: all files land on same day but folder has many files — not an event
+        is_batch_copy = span_days < 1 and len(files) > _BATCH_COPY_MIN_FILES
+        is_event = span_days <= 7 and not is_batch_copy
 
     client_alias = get_client_alias(folder.name)
 

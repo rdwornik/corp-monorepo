@@ -437,14 +437,14 @@ class TestProposeFolderName:
         assert result.type_code == "PROJECT"
 
     def test_event_folder_has_date(self, tmp_path: Path) -> None:
-        """Folder with files all within 7 days (and >2 files) gets a date prefix."""
+        """Subfolder (depth=2) with files all within 7 days gets a date prefix."""
         folder = tmp_path / "Clicks_Workshop"
         folder.mkdir()
         (folder / "agenda.pptx").write_bytes(b"x")
         (folder / "notes.docx").write_bytes(b"x")
         (folder / "recording.txt").write_bytes(b"x")
 
-        result = propose_folder_name(folder)
+        result = propose_folder_name(folder, depth=2)
         assert result.is_event
         assert result.proposed_name[:4].isdigit()
 
@@ -505,19 +505,19 @@ class TestProposeFolderName:
         assert result.unchanged is True
 
     def test_dominant_type_threshold_met(self, tmp_path: Path) -> None:
-        """EVENT folder where ≥60% files share a type → that type used, not MISC."""
+        """EVENT subfolder where ≥60% files share a type → that type used, not MISC."""
         folder = tmp_path / "JLR_Workshop"
         folder.mkdir()
         # 4 workshop-triggering files out of 4 (100%) → should get WORK type
         for name in ["workshop_agenda.pptx", "workshop_notes.docx",
                      "workshop_prep.xlsx", "workshop_summary.pdf"]:
             (folder / name).write_bytes(b"x")
-        result = propose_folder_name(folder)
+        result = propose_folder_name(folder, depth=2)
         assert result.is_event
         assert result.type_code != "MISC"
 
     def test_dominant_type_threshold_not_met(self, tmp_path: Path) -> None:
-        """EVENT folder with mixed types below threshold → MISC."""
+        """EVENT subfolder with mixed types below threshold → MISC."""
         folder = tmp_path / "Mixed_Project"
         folder.mkdir()
         # 1 RFP out of 5 files (20%) → below 60%, should be MISC
@@ -526,7 +526,7 @@ class TestProposeFolderName:
         (folder / "data2.csv").write_bytes(b"x")
         (folder / "data3.csv").write_bytes(b"x")
         (folder / "readme.txt").write_bytes(b"x")
-        result = propose_folder_name(folder)
+        result = propose_folder_name(folder, depth=2)
         assert result.is_event
         assert result.type_code == "MISC"
 
