@@ -74,6 +74,15 @@ type_codes:
   REF:
     doc_type: document
     label: "Reference Document"
+  IMG:
+    label: "Image"
+    extension_hint: [".jpg", ".jpeg", ".png", ".gif", ".svg"]
+  VID:
+    label: "Video"
+    extension_hint: [".mp4", ".avi", ".mov", ".mkv"]
+  ARCV:
+    label: "Archive/Package"
+    extension_hint: [".zip", ".7z", ".rar", ".tar.gz"]
   MISC:
     doc_type: null
     label: "Uncategorized"

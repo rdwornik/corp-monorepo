@@ -26,6 +26,22 @@ def load_naming_config() -> dict:
     return yaml.safe_load(_CONFIG_PATH.read_text(encoding="utf-8"))
 
 
+_EXTENSION_TYPE_MAP: dict[str, str] = {
+    ".jpg": "IMG",
+    ".jpeg": "IMG",
+    ".png": "IMG",
+    ".gif": "IMG",
+    ".svg": "IMG",
+    ".mp4": "VID",
+    ".avi": "VID",
+    ".mov": "VID",
+    ".mkv": "VID",
+    ".zip": "ARCV",
+    ".7z": "ARCV",
+    ".rar": "ARCV",
+}
+
+
 def get_type_code(
     doc_type: str | None = None,
     filename: str = "",
@@ -33,7 +49,7 @@ def get_type_code(
 ) -> str:
     """Get type code from filename hints, doc_type, or source_category.
 
-    Priority: filename_hint > doc_type > source_category fallback > MISC
+    Priority: filename_hint > extension_hint > doc_type > source_category fallback > MISC
     """
     config = load_naming_config()
     type_codes = config["type_codes"]
@@ -45,7 +61,15 @@ def get_type_code(
         if hint and re.search(hint, filename_lower):
             return code
 
-    # 2. doc_type mapping (from CKE classifier or extraction result)
+    # 2. Extension-based for binary/media files (no text content to classify)
+    #    .tar.gz is a two-part extension — check before Path().suffix
+    if filename_lower.endswith(".tar.gz"):
+        return "ARCV"
+    ext = Path(filename).suffix.lower()
+    if ext in _EXTENSION_TYPE_MAP:
+        return _EXTENSION_TYPE_MAP[ext]
+
+    # 3. doc_type mapping (from CKE classifier or extraction result)
     if doc_type:
         for code, spec in type_codes.items():
             if spec.get("doc_type") == doc_type:

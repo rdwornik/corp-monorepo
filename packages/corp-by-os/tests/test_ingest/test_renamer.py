@@ -20,6 +20,7 @@ from corp_by_os.ingest.renamer import (
     _infer_client,
     _infer_type,
     _sanitize,
+    propose_folder_name,
     propose_name,
 )
 from corp_by_os.ops.registry import ContentRegistry
@@ -341,6 +342,130 @@ class TestProposeName:
         result = propose_name(f, c)
         # "RFI" in filename should give RFI type code
         assert "_RFI_" in result.proposed_name
+
+
+class TestExtensionTypeCode:
+    """get_type_code() extension fallback for binary/media files."""
+
+    def test_jpg_gets_img(self) -> None:
+        assert get_type_code(filename="photo.jpg") == "IMG"
+
+    def test_jpeg_gets_img(self) -> None:
+        assert get_type_code(filename="scan.jpeg") == "IMG"
+
+    def test_png_gets_img(self) -> None:
+        assert get_type_code(filename="logo.png") == "IMG"
+
+    def test_mp4_gets_vid(self) -> None:
+        assert get_type_code(filename="demo.mp4") == "VID"
+
+    def test_mov_gets_vid(self) -> None:
+        assert get_type_code(filename="recording.mov") == "VID"
+
+    def test_zip_gets_arcv(self) -> None:
+        assert get_type_code(filename="backup.zip") == "ARCV"
+
+    def test_7z_gets_arcv(self) -> None:
+        assert get_type_code(filename="archive.7z") == "ARCV"
+
+    def test_tar_gz_gets_arcv(self) -> None:
+        assert get_type_code(filename="source.tar.gz") == "ARCV"
+
+    def test_xlsm_not_arch(self) -> None:
+        """xlsm should not be caught by extension map — falls through to MISC."""
+        result = get_type_code(filename="report.xlsm")
+        assert result == "MISC"
+
+    def test_filename_hint_beats_extension(self) -> None:
+        """A filename_hint match wins over extension fallback."""
+        # SOC_2.png — SEC hint in filename beats IMG extension
+        assert get_type_code(filename="SOC_2_certificate.png") == "SEC"
+
+
+class TestAlreadyCompliant:
+    """propose_name() skips files already matching YYYY-MM_TYPE_CLIENT_ pattern."""
+
+    def test_compliant_file_unchanged(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        fname = "2026-03_WORK_JLR_Workshop_Part_2.pptx"
+        f = tmp_path / fname
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        result = propose_name(f, c)
+        assert result.proposed_name == fname
+
+    def test_compliant_file_has_empty_components(
+        self, tmp_path: Path, registry: ContentRegistry
+    ) -> None:
+        fname = "2025-11_RFP_ALFAL_Localhost_Questions.xlsx"
+        f = tmp_path / fname
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        result = propose_name(f, c)
+        assert result.components["type"] == ""
+        assert result.components["date"] == ""
+
+    def test_non_compliant_still_renamed(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        fname = "random_file.docx"
+        f = tmp_path / fname
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        result = propose_name(f, c)
+        assert result.proposed_name != fname
+        assert result.proposed_name[:4].isdigit()
+
+
+class TestProposeFolderName:
+    def test_project_folder_no_date(self, tmp_path: Path) -> None:
+        """Folder with files spanning >30 days gets no date prefix."""
+        folder = tmp_path / "Jaguar_Land_Rover_TMS"
+        folder.mkdir()
+        import time
+
+        old_file = folder / "old.docx"
+        old_file.write_bytes(b"x")
+        # Set mtime 60 days ago
+        old_ts = time.time() - 60 * 86400
+        import os
+
+        os.utime(old_file, (old_ts, old_ts))
+        new_file = folder / "new.docx"
+        new_file.write_bytes(b"x")
+
+        result = propose_folder_name(folder)
+        assert not result.is_event
+        assert not result.proposed_name[:4].isdigit()
+        assert result.type_code == "PROJECT"
+
+    def test_event_folder_has_date(self, tmp_path: Path) -> None:
+        """Folder with files all within 7 days gets a date prefix."""
+        folder = tmp_path / "Clicks_Workshop"
+        folder.mkdir()
+        (folder / "agenda.pptx").write_bytes(b"x")
+        (folder / "notes.docx").write_bytes(b"x")
+
+        result = propose_folder_name(folder)
+        assert result.is_event
+        assert result.proposed_name[:4].isdigit()
+
+    def test_empty_folder(self, tmp_path: Path) -> None:
+        folder = tmp_path / "Empty_Project"
+        folder.mkdir()
+        result = propose_folder_name(folder)
+        assert result.file_count == 0
+        assert result.proposed_name == "Empty_Project"
+
+    def test_unchanged_flag_true_when_same(self, tmp_path: Path) -> None:
+        folder = tmp_path / "CLICK_Retail"
+        folder.mkdir()
+        result = propose_folder_name(folder)
+        assert isinstance(result.unchanged, bool)
+
+    def test_proposed_within_max_length(self, tmp_path: Path) -> None:
+        folder = tmp_path / "Jaguar_Land_Rover_Very_Long_Project_Name_With_Lots_Of_Words"
+        folder.mkdir()
+        (folder / "file.docx").write_bytes(b"x")
+        result = propose_folder_name(folder)
+        assert len(result.proposed_name) <= 40
 
 
 class TestGetClientVariants:

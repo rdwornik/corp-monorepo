@@ -53,10 +53,23 @@ def main() -> None:
             }
         )
 
-    # 20% stratified sample — seed 42 for reproducibility
+    # Stratified 20% sample — cap per-project at 15 to avoid large-project dominance
+    MAX_PER_PROJECT = 15
     random.seed(42)
+
+    from collections import defaultdict
+
+    by_project: dict[str, list[dict]] = defaultdict(list)
+    for entry in all_files:
+        by_project[entry["project"]].append(entry)
+
+    pool: list[dict] = []
+    for proj_files in by_project.values():
+        random.shuffle(proj_files)
+        pool.extend(proj_files[:MAX_PER_PROJECT])
+
     target = max(int(len(all_files) * 0.20), 50)
-    sample = random.sample(all_files, min(target, len(all_files)))
+    sample = random.sample(pool, min(target, len(pool)))
 
     # Copy to sandbox, preserving project folder as top-level context
     copied = 0

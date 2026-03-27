@@ -3228,6 +3228,69 @@ def ingest_extractions_cmd(
 # --- Test Pipeline ---
 
 
+@cli.command("folder-review")
+@click.option(
+    "--path",
+    default=None,
+    type=click.Path(exists=True, file_okay=False),
+    help="Projects root to scan (default: MyWork/10_Projects/)",
+)
+def folder_review_command(path: str | None) -> None:
+    """Scan 10_Projects/ folders and propose renames.  Report only — no files modified."""
+    from corp_by_os.ingest.renamer import FolderRenameProposal, propose_folder_name
+
+    if path:
+        root = Path(path)
+    else:
+        import tomllib
+
+        _paths_toml = Path(__file__).parents[5] / "config" / "paths.toml"
+        with _paths_toml.open("rb") as fh:
+            _cfg = tomllib.load(fh)
+        root = Path(_cfg["paths"]["mywork"]) / "10_Projects"
+
+    if not root.exists():
+        console.print(f"[red]Path not found: {root}[/red]")
+        raise SystemExit(1)
+
+    folders = sorted(d for d in root.iterdir() if d.is_dir() and not d.name.startswith("."))
+    if not folders:
+        console.print("[yellow]No subfolders found.[/yellow]")
+        return
+
+    console.print(f"[dim]Scanning {len(folders)} folders in {root}...[/dim]\n")
+
+    proposals: list[FolderRenameProposal] = []
+    for folder in folders:
+        try:
+            proposals.append(propose_folder_name(folder))
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Could not process %s: %s", folder.name, exc)
+
+    table = Table(title="Folder Review — Proposed Renames", show_lines=True)
+    table.add_column("Current Name", style="cyan", no_wrap=False, max_width=40)
+    table.add_column("Proposed Name", style="green", no_wrap=False, max_width=40)
+    table.add_column("Kind", justify="center")
+    table.add_column("Span", justify="right")
+    table.add_column("Files", justify="right")
+    table.add_column("Status", justify="center")
+
+    changes = 0
+    for p in proposals:
+        kind = "[yellow]EVENT[/yellow]" if p.is_event else "PROJECT"
+        span = f"{p.span_days:.0f}d"
+        status = "[dim]same[/dim]" if p.unchanged else "[bold green]RENAME[/bold green]"
+        if not p.unchanged:
+            changes += 1
+        table.add_row(p.original_name, p.proposed_name, kind, span, str(p.file_count), status)
+
+    console.print(table)
+    console.print(
+        f"\n[dim]{len(proposals)} folders | {changes} would rename | "
+        "report only — no files modified[/dim]"
+    )
+
+
 @cli.command("test-pipeline")
 @click.option("--live", is_flag=True, help="Use real CKE API calls (costs money)")
 @click.option(
