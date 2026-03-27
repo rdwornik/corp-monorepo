@@ -100,3 +100,8 @@ Claude Code: read last 5 entries before starting work.
 - **Did:** Eval baseline (classifier 51.3%, tags 0.753). JLR real usage test (useful output). Client alias fix (retrieve + prep). Obsidian setup (8 MOCs, plugin recs). Lint cleanup. v2/v3 bulk ingest (493→587 vault notes). Context scope in ROUTING.md.
 - **Failed:** Classifier still 51.3% (filename-only ceiling, LLM needed for 70%+)
 - **Next:** Council CLI integration. Obsidian plugins install. Lenzing normalization. RFP KB + vault merge.
+## 2026-03-27 vault rebuild (Council Decision #20)
+
+- **Did:** Re-extracted 216 vault notes via CKE batch (gemini-3.1-pro-preview, deep mode). Ingested with quality-threshold 25, index rebuilt. Added `include_deprecated` filter to retrieve engine — deprecated notes excluded from all query paths. Added missing Compliance MOC. All 943 corp-by-os tests passing.
+- **Errors:** 41 extraction errors, Haiku enrichment failures on all files (non-fatal, expected — returns empty JSON), `source_type=presentation` schema mismatch (pre-existing warn-only).
+- **Next:** Monitor trust-status drift. Consider `source_type` enum expansion for presentation/workshop. Eval baseline updated.

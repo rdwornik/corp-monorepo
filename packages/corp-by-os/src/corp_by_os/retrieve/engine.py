@@ -46,6 +46,7 @@ class RetrievalFilter:
     source_type: str | None = None
     type: str | None = None
     rfp_only: bool = False
+    include_deprecated: bool = False
 
 
 @dataclass
@@ -145,6 +146,7 @@ def retrieve(
                 topics=filters.topics,
                 source_type=filters.source_type,
                 type=filters.type,
+                include_deprecated=filters.include_deprecated,
             )
         except ImportError:
             logger.debug("corp-os-meta not available, skipping product expansion")
@@ -201,6 +203,9 @@ def retrieve(
         if filters.rfp_only:
             where_clauses.append("n.rfp_visible = 1")
 
+        if not filters.include_deprecated:
+            where_clauses.append("(n.confidence IS NULL OR n.confidence != 'deprecated')")
+
         where_sql = " AND " + " AND ".join(where_clauses) if where_clauses else ""
 
         # FTS5 search with BM25 ranking
@@ -234,6 +239,8 @@ def retrieve(
             placeholders = ",".join(str(sid) for sid in seen_ids) or "0"
             variants = _get_client_variants(filters.client)
             client_or = " OR ".join("n.client LIKE ?" for _ in variants)
+            _dep_filter = "AND (n.confidence IS NULL OR n.confidence != 'deprecated')"
+            meta_deprecated_clause = "" if filters.include_deprecated else _dep_filter
             meta_sql = f"""
                 SELECT
                     n.id, n.title, n.client, n.project_id,
@@ -244,6 +251,7 @@ def retrieve(
                 FROM notes n
                 WHERE ({client_or})
                 AND n.id NOT IN ({placeholders})
+                {meta_deprecated_clause}
                 LIMIT ?
             """
             extra = conn.execute(
@@ -511,7 +519,9 @@ def _fallback_search(
         conditions.append(f"({' OR '.join(client_clauses)})")
         params.extend(f"%{v}%" for v in variants)
 
-    where = " OR ".join(conditions) if conditions else "1=1"
+    where = f"({' OR '.join(conditions)})" if conditions else "1=1"
+    if not filters.include_deprecated:
+        where += " AND (n.confidence IS NULL OR n.confidence != 'deprecated')"
     sql = f"""
         SELECT n.id, n.title, n.client, n.project_id,
                n.topics, n.products, n.domains,
