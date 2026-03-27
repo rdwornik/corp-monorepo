@@ -483,7 +483,7 @@ def extract_knowledge(
         ExtractionError: Caller logs and skips
     """
     from google.genai import types
-    from corp_knowledge_extractor.doc_type_classifier import classify_doc_type, should_extract_deep
+    from corp_knowledge_extractor.doc_type_classifier import classify_doc_type_hybrid, should_extract_deep
     from corp_knowledge_extractor.deep_prompt import build_deep_multimodal_prompt
     from corp_knowledge_extractor.freshness import compute_freshness_fields
     from corp_knowledge_extractor.providers.router import select_model
@@ -508,7 +508,8 @@ def extract_knowledge(
     _gemini_file_uri = None  # Track uploaded file URI for transcript reuse
 
     # --- Classify doc type BEFORE Gemini call ---
-    doc_type = classify_doc_type(str(file.path))
+    _doc_type, _conf, _method = classify_doc_type_hybrid(file.path.name)
+    doc_type = _doc_type or "general"
     use_deep = should_extract_deep(doc_type) and custom_prompt is None
 
     # --- Estimate duration from sampled frames for token budget ---
@@ -796,7 +797,7 @@ def _try_pdf_multimodal(
     import copy
     import tempfile
     from google.genai import types
-    from corp_knowledge_extractor.doc_type_classifier import classify_doc_type, should_extract_deep
+    from corp_knowledge_extractor.doc_type_classifier import classify_doc_type_hybrid, should_extract_deep
     from corp_knowledge_extractor.deep_prompt import build_deep_multimodal_prompt
     from corp_knowledge_extractor.freshness import compute_freshness_fields
     from corp_knowledge_extractor.providers.router import select_model
@@ -809,7 +810,8 @@ def _try_pdf_multimodal(
         model_override=model_override,
     )
 
-    doc_type = classify_doc_type(str(file.path))
+    _doc_type, _conf, _method = classify_doc_type_hybrid(file.path.name)
+    doc_type = _doc_type or "general"
     use_deep = should_extract_deep(doc_type)
 
     # --- Large PDF guard: truncate for upload if needed ---
@@ -993,7 +995,7 @@ def _try_pptx_pdf_multimodal(
     import copy
     from google.genai import types
     from corp_knowledge_extractor.slides.pdf_converter import convert_pptx_to_pdf
-    from corp_knowledge_extractor.doc_type_classifier import classify_doc_type, should_extract_deep
+    from corp_knowledge_extractor.doc_type_classifier import classify_doc_type_hybrid, should_extract_deep
     from corp_knowledge_extractor.deep_prompt import build_deep_multimodal_prompt
     from corp_knowledge_extractor.freshness import compute_freshness_fields
     from corp_knowledge_extractor.providers.router import select_model
@@ -1018,7 +1020,8 @@ def _try_pptx_pdf_multimodal(
         model_override=model_override,
     )
 
-    doc_type = classify_doc_type(str(file.path))
+    _doc_type, _conf, _method = classify_doc_type_hybrid(file.path.name)
+    doc_type = _doc_type or "general"
     use_deep = should_extract_deep(doc_type)
 
     # Build prompt with text grounding
@@ -1168,7 +1171,7 @@ def extract_from_text(
     Returns:
         ExtractionResult with AI-structured knowledge
     """
-    from corp_knowledge_extractor.doc_type_classifier import classify_doc_type, should_extract_deep
+    from corp_knowledge_extractor.doc_type_classifier import classify_doc_type_hybrid, should_extract_deep
     from corp_knowledge_extractor.deep_prompt import build_deep_prompt
     from corp_knowledge_extractor.providers.router import (
         route_model,
@@ -1202,7 +1205,9 @@ def extract_from_text(
     text_content = text_result.text[:80000]
 
     # --- Classify doc type and decide extraction depth ---
-    doc_type = classify_doc_type(str(file.path))
+    # Use hybrid classifier (TF-IDF + regex); fall back to LLM guidance when neither fires
+    _doc_type, _conf, _method = classify_doc_type_hybrid(file.path.name, content=text_content)
+    doc_type = _doc_type or "general"
     use_deep = should_extract_deep(doc_type) and custom_prompt is None
 
     # --- Route to correct model ---
@@ -1364,7 +1369,7 @@ def extract_pptx_multimodal(
         ExtractionResult with per-slide analysis
     """
     from google.genai import types
-    from corp_knowledge_extractor.doc_type_classifier import classify_doc_type, should_extract_deep
+    from corp_knowledge_extractor.doc_type_classifier import classify_doc_type_hybrid, should_extract_deep
     from corp_knowledge_extractor.deep_prompt import build_deep_multimodal_prompt
     from corp_knowledge_extractor.freshness import compute_freshness_fields
     from corp_knowledge_extractor.providers.router import select_model
@@ -1379,7 +1384,8 @@ def extract_pptx_multimodal(
     )
 
     # --- Classify doc type BEFORE Gemini call ---
-    doc_type = classify_doc_type(str(file.path))
+    _doc_type, _conf, _method = classify_doc_type_hybrid(file.path.name)
+    doc_type = _doc_type or "general"
     use_deep = should_extract_deep(doc_type) and custom_prompt is None
 
     # Choose prompt: unified deep multimodal or standard extract_pptx_slides

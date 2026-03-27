@@ -45,14 +45,13 @@ from datetime import datetime
 from pathlib import Path
 
 import click
+from corp_by_os.config import get_config
+from corp_by_os.project_resolver import resolve_project
+from corp_by_os.vault_io import list_projects, read_project_info, validate_vault
 from corp_os_meta.pipeline_config import PipelineConfig
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-
-from corp_by_os.config import get_config
-from corp_by_os.project_resolver import resolve_project
-from corp_by_os.vault_io import list_projects, read_project_info, validate_vault
 
 # Use ASCII-safe markers for Windows legacy console compatibility
 CHECK = "Y"
@@ -1301,7 +1300,6 @@ def _run_folder_extraction(
 
     # Build per-folder manifests and extract
     import yaml
-
     from corp_by_os.extraction.non_project.folder_policy import PolicyError, load_policy
     from corp_by_os.extraction.non_project.manifest_emitter import build_manifest, write_manifest
     from corp_by_os.extraction.non_project.routing import resolve_route
@@ -1513,7 +1511,6 @@ def _run_full_reshape(
     classifications: list = []
     try:
         import yaml
-
         from corp_by_os.overnight.classifier import classify_batch as reshape_classify
 
         routing_map_path = mywork_root / "90_System" / "routing_map.yaml"
@@ -2668,6 +2665,7 @@ def classify_command(obj: dict, model: str, budget: float, dry_run: bool) -> Non
     help="Output format (json for machine consumption)",
 )
 @click.option("--rfp-only", is_flag=True, help="Only return RFP-safe notes.")
+@click.option("--verbose", is_flag=True, help="Show doc_type, quality, and score per result.")
 def retrieve_cmd(
     query: str,
     client: str | None,
@@ -2675,6 +2673,7 @@ def retrieve_cmd(
     top: int,
     output_format: str,
     rfp_only: bool,
+    verbose: bool,
 ) -> None:
     """Search the knowledge base.
 
@@ -2758,17 +2757,32 @@ def retrieve_cmd(
     table.add_column("Client", max_width=15)
     table.add_column("Type", style="dim", max_width=12)
     table.add_column("Trust", style="dim", max_width=10)
-    table.add_column("Topics", max_width=30)
+    if verbose:
+        table.add_column("DocType", style="dim", max_width=12)
+        table.add_column("Score", style="dim", max_width=8)
+    else:
+        table.add_column("Topics", max_width=30)
 
     for i, note in enumerate(result.notes, 1):
-        table.add_row(
-            str(i),
-            note.title,
-            note.client or DASH,
-            note.source_type or DASH,
-            note.confidence or DASH,
-            ", ".join(note.topics[:3]) or DASH,
-        )
+        if verbose:
+            table.add_row(
+                str(i),
+                note.title,
+                note.client or DASH,
+                note.source_type or DASH,
+                note.confidence or DASH,
+                note.note_type or DASH,
+                f"{note.relevance_score:.1f}",
+            )
+        else:
+            table.add_row(
+                str(i),
+                note.title,
+                note.client or DASH,
+                note.source_type or DASH,
+                note.confidence or DASH,
+                ", ".join(note.topics[:3]) or DASH,
+            )
 
     console.print(table)
     console.print(
