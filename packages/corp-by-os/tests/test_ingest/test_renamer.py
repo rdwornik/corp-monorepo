@@ -437,11 +437,12 @@ class TestProposeFolderName:
         assert result.type_code == "PROJECT"
 
     def test_event_folder_has_date(self, tmp_path: Path) -> None:
-        """Folder with files all within 7 days gets a date prefix."""
+        """Folder with files all within 7 days (and >2 files) gets a date prefix."""
         folder = tmp_path / "Clicks_Workshop"
         folder.mkdir()
         (folder / "agenda.pptx").write_bytes(b"x")
         (folder / "notes.docx").write_bytes(b"x")
+        (folder / "recording.txt").write_bytes(b"x")
 
         result = propose_folder_name(folder)
         assert result.is_event
@@ -461,11 +462,73 @@ class TestProposeFolderName:
         assert isinstance(result.unchanged, bool)
 
     def test_proposed_within_max_length(self, tmp_path: Path) -> None:
-        folder = tmp_path / "Jaguar_Land_Rover_Very_Long_Project_Name_With_Lots_Of_Words"
+        folder = tmp_path / "Jaguar Land Rover Very Long Project Name With Lots Of Words"
         folder.mkdir()
-        (folder / "file.docx").write_bytes(b"x")
+        # Needs >2 files to skip the consolidate path
+        for i in range(3):
+            (folder / f"file{i}.docx").write_bytes(b"x")
         result = propose_folder_name(folder)
         assert len(result.proposed_name) <= 40
+
+    def test_tiny_folder_consolidate_flag(self, tmp_path: Path) -> None:
+        """Folders with ≤2 files get consolidate=True and no rename proposed."""
+        folder = tmp_path / "Solo_Project"
+        folder.mkdir()
+        (folder / "only.docx").write_bytes(b"x")
+        result = propose_folder_name(folder)
+        assert result.consolidate is True
+        assert result.proposed_name == "Solo_Project"
+        assert result.unchanged is True
+
+    def test_batch_copy_treated_as_project(self, tmp_path: Path) -> None:
+        """span≈0 with >5 files = batch copy → PROJECT, not EVENT."""
+        folder = tmp_path / "NEOM_WMS"
+        folder.mkdir()
+        for i in range(7):
+            (folder / f"file{i}.docx").write_bytes(b"x")
+        result = propose_folder_name(folder)
+        assert result.is_event is False
+        assert result.type_code == "PROJECT"
+
+    def test_clean_project_name_kept_unchanged(self, tmp_path: Path) -> None:
+        """Already-clean PROJECT folder names are not renamed."""
+        folder = tmp_path / "Clicks_Retail"
+        folder.mkdir()
+        import time, os
+        for i in range(3):
+            f = folder / f"file{i}.docx"
+            f.write_bytes(b"x")
+            ts = time.time() - (i * 40 * 86400)
+            os.utime(f, (ts, ts))
+        result = propose_folder_name(folder)
+        assert result.proposed_name == "Clicks_Retail"
+        assert result.unchanged is True
+
+    def test_dominant_type_threshold_met(self, tmp_path: Path) -> None:
+        """EVENT folder where ≥60% files share a type → that type used, not MISC."""
+        folder = tmp_path / "JLR_Workshop"
+        folder.mkdir()
+        # 4 workshop-triggering files out of 4 (100%) → should get WORK type
+        for name in ["workshop_agenda.pptx", "workshop_notes.docx",
+                     "workshop_prep.xlsx", "workshop_summary.pdf"]:
+            (folder / name).write_bytes(b"x")
+        result = propose_folder_name(folder)
+        assert result.is_event
+        assert result.type_code != "MISC"
+
+    def test_dominant_type_threshold_not_met(self, tmp_path: Path) -> None:
+        """EVENT folder with mixed types below threshold → MISC."""
+        folder = tmp_path / "Mixed_Project"
+        folder.mkdir()
+        # 1 RFP out of 5 files (20%) → below 60%, should be MISC
+        (folder / "rfp_response.docx").write_bytes(b"x")
+        (folder / "data.csv").write_bytes(b"x")
+        (folder / "data2.csv").write_bytes(b"x")
+        (folder / "data3.csv").write_bytes(b"x")
+        (folder / "readme.txt").write_bytes(b"x")
+        result = propose_folder_name(folder)
+        assert result.is_event
+        assert result.type_code == "MISC"
 
 
 class TestGetClientVariants:

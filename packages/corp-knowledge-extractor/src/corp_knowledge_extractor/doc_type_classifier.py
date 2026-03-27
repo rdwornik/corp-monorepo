@@ -131,6 +131,17 @@ def classify_doc_type_hybrid(
     if regex_pred is not None:
         return regex_pred, 1.0, "regex"
 
+    # --- Extension-based type (binary files — no text content to classify) ---
+    ext = Path(filename).suffix.lower()
+    _EXTENSION_TYPES: dict[str, str] = {
+        ".jpg": "image", ".jpeg": "image", ".png": "image",
+        ".gif": "image", ".svg": "image",
+        ".mp4": "video", ".avi": "video", ".mov": "video",
+        ".zip": "archive", ".7z": "archive", ".rar": "archive",
+    }
+    if ext in _EXTENSION_TYPES:
+        return _EXTENSION_TYPES[ext], 0.9, "extension"
+
     return None, 0.0, "none"
 
 

@@ -54,6 +54,7 @@ class FolderRenameProposal:
     client_alias: str
     type_code: str  # leading type for event folders; "PROJECT" for project folders
     file_count: int
+    consolidate: bool = False  # True = too few files, flag for manual review
     unchanged: bool = field(init=False)
 
     def __post_init__(self) -> None:
@@ -179,6 +180,11 @@ def propose_name(
     )
 
 
+def _is_clean_name(name: str) -> bool:
+    """Return True if a folder name needs no sanitisation."""
+    return bool(re.match(r"^[A-Za-z0-9_]+$", name)) and len(name) <= _MAX_FOLDER_NAME_LENGTH
+
+
 def _clean_folder_description(folder_name: str, client_alias: str) -> str:
     """Strip client tokens from folder name and return a clean description part."""
     # Remove special chars, normalise to words
@@ -190,29 +196,40 @@ def _clean_folder_description(folder_name: str, client_alias: str) -> str:
     return result[:30].rstrip("_") or "Project"
 
 
+_DOMINANT_TYPE_THRESHOLD = 0.6  # fraction of files needed to declare a dominant type
+
+
 def _infer_folder_type(files: list[Path]) -> str:
-    """Return the most common non-MISC type code from a list of file paths."""
+    """Return the dominant type code if ≥60% of files share it, else MISC."""
     from collections import Counter
 
     counts: Counter[str] = Counter()
     for f in files:
         code = get_type_code(filename=f.name)
-        if code not in ("MISC", "IMG", "VID", "ARCH"):
+        if code not in ("MISC", "IMG", "VID", "ARCV"):
             counts[code] += 1
-    if counts:
-        return counts.most_common(1)[0][0]
+    if not counts:
+        return "MISC"
+    top_code, top_count = counts.most_common(1)[0]
+    if top_count / len(files) >= _DOMINANT_TYPE_THRESHOLD:
+        return top_code
     return "MISC"
+
+
+_BATCH_COPY_MIN_FILES = 6  # span=0 + >5 files = batch copy, not event
 
 
 def propose_folder_name(folder: Path) -> FolderRenameProposal:
     """Propose a new name for a 10_Projects subfolder.
 
     Detection rules:
-    - Files spanning >30 days  → PROJECT folder (no date prefix)
-    - Files all within 7 days  → EVENT folder (YYYY-MM_TYPE_CLIENT_Desc)
-    - 7–30 days                → treated as PROJECT (conservative)
+    - Files spanning >30 days         → PROJECT folder (no date prefix)
+    - Files all within 7 days         → EVENT folder (YYYY-MM_TYPE_CLIENT_Desc)
+    - 7–30 days                       → treated as PROJECT (conservative)
+    - span≈0 AND >5 files             → batch copy, treat as PROJECT
+    - ≤2 files                        → flag for consolidation review, no rename
 
-    Folder pattern (project):  CLIENT_Description
+    Folder pattern (project):  keep existing name if clean, else sanitise
     Folder pattern (event):    YYYY-MM_TYPE_CLIENT_Description
     Max 40 chars, underscores only.
     """
@@ -233,25 +250,45 @@ def propose_folder_name(folder: Path) -> FolderRenameProposal:
             file_count=0,
         )
 
+    # Tiny folder — flag for manual consolidation, no rename proposed
+    if len(files) <= 2:
+        return FolderRenameProposal(
+            original_name=folder.name,
+            proposed_name=folder.name,
+            is_event=False,
+            span_days=0.0,
+            client_alias=get_client_alias(folder.name),
+            type_code="PROJECT",
+            file_count=len(files),
+            consolidate=True,
+        )
+
     mtimes = [f.stat().st_mtime for f in files]
     span_days = (max(mtimes) - min(mtimes)) / 86400
 
-    is_event = span_days <= 7
+    # Batch copy: all files land on same day but folder has many files — not an event
+    is_batch_copy = span_days < 1 and len(files) > _BATCH_COPY_MIN_FILES
+    is_event = span_days <= 7 and not is_batch_copy
 
     client_alias = get_client_alias(folder.name)
-    desc = _clean_folder_description(folder.name, client_alias)
 
     if is_event:
+        desc = _clean_folder_description(folder.name, client_alias)
         date_str = datetime.fromtimestamp(min(mtimes)).strftime("%Y-%m")
         type_code = _infer_folder_type(files)
         stem = f"{date_str}_{type_code}_{client_alias}_{desc}"
+        proposed = stem[:_MAX_FOLDER_NAME_LENGTH].rstrip("_")
+        proposed = re.sub(r"_+", "_", proposed)
     else:
         type_code = "PROJECT"
-        stem = f"{client_alias}_{desc}"
-
-    proposed = stem[:_MAX_FOLDER_NAME_LENGTH].rstrip("_")
-    # Ensure no double underscores
-    proposed = re.sub(r"_+", "_", proposed)
+        # Keep existing name when already clean — avoids redundant alias prefixes
+        if _is_clean_name(folder.name):
+            proposed = folder.name
+        else:
+            # Sanitise: replace non-alphanumeric with underscores, collapse, truncate
+            proposed = re.sub(r"[^A-Za-z0-9_]", "_", folder.name)
+            proposed = re.sub(r"_+", "_", proposed).strip("_")
+            proposed = proposed[:_MAX_FOLDER_NAME_LENGTH].rstrip("_")
 
     return FolderRenameProposal(
         original_name=folder.name,

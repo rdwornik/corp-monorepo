@@ -3244,7 +3244,7 @@ def folder_review_command(path: str | None) -> None:
     else:
         import tomllib
 
-        _paths_toml = Path(__file__).parents[5] / "config" / "paths.toml"
+        _paths_toml = Path(__file__).parents[4] / "config" / "paths.toml"
         with _paths_toml.open("rb") as fh:
             _cfg = tomllib.load(fh)
         root = Path(_cfg["paths"]["mywork"]) / "10_Projects"
@@ -3279,8 +3279,12 @@ def folder_review_command(path: str | None) -> None:
     for p in proposals:
         kind = "[yellow]EVENT[/yellow]" if p.is_event else "PROJECT"
         span = f"{p.span_days:.0f}d"
-        status = "[dim]same[/dim]" if p.unchanged else "[bold green]RENAME[/bold green]"
-        if not p.unchanged:
+        if p.consolidate:
+            status = "[yellow]review: consolidate?[/yellow]"
+        elif p.unchanged:
+            status = "[dim]same[/dim]"
+        else:
+            status = "[bold green]RENAME[/bold green]"
             changes += 1
         table.add_row(p.original_name, p.proposed_name, kind, span, str(p.file_count), status)
 
