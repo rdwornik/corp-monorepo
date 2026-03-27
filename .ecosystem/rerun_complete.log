@@ -62,3 +62,32 @@ Rerun watcher started. Target: 38 entries.
 [12:17:44] done=19, errors=0, total=19
 35
 [12:17:44] done=19, errors=0, total=19
+[12:18:44] done=37, errors=0, total=37
+[12:19:44] done=38, errors=0, total=38
+All entries complete. Running ingest...
+Ingest stdout:
+       Ingest Results       
+ Metric             | Count 
+--------------------+-------
+ Notes ingested     |   277 
+ Quarantined        |     2 
+ Skipped (verified) |     0 
+ Cover slides       |     8 
+
+Destinations:
+  01_Knowledge: 277
+
+2 note(s) quarantined to _quarantine/
+
+Rebuilding search index...
+Index rebuilt: 0 facts indexed.
+
+Ingest stderr:
+ corp_by_os.ingest.extractions: Quarantined: 2026-03-27_other_questions_5c7f.md — quality_score 8 < 25
+INFO corp_by_os.ingest.extractions: Quarantined: 2026-03-27_recordingpepsiemea202601_bce3.md — quality_score 18 < 25
+INFO corp_by_os.index_builder: Indexed 813 CKE notes from vault
+INFO corp_by_os.index_builder: Deduped 325 notes with identical source_hash
+INFO corp_by_os.index_builder: Index rebuilt: 25 projects, 0 facts, 488 notes in 8.6s -> C:\Users\1028120\AppData\Local\corp-by-os\index.db
+
+Ingest return code: 0
+Done.

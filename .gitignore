@@ -41,3 +41,5 @@ output/
 
 # Rebuild staging (large, regenerable)
 .ecosystem/rebuild_staging/
+
+.ecosystem/rebuild_staging/
