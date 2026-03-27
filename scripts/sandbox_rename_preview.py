@@ -134,7 +134,7 @@ def main() -> None:
     print("\n  Example renames (first 10 changed):")
     for r in changed[:10]:
         print(f"    {r['original'][:50]}")
-        print(f"    → {r['proposed'][:50]}")
+        print(f"    -> {r['proposed'][:50]}")
         print(f"      type={r['doc_type']}, conf={r['confidence']:.2f}, method={r['method']}")
         print()
 
