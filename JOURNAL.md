@@ -6,6 +6,11 @@ Claude Code: read last 5 entries before starting work.
 ---
 
 
+## 2026-03-28 session 4 — archive naming cleanup
+- **Did:** Enforced `{YYYY-MM-DD}_{TYPE}_{description}.ext` naming on all `.ecosystem/archive/` files. Renamed 13 non-compliant files (date-at-end and undated variants). All 22 archive files now comply. Merged `chore/archive-naming-cleanup` to main.
+- **Failed:** -
+- **Next:** Per-note v2/v3 deletions (Rob confirms). RFP federation (ADR-22). sandbox_apply.py + doc_type_classifier pattern expansion. MinHash wire into inbox.
+
 ## 2026-03-28 session 3 — Phase 4 pending cleanup
 - **Did:** v2/v3 01_Product_Docs quality comparison (36 notes matched) — v3 wins 20/36 but NOT clear upgrade: 2 v3-empty files (LifeScience_session1v2, Platform_Editedv2) must keep v2; total facts nearly equal (860 v2 / 850 v3). Cognitive_Friday vault cross-ref: both extractions already ingested. Sandbox review summary for Rob (2.4 GB, 53% MISC rate, apply step not built). 4 rebuild scripts archived to scripts/archive/. Phase 4 resolution report written. All tests green (1015+863+183+133+124+62). Merged chore/phase4 to main.
 - **Failed:** -
