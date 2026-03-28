@@ -1,0 +1,10 @@
+Usage: corp index [OPTIONS] COMMAND [ARGS]...
+
+  Manage the cross-project search index.
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  rebuild  Rebuild the SQLite index from all projects.
+  stats    Show index stats.

@@ -1,0 +1,15 @@
+Usage: corp analytics [OPTIONS] COMMAND [ARGS]...
+
+  SQL analytics over the notes index. Run `corp index rebuild` first.
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  clients   Q3: Distinct clients whose notes mention a product.
+  compare   Q9: Side-by-side product sets for multiple clients.
+  overlap   Q6: Clients sharing interest in a product, with note counts.
+  products  Q1: Distinct products mentioned in notes for a client.
+  recent    Q10: Most recent note per client.
+  report    Show cross-project analytics dashboard (facts + projects).
+  timeline  Q2: Notes for a client ordered by date.

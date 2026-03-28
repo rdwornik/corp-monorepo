@@ -1,0 +1,9 @@
+Usage: corp extract [OPTIONS] FOLDER
+
+  Extract knowledge from a MyWork folder via CKE.
+
+Options:
+  --batch            Use Gemini Batch API (50% cheaper, slower)
+  --dry-run          Build manifest but don't extract
+  --output-dir PATH  Override output directory
+  --help             Show this message and exit.

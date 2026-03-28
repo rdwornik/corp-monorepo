@@ -1,0 +1,11 @@
+Usage: corp ingest [OPTIONS] [PATH]
+
+  Route incoming files and folders to their destinations via content registry.
+
+  Without PATH, scans entire 00_Inbox (files + folders). With PATH, ingests a
+  specific file or directory of files.
+
+Options:
+  --dry-run     Match and report without moving files
+  --no-extract  Route only, skip CKE extraction
+  --help        Show this message and exit.

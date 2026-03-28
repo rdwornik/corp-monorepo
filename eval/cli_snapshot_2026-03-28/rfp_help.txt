@@ -1,0 +1,9 @@
+Usage: corp rfp [OPTIONS] COMMAND [ARGS]...
+
+  RFP response tools.
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  answer  Draft an RFP answer using the knowledge base.

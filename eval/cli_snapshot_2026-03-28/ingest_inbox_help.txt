@@ -1,0 +1,20 @@
+Usage: corp ingest-inbox [OPTIONS]
+
+  Interactively route files from 00_Inbox to their canonical locations.
+
+  Processes one file at a time with Rich UI: classify, confirm destination,
+  rename, move, then trigger CKE extraction.
+
+Options:
+  --path PATH         Process a specific file instead of scanning Inbox.
+  --dry-run           Show what would happen without moving files.
+  --auto              Auto-accept high-confidence matches (>=0.90).
+  --undo INTEGER      Undo a previous ingest by event ID.
+  --full              With --undo: also remove vault package and rebuild
+                      index.
+  --skip-extract      Route file but skip CKE extraction.
+  --list              Show ingest history.
+  --list-all          Show all ingest history (no limit).
+  --destination TEXT  Default destination for all files (e.g.
+                      10_Projects/JLR).
+  --help              Show this message and exit.

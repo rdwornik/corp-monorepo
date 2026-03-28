@@ -1,0 +1,7 @@
+Usage: corp project list [OPTIONS]
+
+  List all projects with metadata status.
+
+Options:
+  -s, --status TEXT  Filter by status (active, rfp, won, etc.)
+  --help             Show this message and exit.

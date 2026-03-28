@@ -1,0 +1,6 @@
+Usage: corp template select [OPTIONS] GOAL
+
+  Show which template would be selected for a goal.
+
+Options:
+  --help  Show this message and exit.

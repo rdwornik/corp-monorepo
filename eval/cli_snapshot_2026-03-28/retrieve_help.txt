@@ -1,0 +1,22 @@
+Usage: corp retrieve [OPTIONS] QUERY
+
+  Search the knowledge base.
+
+  Retrieves notes matching the query with optional metadata filters.
+
+  Examples:
+
+      corp retrieve "Platform Architecture"
+
+      corp retrieve "WMS integration" --client Lenzing
+
+      corp retrieve "demand planning" --format json
+
+Options:
+  --client TEXT          Filter by client name
+  --product TEXT         Filter by product
+  --top INTEGER          Number of results
+  --format [table|json]  Output format (json for machine consumption)
+  --rfp-only             Only return RFP-safe notes.
+  --verbose              Show doc_type, quality, and score per result.
+  --help                 Show this message and exit.

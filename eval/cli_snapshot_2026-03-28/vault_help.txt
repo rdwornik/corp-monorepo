@@ -1,0 +1,9 @@
+Usage: corp vault [OPTIONS] COMMAND [ARGS]...
+
+  Vault operations.
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  validate  Validate vault structure and frontmatter.

@@ -1,0 +1,20 @@
+Usage: corp cleanup [OPTIONS]
+
+  Analyze and clean up disk space.
+
+  Default: produces a cleanup plan for review. With --execute: carries out
+  approved deletions.
+
+  Examples:
+
+      corp cleanup                              # Full analysis, plan only
+
+      corp cleanup --scope duplicates           # Just find duplicates
+
+      corp cleanup --scope artifacts --execute  # Clean extraction artifacts
+
+Options:
+  --scope [duplicates|overlap|artifacts|all]
+                                  What to clean up
+  --execute                       Actually delete (default is plan-only)
+  --help                          Show this message and exit.

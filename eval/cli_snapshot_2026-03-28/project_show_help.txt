@@ -1,0 +1,6 @@
+Usage: corp project show [OPTIONS] NAME
+
+  Show project details (fuzzy name match).
+
+Options:
+  --help  Show this message and exit.

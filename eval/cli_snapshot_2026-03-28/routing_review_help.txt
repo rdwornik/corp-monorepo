@@ -1,0 +1,6 @@
+Usage: corp routing-review [OPTIONS]
+
+  Show routing override patterns for manual rule updates.
+
+Options:
+  --help  Show this message and exit.

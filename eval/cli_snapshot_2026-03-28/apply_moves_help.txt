@@ -1,0 +1,7 @@
+Usage: corp apply-moves [OPTIONS] [MOVES_FILE]
+
+  Execute approved moves from moves.yaml.
+
+Options:
+  --dry-run  Preview without executing
+  --help     Show this message and exit.

@@ -1,0 +1,11 @@
+Usage: corp template [OPTIONS] COMMAND [ARGS]...
+
+  Manage presentation templates.
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  list    Show all registered templates.
+  scan    Scan 30_Templates/, update registry.
+  select  Show which template would be selected for a goal.

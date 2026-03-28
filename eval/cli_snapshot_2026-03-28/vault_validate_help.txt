@@ -1,0 +1,6 @@
+Usage: corp vault validate [OPTIONS] [PROJECT]
+
+  Validate vault structure and frontmatter.
+
+Options:
+  --help  Show this message and exit.

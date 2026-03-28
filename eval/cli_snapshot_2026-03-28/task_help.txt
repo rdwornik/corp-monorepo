@@ -1,0 +1,11 @@
+Usage: corp task [OPTIONS] COMMAND [ARGS]...
+
+  Manage tasks.
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  add   Create a new task.
+  done  Mark a task as complete (fuzzy title match).
+  list  List tasks sorted by priority and deadline.

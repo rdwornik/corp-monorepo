@@ -1,0 +1,9 @@
+Usage: corp audit [OPTIONS]
+
+  Full read-only audit of MyWork — scan, analyze, report.
+
+Options:
+  --skip-gemini   Skip Gemini analysis, scan + coverage only
+  --budget FLOAT  Max Gemini spend in USD (default $0.30)
+  --model TEXT    Gemini model for analysis
+  --help          Show this message and exit.

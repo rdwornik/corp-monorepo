@@ -1,0 +1,8 @@
+Usage: corp folder-review [OPTIONS]
+
+  Scan 10_Projects/ folders and propose renames.  Report only — no files
+  modified.
+
+Options:
+  --path DIRECTORY  Projects root to scan (default: MyWork/10_Projects/)
+  --help            Show this message and exit.

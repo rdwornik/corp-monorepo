@@ -1,0 +1,21 @@
+Usage: corp run [OPTIONS] [WORKFLOW]
+
+  Execute a workflow or list available workflows.
+
+Options:
+  --list           List available workflows
+  --dry-run        Preview without executing
+  --confirm        Skip confirmation prompt
+  --client TEXT    Client name
+  --product TEXT   Product name
+  --contact TEXT   Contact name
+  --project TEXT   Project name/ID
+  --topic TEXT     Topic/subject
+  --date TEXT      Date (YYYY-MM-DD)
+  --reason TEXT    Reason (for archive)
+  --notes TEXT     Additional notes
+  --title TEXT     Task title
+  --deadline TEXT  Deadline (YYYY-MM-DD)
+  --priority TEXT  Priority (high/medium/low)
+  --status TEXT    Status filter
+  --help           Show this message and exit.

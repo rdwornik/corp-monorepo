@@ -1,5 +1,5 @@
 ---
-Last updated: 2026-03-28
+Last updated: 2026-03-29
 ---
 
 > **Paste this file into new Claude.ai chats for context. This is the ONLY document a new chat needs.**
@@ -20,8 +20,8 @@ Update at end of each session: `python scripts/update_handoff.py`
 | Tag coverage (mean) | 79.7% | 2026-03-26 |
 | Product Jaccard | 1.000 (idempotent) | 2026-03-26 |
 | People NER F1 | 92.7% | 2026-03-26 |
-| Council decisions | 22 | 2026-03-28 |
-| ADRs | 22 | 2026-03-28 |
+| Council decisions | 23 | 2026-03-29 |
+| ADRs | 23 | 2026-03-29 |
 | Gotchas | 37 | 2026-03-28 |
 
 ---
@@ -187,9 +187,10 @@ C:/Users/1028120/Documents/MyWork/10_Projects/
 | #20 | Vault Rebuild | Re-extract 216 notes via CKE batch (gemini-pro deep); deprecated filter added to retrieval |
 | #21 | Ontology Approach | `taxonomy.yaml` as single authoritative tag vocab; `product_aliases.yaml` + `client_aliases.yaml` normalize variants |
 | #22 | RFP Federation | How to federate RFP KB (1,325 entries) with vault search (487 notes) — same `index.db`, separate `rfp_entries` FTS5 table, grouped output, default `--source all` |
+| #23 | Monorepo Internal Architecture | Split cli.py monolith (3,573 lines → 14 modules); eliminate cke_client.py boundary violation via subprocess; flatten doctor/freshness/extraction/non_project; centralize parse_llm_json in corp-os-meta; delete 4 dead corp-rfp-agent files |
 
 Full transcripts: `.ecosystem/council_transcripts/DECISION_NN_*.md`
-ADR summaries: `decisions/ADR-NN-*.md` (ADR-01 through ADR-21; ADR-22 not yet written)
+ADR summaries: `decisions/ADR-NN-*.md` (ADR-01 through ADR-23)
 
 ---
 
@@ -411,12 +412,19 @@ Package paths:
 
 ## Open Decisions (what's next)
 
-1. **Ontology Q4** — canonical product map; unblocks 4 remaining benchmark SQL queries
-2. **RFP Federation** (Council #22, ADR-22) — implement `corp rfp-index` + `rfp_entries` FTS5 table + grouped `corp retrieve` output; not yet built
-3. **File renames** — bulk rename 585 MyWork files to naming v2 convention
-4. **Local AI** — Ollama exploration for offline/private extraction tier
-5. **Outlook automation** — email ingestion pipeline
-6. **30-day skill eval** — due **2026-04-25** (baseline: 2026-03-26)
+### ADR-23 Implementation (in order)
+1. **Phase 1** — CLI split: `cli/` directory, 14 domain modules, `_common.py`. Gate: shared-state audit (complete). Snapshot baseline in `eval/cli_snapshot_2026-03-28/`.
+2. **Phase 2** — Subprocess boundary: refactor `overnight/cke_client.py` to subprocess. Gate: call volume = 3/run (no batching needed). Reference: `corp-project-extractor/cke_invoker.py` pattern.
+3. **Phase 3** — Flatten nesting: merge `doctor/` (2 files), `freshness/` (2 files) into root-level modules; flatten `extraction/non_project/` (3 files) into `extraction/`. Gate: Phase 1 complete.
+4. **Phase 4** — Centralize utils + dead code: port `parse_llm_json` to `corp-os-meta`; delete 4 dead corp-rfp-agent files (+ update `test_cli_smoke.py` for `kb_to_markdown.py`). Gate: Phase 3 complete.
+
+### Other open decisions
+5. **Ontology Q4** — canonical product map; unblocks 4 remaining benchmark SQL queries
+6. **RFP Federation** (ADR-22) — implement `corp rfp-index` + `rfp_entries` FTS5 table + grouped `corp retrieve` output; not yet built
+7. **File renames** — bulk rename 585 MyWork files to naming v2 convention
+8. **Local AI** — Ollama exploration for offline/private extraction tier
+9. **Outlook automation** — email ingestion pipeline
+10. **30-day skill eval** — due **2026-04-25** (baseline: 2026-03-26)
 
 ---
 

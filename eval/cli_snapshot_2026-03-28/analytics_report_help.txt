@@ -1,0 +1,6 @@
+Usage: corp analytics report [OPTIONS]
+
+  Show cross-project analytics dashboard (facts + projects).
+
+Options:
+  --help  Show this message and exit.

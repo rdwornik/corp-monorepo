@@ -1,0 +1,7 @@
+Usage: corp cleanup-scan [OPTIONS]
+
+  Scan MyWork for misplaced files and generate move proposals.
+
+Options:
+  -o, --output PATH  Output path for moves.yaml (default: .corp/moves.yaml)
+  --help             Show this message and exit.

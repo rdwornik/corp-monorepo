@@ -1,0 +1,6 @@
+Usage: corp doctor [OPTIONS]
+
+  Check all agent CLIs are on PATH and working.
+
+Options:
+  --help  Show this message and exit.
