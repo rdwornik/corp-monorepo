@@ -118,6 +118,11 @@ Claude Code: read last 5 entries before starting work.
 - **Failed:** -
 - **Next:** Ontology Q4 (canonical product map). RFP federation implementation. File renames (585 files). MinHash wire into inbox.
 
+## 2026-03-28 session 2 — repo audit + cleanup + governance
+- **Did:** Full monorepo audit (2026-03-28_CLEANUP_PLAN.md, 2026-03-28_REPO_INVESTIGATION.md → archived). Phase 2 safe deletions: rebuild_staging (2 GB), misc/01_Product_Docs temp_frames (2.4 GB), Python caches (~0.3 GB), flattened _outputs/_outputs/ nesting. Phase 3 governance: ADR-22 written (RFP KB federation), docs/ phase reports date-prefixed, .ecosystem/ root clean (only MASTER_HANDOFF.md remains), CLAUDE.md council count 21→22, MASTER_HANDOFF.md ADR count + council #22 summary updated.
+- **Failed:** -
+- **Next:** Implement ADR-22 (corp rfp-index + rfp_entries table + grouped corp retrieve). .sandbox/ review (Rob). v2/v3 _outputs/ per-note quality audit (01_Product_Docs only).
+
 ## 2026-03-27 vault rebuild (Council Decision #20)
 
 - **Did:** Re-extracted 216 vault notes via CKE batch (gemini-3.1-pro-preview, deep mode). Ingested with quality-threshold 25, index rebuilt. Added `include_deprecated` filter to retrieve engine — deprecated notes excluded from all query paths. Added missing Compliance MOC. All 943 corp-by-os tests passing.
