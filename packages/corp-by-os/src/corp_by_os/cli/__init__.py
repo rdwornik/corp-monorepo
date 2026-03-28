@@ -1084,7 +1084,9 @@ def analytics_compare(clients: str) -> None:
         table.add_row(*row)
 
     console.print(table)
-    console.print(f"[dim]{len(all_products_sorted)} distinct products across {len(client_list)} clients[/dim]")
+    console.print(
+        f"[dim]{len(all_products_sorted)} distinct products across {len(client_list)} clients[/dim]"
+    )
 
 
 @analytics_group.command("recent")
@@ -2624,10 +2626,7 @@ def dedup_report_command(obj: dict, threshold: float, fmt: str) -> None:
     try:
         from corp_by_os.ingest.dedup import get_dedup_report
     except ImportError:
-        console.print(
-            "[red]datasketch not installed.[/red] "
-            'Run: pip install "corp-by-os[dedup]"'
-        )
+        console.print('[red]datasketch not installed.[/red] Run: pip install "corp-by-os[dedup]"')
         return
 
     from corp_by_os.ops.database import OpsDB
@@ -2682,8 +2681,7 @@ def dedup_report_command(obj: dict, threshold: float, fmt: str) -> None:
 
     console.print(table)
     console.print(
-        f"\n[dim]{len(pairs)} candidate pair(s). "
-        "Review and decide — no auto-deletion.[/dim]"
+        f"\n[dim]{len(pairs)} candidate pair(s). Review and decide — no auto-deletion.[/dim]"
     )
 
 
