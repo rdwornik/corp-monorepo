@@ -51,20 +51,13 @@ from datetime import datetime
 from pathlib import Path
 
 import click
+from corp_by_os.cli._common import CHECK, DASH, console, logger
 from corp_by_os.config import get_config
 from corp_by_os.project_resolver import resolve_project
 from corp_by_os.vault_io import list_projects, read_project_info, validate_vault
 from corp_os_meta.pipeline_config import PipelineConfig
-from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-
-# Use ASCII-safe markers for Windows legacy console compatibility
-CHECK = "Y"
-DASH = "-"
-
-console = Console()
-logger = logging.getLogger(__name__)
 
 
 @click.group()
