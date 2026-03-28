@@ -1,0 +1,13 @@
+Usage: corp dedup-report [OPTIONS]
+
+  Show near-duplicate file pairs detected by MinHash.
+
+  Reads content_signatures stored in ops.db and surfaces candidate pairs above
+  the similarity threshold for human review. No files are deleted — this is a
+  report only.
+
+Options:
+  --threshold FLOAT      Minimum Jaccard similarity to report (0–1).
+                         [default: 0.6]
+  --format [table|json]  [default: table]
+  --help                 Show this message and exit.

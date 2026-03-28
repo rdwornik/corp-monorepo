@@ -1,0 +1,6 @@
+Usage: corp template scan [OPTIONS]
+
+  Scan 30_Templates/, update registry.
+
+Options:
+  --help  Show this message and exit.

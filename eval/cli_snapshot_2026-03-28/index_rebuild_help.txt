@@ -1,0 +1,7 @@
+Usage: corp index rebuild [OPTIONS]
+
+  Rebuild the SQLite index from all projects.
+
+Options:
+  -p, --project TEXT  Update single project only
+  --help              Show this message and exit.

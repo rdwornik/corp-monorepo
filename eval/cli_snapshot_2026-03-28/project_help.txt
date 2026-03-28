@@ -1,0 +1,11 @@
+Usage: corp project [OPTIONS] COMMAND [ARGS]...
+
+  Manage projects.
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  list  List all projects with metadata status.
+  open  Open project folder in Explorer (fuzzy name match).
+  show  Show project details (fuzzy name match).

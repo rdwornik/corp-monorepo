@@ -1,0 +1,7 @@
+Usage: corp analytics products [OPTIONS]
+
+  Q1: Distinct products mentioned in notes for a client.
+
+Options:
+  --client TEXT  Client name (exact match)  [required]
+  --help         Show this message and exit.

@@ -1,0 +1,14 @@
+Usage: corp overnight [OPTIONS]
+
+  Run overnight extraction and reshape pipeline.
+
+Options:
+  --scope [all-non-project|source-library|rfp|templates|full-reshape]
+                                  Which folders to process
+  --budget FLOAT                  Max spend in USD
+  --dry-run                       Preflight + scan only, no extraction
+  --batch                         Use Gemini Batch API (50% cheaper)
+  --auto-threshold FLOAT          Auto-approve confidence threshold
+  --reset                         Clear all pending files from state DB and
+                                  exit
+  --help                          Show this message and exit.

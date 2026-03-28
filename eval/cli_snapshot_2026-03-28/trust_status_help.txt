@@ -1,0 +1,6 @@
+Usage: corp trust-status [OPTIONS]
+
+  Show trust_level distribution across vault notes.
+
+Options:
+  --help  Show this message and exit.

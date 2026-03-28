@@ -1,0 +1,24 @@
+Usage: corp ingest-extractions [OPTIONS] CKE_OUTPUT_PATH
+
+  Ingest CKE extraction output into the vault.
+
+  Reads CKE output packages, validates frontmatter, applies quality gate, and
+  copies accepted notes to vault/01_Knowledge/ (flat). Cover slides go to
+  _assets/. Failed notes go to _quarantine/. Respects trust_level=verified.
+
+  Examples:
+
+      corp ingest-extractions /path/to/cke/output
+
+      corp ingest-extractions /path/to/cke/output --dry-run
+
+      corp ingest-extractions /path/to/cke/output --rebuild-index
+
+      corp ingest-extractions /path/to/cke/output --quality-threshold 50
+
+Options:
+  --dry-run                    Show what would be ingested
+  --force                      Overwrite even verified notes
+  --quality-threshold INTEGER  Min quality_score to accept (0-100)
+  --rebuild-index              Rebuild FTS5 search index after ingest
+  --help                       Show this message and exit.

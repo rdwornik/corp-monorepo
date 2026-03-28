@@ -1,0 +1,21 @@
+Usage: corp prep [OPTIONS] CLIENT
+
+  Prepare a client briefing for an upcoming meeting.
+
+  Retrieves all knowledge about the client and generates a structured briefing
+  with key facts, talking points, and knowledge gaps.
+
+  The briefing is saved as a markdown file.
+
+  Examples:
+
+      corp prep Lenzing
+
+      corp prep SGDBF
+
+      corp prep "Alfa Laval"
+
+Options:
+  --model TEXT   LLM model for synthesis
+  --output TEXT  Output directory (default: project folder or 90_System)
+  --help         Show this message and exit.

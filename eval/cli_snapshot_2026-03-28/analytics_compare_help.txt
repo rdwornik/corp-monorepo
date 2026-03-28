@@ -1,0 +1,7 @@
+Usage: corp analytics compare [OPTIONS]
+
+  Q9: Side-by-side product sets for multiple clients.
+
+Options:
+  --clients TEXT  Comma-separated client names  [required]
+  --help          Show this message and exit.

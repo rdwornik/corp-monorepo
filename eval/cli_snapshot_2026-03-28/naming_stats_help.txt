@@ -1,0 +1,6 @@
+Usage: corp naming-stats [OPTIONS]
+
+  Show naming convention type code distribution from routing feedback.
+
+Options:
+  --help  Show this message and exit.

@@ -1,0 +1,6 @@
+Usage: corp project open [OPTIONS] NAME
+
+  Open project folder in Explorer (fuzzy name match).
+
+Options:
+  --help  Show this message and exit.

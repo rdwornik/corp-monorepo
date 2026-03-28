@@ -1,0 +1,10 @@
+Usage: corp query [OPTIONS] [SEARCH_TERMS]
+
+  Search across project facts and metadata.
+
+Options:
+  -p, --project TEXT   Filter by project
+  --product TEXT       Filter by product
+  --topic TEXT         Filter by topic
+  -n, --limit INTEGER  Max results
+  --help               Show this message and exit.

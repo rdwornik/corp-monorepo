@@ -1,0 +1,9 @@
+Usage: corp task add [OPTIONS] TITLE
+
+  Create a new task.
+
+Options:
+  -p, --project TEXT            Associated project
+  -d, --deadline TEXT           Deadline (YYYY-MM-DD)
+  --priority [high|medium|low]
+  --help                        Show this message and exit.

@@ -1,0 +1,16 @@
+Usage: corp freshness [OPTIONS]
+
+  Check freshness of vault notes against source files.
+
+  Scans all vault notes and reports which ones are stale, orphaned, or due for
+  review.
+
+  Examples:
+
+      corp freshness
+
+      corp freshness --verbose
+
+Options:
+  --verbose  Show all results, not just issues
+  --help     Show this message and exit.

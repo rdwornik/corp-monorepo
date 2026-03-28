@@ -1,0 +1,6 @@
+Usage: corp analytics recent [OPTIONS]
+
+  Q10: Most recent note per client.
+
+Options:
+  --help  Show this message and exit.

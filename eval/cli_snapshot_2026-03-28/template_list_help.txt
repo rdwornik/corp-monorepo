@@ -1,0 +1,6 @@
+Usage: corp template list [OPTIONS]
+
+  Show all registered templates.
+
+Options:
+  --help  Show this message and exit.

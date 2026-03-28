@@ -1,0 +1,20 @@
+Usage: corp classify [OPTIONS]
+
+  Classify quarantined files using Gemini LLM.
+
+  Reads files in _Unmatched (quarantined by corp ingest), classifies each
+  using Gemini Flash, and stages them at the classified destination for review
+  via corp finalize.
+
+  Example workflow:
+
+      corp ingest                  # Some files quarantined     corp classify
+      --dry-run      # Preview LLM classifications     corp classify
+      # Classify and stage     corp finalize --approve-all  # Commit staged
+      files
+
+Options:
+  --model TEXT    Gemini model for classification
+  --budget FLOAT  Maximum API spend ($)
+  --dry-run       Classify without moving files
+  --help          Show this message and exit.

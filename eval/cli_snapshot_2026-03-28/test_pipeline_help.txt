@@ -1,0 +1,29 @@
+Usage: corp test-pipeline [OPTIONS]
+
+  Run an end-to-end pipeline smoke test in an isolated sandbox.
+
+  Exercises all key pipeline stages (sandbox init, classify/rename, vault
+  ingest, index rebuild, retrieve) without touching production data.
+
+  Fixture mode (default): no API calls, runs in ~2s.   If recorded fixtures
+  exist they are replayed instead of mock notes. Live mode (--live): invokes
+  real CKE extraction (costs money). Record mode (--record): live mode + saves
+  responses as fixture JSONs.   Run once to refresh fixtures when CKE models
+  change.
+
+  Examples:
+
+      corp test-pipeline
+      corp test-pipeline --verbose
+      corp test-pipeline --live --keep-sandbox
+      corp test-pipeline --record
+      corp test-pipeline --output report.json
+
+Options:
+  --live             Use real CKE API calls (costs money)
+  --record           Record live CKE responses as reusable fixture JSONs
+                     (implies --live)
+  --keep-sandbox     Keep sandbox directory after run
+  -v, --verbose      Enable DEBUG logging during test
+  -o, --output FILE  Save JSON report to file
+  --help             Show this message and exit.

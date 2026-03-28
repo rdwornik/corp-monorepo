@@ -1,0 +1,7 @@
+Usage: corp analytics timeline [OPTIONS]
+
+  Q2: Notes for a client ordered by date.
+
+Options:
+  --client TEXT  Client name (exact match)  [required]
+  --help         Show this message and exit.

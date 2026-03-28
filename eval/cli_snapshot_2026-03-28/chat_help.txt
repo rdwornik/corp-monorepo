@@ -1,0 +1,7 @@
+Usage: corp chat [OPTIONS]
+
+  Interactive chat — natural language workflow routing.
+
+Options:
+  --no-llm  Keyword matching only, no Gemini calls
+  --help    Show this message and exit.

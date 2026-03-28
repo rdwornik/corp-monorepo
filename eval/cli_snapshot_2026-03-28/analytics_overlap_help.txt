@@ -1,0 +1,7 @@
+Usage: corp analytics overlap [OPTIONS]
+
+  Q6: Clients sharing interest in a product, with note counts.
+
+Options:
+  --product TEXT  Product name (substring match)  [required]
+  --help          Show this message and exit.

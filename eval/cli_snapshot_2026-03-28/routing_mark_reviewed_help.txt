@@ -1,0 +1,6 @@
+Usage: corp routing-mark-reviewed [OPTIONS]
+
+  Mark all current routing feedback as reviewed.
+
+Options:
+  --help  Show this message and exit.

@@ -1,0 +1,21 @@
+Usage: corp rfp answer [OPTIONS] QUESTION
+
+  Draft an RFP answer using the knowledge base.
+
+  Searches all extracted knowledge for relevant information and generates a
+  professional RFP response with citations.
+
+  Examples:
+
+      corp rfp answer "Describe your SaaS deployment model"
+
+      corp rfp answer "How does data integration work?" --client Lenzing
+
+      corp rfp answer "What AI/ML capabilities?" --product "Cognitive Demand
+      Planning"
+
+Options:
+  --client TEXT   Client context for tailored answer
+  --product TEXT  Filter by product area
+  --model TEXT    LLM model
+  --help          Show this message and exit.

@@ -1,0 +1,43 @@
+Usage: corp [OPTIONS] COMMAND [ARGS]...
+
+  Corp-by-os — root orchestrator for the agent ecosystem.
+
+Options:
+  -v, --verbose  Enable debug logging
+  --help         Show this message and exit.
+
+Commands:
+  analytics              SQL analytics over the notes index.
+  apply-moves            Execute approved moves from moves.yaml.
+  audit                  Full read-only audit of MyWork — scan, analyze,...
+  chat                   Interactive chat — natural language workflow...
+  classify               Classify quarantined files using Gemini LLM.
+  cleanup                Analyze and clean up disk space.
+  cleanup-scan           Scan MyWork for misplaced files and generate...
+  dedup-report           Show near-duplicate file pairs detected by MinHash.
+  doctor                 Check all agent CLIs are on PATH and working.
+  extract                Extract knowledge from a MyWork folder via CKE.
+  files-stats            Show file registry statistics.
+  finalize               Review and approve staged files.
+  folder-review          Scan 10_Projects/ folders and propose renames.
+  freshness              Check freshness of vault notes against source...
+  index                  Manage the cross-project search index.
+  ingest                 Route incoming files and folders to their...
+  ingest-extractions     Ingest CKE extraction output into the vault.
+  ingest-inbox           Interactively route files from 00_Inbox to their...
+  naming-stats           Show naming convention type code distribution...
+  overnight              Run overnight extraction and reshape pipeline.
+  prep                   Prepare a client briefing for an upcoming meeting.
+  project                Manage projects.
+  query                  Search across project facts and metadata.
+  retrieve               Search the knowledge base.
+  rfp                    RFP response tools.
+  routing-mark-reviewed  Mark all current routing feedback as reviewed.
+  routing-review         Show routing override patterns for manual rule...
+  run                    Execute a workflow or list available workflows.
+  task                   Manage tasks.
+  tasks                  Shortcut for 'corp task list'.
+  template               Manage presentation templates.
+  test-pipeline          Run an end-to-end pipeline smoke test in an...
+  trust-status           Show trust_level distribution across vault notes.
+  vault                  Vault operations.

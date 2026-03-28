@@ -1,0 +1,11 @@
+Usage: corp finalize [OPTIONS]
+
+  Review and approve staged files.
+
+  Files below the confidence threshold are staged in _Staging/ directories.
+  This command lists them for review and moves approved files to their final
+  destinations.
+
+Options:
+  --approve-all  Move all staged files to final destinations
+  --help         Show this message and exit.

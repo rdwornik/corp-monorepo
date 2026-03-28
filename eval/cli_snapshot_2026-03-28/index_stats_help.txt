@@ -1,0 +1,6 @@
+Usage: corp index stats [OPTIONS]
+
+  Show index stats.
+
+Options:
+  --help  Show this message and exit.

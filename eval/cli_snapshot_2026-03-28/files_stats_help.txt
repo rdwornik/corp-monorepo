@@ -1,0 +1,6 @@
+Usage: corp files-stats [OPTIONS]
+
+  Show file registry statistics.
+
+Options:
+  --help  Show this message and exit.

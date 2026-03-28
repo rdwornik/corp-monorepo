@@ -1,0 +1,8 @@
+Usage: corp tasks [OPTIONS]
+
+  Shortcut for 'corp task list'.
+
+Options:
+  -s, --status TEXT  Filter by status
+  --all              Show all statuses
+  --help             Show this message and exit.
