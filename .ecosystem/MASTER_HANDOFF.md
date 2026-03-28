@@ -21,7 +21,7 @@ Update at end of each session: `python scripts/update_handoff.py`
 | Product Jaccard | 1.000 (idempotent) | 2026-03-26 |
 | People NER F1 | 92.7% | 2026-03-26 |
 | Council decisions | 22 | 2026-03-28 |
-| ADRs | 21 (ADR-22 pending) | 2026-03-28 |
+| ADRs | 22 | 2026-03-28 |
 | Gotchas | 37 | 2026-03-28 |
 
 ---
@@ -186,7 +186,7 @@ C:/Users/1028120/Documents/MyWork/10_Projects/
 | #19 | Light Scan | `light_scan.py` with `ScanResult`; 7 format scanners; tiered fault tolerance; runs before CKE |
 | #20 | Vault Rebuild | Re-extract 216 notes via CKE batch (gemini-pro deep); deprecated filter added to retrieval |
 | #21 | Ontology Approach | `taxonomy.yaml` as single authoritative tag vocab; `product_aliases.yaml` + `client_aliases.yaml` normalize variants |
-| #22 | RFP Federation | How to federate RFP KB (1,325 entries) with vault search (487 notes) — **ADR-22 pending** |
+| #22 | RFP Federation | How to federate RFP KB (1,325 entries) with vault search (487 notes) — same `index.db`, separate `rfp_entries` FTS5 table, grouped output, default `--source all` |
 
 Full transcripts: `.ecosystem/council_transcripts/DECISION_NN_*.md`
 ADR summaries: `decisions/ADR-NN-*.md` (ADR-01 through ADR-21; ADR-22 not yet written)
@@ -388,7 +388,7 @@ index.db:       %LOCALAPPDATA%/corp-by-os/index.db
 
 Monorepo layout:
   config/paths.toml                          centralized paths
-  decisions/ADR-NN-*.md                      21 ADR summaries
+  decisions/ADR-NN-*.md                      22 ADR summaries
   .ecosystem/council_transcripts/            22 full debate transcripts
   eval/eval_history.jsonl                    metric snapshots
   models/hybrid_classifier.json             dual TF-IDF model
@@ -412,7 +412,7 @@ Package paths:
 ## Open Decisions (what's next)
 
 1. **Ontology Q4** — canonical product map; unblocks 4 remaining benchmark SQL queries
-2. **RFP Federation** (Council #22) — federate RFP KB (1,325 entries) with vault (488 notes); ADR-22 pending
+2. **RFP Federation** (Council #22, ADR-22) — implement `corp rfp-index` + `rfp_entries` FTS5 table + grouped `corp retrieve` output; not yet built
 3. **File renames** — bulk rename 585 MyWork files to naming v2 convention
 4. **Local AI** — Ollama exploration for offline/private extraction tier
 5. **Outlook automation** — email ingestion pipeline

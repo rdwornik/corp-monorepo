@@ -33,7 +33,7 @@
 - API keys in env vars, NEVER in config files
 - GEMINI_API_KEY is the standard (not GOOGLE_API_KEY)
 
-## Council Decisions: 21 (ADR summaries in `decisions/`, full transcripts in `.ecosystem/council_transcripts/`)
+## Council Decisions: 22 (ADR summaries in `decisions/`, full transcripts in `.ecosystem/council_transcripts/`)
 - #14: Naming convention v2 — `{YYYY-MM}_{TYPE}_{CLIENT}_{Description}.{ext}`
 
 ## Safety
