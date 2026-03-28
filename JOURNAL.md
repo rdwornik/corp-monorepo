@@ -5,6 +5,12 @@ Claude Code: read last 5 entries before starting work.
 
 ---
 
+
+## 2026-03-28
+- **Did:** SQL analytics MVP (6/10 benchmark queries). People added to FTS. Gemini 2.0 Flash-Lite for Tier 2 (-75% cost). Scripts/ to Dev/ migration (11 files, 2673 DB rows). .ecosystem consolidated. ADRs synced (#13-#21). Phase 1 cleanup (archives deleted). Corp-pdf-toolkit archived. Council #22 RFP federation debate. Venvs recreated. Full health check passed.
+- **Failed:** -
+- **Next:** Ontology Q4 (canonical product map). RFP federation implementation. File renames (585 files). MinHash wire into inbox.
+
 ## 2026-03-27 MinHash near-duplicate detection
 
 - **Did:** Implemented `ingest/dedup.py` — MinHash signatures (128 perms, word 3-grams), `content_signatures` table in ops.db, `check_near_duplicate()` pipeline hook (after light_scan, before CKE), `get_dedup_report()` for `corp dedup-report` CLI command. Installed datasketch 1.9.0. 24 new tests, all pass. Full suite: **992 passed, 1 skipped**.
@@ -106,6 +112,12 @@ Claude Code: read last 5 entries before starting work.
 - **Did:** Eval baseline (classifier 51.3%, tags 0.753). JLR real usage test (useful output). Client alias fix (retrieve + prep). Obsidian setup (8 MOCs, plugin recs). Lint cleanup. v2/v3 bulk ingest (493→587 vault notes). Context scope in ROUTING.md.
 - **Failed:** Classifier still 51.3% (filename-only ceiling, LLM needed for 70%+)
 - **Next:** Council CLI integration. Obsidian plugins install. Lenzing normalization. RFP KB + vault merge.
+
+## 2026-03-28
+- **Did:** SQL analytics MVP (6/10 benchmark queries). People added to FTS. Gemini 2.0 Flash-Lite for Tier 2 (-75% cost). Scripts/ to Dev/ migration (11 files, 2673 DB rows). .ecosystem consolidated. ADRs synced (#13-#21). Phase 1 cleanup (archives deleted). Corp-pdf-toolkit archived. Council #22 RFP federation debate. Venvs recreated. Full health check passed.
+- **Failed:** -
+- **Next:** Ontology Q4 (canonical product map). RFP federation implementation. File renames (585 files). MinHash wire into inbox.
+
 ## 2026-03-27 vault rebuild (Council Decision #20)
 
 - **Did:** Re-extracted 216 vault notes via CKE batch (gemini-3.1-pro-preview, deep mode). Ingested with quality-threshold 25, index rebuilt. Added `include_deprecated` filter to retrieve engine — deprecated notes excluded from all query paths. Added missing Compliance MOC. All 943 corp-by-os tests passing.
