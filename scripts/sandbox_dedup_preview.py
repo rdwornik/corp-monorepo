@@ -11,7 +11,7 @@ from pathlib import Path
 
 logging.basicConfig(level=logging.WARNING)
 
-SANDBOX = Path(r"C:\Users\1028120\Documents\Scripts\corp-monorepo\.sandbox\cleanup_pilot")
+SANDBOX = Path(__file__).resolve().parents[1] / ".sandbox/cleanup_pilot"
 THRESHOLD = 0.5  # lower than prod (0.6) to surface more candidates for review
 
 

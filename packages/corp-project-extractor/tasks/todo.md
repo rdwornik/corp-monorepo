@@ -22,7 +22,7 @@ New repo in the Corporate OS agent ecosystem. Scans pre-sales project folders, c
 
 ### 0.1 Repository Init
 ```powershell
-cd C:\Users\1028120\Documents\Scripts
+cd C:\Users\1028120\Documents\Dev
 mkdir corp-project-extractor
 cd corp-project-extractor
 git init
@@ -126,7 +126,7 @@ PROJECTS_ROOT=C:\Users\1028120\OneDrive - Blue Yonder\MyWork\10_Projects
 ARCHIVE_ROOT=C:\Users\1028120\OneDrive - Blue Yonder\MyWork\80_Archive
 
 # Optional: path to corporate-pdf-toolkit for enhanced PDF extraction
-PDF_TOOLKIT_PATH=C:\Users\1028120\Documents\Scripts\corporate-pdf-toolkit
+PDF_TOOLKIT_PATH=C:\Users\1028120\Documents\Dev\corporate-pdf-toolkit
 ```
 
 ### 0.6 .gitignore

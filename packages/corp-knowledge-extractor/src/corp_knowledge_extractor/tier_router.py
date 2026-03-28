@@ -51,8 +51,8 @@ TIER_COSTS = {
 # Model used for each tier
 TIER_MODELS = {
     Tier.LOCAL: None,
-    Tier.TEXT_AI: "gemini-3-flash-preview",
-    Tier.MULTIMODAL: "gemini-3-flash-preview",
+    Tier.TEXT_AI: "gemini-3.1-flash-lite",
+    Tier.MULTIMODAL: "gemini-3.1-pro-preview",
 }
 
 

@@ -11,7 +11,7 @@ import json
 from collections import Counter
 from pathlib import Path
 
-SANDBOX = Path(r"C:\Users\1028120\Documents\Scripts\corp-monorepo\.sandbox\cleanup_pilot")
+SANDBOX = Path(__file__).resolve().parents[1] / ".sandbox/cleanup_pilot"
 
 
 def _load(name: str) -> list:

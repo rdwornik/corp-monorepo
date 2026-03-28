@@ -34,12 +34,12 @@ class TestSelectModel:
 
     def test_select_model_docx(self):
         model, reason = select_model(Path("document.docx"), 50000)
-        assert model == "gemini-3-flash-preview"
+        assert model == "gemini-3.1-flash-lite"
         assert reason == "text_default"
 
     def test_select_model_xlsx(self):
         model, reason = select_model(Path("data.xlsx"), 50000)
-        assert model == "gemini-3-flash-preview"
+        assert model == "gemini-3.1-flash-lite"
         assert reason == "text_default"
 
     def test_select_model_tiny(self):

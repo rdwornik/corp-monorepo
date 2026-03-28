@@ -75,7 +75,7 @@ def generate_transcript(
         )
 
     client = genai.Client(api_key=api_key)
-    model = config.get("model_override") or config.get("gemini", {}).get("model", "gemini-3-flash-preview")
+    model = config.get("model_override") or config.get("gemini", {}).get("model", "gemini-3.1-flash-lite")
 
     contents = [
         types.Part.from_uri(file_uri=gemini_file_uri, mime_type="video/mp4"),

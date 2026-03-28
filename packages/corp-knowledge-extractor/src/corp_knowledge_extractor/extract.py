@@ -123,7 +123,7 @@ def _get_client(config: dict):
 
 
 def _get_model(config: dict) -> str:
-    return config.get("model_override") or config.get("gemini", {}).get("model", "gemini-3-flash-preview")
+    return config.get("model_override") or config.get("gemini", {}).get("model", "gemini-3.1-flash-lite")
 
 
 def _estimate_gemini_cost(model: str, total_tokens: int) -> float:
@@ -132,8 +132,9 @@ def _estimate_gemini_cost(model: str, total_tokens: int) -> float:
     Uses a blended rate (input-heavy assumption: ~80% input, ~20% output).
     """
     rates = {
-        "gemini-3-flash-preview": 1.00,  # blended $/1M tokens
-        "gemini-3.1-flash-lite": 0.50,
+        "gemini-3.1-flash-lite": 0.25,   # blended $/1M tokens
+        "gemini-3.1-flash": 0.50,
+        "gemini-3-flash-preview": 1.00,  # kept for backward compat
         "gemini-3.1-pro-preview": 4.00,
     }
     rate = rates.get(model, 1.00)
@@ -499,9 +500,9 @@ def extract_knowledge(
         has_images=has_images,
         model_override=model_override,
     )
-    # "free" means Tier 1 — shouldn't reach here, but fall back to flash
+    # "free" means Tier 1 — shouldn't reach here, but fall back to flash-lite
     if model == "free":
-        model = "gemini-3-flash-preview"
+        model = "gemini-3.1-flash-lite"
         routing_reason = "tier3_fallback"
 
     INLINE_SIZE_LIMIT = 20 * 1024 * 1024  # 20MB

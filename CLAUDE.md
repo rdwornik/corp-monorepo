@@ -33,7 +33,7 @@
 - API keys in env vars, NEVER in config files
 - GEMINI_API_KEY is the standard (not GOOGLE_API_KEY)
 
-## Council Decisions: 14 (see `.ecosystem/decisions/`)
+## Council Decisions: 21 (ADR summaries in `decisions/`, full transcripts in `.ecosystem/council_transcripts/`)
 - #14: Naming convention v2 — `{YYYY-MM}_{TYPE}_{CLIENT}_{Description}.{ext}`
 
 ## Safety
@@ -46,6 +46,17 @@
 2. After implementation, self-review: focus on error handling, edge cases, gotchas
 3. Before merging, run: ./scripts/dev-check.ps1
 4. Append session summary to JOURNAL.md before ending
+
+## Session Handoff
+When starting a new Claude.ai chat session, paste:
+1. `.ecosystem/MASTER_HANDOFF.md` (living doc, updated after each session)
+2. Latest Council debate output (if pending)
+
+`MASTER_HANDOFF.md` replaces per-session handoffs.
+Update it at end of every major session:
+```
+python scripts/update_handoff.py
+```
 
 ## Prompt Decision Rule
 - 1 file, 1 package → conversational (just talk to Claude Code)

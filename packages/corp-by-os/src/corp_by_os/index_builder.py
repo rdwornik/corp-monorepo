@@ -107,25 +107,25 @@ CREATE TABLE IF NOT EXISTS notes (
 );
 
 CREATE VIRTUAL TABLE IF NOT EXISTS notes_fts USING fts5(
-    title, topics, products, domains, client, project_id, doc_type,
+    title, topics, products, domains, people, client, project_id, doc_type,
     content=notes, content_rowid=id
 );
 
 CREATE TRIGGER IF NOT EXISTS notes_ai AFTER INSERT ON notes BEGIN
     INSERT INTO notes_fts(
-        rowid, title, topics, products, domains, client, project_id, doc_type)
+        rowid, title, topics, products, domains, people, client, project_id, doc_type)
     VALUES (
         new.id, new.title, new.topics, new.products, new.domains,
-        new.client, new.project_id, new.doc_type);
+        new.people, new.client, new.project_id, new.doc_type);
 END;
 
 CREATE TRIGGER IF NOT EXISTS notes_ad AFTER DELETE ON notes BEGIN
     INSERT INTO notes_fts(
         notes_fts, rowid, title, topics, products, domains,
-        client, project_id, doc_type)
+        people, client, project_id, doc_type)
     VALUES (
         'delete', old.id, old.title, old.topics, old.products,
-        old.domains, old.client, old.project_id, old.doc_type);
+        old.domains, old.people, old.client, old.project_id, old.doc_type);
 END;
 
 -- Triggers to keep FTS in sync with facts table

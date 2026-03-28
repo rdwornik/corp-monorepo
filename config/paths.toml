@@ -5,7 +5,7 @@
 [paths]
 vault = "C:/Users/1028120/Documents/ObsidianVault"
 mywork = "C:/Users/1028120/Documents/MyWork"
-scripts = "C:/Users/1028120/Documents/Scripts"
+scripts = "%SCRIPTS_ROOT%"
 secrets = "C:/Users/1028120/Documents/.secrets/.env"
 rfp_kb = "C:/Users/1028120/Documents/corp_data/rfp_kb"
 

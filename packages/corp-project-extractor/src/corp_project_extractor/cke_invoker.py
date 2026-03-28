@@ -14,11 +14,11 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-# CKE location -- env var > monorepo > standalone fallback
+# CKE location -- env var > relative to this package inside monorepo
 CKE_DIR = Path(
     os.environ.get(
         "CKE_PATH",
-        "C:/Users/1028120/Documents/Scripts/corp-monorepo/packages/corp-knowledge-extractor",
+        str(Path(__file__).parents[4] / "packages" / "corp-knowledge-extractor"),
     )
 )
 

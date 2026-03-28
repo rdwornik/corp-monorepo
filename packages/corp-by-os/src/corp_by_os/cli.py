@@ -15,7 +15,13 @@ Commands:
     corp index rebuild [--project X]
     corp index stats
     corp query "search terms" [--project X] [--product Y] [--topic Z]
-    corp analytics
+    corp analytics report
+    corp analytics products --client CLIENT
+    corp analytics timeline --client CLIENT
+    corp analytics clients --product PRODUCT
+    corp analytics overlap --product PRODUCT
+    corp analytics compare --clients "C1,C2"
+    corp analytics recent
     corp template list
     corp template scan
     corp template select "goal description"
@@ -873,9 +879,14 @@ def query_command(
         sys.exit(1)
 
 
-@cli.command("analytics")
-def analytics_command() -> None:
-    """Show cross-project analytics and patterns."""
+@cli.group("analytics")
+def analytics_group() -> None:
+    """SQL analytics over the notes index. Run `corp index rebuild` first."""
+
+
+@analytics_group.command("report")
+def analytics_report_command() -> None:
+    """Show cross-project analytics dashboard (facts + projects)."""
     from corp_by_os.index_builder import get_index_path
     from corp_by_os.query_engine import get_analytics
 
@@ -935,6 +946,171 @@ def analytics_command() -> None:
     cfg = get_config()
     dashboard = cfg.vault_path / "00_dashboards" / "analytics.md"
     console.print(f"\n[dim]Dashboard: {dashboard}[/dim]")
+
+
+@analytics_group.command("products")
+@click.option("--client", required=True, help="Client name (exact match)")
+def analytics_products(client: str) -> None:
+    """Q1: Distinct products mentioned in notes for a client."""
+    from corp_by_os.index_builder import get_index_path
+    from corp_by_os.query_engine import notes_products_for_client
+
+    if not get_index_path().exists():
+        console.print("[yellow]No index. Run `corp index rebuild` first.[/yellow]")
+        sys.exit(1)
+
+    products = notes_products_for_client(client)
+    if not products:
+        console.print(f"[yellow]No products found for client '{client}'.[/yellow]")
+        return
+
+    table = Table(title=f"Products — {client}", show_lines=False)
+    table.add_column("Product", style="cyan")
+    for p in products:
+        table.add_row(p)
+    console.print(table)
+    console.print(f"[dim]{len(products)} distinct products[/dim]")
+
+
+@analytics_group.command("timeline")
+@click.option("--client", required=True, help="Client name (exact match)")
+def analytics_timeline(client: str) -> None:
+    """Q2: Notes for a client ordered by date."""
+    from corp_by_os.index_builder import get_index_path
+    from corp_by_os.query_engine import notes_timeline_for_client
+
+    if not get_index_path().exists():
+        console.print("[yellow]No index. Run `corp index rebuild` first.[/yellow]")
+        sys.exit(1)
+
+    notes = notes_timeline_for_client(client)
+    if not notes:
+        console.print(f"[yellow]No dated notes found for client '{client}'.[/yellow]")
+        return
+
+    table = Table(title=f"Timeline — {client}", show_lines=False)
+    table.add_column("Date", style="green", width=12)
+    table.add_column("Title", style="white")
+    table.add_column("Products", style="cyan")
+    table.add_column("Type", style="dim", width=14)
+    for n in notes:
+        table.add_row(n["date"], n["title"], n["products"], n["doc_type"] or n["type"])
+    console.print(table)
+    console.print(f"[dim]{len(notes)} notes[/dim]")
+
+
+@analytics_group.command("clients")
+@click.option("--product", required=True, help="Product name (substring match)")
+def analytics_clients(product: str) -> None:
+    """Q3: Distinct clients whose notes mention a product."""
+    from corp_by_os.index_builder import get_index_path
+    from corp_by_os.query_engine import notes_clients_for_product
+
+    if not get_index_path().exists():
+        console.print("[yellow]No index. Run `corp index rebuild` first.[/yellow]")
+        sys.exit(1)
+
+    clients = notes_clients_for_product(product)
+    if not clients:
+        console.print(f"[yellow]No clients found with product '{product}'.[/yellow]")
+        return
+
+    table = Table(title=f"Clients with '{product}'", show_lines=False)
+    table.add_column("Client", style="cyan")
+    for c in clients:
+        table.add_row(c)
+    console.print(table)
+    console.print(f"[dim]{len(clients)} clients[/dim]")
+
+
+@analytics_group.command("overlap")
+@click.option("--product", required=True, help="Product name (substring match)")
+def analytics_overlap(product: str) -> None:
+    """Q6: Clients sharing interest in a product, with note counts."""
+    from corp_by_os.index_builder import get_index_path
+    from corp_by_os.query_engine import notes_overlap_for_product
+
+    if not get_index_path().exists():
+        console.print("[yellow]No index. Run `corp index rebuild` first.[/yellow]")
+        sys.exit(1)
+
+    rows = notes_overlap_for_product(product)
+    if not rows:
+        console.print(f"[yellow]No overlap data found for product '{product}'.[/yellow]")
+        return
+
+    table = Table(title=f"Client Overlap — '{product}'", show_lines=False)
+    table.add_column("Client", style="cyan")
+    table.add_column("Notes", justify="right")
+    for client, cnt in rows:
+        table.add_row(client, str(cnt))
+    console.print(table)
+    console.print(f"[dim]{len(rows)} clients share interest in '{product}'[/dim]")
+
+
+@analytics_group.command("compare")
+@click.option("--clients", required=True, help="Comma-separated client names")
+def analytics_compare(clients: str) -> None:
+    """Q9: Side-by-side product sets for multiple clients."""
+    from corp_by_os.index_builder import get_index_path
+    from corp_by_os.query_engine import notes_compare_clients
+
+    if not get_index_path().exists():
+        console.print("[yellow]No index. Run `corp index rebuild` first.[/yellow]")
+        sys.exit(1)
+
+    client_list = [c.strip() for c in clients.split(",") if c.strip()]
+    if len(client_list) < 2:
+        console.print("[red]Provide at least 2 comma-separated client names.[/red]")
+        sys.exit(1)
+
+    comparison = notes_compare_clients(client_list)
+
+    # Find all products across all clients
+    all_products: set[str] = set()
+    for prods in comparison.values():
+        all_products.update(prods)
+    all_products_sorted = sorted(all_products)
+
+    table = Table(title="Client Product Comparison", show_lines=True)
+    table.add_column("Product", style="cyan")
+    for c in client_list:
+        table.add_column(c, justify="center")
+
+    for product in all_products_sorted:
+        row = [product]
+        for c in client_list:
+            row.append("Y" if product in comparison[c] else "-")
+        table.add_row(*row)
+
+    console.print(table)
+    console.print(f"[dim]{len(all_products_sorted)} distinct products across {len(client_list)} clients[/dim]")
+
+
+@analytics_group.command("recent")
+def analytics_recent() -> None:
+    """Q10: Most recent note per client."""
+    from corp_by_os.index_builder import get_index_path
+    from corp_by_os.query_engine import notes_recent
+
+    if not get_index_path().exists():
+        console.print("[yellow]No index. Run `corp index rebuild` first.[/yellow]")
+        sys.exit(1)
+
+    rows = notes_recent()
+    if not rows:
+        console.print("[yellow]No dated notes found in index.[/yellow]")
+        return
+
+    table = Table(title="Most Recent Note per Client", show_lines=False)
+    table.add_column("Date", style="green", width=12)
+    table.add_column("Client", style="cyan")
+    table.add_column("Title", style="white")
+    table.add_column("Products", style="dim")
+    for r in rows:
+        table.add_row(r["date"], r["client"], r["title"], r["products"])
+    console.print(table)
+    console.print(f"[dim]{len(rows)} clients[/dim]")
 
 
 # --- Template commands ---

@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 # Model -> provider mapping
 ANTHROPIC_MODELS = {"claude-haiku-4-5-20251001", "claude-sonnet-4-6"}
-GEMINI_MODELS = {"gemini-3-flash-preview", "gemini-3.1-flash-lite", "gemini-3.1-pro-preview"}
+GEMINI_MODELS = {"gemini-3-flash-preview", "gemini-3.1-flash-lite", "gemini-3.1-flash", "gemini-3.1-pro-preview"}
 
 # Default routing rules
 DEFAULT_TEXT_MODEL = "claude-haiku-4-5-20251001"
@@ -94,7 +94,7 @@ def select_model(
     if ext == ".pdf":
         return "gemini-3.1-pro-preview", "pdf_multimodal"
 
-    return "gemini-3-flash-preview", "text_default"
+    return "gemini-3.1-flash-lite", "text_default"
 
 
 def route_model(

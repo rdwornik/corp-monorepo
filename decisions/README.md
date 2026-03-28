@@ -1,6 +1,6 @@
 # Architecture Decision Records
 
-Distilled from AI Council debates in `.ecosystem/decisions/` (Scripts root).
+Distilled from AI Council debates. Full transcripts in `.ecosystem/council_transcripts/`.
 Max 20 lines each. Format: Context / Decision / Consequences.
 
 | ADR | Title | Status |
@@ -18,7 +18,15 @@ Max 20 lines each. Format: Context / Decision / Consequences.
 | [ADR-10](ADR-10-naming-convention.md) | Vault Naming Convention (type-first) | Superseded by ADR-14 |
 | [ADR-11](ADR-11-file-distribution.md) | File Distribution Algorithm | Accepted |
 | [ADR-12](ADR-12-execution-patterns.md) | Claude Code Execution Patterns | Accepted |
+| [ADR-13](ADR-13-monorepo-architecture.md) | Monorepo Package Architecture | Accepted |
 | [ADR-14](ADR-14-naming-convention-v2.md) | Naming Convention v2 (date-first) | Accepted |
+| [ADR-15](ADR-15-sandbox-testing.md) | Sandbox Testing Pipeline | Accepted |
+| [ADR-16](ADR-16-eval-metrics.md) | Evaluation Metrics and Baseline | Accepted |
+| [ADR-17](ADR-17-obsidian-plugins.md) | Obsidian Vault Navigation and Plugin Selection | Accepted |
+| [ADR-18](ADR-18-algorithmic-hybrid.md) | Algorithmic Hybrid Classifier | Accepted |
+| [ADR-19](ADR-19-light-scan-architecture.md) | Light Scan Architecture | Accepted |
+| [ADR-20](ADR-20-vault-restructure.md) | Vault Rebuild Strategy | Accepted |
+| [ADR-21](ADR-21-ontology-approach.md) | Knowledge Ontology and Tagging Approach | Accepted |
 
 ## How to add a new ADR
 

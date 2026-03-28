@@ -11,15 +11,15 @@ Does NOT delete any notes.
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 from pathlib import Path
 
-MANIFEST_PATH = Path(
-    "C:/Users/1028120/Documents/Scripts/corp-monorepo"
-    "/.ecosystem/archive/2026-03-26_VAULT_MANIFEST.json"
-)
-VAULT_ROOT = Path("C:/Users/1028120/Documents/ObsidianVault/01_Knowledge")
+_MONOREPO_ROOT = Path(__file__).resolve().parents[1]
+
+MANIFEST_PATH = _MONOREPO_ROOT / ".ecosystem/archive/2026-03-26_VAULT_MANIFEST.json"
+VAULT_ROOT = Path(os.environ["USERPROFILE"]) / "Documents" / "ObsidianVault" / "01_Knowledge"
 
 
 def _update_frontmatter(text: str, updates: dict[str, str]) -> str:

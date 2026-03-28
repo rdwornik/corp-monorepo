@@ -8,16 +8,16 @@ to _quarantine/. Updates frontmatter with quarantine_reason.
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import sys
 from pathlib import Path
 
-MANIFEST_PATH = Path(
-    "C:/Users/1028120/Documents/Scripts/corp-monorepo"
-    "/.ecosystem/archive/2026-03-26_VAULT_MANIFEST.json"
-)
-VAULT_ROOT = Path("C:/Users/1028120/Documents/ObsidianVault")
+_MONOREPO_ROOT = Path(__file__).resolve().parents[1]
+
+MANIFEST_PATH = _MONOREPO_ROOT / ".ecosystem/archive/2026-03-26_VAULT_MANIFEST.json"
+VAULT_ROOT = Path(os.environ["USERPROFILE"]) / "Documents" / "ObsidianVault"
 KNOWLEDGE_DIR = VAULT_ROOT / "01_Knowledge"
 QUARANTINE_DIR = VAULT_ROOT / "_quarantine"
 

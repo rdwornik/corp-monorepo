@@ -11,17 +11,11 @@ import json
 from collections import defaultdict
 from pathlib import Path
 
-FULL_MANIFEST_PATH = Path(
-    "C:/Users/1028120/Documents/Scripts/corp-monorepo"
-    "/.ecosystem/archive/rebuild_batch_manifest.json"
-)
-PILOT_MANIFEST_PATH = Path(
-    "C:/Users/1028120/Documents/Scripts/corp-monorepo"
-    "/.ecosystem/archive/rebuild_pilot_manifest.json"
-)
-STAGING_ROOT = Path(
-    "C:/Users/1028120/Documents/Scripts/corp-monorepo/.ecosystem/rebuild_staging"
-)
+_MONOREPO_ROOT = Path(__file__).resolve().parents[1]
+
+FULL_MANIFEST_PATH = _MONOREPO_ROOT / ".ecosystem/archive/rebuild_batch_manifest.json"
+PILOT_MANIFEST_PATH = _MONOREPO_ROOT / ".ecosystem/archive/rebuild_pilot_manifest.json"
+STAGING_ROOT = _MONOREPO_ROOT / ".ecosystem/rebuild_staging"
 PILOT_OUTPUT_DIR = str(STAGING_ROOT / "source_library" / "rebuild_pilot")
 
 

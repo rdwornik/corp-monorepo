@@ -44,7 +44,3 @@ output/
 
 # Sandbox (copied source files — never commit)
 .sandbox/
-
-.ecosystem/rebuild_staging/
-
-.ecosystem/rebuild_staging/

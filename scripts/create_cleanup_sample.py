@@ -6,13 +6,14 @@ folder as context. Saves a manifest.json with metadata for downstream scripts.
 Does NOT modify source files.
 """
 import json
+import os
 import random
 import shutil
 from collections import Counter
 from pathlib import Path
 
-MYWORK = Path(r"C:\Users\1028120\Documents\MyWork\10_Projects")
-SANDBOX = Path(r"C:\Users\1028120\Documents\Scripts\corp-monorepo\.sandbox\cleanup_pilot")
+MYWORK = Path(os.environ["USERPROFILE"]) / "Documents" / "MyWork" / "10_Projects"
+SANDBOX = Path(__file__).resolve().parents[1] / ".sandbox/cleanup_pilot"
 
 SKIP_EXTENSIONS = {".tmp", ".lnk", ".url"}
 SKIP_PREFIXES = (".", "~$")  # hidden + Office lock files

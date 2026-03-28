@@ -31,19 +31,15 @@ import json
 from pathlib import Path
 from typing import Any
 
-MANIFEST_PATH = Path(
-    "C:/Users/1028120/Documents/Scripts/corp-monorepo"
-    "/.ecosystem/archive/2026-03-26_VAULT_MANIFEST.json"
-)
-OUTPUT_PATH = Path(
-    "C:/Users/1028120/Documents/Scripts/corp-monorepo"
-    "/.ecosystem/archive/rebuild_batch_manifest.json"
-)
+_MONOREPO_ROOT = Path(__file__).resolve().parents[1]
+
+MANIFEST_PATH = _MONOREPO_ROOT / ".ecosystem/archive/2026-03-26_VAULT_MANIFEST.json"
+OUTPUT_PATH = _MONOREPO_ROOT / ".ecosystem/archive/rebuild_batch_manifest.json"
 
 # CKE output dir — temp staging area for re-extracted notes
 # Structure: scope/series/pkg/extract/*.md
 # ingest-extractions expects: source_library/rebuild/<pkg>/extract/
-STAGING_ROOT = Path("C:/Users/1028120/Documents/Scripts/corp-monorepo/.ecosystem/rebuild_staging")
+STAGING_ROOT = _MONOREPO_ROOT / ".ecosystem/rebuild_staging"
 OUTPUT_DIR = str(STAGING_ROOT / "source_library" / "rebuild")
 
 

@@ -323,3 +323,129 @@ def _parse_json_list(raw: str | None) -> list[str]:
     except (json.JSONDecodeError, TypeError):
         pass
     return []
+
+
+def _parse_csv_list(raw: str | None) -> list[str]:
+    """Parse a comma-separated string into a list, stripping whitespace."""
+    if not raw:
+        return []
+    return [item.strip() for item in raw.split(",") if item.strip()]
+
+
+# --- Notes-based SQL analytics (Q1, Q2, Q3, Q6, Q9, Q10) ---
+
+
+def notes_products_for_client(client: str, db_path: Path | None = None) -> list[str]:
+    """Q1: Distinct products mentioned across notes for a client."""
+    conn = _connect(db_path)
+    try:
+        _ensure_schema(conn)
+        rows = conn.execute(
+            "SELECT products FROM notes WHERE client=? AND products != '' AND products IS NOT NULL",
+            (client,),
+        ).fetchall()
+    finally:
+        conn.close()
+
+    product_set: set[str] = set()
+    for (raw,) in rows:
+        product_set.update(_parse_csv_list(raw))
+    return sorted(product_set)
+
+
+def notes_timeline_for_client(
+    client: str, db_path: Path | None = None
+) -> list[dict[str, str]]:
+    """Q2: Notes for a client ordered by date."""
+    conn = _connect(db_path)
+    try:
+        _ensure_schema(conn)
+        rows = conn.execute(
+            """SELECT title, date, products, type, doc_type
+               FROM notes
+               WHERE client=? AND date IS NOT NULL AND date != ''
+               ORDER BY date""",
+            (client,),
+        ).fetchall()
+    finally:
+        conn.close()
+
+    return [
+        {"title": r[0], "date": r[1], "products": r[2] or "", "type": r[3] or "", "doc_type": r[4] or ""}
+        for r in rows
+    ]
+
+
+def notes_clients_for_product(product: str, db_path: Path | None = None) -> list[str]:
+    """Q3: Distinct clients whose notes mention a product."""
+    conn = _connect(db_path)
+    try:
+        _ensure_schema(conn)
+        rows = conn.execute(
+            "SELECT DISTINCT client FROM notes WHERE products LIKE ? AND client != '' AND client IS NOT NULL",
+            (f"%{product}%",),
+        ).fetchall()
+    finally:
+        conn.close()
+    return sorted(r[0] for r in rows)
+
+
+def notes_overlap_for_product(
+    product: str, db_path: Path | None = None
+) -> list[tuple[str, int]]:
+    """Q6: Clients sharing interest in a product, with note counts."""
+    conn = _connect(db_path)
+    try:
+        _ensure_schema(conn)
+        rows = conn.execute(
+            """SELECT client, COUNT(*) as cnt
+               FROM notes
+               WHERE products LIKE ? AND client != '' AND client IS NOT NULL
+               GROUP BY client
+               ORDER BY cnt DESC""",
+            (f"%{product}%",),
+        ).fetchall()
+    finally:
+        conn.close()
+    return [(r[0], r[1]) for r in rows]
+
+
+def notes_compare_clients(
+    clients: list[str], db_path: Path | None = None
+) -> dict[str, list[str]]:
+    """Q9: Side-by-side product sets for each client."""
+    conn = _connect(db_path)
+    try:
+        _ensure_schema(conn)
+        result: dict[str, set[str]] = {c: set() for c in clients}
+        for client in clients:
+            rows = conn.execute(
+                "SELECT products FROM notes WHERE client=? AND products != '' AND products IS NOT NULL",
+                (client,),
+            ).fetchall()
+            for (raw,) in rows:
+                result[client].update(_parse_csv_list(raw))
+    finally:
+        conn.close()
+    return {c: sorted(prods) for c, prods in result.items()}
+
+
+def notes_recent(db_path: Path | None = None) -> list[dict[str, str]]:
+    """Q10: Most recent note per client."""
+    conn = _connect(db_path)
+    try:
+        _ensure_schema(conn)
+        rows = conn.execute(
+            """SELECT n.client, n.title, n.date, n.products
+               FROM notes n
+               INNER JOIN (
+                   SELECT client, MAX(id) as latest_id
+                   FROM notes
+                   WHERE date != '' AND date IS NOT NULL AND client != '' AND client IS NOT NULL
+                   GROUP BY client
+               ) latest ON n.id = latest.latest_id
+               ORDER BY n.date DESC""",
+        ).fetchall()
+    finally:
+        conn.close()
+    return [{"client": r[0], "title": r[1], "date": r[2], "products": r[3] or ""} for r in rows]

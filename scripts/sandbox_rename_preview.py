@@ -18,7 +18,7 @@ from pathlib import Path
 
 logging.basicConfig(level=logging.WARNING)  # suppress debug noise
 
-SANDBOX = Path(r"C:\Users\1028120\Documents\Scripts\corp-monorepo\.sandbox\cleanup_pilot")
+SANDBOX = Path(__file__).resolve().parents[1] / ".sandbox/cleanup_pilot"
 MAX_NAME_LEN = 120  # matches renamer.py _MAX_NAME_LENGTH
 
 

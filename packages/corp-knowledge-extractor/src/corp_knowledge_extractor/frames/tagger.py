@@ -40,7 +40,7 @@ def tag_frames(frames: list[dict], batch_size: int = None) -> list[dict]:
         raise ValueError("GEMINI_API_KEY not set. Check global env (keys list).")
 
     client = genai.Client(api_key=api_key)
-    model_name = get("settings", "llm.tagger_model", "gemini-3-flash-preview")
+    model_name = get("settings", "llm.tagger_model", "gemini-3.1-flash-lite")
 
     # Process in batches
     for i in range(0, len(frames), batch_size):
