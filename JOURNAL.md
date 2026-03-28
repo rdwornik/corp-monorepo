@@ -6,6 +6,16 @@ Claude Code: read last 5 entries before starting work.
 ---
 
 
+## 2026-03-28 session 3 — Phase 4 pending cleanup
+- **Did:** v2/v3 01_Product_Docs quality comparison (36 notes matched) — v3 wins 20/36 but NOT clear upgrade: 2 v3-empty files (LifeScience_session1v2, Platform_Editedv2) must keep v2; total facts nearly equal (860 v2 / 850 v3). Cognitive_Friday vault cross-ref: both extractions already ingested. Sandbox review summary for Rob (2.4 GB, 53% MISC rate, apply step not built). 4 rebuild scripts archived to scripts/archive/. Phase 4 resolution report written. All tests green (1015+863+183+133+124+62). Merged chore/phase4 to main.
+- **Failed:** -
+- **Next:** Per-note v2/v3 deletions (Rob confirms). RFP federation (ADR-22). sandbox_apply.py + doc_type_classifier pattern expansion. MinHash wire into inbox.
+
+## 2026-03-28 session 2 — repo audit + cleanup + governance
+- **Did:** Full monorepo audit (plans archived). Phase 2 safe deletions (5 GB freed). Phase 3 governance: ADR-22 written, docs/ date-prefixed, .ecosystem/ root clean, CLAUDE.md + MASTER_HANDOFF.md counts updated (21→22 ADRs). All tests passing. Merged chore/phase3 to main.
+- **Failed:** -
+- **Next:** Implement ADR-22, .sandbox/ review (Rob), v2/v3 _outputs/ audit.
+
 ## 2026-03-28
 - **Did:** SQL analytics MVP (6/10 benchmark queries). People added to FTS. Gemini 2.0 Flash-Lite for Tier 2 (-75% cost). Scripts/ to Dev/ migration (11 files, 2673 DB rows). .ecosystem consolidated. ADRs synced (#13-#21). Phase 1 cleanup (archives deleted). Corp-pdf-toolkit archived. Council #22 RFP federation debate. Venvs recreated. Full health check passed.
 - **Failed:** -
