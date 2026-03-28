@@ -365,3 +365,32 @@ The vault rebuild (Council #20) re-extracted 257 notes through the current pipel
 ### Decision Needed
 
 7. **Entire `_outputs/` directory** — after dedup, decide: keep golden_set locally, archive the rest to external storage, or delete if all notes are in vault
+
+---
+
+## Phase 2 Executed — 2026-03-28
+
+branch: chore/phase2-cleanup-2026-03-28
+
+BEFORE: 25 GB total
+AFTER: 20 GB total
+FREED: ~5 GB
+
+What was deleted:
+- .ecosystem/rebuild_staging/ — 2.0 GB (gitignored, vault rebuild complete, report at .ecosystem/archive/2026-03-27_VAULT_REBUILD_REPORT.md)
+- packages/corp-knowledge-extractor/_outputs/_outputs/misc/01_Product_Docs/ — 2.4 GB (gitignored, 1,535 orphaned temp_frames PNGs, no extract/ dir)
+- __pycache__/ (46 dirs), *.egg-info/ (6 dirs), .pytest_cache/ (7 dirs), .ruff_cache/ (7 dirs), .hypothesis/, output/ — ~0.3 GB (all gitignored caches)
+
+Flatten result:
+- _outputs/_outputs/ nesting removed
+- Contents moved up to _outputs/: golden_set/, misc/, test/, v2/, v3/
+- jlr_pilot/, jlr_staged/ were already at correct level — unchanged
+- Cognitive_Friday/ preserved inside misc/
+- No git changes (all gitignored)
+
+Test results: ALL PACKAGES PASSED (6/6)
+
+Remaining cleanup items:
+- 01_Product_Docs v2-vs-v3 per-note quality comparison (only true dedup work remaining)
+- .sandbox/ (2.4 GB) — pending Rob's review of cleanup_pilot/ pipeline test results
+- Long-term _outputs/ archival decision after dedup (18 GB remaining: v2 11 GB, v3 6.5 GB, golden_set 103 MB, misc/Cognitive_Friday 8 notes)
