@@ -1,5 +1,5 @@
 ---
-Last updated: 2026-03-28T14:17:32Z
+Last updated: 2026-03-28T16:21:44Z
 ---
 
 > **Paste this file into new Claude.ai chats for context.**
@@ -17,12 +17,12 @@ python scripts/update_handoff.py
 
 | Metric | Value |
 |--------|-------|
-| Vault notes (indexed) | 488  |
-| Tests passing | 992  |
-| Hybrid classifier accuracy | 93.7%  |
-| Tag coverage (mean) | 79.7%  |
-| People NER F1 | 92.7%  |
-| Eval timestamp | 2026-03-27  |
+| Vault notes (indexed) | 488   |
+| Tests passing | 992   |
+| Hybrid classifier accuracy | 93.7%   |
+| Tag coverage (mean) | 79.7%   |
+| People NER F1 | 92.7%   |
+| Eval timestamp | 2026-03-27   |
 
 ---
 
