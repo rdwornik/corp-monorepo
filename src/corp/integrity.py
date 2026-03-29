@@ -12,6 +12,18 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
+from corp.schema.folder_names import (
+    ADMIN,
+    INBOX,
+    PROJECTS,
+    RFP,
+    SOURCE_LIBRARY,
+    STAGING,
+    SYSTEM,
+    TEMPLATES,
+    UNMATCHED,
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -367,14 +379,14 @@ def _check_mywork_structure(
 ) -> None:
     """Verify MyWork folder structure is intact."""
     required_folders = [
-        "00_Inbox",
-        "10_Projects",
+        INBOX,
+        PROJECTS,
         "20_Extra_Initiatives",
-        "30_Templates",
-        "50_RFP",
-        "60_Source_Library",
-        "70_Admin",
-        "90_System",
+        TEMPLATES,
+        RFP,
+        SOURCE_LIBRARY,
+        ADMIN,
+        SYSTEM,
     ]
 
     for folder in required_folders:
@@ -399,7 +411,7 @@ def _check_inbox(
     mywork_root: Path,
 ) -> None:
     """Check Inbox health — should be empty or near-empty."""
-    inbox = mywork_root / "00_Inbox"
+    inbox = mywork_root / INBOX
     if not inbox.exists():
         return
 
@@ -408,7 +420,7 @@ def _check_inbox(
         "_triage_schema.yaml",
         "folder_manifest.yaml",
     }
-    skip_dirs = {"_Unmatched", "_Staging"}
+    skip_dirs = {UNMATCHED, STAGING}
 
     files: list[Path] = []
     for item in inbox.iterdir():
@@ -422,7 +434,7 @@ def _check_inbox(
                         category="filesystem",
                         severity="info",
                         description=(f"{len(quarantined)} files in {item.name}/ awaiting review"),
-                        path=f"00_Inbox/{item.name}",
+                        path=f"{INBOX}/{item.name}",
                         fix_hint="Run: corp classify or corp finalize",
                     )
                 )
@@ -435,7 +447,7 @@ def _check_inbox(
                 category="filesystem",
                 severity="info",
                 description=f"{len(files)} file(s) in Inbox awaiting ingest",
-                path="00_Inbox",
+                path=INBOX,
                 fix_hint="Run: corp ingest",
             )
         )
