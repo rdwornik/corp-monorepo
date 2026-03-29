@@ -113,7 +113,7 @@ mkdirs(
 # PHASE 2: Move corp-os-meta → src/corp/schema/
 # ============================================================
 print("\n[2/7] Moving corp-os-meta -> src/corp/schema/...")
-meta_src = "packages/corp-os-meta/corp_os_meta"
+meta_src = "src/corp/schema"
 meta_dst = "src/corp/schema"
 
 # Move individual .py files (not dirs)
@@ -133,7 +133,7 @@ git_mv_contents("packages/corp-os-meta/tests", "tests/schema")
 # PHASE 3: Move CKE → src/corp/extractor/
 # ============================================================
 print("\n[3/7] Moving CKE -> src/corp/extractor/...")
-cke_src = "packages/corp-knowledge-extractor/src/corp_knowledge_extractor"
+cke_src = "src/corp/extractor"
 cke_dst = "src/corp/extractor"
 
 # Move top-level .py files
@@ -185,7 +185,7 @@ for item in sorted((REPO / cke_tests).iterdir()):
 # PHASE 4: Move corp-by-os → src/corp/ (promoted)
 # ============================================================
 print("\n[4/7] Moving corp-by-os -> src/corp/ (promoted to root)...")
-cbo_src = "packages/corp-by-os/src/corp_by_os"
+cbo_src = "src/corp"
 cbo_dst = "src/corp"
 
 # Move subpackage directories
@@ -243,7 +243,7 @@ for item in sorted((REPO / cbo_scripts).iterdir()):
 # PHASE 5: Move CPE → src/corp/project/
 # ============================================================
 print("\n[5/7] Moving CPE -> src/corp/project/...")
-cpe_src = "packages/corp-project-extractor/src/corp_project_extractor"
+cpe_src = "src/corp/project"
 cpe_dst = "src/corp/project"
 
 git_mv_contents(cpe_src, cpe_dst)
@@ -270,7 +270,7 @@ for item in sorted((REPO / cpe_tests).iterdir()):
 # PHASE 6: Move rfp-agent → src/corp/rfp/
 # ============================================================
 print("\n[6/7] Moving rfp-agent -> src/corp/rfp/...")
-rfp_src = "packages/corp-rfp-agent/src/corp_rfp_agent"
+rfp_src = "src/corp/rfp"
 rfp_dst = "src/corp/rfp"
 
 # Move top-level .py files
@@ -325,7 +325,7 @@ for item in sorted((REPO / rfp_tests).iterdir()):
 # PHASE 7: Move COM → src/corp/opportunity/
 # ============================================================
 print("\n[7/7] Moving COM -> src/corp/opportunity/...")
-com_src = "packages/corp-opportunity-manager/src/corp_opportunity_manager"
+com_src = "src/corp/opportunity"
 com_dst = "src/corp/opportunity"
 
 git_mv_contents(com_src, com_dst)

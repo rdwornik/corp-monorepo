@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 import yaml
-from corp_project_extractor.renderer import render_project
+from corp.project.renderer import render_project
 
 
 def _create_extraction(

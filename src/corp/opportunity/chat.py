@@ -8,20 +8,21 @@ from collections.abc import Callable
 from datetime import date, datetime
 from pathlib import Path
 
-from corp_opportunity_manager.config import AppConfig
-from corp_opportunity_manager.folder_manager import create_opportunity
-from corp_opportunity_manager.folder_standards import (
-    check_structure,
-    create_subfolder,
-    list_project_files,
-)
-from corp_opportunity_manager.llm_client import parse_intent
-from corp_opportunity_manager.models import IntentResult, OpportunityConfig
-from corp_opportunity_manager.templates import deck_filename
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt
 from rich.table import Table
+
+from corp.opportunity.config import AppConfig
+from corp.opportunity.folder_manager import create_opportunity
+from corp.opportunity.folder_standards import (
+    check_structure,
+    create_subfolder,
+    list_project_files,
+)
+from corp.opportunity.llm_client import parse_intent
+from corp.opportunity.models import IntentResult, OpportunityConfig
+from corp.opportunity.templates import deck_filename
 
 logger = logging.getLogger(__name__)
 
@@ -338,7 +339,7 @@ def _try_excel_update(session: ChatSession, client: str, folder_path: Path) -> N
     if not session.config.project_codes_excel or not session.config.project_codes_excel.exists():
         return
 
-    from corp_opportunity_manager.excel_manager import (
+    from corp.opportunity.excel_manager import (
         find_row_by_client,
         update_folder_link,
     )

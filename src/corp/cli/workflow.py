@@ -3,10 +3,11 @@
 import sys
 
 import click
-from corp_by_os.cli._common import CHECK, DASH, console
-from corp_by_os.project_resolver import resolve_project
 from rich.panel import Panel
 from rich.table import Table
+
+from corp.cli._common import CHECK, DASH, console
+from corp.project_resolver import resolve_project
 
 
 @click.command("run")
@@ -34,7 +35,7 @@ def run_workflow(
     **kwargs: str | None,
 ) -> None:
     """Execute a workflow or list available workflows."""
-    from corp_by_os.workflow_engine import (
+    from corp.workflow_engine import (
         execute_workflow,
         load_workflows,
         preview_workflow,

@@ -7,9 +7,9 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from corp_opportunity_manager.chat import ChatSession, _parse_date
-from corp_opportunity_manager.config import AppConfig
-from corp_opportunity_manager.models import IntentResult
+from corp.opportunity.chat import ChatSession, _parse_date
+from corp.opportunity.config import AppConfig
+from corp.opportunity.models import IntentResult
 from rich.console import Console
 
 
@@ -49,7 +49,7 @@ def session(app_config: AppConfig) -> ChatSession:
 class TestIntentRouting:
     """Test that intents get routed to correct handlers."""
 
-    @patch("corp_opportunity_manager.chat.parse_intent")
+    @patch("corp.opportunity.chat.parse_intent")
     def test_create_opportunity_route(self, mock_parse, session: ChatSession):
         mock_parse.return_value = IntentResult(
             intent="create_opportunity",
@@ -64,7 +64,7 @@ class TestIntentRouting:
             session.config.projects_root / "TestCo_Planning" / "_knowledge" / "project-info.yaml"
         ).exists()
 
-    @patch("corp_opportunity_manager.chat.parse_intent")
+    @patch("corp.opportunity.chat.parse_intent")
     def test_list_projects_route(self, mock_parse, session: ChatSession):
         # Create a project first
         (session.config.projects_root / "Lenzing_Planning").mkdir()
@@ -78,7 +78,7 @@ class TestIntentRouting:
         session._process("List all projects")
         # No exception = success (output goes to mock console)
 
-    @patch("corp_opportunity_manager.chat.parse_intent")
+    @patch("corp.opportunity.chat.parse_intent")
     def test_show_project_route(self, mock_parse, session: ChatSession):
         # Create project with files
         proj = session.config.projects_root / "Lenzing_Planning"
@@ -94,7 +94,7 @@ class TestIntentRouting:
         )
         session._process("Show Lenzing")
 
-    @patch("corp_opportunity_manager.chat.parse_intent")
+    @patch("corp.opportunity.chat.parse_intent")
     def test_create_subfolder_route(self, mock_parse, session: ChatSession):
         proj = session.config.projects_root / "Lenzing_Planning"
         proj.mkdir()
@@ -107,7 +107,7 @@ class TestIntentRouting:
         session._process("Got an RFP from Lenzing")
         assert (proj / "RFP" / "Original").exists()
 
-    @patch("corp_opportunity_manager.chat.parse_intent")
+    @patch("corp.opportunity.chat.parse_intent")
     def test_check_structure_route(self, mock_parse, session: ChatSession):
         proj = session.config.projects_root / "Lenzing_Planning"
         proj.mkdir()
@@ -119,7 +119,7 @@ class TestIntentRouting:
         )
         session._process("Check Lenzing structure")
 
-    @patch("corp_opportunity_manager.chat.parse_intent")
+    @patch("corp.opportunity.chat.parse_intent")
     def test_chitchat_route(self, mock_parse, session: ChatSession):
         mock_parse.return_value = IntentResult(
             intent="chitchat",
@@ -128,7 +128,7 @@ class TestIntentRouting:
         )
         session._process("Hello")
 
-    @patch("corp_opportunity_manager.chat.parse_intent")
+    @patch("corp.opportunity.chat.parse_intent")
     def test_clarify_route(self, mock_parse, session: ChatSession):
         mock_parse.return_value = IntentResult(
             intent="clarify",
@@ -137,7 +137,7 @@ class TestIntentRouting:
         )
         session._process("do something")
 
-    @patch("corp_opportunity_manager.chat.parse_intent")
+    @patch("corp.opportunity.chat.parse_intent")
     def test_missing_client_shows_llm_response(self, mock_parse, session: ChatSession):
         mock_parse.return_value = IntentResult(
             intent="create_opportunity",
@@ -151,7 +151,7 @@ class TestIntentRouting:
 class TestHistory:
     """Test conversation history management."""
 
-    @patch("corp_opportunity_manager.chat.parse_intent")
+    @patch("corp.opportunity.chat.parse_intent")
     def test_history_grows(self, mock_parse, session: ChatSession):
         mock_parse.return_value = IntentResult(
             intent="chitchat",
@@ -177,7 +177,7 @@ class TestHelpers:
     def test_parse_date_invalid(self):
         assert _parse_date("not-a-date") == date.today()
 
-    @patch("corp_opportunity_manager.chat.parse_intent")
+    @patch("corp.opportunity.chat.parse_intent")
     def test_prep_deck_creates_file(self, mock_parse, session: ChatSession):
         # Create project folder first
         proj = session.config.projects_root / "Lenzing_Planning"
@@ -191,7 +191,7 @@ class TestHelpers:
         session._process("Prep demo deck for Lenzing March 15")
         assert (proj / "Lenzing_2026-03-15_Demo.pptx").exists()
 
-    @patch("corp_opportunity_manager.chat.parse_intent")
+    @patch("corp.opportunity.chat.parse_intent")
     def test_prep_deck_no_project(self, mock_parse, session: ChatSession):
         mock_parse.return_value = IntentResult(
             intent="prep_deck",

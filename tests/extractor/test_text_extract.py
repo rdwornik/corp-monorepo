@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from corp_knowledge_extractor.text_extract import (
+from corp.extractor.text_extract import (
     TextExtractionResult,
     _assess_quality,
     extract_text,

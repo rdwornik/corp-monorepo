@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import pytest
-from corp_os_meta.pipeline_config import PipelineConfig
+from corp.schema.pipeline_config import PipelineConfig
 
 
 class TestSandbox:

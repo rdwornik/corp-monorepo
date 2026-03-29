@@ -6,8 +6,8 @@ import json
 from pathlib import Path
 
 import pytest
-from corp_by_os.overnight.monitor import OvernightMonitor
-from corp_by_os.overnight.state import OvernightState
+from corp.overnight.monitor import OvernightMonitor
+from corp.overnight.state import OvernightState
 
 
 @pytest.fixture()

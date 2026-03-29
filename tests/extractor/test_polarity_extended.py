@@ -1,6 +1,6 @@
 """Tests for extended polarity classification."""
 
-from corp_knowledge_extractor.polarity import (
+from corp.extractor.polarity import (
     classify_fact_polarity,
     classify_note_polarity,
 )

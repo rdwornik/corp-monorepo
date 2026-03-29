@@ -10,7 +10,7 @@ import logging
 from dataclasses import dataclass
 from pathlib import Path
 
-from corp_by_os.ops.registry import ContentRegistry, RegistryMatch
+from corp.ops.registry import ContentRegistry, RegistryMatch
 
 logger = logging.getLogger(__name__)
 

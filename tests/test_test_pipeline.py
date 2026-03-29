@@ -12,13 +12,13 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from corp_by_os.test_pipeline import (
+from corp.schema.pipeline_config import PipelineConfig
+from corp.test_pipeline import (
     PipelineTestReport,
     StepResult,
     format_report,
     run_pipeline_test,
 )
-from corp_os_meta.pipeline_config import PipelineConfig
 
 
 @pytest.fixture()
@@ -156,7 +156,7 @@ def test_record_flag_graceful_skip(
 ) -> None:
     """record=True with CKE unavailable should not crash and leave recorded_fixtures == 0."""
     monkeypatch.setattr(
-        "corp_by_os.overnight.cke_client.is_available",
+        "corp.overnight.cke_client.is_available",
         lambda: (False, "no key"),
     )
     report = run_pipeline_test(

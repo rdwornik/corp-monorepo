@@ -5,8 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from corp_by_os.ops.database import OpsDB
-from corp_by_os.ops.file_registry import ExtractionRecord, FileRecord, FileRegistry
+from corp.ops.database import OpsDB
+from corp.ops.file_registry import ExtractionRecord, FileRecord, FileRegistry
 
 
 @pytest.fixture()

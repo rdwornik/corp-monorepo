@@ -14,7 +14,7 @@ import pytest
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from config.config_loader import get, get_path
+from corp.extractor.config_loader import get, get_path
 
 
 class TestConfigLoader:

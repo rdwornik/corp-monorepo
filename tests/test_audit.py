@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 import pytest
-from corp_by_os.audit import (
+from corp.audit import (
     _build_file_listing,
     _build_project_listing,
     _parse_gemini_json,

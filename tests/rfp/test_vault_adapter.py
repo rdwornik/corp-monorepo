@@ -3,7 +3,7 @@
 import json
 from unittest.mock import MagicMock, patch
 
-import corp_rfp_agent.vault_adapter as vault_adapter
+import corp.rfp.vault_adapter as vault_adapter
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -55,7 +55,7 @@ def test_retrieve_parses_json():
     fake_result.stderr = ""
 
     with patch(
-        "corp_rfp_agent.vault_adapter.subprocess.run", return_value=fake_result
+        "corp.rfp.vault_adapter.subprocess.run", return_value=fake_result
     ) as mock_run:
         result = vault_adapter.retrieve("warehouse API", limit=5)
 
@@ -89,7 +89,7 @@ def test_retrieve_empty_results():
     fake_result.stdout = stdout
     fake_result.stderr = ""
 
-    with patch("corp_rfp_agent.vault_adapter.subprocess.run", return_value=fake_result):
+    with patch("corp.rfp.vault_adapter.subprocess.run", return_value=fake_result):
         result = vault_adapter.retrieve("nonexistent topic")
 
     assert result == []
@@ -108,7 +108,7 @@ def test_retrieve_filters_by_product():
     fake_result.stderr = ""
 
     with patch(
-        "corp_rfp_agent.vault_adapter.subprocess.run", return_value=fake_result
+        "corp.rfp.vault_adapter.subprocess.run", return_value=fake_result
     ) as mock_run:
         vault_adapter.retrieve("API integration", products=["wms", "planning"])
 
@@ -132,7 +132,7 @@ def test_retrieve_for_rfp_returns_best():
         _sample_note(note_id=44, relevance_score=0.4, content="Tertiary."),
     ]
 
-    with patch("corp_rfp_agent.vault_adapter.retrieve", return_value=notes):
+    with patch("corp.rfp.vault_adapter.retrieve", return_value=notes):
         result = vault_adapter.retrieve_for_rfp(
             "How does WMS handle APIs?", family="wms"
         )
@@ -149,7 +149,7 @@ def test_retrieve_for_rfp_returns_best():
 # ---------------------------------------------------------------------------
 def test_retrieve_for_rfp_no_data():
     """retrieve_for_rfp() returns NO_DATA when no notes found."""
-    with patch("corp_rfp_agent.vault_adapter.retrieve", return_value=[]):
+    with patch("corp.rfp.vault_adapter.retrieve", return_value=[]):
         result = vault_adapter.retrieve_for_rfp("Something obscure")
 
     assert result["status"] == "NO_DATA"
@@ -165,7 +165,7 @@ def test_retrieve_for_rfp_low_confidence():
     """retrieve_for_rfp() returns LOW_CONFIDENCE when best score is below threshold."""
     notes = [_sample_note(relevance_score=0.1, content="Weak match.")]
 
-    with patch("corp_rfp_agent.vault_adapter.retrieve", return_value=notes):
+    with patch("corp.rfp.vault_adapter.retrieve", return_value=notes):
         result = vault_adapter.retrieve_for_rfp("Vague question")
 
     assert result["status"] == "LOW_CONFIDENCE"
@@ -181,11 +181,11 @@ def test_fallback_when_cli_unavailable():
     # Simulate FileNotFoundError from subprocess (CLI not installed)
     with (
         patch(
-            "corp_rfp_agent.vault_adapter.subprocess.run",
+            "corp.rfp.vault_adapter.subprocess.run",
             side_effect=FileNotFoundError("corp not found"),
         ),
         patch(
-            "corp_rfp_agent.vault_adapter._retrieve_via_sqlite",
+            "corp.rfp.vault_adapter._retrieve_via_sqlite",
             return_value=[_sample_note()],
         ) as mock_sql,
     ):
@@ -245,7 +245,7 @@ def test_fallback_direct_sqlite(tmp_path):
     )
 
     # Patch _find_index_db to use our temp DB
-    with patch("corp_rfp_agent.vault_adapter._find_index_db", return_value=db_path):
+    with patch("corp.rfp.vault_adapter._find_index_db", return_value=db_path):
         result = vault_adapter._retrieve_via_sqlite("REST API", limit=5)
 
     assert len(result) == 1
@@ -267,7 +267,7 @@ def test_corp_cli_error_returns_empty():
     fake_result.stdout = ""
     fake_result.stderr = "Error: index not found"
 
-    with patch("corp_rfp_agent.vault_adapter.subprocess.run", return_value=fake_result):
+    with patch("corp.rfp.vault_adapter.subprocess.run", return_value=fake_result):
         result = vault_adapter._retrieve_via_cli("test query")
 
     assert result == []
@@ -291,7 +291,7 @@ def test_retrieve_sorts_verified_first():
     fake_result.stdout = stdout
     fake_result.stderr = ""
 
-    with patch("corp_rfp_agent.vault_adapter.subprocess.run", return_value=fake_result):
+    with patch("corp.rfp.vault_adapter.subprocess.run", return_value=fake_result):
         result = vault_adapter.retrieve("test query")
 
     # Verified notes come first, ordered by relevance within each tier

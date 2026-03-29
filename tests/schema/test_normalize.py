@@ -1,6 +1,6 @@
 """Tests for taxonomy normalization."""
 
-from corp_os_meta.normalize import load_taxonomy, normalize_frontmatter, normalize_terms
+from corp.schema.normalize import load_taxonomy, normalize_frontmatter, normalize_terms
 
 
 def test_alias_resolution():

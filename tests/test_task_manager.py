@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 import yaml
-from corp_by_os.models import TaskPriority, TaskStatus
-from corp_by_os.task_manager import (
+from corp.models import TaskPriority, TaskStatus
+from corp.task_manager import (
     _parse_task_file,
     _slugify_title,
     add_task,

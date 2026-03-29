@@ -1,4 +1,4 @@
-"""corp_os_meta — Shared metadata schema for corp-by-os agent ecosystem."""
+"""corp.schema — Shared metadata schema for corp-by-os agent ecosystem."""
 
 from .models import (
     SCHEMA_VERSION,

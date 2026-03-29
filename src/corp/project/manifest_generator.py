@@ -12,7 +12,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 
-from corp_project_extractor.models import Manifest
+from corp.project.models import Manifest
 
 logger = logging.getLogger(__name__)
 
@@ -162,7 +162,7 @@ def generate_cke_manifest(
     }
 
     # Write manifest alongside the CPE manifest
-    from corp_project_extractor.config import get_settings
+    from corp.project.config import get_settings
 
     settings = get_settings()
     knowledge_dir = project_root / settings.knowledge_dir

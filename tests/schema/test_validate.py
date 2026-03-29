@@ -2,8 +2,8 @@
 
 from datetime import date
 
-from corp_os_meta import ValidationResult, validate_frontmatter
-from corp_os_meta.validate import validate_against_schema
+from corp.schema import ValidationResult, validate_frontmatter
+from corp.schema.validate import validate_against_schema
 
 
 def test_valid_note():

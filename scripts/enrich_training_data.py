@@ -74,7 +74,7 @@ def main() -> None:
         0,
         str(REPO_ROOT / "packages/corp-by-os/src"),
     )
-    from corp_by_os.ingest.light_scan import ScanResult, light_scan  # noqa: PLC0415
+    from corp.ingest.light_scan import ScanResult, light_scan  # noqa: PLC0415
 
     with FIXTURE_PATH.open(encoding="utf-8") as f:
         examples: list[dict] = json.load(f)

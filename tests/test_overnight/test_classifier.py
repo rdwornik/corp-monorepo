@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from corp_by_os.overnight.classifier import (
+from corp.overnight.classifier import (
     _clean_spaces,
     _propose_rename,
     _slugify,

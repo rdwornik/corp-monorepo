@@ -23,13 +23,14 @@ load_dotenv(override=False)
 
 import click  # noqa: E402
 import yaml  # noqa: E402
-from corp_os_meta import (  # noqa: E402
+from rich.console import Console  # noqa: E402
+from rich.table import Table  # noqa: E402
+
+from corp.schema import (  # noqa: E402
     load_taxonomy,
     normalize_frontmatter,
     validate_frontmatter,
 )
-from rich.console import Console  # noqa: E402
-from rich.table import Table  # noqa: E402
 
 console = Console()
 

@@ -4,9 +4,9 @@ import os
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from corp_knowledge_extractor.extract import ExtractionResult
-from corp_knowledge_extractor.inventory import FileType, SourceFile
-from corp_knowledge_extractor.synthesize import _run_synthesis
+from corp.extractor.extract import ExtractionResult
+from corp.extractor.inventory import FileType, SourceFile
+from corp.extractor.synthesize import _run_synthesis
 
 
 def _make_result(

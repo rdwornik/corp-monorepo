@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 import yaml
-from corp_by_os.ingest.router import (
+from corp.ingest.router import (
     compute_file_hash,
     finalize_file,
     get_staged_files,
@@ -15,8 +15,8 @@ from corp_by_os.ingest.router import (
     ingest_folder,
     scan_inbox,
 )
-from corp_by_os.ops.database import OpsDB
-from corp_by_os.ops.registry import ContentRegistry
+from corp.ops.database import OpsDB
+from corp.ops.registry import ContentRegistry
 
 
 @pytest.fixture()

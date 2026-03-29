@@ -38,7 +38,7 @@ KNOWN_DUPLICATES = [
 )
 def test_short_form_normalizes_to_canonical(short: str, canonical: str) -> None:
     """Short product name normalizes to full BY-prefixed canonical form."""
-    from corp_knowledge_extractor.post_process import normalize_product_names
+    from corp.extractor.post_process import normalize_product_names
 
     result = normalize_product_names([short])
     assert result == [canonical], f"{short!r} → {result}, expected [{canonical!r}]"
@@ -51,7 +51,7 @@ def test_short_form_normalizes_to_canonical(short: str, canonical: str) -> None:
 )
 def test_dedup_when_both_present(short: str, canonical: str) -> None:
     """When both short and canonical forms are present, dedup to canonical."""
-    from corp_knowledge_extractor.post_process import normalize_product_names
+    from corp.extractor.post_process import normalize_product_names
 
     result = normalize_product_names([short, canonical])
     assert result == [canonical], f"[{short!r}, {canonical!r}] → {result}"
@@ -59,7 +59,7 @@ def test_dedup_when_both_present(short: str, canonical: str) -> None:
 
 def test_third_party_products_preserved() -> None:
     """Third-party products (Azure, Snowflake, SAP) are preserved as-is."""
-    from corp_knowledge_extractor.post_process import normalize_product_names
+    from corp.extractor.post_process import normalize_product_names
 
     third_party = ["Azure", "Snowflake", "SAP"]
     result = normalize_product_names(third_party)

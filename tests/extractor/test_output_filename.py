@@ -1,6 +1,6 @@
 """Tests for normalized output filename convention (Council Decision #7)."""
 
-from corp_knowledge_extractor.synthesize import normalize_output_filename
+from corp.extractor.synthesize import normalize_output_filename
 
 
 class TestNormalizeOutputFilename:

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 import yaml
-from corp_by_os.cleanup.executor import _guard_onedrive, execute_moves
+from corp.cleanup.executor import _guard_onedrive, execute_moves
 
 
 def _write_moves(path, entries):

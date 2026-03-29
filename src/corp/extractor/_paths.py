@@ -6,7 +6,7 @@ needs updating when the package moves (e.g., monorepo merge).
 
 from pathlib import Path
 
-PACKAGE_DIR = Path(__file__).parent  # src/corp_knowledge_extractor/
+PACKAGE_DIR = Path(__file__).parent  # src/corp.extractor/
 SRC_DIR = PACKAGE_DIR.parent  # src/
 REPO_ROOT = SRC_DIR.parent  # repo root
 CONFIG_DIR = REPO_ROOT / "config"

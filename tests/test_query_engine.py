@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 import yaml
-from corp_by_os.index_builder import rebuild_index
-from corp_by_os.query_engine import (
+from corp.index_builder import rebuild_index
+from corp.query_engine import (
     _sanitize_fts_query,
     get_analytics,
     search_facts,

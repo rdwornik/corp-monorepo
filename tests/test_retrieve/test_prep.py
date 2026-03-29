@@ -8,8 +8,8 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from corp_by_os.retrieve.engine import RetrievedNote
-from corp_by_os.retrieve.prep import (
+from corp.retrieve.engine import RetrievedNote
+from corp.retrieve.prep import (
     PrepBriefing,
     build_notes_context,
     generate_prep,
@@ -174,8 +174,8 @@ class TestGeneratePrep:
         output_dir = vault.parent / "output"
 
         with (
-            patch("corp_by_os.retrieve.prep.genai") as mock_genai,
-            patch("corp_by_os.retrieve.prep.genai_types") as mock_types,
+            patch("corp.retrieve.prep.genai") as mock_genai,
+            patch("corp.retrieve.prep.genai_types") as mock_types,
         ):
             mock_response = MagicMock()
             mock_response.text = "## Client Overview\n\nLenzing is a fiber company."
@@ -205,8 +205,8 @@ class TestGeneratePrep:
         output_dir = vault.parent / "custom_output"
 
         with (
-            patch("corp_by_os.retrieve.prep.genai") as mock_genai,
-            patch("corp_by_os.retrieve.prep.genai_types") as mock_types,
+            patch("corp.retrieve.prep.genai") as mock_genai,
+            patch("corp.retrieve.prep.genai_types") as mock_types,
         ):
             mock_response = MagicMock()
             mock_response.text = "Briefing content"
@@ -236,8 +236,8 @@ class TestGeneratePrep:
         conn.close()
 
         with (
-            patch("corp_by_os.retrieve.prep.genai") as mock_genai,
-            patch("corp_by_os.retrieve.prep.genai_types") as mock_types,
+            patch("corp.retrieve.prep.genai") as mock_genai,
+            patch("corp.retrieve.prep.genai_types") as mock_types,
         ):
             mock_response = MagicMock()
             mock_response.text = "No information available."
@@ -260,8 +260,8 @@ class TestGeneratePrep:
         db_path, vault = prep_db
 
         with (
-            patch("corp_by_os.retrieve.prep.genai") as mock_genai,
-            patch("corp_by_os.retrieve.prep.genai_types") as mock_types,
+            patch("corp.retrieve.prep.genai") as mock_genai,
+            patch("corp.retrieve.prep.genai_types") as mock_types,
         ):
             mock_client = MagicMock()
             mock_client.models.generate_content.side_effect = RuntimeError("API down")
@@ -286,8 +286,8 @@ class TestGeneratePrep:
         output_dir = project_dir / "_corp_prep"
 
         with (
-            patch("corp_by_os.retrieve.prep.genai") as mock_genai,
-            patch("corp_by_os.retrieve.prep.genai_types") as mock_types,
+            patch("corp.retrieve.prep.genai") as mock_genai,
+            patch("corp.retrieve.prep.genai_types") as mock_types,
         ):
             mock_response = MagicMock()
             mock_response.text = "Briefing content"
@@ -314,7 +314,7 @@ class TestGeneratePrep:
         """Missing genai SDK returns unavailable message."""
         db_path, vault = prep_db
 
-        with patch("corp_by_os.retrieve.prep.genai", None):
+        with patch("corp.retrieve.prep.genai", None):
             briefing = generate_prep(
                 "Lenzing",
                 db_path,

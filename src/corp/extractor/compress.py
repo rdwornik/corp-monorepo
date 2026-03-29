@@ -4,7 +4,7 @@ Video compression utilities using FFmpeg.
 Reads compression settings from config['compression'].
 
 Usage:
-    from corp_knowledge_extractor.compress import needs_compression, compress_video
+    from corp.extractor.compress import needs_compression, compress_video
     from pathlib import Path
 
     config = load_config()

@@ -7,10 +7,11 @@ from datetime import datetime
 from pathlib import Path
 
 import click
-from corp_by_os.cli._common import console, logger
-from corp_by_os.cli.extract import EXTRACT_EXTENSIONS
-from corp_by_os.config import get_config
-from corp_os_meta.pipeline_config import PipelineConfig
+
+from corp.cli._common import console, logger
+from corp.cli.extract import EXTRACT_EXTENSIONS
+from corp.config import get_config
+from corp.schema.pipeline_config import PipelineConfig
 
 OVERNIGHT_SCOPES: dict[str, list[str]] = {
     "all-non-project": ["30_Templates", "50_RFP", "60_Source_Library"],
@@ -48,7 +49,7 @@ def overnight_command(
     """Run overnight extraction and reshape pipeline."""
     config = (obj or {}).get("config") or PipelineConfig.production()
     if reset:
-        from corp_by_os.overnight.state import OvernightState
+        from corp.overnight.state import OvernightState
 
         state = OvernightState(config=config)
         cleared = state.conn.execute("DELETE FROM files WHERE status = 'pending'").rowcount
@@ -57,7 +58,7 @@ def overnight_command(
         state.close()
         return
 
-    from corp_by_os.overnight.preflight import run_preflight
+    from corp.overnight.preflight import run_preflight
 
     cfg = get_config()
     mywork_root = cfg.mywork_root
@@ -93,9 +94,9 @@ def _run_folder_extraction(
     """Extraction flow for named folder scopes."""
     import uuid
 
-    from corp_by_os.overnight.cke_client import is_available
-    from corp_by_os.overnight.monitor import OvernightMonitor
-    from corp_by_os.overnight.state import OvernightState
+    from corp.overnight.cke_client import is_available
+    from corp.overnight.monitor import OvernightMonitor
+    from corp.overnight.state import OvernightState
 
     run_id = f"overnight-{scope}-{uuid.uuid4().hex[:8]}"
     state = OvernightState(config=config)
@@ -108,7 +109,7 @@ def _run_folder_extraction(
     console.print(f"[bold]Scope:[/bold] {scope} -> {', '.join(folders)}")
 
     # Scan folders
-    from corp_by_os.overnight.safety import is_safe_for_upload
+    from corp.overnight.safety import is_safe_for_upload
 
     total_files = 0
     for folder_name in folders:
@@ -117,7 +118,7 @@ def _run_folder_extraction(
             console.print(f"  [yellow]Skipping {folder_name} (not found)[/yellow]")
             continue
 
-        from corp_by_os.extraction.scanner import scan_folder
+        from corp.extraction.scanner import scan_folder
 
         results = scan_folder(folder_path, allow_extensions=EXTRACT_EXTENSIONS)
         safe_count = 0
@@ -160,11 +161,12 @@ def _run_folder_extraction(
 
     # Build per-folder manifests and extract
     import yaml
-    from corp_by_os.extraction.folder_policy import PolicyError, load_policy
-    from corp_by_os.extraction.manifest_emitter import build_manifest, write_manifest
-    from corp_by_os.extraction.routing import resolve_route
-    from corp_by_os.extraction.vault_writer import move_to_vault
-    from corp_by_os.overnight.cke_client import extract_batch, extract_sync
+
+    from corp.extraction.folder_policy import PolicyError, load_policy
+    from corp.extraction.manifest_emitter import build_manifest, write_manifest
+    from corp.extraction.routing import resolve_route
+    from corp.extraction.vault_writer import move_to_vault
+    from corp.overnight.cke_client import extract_batch, extract_sync
 
     routing_map_path = mywork_root / "90_System" / "routing_map.yaml"
     with open(routing_map_path, encoding="utf-8") as f:
@@ -311,10 +313,10 @@ def _run_full_reshape(
     """
     import uuid
 
-    from corp_by_os.overnight.cke_client import is_available, scan_local
-    from corp_by_os.overnight.monitor import OvernightMonitor
-    from corp_by_os.overnight.safety import is_safe_for_upload
-    from corp_by_os.overnight.state import OvernightState
+    from corp.overnight.cke_client import is_available, scan_local
+    from corp.overnight.monitor import OvernightMonitor
+    from corp.overnight.safety import is_safe_for_upload
+    from corp.overnight.state import OvernightState
 
     run_id = f"reshape-{uuid.uuid4().hex[:8]}"
     state = OvernightState(config=config)
@@ -350,7 +352,7 @@ def _run_full_reshape(
     console.print("[bold]Phase 2: Dedup...[/bold]")
     dup_groups: list = []
     try:
-        from corp_by_os.overnight.dedup import deduplicate
+        from corp.overnight.dedup import deduplicate
 
         unique, dup_groups = deduplicate(safe_results)
         if dup_groups:
@@ -371,7 +373,8 @@ def _run_full_reshape(
     classifications: list = []
     try:
         import yaml
-        from corp_by_os.overnight.classifier import classify_batch as reshape_classify
+
+        from corp.overnight.classifier import classify_batch as reshape_classify
 
         routing_map_path = mywork_root / "90_System" / "routing_map.yaml"
         if routing_map_path.exists():
@@ -448,7 +451,7 @@ def _run_freshness_phase(cfg: AppConfig) -> None:  # noqa: F821
     """
     import json as _json
 
-    from corp_by_os.freshness_scanner import scan_vault_freshness
+    from corp.freshness_scanner import scan_vault_freshness
 
     console.print("\n[bold]Freshness scan...[/bold]")
     try:

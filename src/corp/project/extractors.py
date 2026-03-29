@@ -14,8 +14,9 @@ from datetime import datetime
 from pathlib import Path
 
 import yaml
-from corp_project_extractor.config import get_settings
-from corp_project_extractor.models import ExtractionResult
+
+from corp.project.config import get_settings
+from corp.project.models import ExtractionResult
 
 log = logging.getLogger(__name__)
 

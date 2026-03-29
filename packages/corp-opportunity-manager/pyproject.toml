@@ -17,7 +17,7 @@ llm = ["google-genai>=1.0"]
 dev = ["pytest>=7.0", "pytest-cov", "ruff"]
 
 [project.scripts]
-com = "corp_opportunity_manager.cli:cli"
+com = "corp.opportunity.cli:cli"
 
 [build-system]
 requires = ["setuptools>=68.0"]

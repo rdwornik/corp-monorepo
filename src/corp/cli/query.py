@@ -4,8 +4,9 @@ import sys
 from pathlib import Path
 
 import click
-from corp_by_os.cli._common import console, logger
 from rich.table import Table
+
+from corp.cli._common import console, logger
 
 
 @click.command("query")
@@ -22,14 +23,14 @@ def query_command(
     limit: int,
 ) -> None:
     """Search across project facts and metadata."""
-    from corp_by_os.index_builder import get_index_path
+    from corp.index_builder import get_index_path
 
     if not get_index_path().exists():
         console.print("[yellow]No index. Run `corp index rebuild` first.[/yellow]")
         sys.exit(1)
 
     if search_terms:
-        from corp_by_os.query_engine import search_facts
+        from corp.query_engine import search_facts
 
         results = search_facts(search_terms, project_filter=project, limit=limit)
         if not results:
@@ -48,7 +49,7 @@ def query_command(
         console.print(f"[dim]{len(results)} results[/dim]")
 
     elif product or topic:
-        from corp_by_os.query_engine import search_projects
+        from corp.query_engine import search_projects
 
         products_list = [product] if product else None
         topics_list = [topic] if topic else None
@@ -90,7 +91,7 @@ def query_command(
 )
 def folder_review_command(path: str | None) -> None:
     """Scan 10_Projects/ folders and propose renames.  Report only — no files modified."""
-    from corp_by_os.ingest.renamer import FolderRenameProposal, propose_folder_name
+    from corp.ingest.renamer import FolderRenameProposal, propose_folder_name
 
     if path:
         root = Path(path)

@@ -3,14 +3,15 @@ import os
 import sys
 from pathlib import Path
 
-from corp_knowledge_extractor._paths import REPO_ROOT
 from dotenv import load_dotenv
 from google import genai
+
+from corp.extractor._paths import REPO_ROOT
 
 _project_root = str(REPO_ROOT)
 if _project_root not in sys.path:
     sys.path.insert(0, _project_root)
-from config.config_loader import get  # noqa: E402
+from corp.extractor.config_loader import get  # noqa: E402
 
 # Global API keys (Documents/.secrets/.env)
 _global_env = Path.home() / "Documents" / ".secrets" / ".env"

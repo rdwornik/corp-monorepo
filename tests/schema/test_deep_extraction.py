@@ -2,7 +2,7 @@
 
 from datetime import date
 
-from corp_os_meta import (
+from corp.schema import (
     OVERLAY_MAP,
     ArchitectureOverlay,
     CommercialOverlay,

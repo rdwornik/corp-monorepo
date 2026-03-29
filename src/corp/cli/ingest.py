@@ -3,10 +3,11 @@
 from pathlib import Path
 
 import click
-from corp_by_os.cli._common import CHECK, DASH, console
-from corp_by_os.config import get_config
-from corp_os_meta.pipeline_config import PipelineConfig
 from rich.table import Table
+
+from corp.cli._common import CHECK, DASH, console
+from corp.config import get_config
+from corp.schema.pipeline_config import PipelineConfig
 
 
 @click.command("ingest")
@@ -25,15 +26,15 @@ def ingest_command(
     Without PATH, scans entire 00_Inbox (files + folders).
     With PATH, ingests a specific file or directory of files.
     """
-    from corp_by_os.ingest.router import (
+    from corp.ingest.router import (
         IngestResult,
         PackageIngestResult,
         ingest_all,
         ingest_file,
         ingest_folder,
     )
-    from corp_by_os.ops.database import OpsDB
-    from corp_by_os.ops.registry import ContentRegistry, get_content_registry_path
+    from corp.ops.database import OpsDB
+    from corp.ops.registry import ContentRegistry, get_content_registry_path
 
     config = (obj or {}).get("config") or PipelineConfig.production()
     cfg = get_config()
@@ -228,14 +229,14 @@ def ingest_inbox_command(
     Processes one file at a time with Rich UI: classify, confirm
     destination, rename, move, then trigger CKE extraction.
     """
-    from corp_by_os.ingest.inbox import (
+    from corp.ingest.inbox import (
         _list_events,
         _scan_inbox_files,
         _undo_event,
         process_file,
     )
-    from corp_by_os.ops.database import OpsDB
-    from corp_by_os.ops.registry import ContentRegistry, get_content_registry_path
+    from corp.ops.database import OpsDB
+    from corp.ops.registry import ContentRegistry, get_content_registry_path
 
     config = (obj or {}).get("config") or PipelineConfig.production()
     cfg = get_config()
@@ -315,8 +316,8 @@ def finalize_command(obj: dict, approve_all: bool) -> None:
     This command lists them for review and moves approved files to their
     final destinations.
     """
-    from corp_by_os.ingest.router import finalize_file, get_staged_files
-    from corp_by_os.ops.database import OpsDB
+    from corp.ingest.router import finalize_file, get_staged_files
+    from corp.ops.database import OpsDB
 
     config = (obj or {}).get("config") or PipelineConfig.production()
     cfg = get_config()
@@ -381,9 +382,9 @@ def classify_command(obj: dict, model: str, budget: float, dry_run: bool) -> Non
         corp classify                # Classify and stage
         corp finalize --approve-all  # Commit staged files
     """
-    from corp_by_os.ingest.llm_classifier import classify_quarantined_batch
-    from corp_by_os.ops.database import OpsDB
-    from corp_by_os.ops.registry import ContentRegistry, get_content_registry_path
+    from corp.ingest.llm_classifier import classify_quarantined_batch
+    from corp.ops.database import OpsDB
+    from corp.ops.registry import ContentRegistry, get_content_registry_path
 
     config = (obj or {}).get("config") or PipelineConfig.production()
     cfg = get_config()
@@ -459,7 +460,7 @@ def freshness_cmd(verbose: bool) -> None:
 
         corp freshness --verbose
     """
-    from corp_by_os.freshness_scanner import scan_vault_freshness
+    from corp.freshness_scanner import scan_vault_freshness
 
     cfg = get_config()
 
@@ -548,13 +549,13 @@ def ingest_extractions_cmd(
 
         corp ingest-extractions /path/to/cke/output --quality-threshold 50
     """
-    from corp_by_os.ingest.extractions import ingest_extractions
+    from corp.ingest.extractions import ingest_extractions
 
     config = (obj or {}).get("config") or PipelineConfig.production()
     cfg = get_config()
 
     try:
-        from corp_by_os.ops.database import OpsDB
+        from corp.ops.database import OpsDB
 
         ops = OpsDB(config=config)
     except Exception:
@@ -603,7 +604,7 @@ def ingest_extractions_cmd(
     if result.notes_ingested > 0 and not dry_run and rebuild_index:
         console.print("\n[dim]Rebuilding search index...[/dim]")
         try:
-            from corp_by_os.index_builder import rebuild_index as do_rebuild
+            from corp.index_builder import rebuild_index as do_rebuild
 
             stats = do_rebuild(config=config)
             console.print(f"[green]Index rebuilt: {stats.facts_indexed} facts indexed.[/green]")

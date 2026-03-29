@@ -11,7 +11,7 @@ synchronous since it requires file uploads that can't be embedded
 in JSONL.
 
 Usage:
-    from corp_knowledge_extractor.batch_api import BatchJobRunner
+    from corp.extractor.batch_api import BatchJobRunner
 
     runner = BatchJobRunner(manifest, config)
     summary = runner.run(poll_interval=60, timeout=86400)
@@ -23,7 +23,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-from corp_knowledge_extractor.extract import (
+from corp.extractor.extract import (
     ExtractionError,
     ExtractionResult,
     _get_client,
@@ -32,21 +32,21 @@ from corp_knowledge_extractor.extract import (
     _prepend_user_context,
     _result_from_json,
 )
-from corp_knowledge_extractor.inventory import FileType, SourceFile
-from corp_knowledge_extractor.manifest import (
+from corp.extractor.inventory import FileType, SourceFile
+from corp.extractor.manifest import (
     FileStatus,
     Manifest,
     ManifestEntry,
     save_status,
 )
-from corp_knowledge_extractor.post_process import post_process_extraction
-from corp_knowledge_extractor.tier_router import (
+from corp.extractor.post_process import post_process_extraction
+from corp.extractor.tier_router import (
     TIER_COSTS,
     Tier,
     TierDecision,
     route_tier,
 )
-from corp_os_meta.utils import parse_llm_json
+from corp.schema.utils import parse_llm_json
 
 logger = logging.getLogger(__name__)
 
@@ -336,13 +336,12 @@ class BatchJobRunner:
         Execute batch processing. Returns summary dict compatible with
         the synchronous BatchProcessor.process_all() output.
         """
-        from corp_knowledge_extractor.compress import compress_video, needs_compression
-        from corp_knowledge_extractor.correlate import correlate_files
-        from corp_knowledge_extractor.extract import extract_knowledge, extract_local
-        from corp_knowledge_extractor.frames.sampler import sample_frames
-        from corp_knowledge_extractor.manifest import load_status
-        from corp_knowledge_extractor.synthesize import build_package
-
+        from corp.extractor.compress import compress_video, needs_compression
+        from corp.extractor.correlate import correlate_files
+        from corp.extractor.extract import extract_knowledge, extract_local
+        from corp.extractor.frames.sampler import sample_frames
+        from corp.extractor.manifest import load_status
+        from corp.extractor.synthesize import build_package
         from scripts.run import keep_slide_frames
 
         output_dir = self.manifest.output_dir

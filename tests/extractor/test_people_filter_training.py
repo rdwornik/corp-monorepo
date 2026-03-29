@@ -34,7 +34,7 @@ def test_fixture_has_type_distribution() -> None:
 
 def test_filter_people_no_crashes() -> None:
     """filter_people handles all real people strings without error."""
-    from corp_knowledge_extractor.post_process import filter_people
+    from corp.extractor.post_process import filter_people
 
     all_names = [p["input"] for p in ALL_PEOPLE]
     # Should not raise
@@ -44,7 +44,7 @@ def test_filter_people_no_crashes() -> None:
 
 def test_filter_people_keeps_most_entries() -> None:
     """Most extraction people entries are real people, not roles."""
-    from corp_knowledge_extractor.post_process import filter_people
+    from corp.extractor.post_process import filter_people
 
     all_names = [p["input"] for p in ALL_PEOPLE]
     kept, filtered = filter_people(all_names)
@@ -55,7 +55,7 @@ def test_filter_people_keeps_most_entries() -> None:
 
 def test_pure_role_titles_filtered() -> None:
     """Pure role titles (no person name) should be filtered."""
-    from corp_knowledge_extractor.post_process import filter_people
+    from corp.extractor.post_process import filter_people
 
     pure_roles = [
         "Technical Account Manager",
@@ -71,7 +71,7 @@ def test_pure_role_titles_filtered() -> None:
 
 def test_named_people_with_roles_kept() -> None:
     """People with real names + role descriptions should be kept."""
-    from corp_knowledge_extractor.post_process import filter_people
+    from corp.extractor.post_process import filter_people
 
     named_people = [
         "Amy Wilkes (Supply Chain Degree Apprentice)",
@@ -86,7 +86,7 @@ def test_named_people_with_roles_kept() -> None:
 
 def test_high_frequency_people_are_real() -> None:
     """People appearing in 5+ extractions are likely real (not role titles)."""
-    from corp_knowledge_extractor.post_process import filter_people
+    from corp.extractor.post_process import filter_people
 
     frequent = [p["input"] for p in ALL_PEOPLE if p["count"] >= 5]
     if not frequent:

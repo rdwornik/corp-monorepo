@@ -4,7 +4,7 @@ import json
 import logging
 from datetime import datetime
 
-from corp_knowledge_extractor._paths import DATA_DIR
+from corp.extractor._paths import DATA_DIR
 
 log = logging.getLogger(__name__)
 

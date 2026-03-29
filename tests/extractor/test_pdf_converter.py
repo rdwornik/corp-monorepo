@@ -4,8 +4,8 @@ import subprocess
 from unittest.mock import MagicMock, patch
 
 import fitz
-from corp_knowledge_extractor.extract import _render_pdf_to_slides
-from corp_knowledge_extractor.slides.pdf_converter import (
+from corp.extractor.extract import _render_pdf_to_slides
+from corp.extractor.slides.pdf_converter import (
     _convert_via_com,
     convert_pptx_to_pdf,
 )
@@ -48,7 +48,7 @@ class TestConverterCascade:
             pdf_path.write_bytes(b"%PDF-1.4 fake")
             return pdf_path
 
-        with patch("corp_knowledge_extractor.slides.pdf_converter._convert_via_com", side_effect=fake_com):
+        with patch("corp.extractor.slides.pdf_converter._convert_via_com", side_effect=fake_com):
             result = convert_pptx_to_pdf(pptx, out_dir)
 
         assert result is not None
@@ -69,10 +69,10 @@ class TestConverterCascade:
 
         with (
             patch(
-                "corp_knowledge_extractor.slides.pdf_converter._convert_via_com",
+                "corp.extractor.slides.pdf_converter._convert_via_com",
                 side_effect=subprocess.TimeoutExpired("cmd", 30),
             ),
-            patch("corp_knowledge_extractor.slides.pdf_converter._convert_via_libreoffice", side_effect=fake_lo),
+            patch("corp.extractor.slides.pdf_converter._convert_via_libreoffice", side_effect=fake_lo),
         ):
             result = convert_pptx_to_pdf(pptx, out_dir)
 
@@ -93,9 +93,9 @@ class TestConverterCascade:
 
         with (
             patch(
-                "corp_knowledge_extractor.slides.pdf_converter._convert_via_com", side_effect=ImportError("No comtypes")
+                "corp.extractor.slides.pdf_converter._convert_via_com", side_effect=ImportError("No comtypes")
             ),
-            patch("corp_knowledge_extractor.slides.pdf_converter._convert_via_libreoffice", side_effect=fake_lo),
+            patch("corp.extractor.slides.pdf_converter._convert_via_libreoffice", side_effect=fake_lo),
         ):
             result = convert_pptx_to_pdf(pptx, out_dir)
 
@@ -109,10 +109,10 @@ class TestConverterCascade:
 
         with (
             patch(
-                "corp_knowledge_extractor.slides.pdf_converter._convert_via_com", side_effect=ImportError("No comtypes")
+                "corp.extractor.slides.pdf_converter._convert_via_com", side_effect=ImportError("No comtypes")
             ),
             patch(
-                "corp_knowledge_extractor.slides.pdf_converter._convert_via_libreoffice",
+                "corp.extractor.slides.pdf_converter._convert_via_libreoffice",
                 side_effect=FileNotFoundError("No LO"),
             ),
         ):
@@ -128,9 +128,9 @@ class TestPptxMultimodalRouting:
         """PDF available → Tier 3 multimodal extraction used."""
         from unittest.mock import patch
 
-        from corp_knowledge_extractor.extract import ExtractionResult
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.text_extract import TextExtractionResult
+        from corp.extractor.extract import ExtractionResult
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.text_extract import TextExtractionResult
 
         pptx = tmp_path / "deck.pptx"
         pptx.write_bytes(b"PK\x03\x04fake")
@@ -142,8 +142,8 @@ class TestPptxMultimodalRouting:
         fake_result = MagicMock(spec=ExtractionResult)
         fake_result.title = "Test Deck"
 
-        with patch("corp_knowledge_extractor.extract._try_pptx_pdf_multimodal", return_value=fake_result) as mock_multi:
-            from corp_knowledge_extractor.extract import extract_from_text
+        with patch("corp.extractor.extract._try_pptx_pdf_multimodal", return_value=fake_result) as mock_multi:
+            from corp.extractor.extract import extract_from_text
 
             result = extract_from_text(sf, {"gemini": {"model": "test"}}, text_result)
 
@@ -154,8 +154,8 @@ class TestPptxMultimodalRouting:
         """No PDF → Tier 2 text-only with warning."""
         from unittest.mock import patch
 
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.text_extract import TextExtractionResult
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.text_extract import TextExtractionResult
 
         pptx = tmp_path / "deck.pptx"
         pptx.write_bytes(b"PK\x03\x04fake")
@@ -164,15 +164,15 @@ class TestPptxMultimodalRouting:
 
         # Make PDF multimodal return None (conversion failed)
         with (
-            patch("corp_knowledge_extractor.extract._try_pptx_pdf_multimodal", return_value=None),
-            patch("corp_knowledge_extractor.providers.router.route_model", return_value="gemini-3-flash-preview"),
-            patch("corp_knowledge_extractor.providers.router.get_provider") as mock_provider_fn,
-            patch("corp_knowledge_extractor.providers.validator.validate_and_retry") as mock_validate,
-            patch("corp_knowledge_extractor.freshness.compute_freshness_fields", return_value={}),
-            patch("corp_knowledge_extractor.extract.extract_source_date", return_value=None),
-            patch("corp_knowledge_extractor.doc_type_classifier.classify_doc_type", return_value="presentation"),
-            patch("corp_knowledge_extractor.doc_type_classifier.should_extract_deep", return_value=False),
-            patch("corp_knowledge_extractor.extract.post_process_extraction") as mock_pp,
+            patch("corp.extractor.extract._try_pptx_pdf_multimodal", return_value=None),
+            patch("corp.extractor.providers.router.route_model", return_value="gemini-3-flash-preview"),
+            patch("corp.extractor.providers.router.get_provider") as mock_provider_fn,
+            patch("corp.extractor.providers.validator.validate_and_retry") as mock_validate,
+            patch("corp.extractor.freshness.compute_freshness_fields", return_value={}),
+            patch("corp.extractor.extract.extract_source_date", return_value=None),
+            patch("corp.extractor.doc_type_classifier.classify_doc_type", return_value="presentation"),
+            patch("corp.extractor.doc_type_classifier.should_extract_deep", return_value=False),
+            patch("corp.extractor.extract.post_process_extraction") as mock_pp,
         ):
             # Set up provider mock
             mock_response = MagicMock()
@@ -202,7 +202,7 @@ class TestPptxMultimodalRouting:
             mock_pp_result.changes = []
             mock_pp.return_value = mock_pp_result
 
-            from corp_knowledge_extractor.extract import extract_from_text
+            from corp.extractor.extract import extract_from_text
 
             result = extract_from_text(
                 sf, {"gemini": {"model": "test"}, "prompts": {"extract": "Extract knowledge"}}, text_result

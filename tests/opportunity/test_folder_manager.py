@@ -4,9 +4,9 @@ from datetime import date
 
 import pytest
 import yaml
-from corp_opportunity_manager.config import AppConfig
-from corp_opportunity_manager.folder_manager import create_opportunity
-from corp_opportunity_manager.models import OpportunityConfig
+from corp.opportunity.config import AppConfig
+from corp.opportunity.folder_manager import create_opportunity
+from corp.opportunity.models import OpportunityConfig
 
 
 def test_create_opportunity_creates_folder(app_config: AppConfig):

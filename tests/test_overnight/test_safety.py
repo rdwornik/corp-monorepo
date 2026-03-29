@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from corp_by_os.overnight.safety import filter_safe_files, is_safe_for_upload
+from corp.overnight.safety import filter_safe_files, is_safe_for_upload
 
 
 class TestBlockedExtension:

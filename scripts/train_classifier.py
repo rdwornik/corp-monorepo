@@ -158,7 +158,7 @@ def main() -> None:
     print("Serialization: JSON (no pickle)")
 
     # Also copy to CKE data dir for packaging
-    cke_data = MONOREPO / "packages/corp-knowledge-extractor/src/corp_knowledge_extractor/data"
+    cke_data = MONOREPO / "src/corp/extractor/data"
     dest = cke_data / "hybrid_classifier.json"
     dest.write_text(json.dumps(model_data, indent=2), encoding="utf-8")
     print(f"Copied to CKE data: {dest}")

@@ -52,8 +52,8 @@ if _global_env.exists():
 # Local .env (project-specific vars only)
 load_dotenv(PROJECT_ROOT / ".env", override=False)
 
-from corp_rfp_agent.anonymization import AnonymizationMiddleware  # noqa: E402
-from corp_rfp_agent.llm_router import LLMRouter  # noqa: E402
+from corp.rfp.anonymization import AnonymizationMiddleware  # noqa: E402
+from corp.rfp.llm_router import LLMRouter  # noqa: E402
 
 
 def call_llm_with_retry(llm_func, *args, max_retries=3, **kwargs):

@@ -1,7 +1,7 @@
 """Acceptance tests for Word agent -- structure checks only (no LLM calls)."""
 
 import pytest
-from corp_rfp_agent.rfp_answer_word import (
+from corp.rfp.rfp_answer_word import (
     build_section_tree,
     collect_answerable_sections,
     detect_heading_level,

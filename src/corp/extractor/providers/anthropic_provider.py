@@ -3,7 +3,7 @@
 import logging
 import os
 
-from corp_knowledge_extractor.providers.base import (
+from corp.extractor.providers.base import (
     ExtractionProvider,
     ExtractionRequest,
     ExtractionResponse,

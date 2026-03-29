@@ -7,7 +7,7 @@ import re
 from datetime import date
 from pathlib import Path
 
-from corp_opportunity_manager.models import StructureIssue
+from corp.opportunity.models import StructureIssue
 
 logger = logging.getLogger(__name__)
 

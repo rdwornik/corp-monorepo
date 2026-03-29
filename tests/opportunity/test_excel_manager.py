@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import pytest
-from corp_opportunity_manager.excel_manager import (
+from corp.opportunity.excel_manager import (
     find_row_by_client,
     list_projects,
     update_folder_link,

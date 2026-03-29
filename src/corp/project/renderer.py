@@ -15,7 +15,8 @@ from datetime import date, datetime
 from pathlib import Path
 
 import yaml
-from corp_project_extractor.config import get_settings
+
+from corp.project.config import get_settings
 
 logger = logging.getLogger(__name__)
 

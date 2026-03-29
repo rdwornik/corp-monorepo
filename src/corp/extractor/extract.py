@@ -6,9 +6,9 @@ For videos WITH sampled frames: uploads video + sends sampled frame images inlin
 so Gemini can identify unique slides and produce per-slide analysis.
 
 Usage:
-    from corp_knowledge_extractor.extract import extract_knowledge, ExtractionResult, ExtractionError
-    from corp_knowledge_extractor.inventory import SourceFile
-    from corp_knowledge_extractor.frames.sampler import SampledFrame
+    from corp.extractor.extract import extract_knowledge, ExtractionResult, ExtractionError
+    from corp.extractor.inventory import SourceFile
+    from corp.extractor.frames.sampler import SampledFrame
 
     # Plain extraction
     result = extract_knowledge(source_file, config)
@@ -25,15 +25,15 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from corp_knowledge_extractor.frames.sampler import SampledFrame
-from corp_knowledge_extractor.inventory import FileType, SourceFile
-from corp_knowledge_extractor.post_process import post_process_extraction
-from corp_knowledge_extractor.taxonomy_prompt import get_taxonomy_for_prompt
-from corp_knowledge_extractor.text_extract import (
+from corp.extractor.frames.sampler import SampledFrame
+from corp.extractor.inventory import FileType, SourceFile
+from corp.extractor.post_process import post_process_extraction
+from corp.extractor.taxonomy_prompt import get_taxonomy_for_prompt
+from corp.extractor.text_extract import (
     TextExtractionResult,
     extract_source_date,
 )
-from corp_os_meta.utils import normalize_string_list, parse_llm_json
+from corp.schema.utils import normalize_string_list, parse_llm_json
 
 log = logging.getLogger(__name__)
 
@@ -295,8 +295,8 @@ def _enrich_facts(
     text_result: TextExtractionResult | None,
 ) -> list[dict]:
     """Build enriched facts list with source_date, locator, polarity, and validation."""
-    from corp_knowledge_extractor.fact_validation import validate_fact_against_source
-    from corp_knowledge_extractor.polarity import detect_polarity
+    from corp.extractor.fact_validation import validate_fact_against_source
+    from corp.extractor.polarity import detect_polarity
 
     file_ext = source_file.path.suffix.lower()
     max_pages = 0
@@ -486,14 +486,15 @@ def extract_knowledge(
     Raises:
         ExtractionError: Caller logs and skips
     """
-    from corp_knowledge_extractor.deep_prompt import build_deep_multimodal_prompt
-    from corp_knowledge_extractor.doc_type_classifier import (
+    from google.genai import types
+
+    from corp.extractor.deep_prompt import build_deep_multimodal_prompt
+    from corp.extractor.doc_type_classifier import (
         classify_doc_type_hybrid,
         should_extract_deep,
     )
-    from corp_knowledge_extractor.freshness import compute_freshness_fields
-    from corp_knowledge_extractor.providers.router import select_model
-    from google.genai import types
+    from corp.extractor.freshness import compute_freshness_fields
+    from corp.extractor.providers.router import select_model
 
     client = _get_client(config)
 
@@ -709,12 +710,12 @@ def _haiku_enrichment(
     try:
         import json
 
-        from corp_knowledge_extractor.fact_validation import (
+        from corp.extractor.fact_validation import (
             validate_fact_against_source,
         )
-        from corp_knowledge_extractor.polarity import detect_polarity
-        from corp_knowledge_extractor.providers.base import ExtractionRequest
-        from corp_knowledge_extractor.providers.router import get_provider
+        from corp.extractor.polarity import detect_polarity
+        from corp.extractor.providers.base import ExtractionRequest
+        from corp.extractor.providers.router import get_provider
 
         model = "claude-haiku-4-5-20251001"
         provider = get_provider(model)
@@ -807,14 +808,15 @@ def _try_pdf_multimodal(
     import copy
     import tempfile
 
-    from corp_knowledge_extractor.deep_prompt import build_deep_multimodal_prompt
-    from corp_knowledge_extractor.doc_type_classifier import (
+    from google.genai import types
+
+    from corp.extractor.deep_prompt import build_deep_multimodal_prompt
+    from corp.extractor.doc_type_classifier import (
         classify_doc_type_hybrid,
         should_extract_deep,
     )
-    from corp_knowledge_extractor.freshness import compute_freshness_fields
-    from corp_knowledge_extractor.providers.router import select_model
-    from google.genai import types
+    from corp.extractor.freshness import compute_freshness_fields
+    from corp.extractor.providers.router import select_model
 
     client = _get_client(config)
     model_override = config.get("model_override")
@@ -1011,15 +1013,16 @@ def _try_pptx_pdf_multimodal(
     # Convert PPTX to PDF
     import tempfile
 
-    from corp_knowledge_extractor.deep_prompt import build_deep_multimodal_prompt
-    from corp_knowledge_extractor.doc_type_classifier import (
+    from google.genai import types
+
+    from corp.extractor.deep_prompt import build_deep_multimodal_prompt
+    from corp.extractor.doc_type_classifier import (
         classify_doc_type_hybrid,
         should_extract_deep,
     )
-    from corp_knowledge_extractor.freshness import compute_freshness_fields
-    from corp_knowledge_extractor.providers.router import select_model
-    from corp_knowledge_extractor.slides.pdf_converter import convert_pptx_to_pdf
-    from google.genai import types
+    from corp.extractor.freshness import compute_freshness_fields
+    from corp.extractor.providers.router import select_model
+    from corp.extractor.slides.pdf_converter import convert_pptx_to_pdf
 
     pdf_dir = Path(tempfile.mkdtemp(prefix="cke_pptx_pdf_"))
     pdf_path = convert_pptx_to_pdf(file.path, pdf_dir)
@@ -1189,20 +1192,20 @@ def extract_from_text(
     Returns:
         ExtractionResult with AI-structured knowledge
     """
-    from corp_knowledge_extractor.deep_prompt import build_deep_prompt
-    from corp_knowledge_extractor.doc_type_classifier import (
+    from corp.extractor.deep_prompt import build_deep_prompt
+    from corp.extractor.doc_type_classifier import (
         classify_doc_type_hybrid,
         should_extract_deep,
     )
-    from corp_knowledge_extractor.freshness import compute_freshness_fields
-    from corp_knowledge_extractor.providers.base import ExtractionRequest
-    from corp_knowledge_extractor.providers.router import (
+    from corp.extractor.freshness import compute_freshness_fields
+    from corp.extractor.providers.base import ExtractionRequest
+    from corp.extractor.providers.router import (
         DEFAULT_LARGE_CONTEXT_MODEL,
         get_provider,
         has_anthropic_key,
         route_model,
     )
-    from corp_knowledge_extractor.providers.validator import validate_and_retry
+    from corp.extractor.providers.validator import validate_and_retry
 
     # For PDF: attempt native multimodal extraction via Gemini Pro
     if file.path.suffix.lower() == ".pdf" and custom_prompt is None:
@@ -1389,14 +1392,15 @@ def extract_pptx_multimodal(
     Returns:
         ExtractionResult with per-slide analysis
     """
-    from corp_knowledge_extractor.deep_prompt import build_deep_multimodal_prompt
-    from corp_knowledge_extractor.doc_type_classifier import (
+    from google.genai import types
+
+    from corp.extractor.deep_prompt import build_deep_multimodal_prompt
+    from corp.extractor.doc_type_classifier import (
         classify_doc_type_hybrid,
         should_extract_deep,
     )
-    from corp_knowledge_extractor.freshness import compute_freshness_fields
-    from corp_knowledge_extractor.providers.router import select_model
-    from google.genai import types
+    from corp.extractor.freshness import compute_freshness_fields
+    from corp.extractor.providers.router import select_model
 
     client = _get_client(config)
     model_override = config.get("model_override")
@@ -1579,7 +1583,7 @@ def extract_local(
     result.facts = _enrich_facts(raw_result, file, result.source_date, text_result)
 
     # Freshness tracking
-    from corp_knowledge_extractor.freshness import compute_freshness_fields
+    from corp.extractor.freshness import compute_freshness_fields
 
     result.freshness = compute_freshness_fields(file.path)
 

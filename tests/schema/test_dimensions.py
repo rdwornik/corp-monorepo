@@ -2,15 +2,15 @@
 
 from datetime import date, timedelta
 
-from corp_os_meta import NoteFrontmatter, ValidationResult, validate_frontmatter
-from corp_os_meta.models import (
+from corp.schema import NoteFrontmatter, ValidationResult, validate_frontmatter
+from corp.schema.models import (
     SCHEMA_VERSION,
     Authority,
     Confidentiality,
     Layer,
     SourceType,
 )
-from corp_os_meta.normalize import (
+from corp.schema.normalize import (
     calculate_valid_to,
     load_taxonomy,
     normalize_frontmatter,

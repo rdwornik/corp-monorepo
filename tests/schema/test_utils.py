@@ -1,7 +1,7 @@
 """Tests for shared utilities."""
 
 import pytest
-from corp_os_meta import parse_llm_json
+from corp.schema import parse_llm_json
 
 
 def test_parse_clean_json():

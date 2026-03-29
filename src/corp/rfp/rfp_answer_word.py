@@ -55,14 +55,14 @@ try:
 except ImportError:
     CHROMADB_AVAILABLE = False
 
-from corp_rfp_agent.llm_router import (  # noqa: E402
+from corp.rfp.llm_router import (  # noqa: E402
     MODELS,
     clean_bold_markdown,
     extract_answer,
     extract_question,
     retry_with_backoff,
 )
-from corp_rfp_agent.vault_adapter import retrieve as vault_retrieve  # noqa: E402
+from corp.rfp.vault_adapter import retrieve as vault_retrieve  # noqa: E402
 
 # --- CONFIGURATION ---
 FAMILY_CONFIG_PATH = PROJECT_ROOT / "data/kb/schema/family_config.json"

@@ -4,8 +4,9 @@ import logging
 import os
 from pathlib import Path
 
-from corp_knowledge_extractor.providers.base import ExtractionProvider
 from dotenv import load_dotenv
+
+from corp.extractor.providers.base import ExtractionProvider
 
 # Global API keys (Documents/.secrets/.env)
 _global_env = Path.home() / "Documents" / ".secrets" / ".env"
@@ -46,18 +47,18 @@ def get_provider(model: str) -> ExtractionProvider:
                 "ANTHROPIC_API_KEY not set — falling back to Gemini for model %s",
                 model,
             )
-            from corp_knowledge_extractor.providers.gemini_provider import (
+            from corp.extractor.providers.gemini_provider import (
                 GeminiProvider,
             )
 
             return GeminiProvider()
-        from corp_knowledge_extractor.providers.anthropic_provider import (
+        from corp.extractor.providers.anthropic_provider import (
             AnthropicProvider,
         )
 
         return AnthropicProvider()
     elif model in GEMINI_MODELS:
-        from corp_knowledge_extractor.providers.gemini_provider import GeminiProvider
+        from corp.extractor.providers.gemini_provider import GeminiProvider
 
         return GeminiProvider()
     else:

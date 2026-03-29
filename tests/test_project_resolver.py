@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from corp_by_os.project_resolver import (
+from corp.project_resolver import (
     _score_match,
     get_onedrive_path,
     get_vault_path,

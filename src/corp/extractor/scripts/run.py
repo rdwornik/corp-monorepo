@@ -33,29 +33,28 @@ if _global_env.exists():
 # Local .env (project-specific vars only)
 load_dotenv(override=False)
 
-from corp_knowledge_extractor.compress import compress_video  # noqa: E402
-from corp_knowledge_extractor.correlate import correlate_files  # noqa: E402
-from corp_knowledge_extractor.extract import (  # noqa: E402
+from corp.extractor.compress import compress_video  # noqa: E402
+from corp.extractor.config_loader import load_config  # noqa: E402
+from corp.extractor.correlate import correlate_files  # noqa: E402
+from corp.extractor.extract import (  # noqa: E402
     ExtractionError,
     extract_from_text,
     extract_knowledge,
     extract_local,
     extract_pptx_multimodal,
 )
-from corp_knowledge_extractor.frames.sampler import SampledFrame  # noqa: E402
-from corp_knowledge_extractor.frames.scene_detect import scene_detect  # noqa: E402
-from corp_knowledge_extractor.inventory import FileType, scan_input  # noqa: E402
-from corp_knowledge_extractor.reextract import reextract_package  # noqa: E402
-from corp_knowledge_extractor.synthesize import (  # noqa: E402
+from corp.extractor.frames.sampler import SampledFrame  # noqa: E402
+from corp.extractor.frames.scene_detect import scene_detect  # noqa: E402
+from corp.extractor.inventory import FileType, scan_input  # noqa: E402
+from corp.extractor.reextract import reextract_package  # noqa: E402
+from corp.extractor.synthesize import (  # noqa: E402
     build_package,
     write_transcript_note,
 )
-from corp_knowledge_extractor.transcript import (  # noqa: E402
+from corp.extractor.transcript import (  # noqa: E402
     TranscriptResult,
     generate_transcript,
 )
-
-from config.config_loader import load_config  # noqa: E402
 
 logging.basicConfig(
     level=logging.INFO,
@@ -198,11 +197,12 @@ def _try_session_merge(files, extracts, extract_dir, _print_fn):
     import hashlib as _hashlib
 
     import yaml as _yaml
-    from corp_knowledge_extractor.correlate_sessions import (
+
+    from corp.extractor.correlate_sessions import (
         confirm_stage2,
         detect_stage1,
     )
-    from corp_knowledge_extractor.merge_session import merge_correlated
+    from corp.extractor.merge_session import merge_correlated
 
     all_paths = [f.path for f in files]
     session_group = detect_stage1(all_paths)
@@ -385,7 +385,7 @@ def process(
         _print(f"  {f.type.value:12s}  {f.path.name}  ({f.size_bytes / 1024 / 1024:.1f} MB)")
 
     # --- 1b. Tier routing ---
-    from corp_knowledge_extractor.tier_router import (
+    from corp.extractor.tier_router import (
         Tier,
         estimate_batch_cost,
         route_tier,
@@ -465,7 +465,7 @@ def process(
                     existing = json.loads(existing_json.read_text(encoding="utf-8"))
                     existing_hash = (existing.get("freshness") or {}).get("source_hash")
                     if existing_hash:
-                        from corp_knowledge_extractor.freshness import (
+                        from corp.extractor.freshness import (
                             compute_source_hash,
                         )
 
@@ -474,7 +474,7 @@ def process(
                             _print("    [SKIP] Already extracted (hash match)")
                             log.info("Skipping %s — already extracted (hash match)", f.path.name)
                             # Load existing result for downstream steps
-                            from corp_knowledge_extractor.extract import (
+                            from corp.extractor.extract import (
                                 ExtractionResult,
                             )
 
@@ -498,7 +498,7 @@ def process(
                 )
             elif f.path.suffix.lower() == ".pptx" and decision.tier == Tier.MULTIMODAL:
                 # PPTX multimodal: render slides as PNG, send to Gemini
-                from corp_knowledge_extractor.slides.renderer import render_slides
+                from corp.extractor.slides.renderer import render_slides
 
                 temp_slides_dir = output_p / package_name / "temp_slides" / f.name
                 rendered = render_slides(f.path, temp_slides_dir)
@@ -718,7 +718,7 @@ def process_manifest(
 
         cke process-manifest manifest.json --batch --batch-poll-interval 30
     """
-    from corp_knowledge_extractor.manifest import Manifest
+    from corp.extractor.manifest import Manifest
 
     config = load_config()
     MODEL_MAP = {"flash": "gemini-3-flash-preview", "pro": "gemini-3.1-pro-preview"}
@@ -744,12 +744,12 @@ def process_manifest(
     _print("")
 
     if batch:
-        from corp_knowledge_extractor.batch_api import BatchJobRunner
+        from corp.extractor.batch_api import BatchJobRunner
 
         runner = BatchJobRunner(manifest, config, force_tier=tier, resume=resume, force=force)
         summary = runner.run(poll_interval=batch_poll_interval, timeout=batch_timeout)
     else:
-        from corp_knowledge_extractor.batch import BatchProcessor
+        from corp.extractor.batch import BatchProcessor
 
         processor = BatchProcessor(manifest, config, max_rpm=max_rpm, resume=resume, force_tier=tier, force=force)
         summary = processor.process_all()
@@ -847,7 +847,7 @@ def info(package_path: str):
 )
 def scan(path: str, recursive: bool, output: str | None, exclude: tuple[str, ...]):
     """Scan files and extract local metadata (Tier 1, no API calls)."""
-    from corp_knowledge_extractor.scan import results_to_json, scan_path
+    from corp.extractor.scan import results_to_json, scan_path
 
     input_path = Path(path).resolve()
     _print(f"Scanning: {input_path}")

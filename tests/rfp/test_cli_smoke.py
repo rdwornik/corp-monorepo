@@ -6,10 +6,10 @@ import sys
 import pytest
 
 COMMANDS = [
-    [sys.executable, "src/corp_rfp_agent/rfp_answer_word.py", "--help"],
-    [sys.executable, "src/corp_rfp_agent/rfp_excel_agent.py", "--help"],
-    [sys.executable, "src/corp_rfp_agent/rfp_feedback.py", "--help"],
-    [sys.executable, "src/corp_rfp_agent/validate_profiles.py", "--help"],
+    [sys.executable, "src/corp/rfp/rfp_answer_word.py", "--help"],
+    [sys.executable, "src/corp/rfp/rfp_excel_agent.py", "--help"],
+    [sys.executable, "src/corp/rfp/rfp_feedback.py", "--help"],
+    [sys.executable, "src/corp/rfp/validate_profiles.py", "--help"],
 ]
 
 

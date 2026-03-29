@@ -9,21 +9,21 @@ from pathlib import Path
 
 import pytest
 import yaml
-from corp_by_os.ingest.classifier import classify
-from corp_by_os.ingest.naming_config import (
+from corp.ingest.classifier import classify
+from corp.ingest.naming_config import (
     clean_description,
     get_client_alias,
     get_client_variants,
     get_type_code,
 )
-from corp_by_os.ingest.renamer import (
+from corp.ingest.renamer import (
     _infer_client,
     _infer_type,
     _sanitize,
     propose_folder_name,
     propose_name,
 )
-from corp_by_os.ops.registry import ContentRegistry
+from corp.ops.registry import ContentRegistry
 
 
 @pytest.fixture()

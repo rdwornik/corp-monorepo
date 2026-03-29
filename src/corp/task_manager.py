@@ -11,8 +11,9 @@ from datetime import date
 from pathlib import Path
 
 import yaml
-from corp_by_os.config import get_config
-from corp_by_os.models import Task, TaskPriority, TaskStatus, VaultZone
+
+from corp.config import get_config
+from corp.models import Task, TaskPriority, TaskStatus, VaultZone
 
 logger = logging.getLogger(__name__)
 
@@ -112,7 +113,7 @@ def _slugify_title(title: str) -> str:
         "write",
     }
     # Strip diacritics for comparison
-    from corp_by_os.intent_router import _strip_diacritics
+    from corp.intent_router import _strip_diacritics
 
     normalized = _strip_diacritics(title.lower().strip())
     words = re.split(r"[^a-z0-9]+", normalized)

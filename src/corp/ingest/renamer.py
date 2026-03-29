@@ -17,8 +17,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
-from corp_by_os.ingest.classifier import Classification
-from corp_by_os.ingest.naming_config import (
+from corp.ingest.classifier import Classification
+from corp.ingest.naming_config import (
     clean_description,
     get_client_alias,
     get_type_code,

@@ -1,6 +1,6 @@
 """Tests for product key resolution and source reliability."""
 
-from corp_os_meta.products import (
+from corp.schema.products import (
     classify_source_tier,
     expand_product_query,
     get_children,

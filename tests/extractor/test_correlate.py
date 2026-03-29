@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
-from corp_knowledge_extractor.correlate import _stem_prefix, correlate_files
-from corp_knowledge_extractor.inventory import FileType, SourceFile
+from corp.extractor.correlate import _stem_prefix, correlate_files
+from corp.extractor.inventory import FileType, SourceFile
 
 
 def _sf(name: str, ft: FileType, size: int = 1000) -> SourceFile:

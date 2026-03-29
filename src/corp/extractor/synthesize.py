@@ -15,7 +15,7 @@ Output structure:
     └── .history/       (re-extract only)
 
 Usage:
-    from corp_knowledge_extractor.synthesize import build_package
+    from corp.extractor.synthesize import build_package
 
     pkg_path = build_package(groups, extracts, output_dir, "My Meeting", config)
 """
@@ -29,14 +29,15 @@ import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
-from corp_knowledge_extractor.compress import compress_video, needs_compression
-from corp_knowledge_extractor.correlate import FileGroup
-from corp_knowledge_extractor.extract import ExtractionResult
-from corp_knowledge_extractor.inventory import FileType, SourceFile
-from corp_knowledge_extractor.post_process import generate_tags, validate_tags
-from corp_knowledge_extractor.transcript import TranscriptResult
-from corp_os_meta.utils import normalize_string_list, parse_llm_json
 from jinja2 import Environment, FileSystemLoader
+
+from corp.extractor.compress import compress_video, needs_compression
+from corp.extractor.correlate import FileGroup
+from corp.extractor.extract import ExtractionResult
+from corp.extractor.inventory import FileType, SourceFile
+from corp.extractor.post_process import generate_tags, validate_tags
+from corp.extractor.transcript import TranscriptResult
+from corp.schema.utils import normalize_string_list, parse_llm_json
 
 log = logging.getLogger(__name__)
 
@@ -120,7 +121,7 @@ def compute_quality_score(
 
 
 def _get_jinja_env() -> Environment:
-    from corp_knowledge_extractor._paths import TEMPLATES_DIR
+    from corp.extractor._paths import TEMPLATES_DIR
 
     templates_dir = TEMPLATES_DIR
     env = Environment(

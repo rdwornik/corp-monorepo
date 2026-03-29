@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from corp_by_os.cleanup.scanner import scan_problematic_files
+from corp.cleanup.scanner import scan_problematic_files
 
 
 def test_scan_finds_inbox_files(mywork_cleanup):

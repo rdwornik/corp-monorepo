@@ -1,6 +1,6 @@
 """Tests for the deterministic document type classifier."""
 
-from corp_knowledge_extractor.doc_type_classifier import (
+from corp.extractor.doc_type_classifier import (
     DEEP_DOC_TYPES,
     classify_doc_type,
     classify_from_filename,

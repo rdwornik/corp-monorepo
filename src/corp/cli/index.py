@@ -3,9 +3,10 @@
 import sys
 
 import click
-from corp_by_os.cli._common import console
-from corp_os_meta.pipeline_config import PipelineConfig
 from rich.table import Table
+
+from corp.cli._common import console
+from corp.schema.pipeline_config import PipelineConfig
 
 
 @click.group("index")
@@ -18,7 +19,7 @@ def index_group() -> None:
 @click.pass_obj
 def index_rebuild(obj: dict, project: str | None) -> None:
     """Rebuild the SQLite index from all projects."""
-    from corp_by_os.index_builder import rebuild_index, update_project
+    from corp.index_builder import rebuild_index, update_project
 
     config = (obj or {}).get("config") or PipelineConfig.production()
 
@@ -44,7 +45,7 @@ def index_rebuild(obj: dict, project: str | None) -> None:
 @index_group.command("stats")
 def index_stats() -> None:
     """Show index stats."""
-    from corp_by_os.index_builder import get_index_path, get_index_stats
+    from corp.index_builder import get_index_path, get_index_stats
 
     path = get_index_path()
     if not path.exists():

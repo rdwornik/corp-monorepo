@@ -12,28 +12,28 @@ from unittest.mock import MagicMock, patch
 class TestSelectModelPdf:
     def test_pdf_always_pro(self):
         """Any .pdf → gemini-3.1-pro-preview regardless of size or images."""
-        from corp_knowledge_extractor.providers.router import select_model
+        from corp.extractor.providers.router import select_model
 
         model, reason = select_model(Path("report.pdf"), file_size=100_000)
         assert model == "gemini-3.1-pro-preview"
 
     def test_pdf_reason(self):
         """routing_reason for PDF is pdf_multimodal."""
-        from corp_knowledge_extractor.providers.router import select_model
+        from corp.extractor.providers.router import select_model
 
         _, reason = select_model(Path("report.pdf"), file_size=100_000)
         assert reason == "pdf_multimodal"
 
     def test_pdf_no_images_flag_still_pro(self):
         """PDF routes to Pro even without has_images flag."""
-        from corp_knowledge_extractor.providers.router import select_model
+        from corp.extractor.providers.router import select_model
 
         model, _ = select_model(Path("report.pdf"), file_size=500_000, has_images=False)
         assert model == "gemini-3.1-pro-preview"
 
     def test_pdf_override_wins(self):
         """Manual model override still takes precedence."""
-        from corp_knowledge_extractor.providers.router import select_model
+        from corp.extractor.providers.router import select_model
 
         model, reason = select_model(Path("report.pdf"), file_size=100_000, model_override="flash")
         assert model == "gemini-3-flash-preview"
@@ -41,7 +41,7 @@ class TestSelectModelPdf:
 
     def test_small_pdf_still_local(self):
         """PDFs under 5000 bytes still route to local (free)."""
-        from corp_knowledge_extractor.providers.router import select_model
+        from corp.extractor.providers.router import select_model
 
         model, reason = select_model(Path("tiny.pdf"), file_size=3000)
         assert model == "free"
@@ -67,22 +67,22 @@ def _make_fake_gemini_response(text: str, tokens: int = 500):
 def _mock_pdf_extraction_deps():
     """Return a dict of common patches for _try_pdf_multimodal."""
     return {
-        "corp_knowledge_extractor.doc_type_classifier.classify_doc_type": MagicMock(return_value="general"),
-        "corp_knowledge_extractor.doc_type_classifier.should_extract_deep": MagicMock(return_value=False),
-        "corp_knowledge_extractor.freshness.compute_freshness_fields": MagicMock(return_value={}),
-        "corp_knowledge_extractor.extract.extract_source_date": MagicMock(return_value=None),
-        "corp_knowledge_extractor.extract._enrich_facts": MagicMock(return_value=[]),
-        "corp_knowledge_extractor.extract._haiku_enrichment": MagicMock(return_value=[]),
-        "corp_knowledge_extractor.extract.get_taxonomy_for_prompt": MagicMock(return_value="TAXONOMY"),
+        "corp.extractor.doc_type_classifier.classify_doc_type": MagicMock(return_value="general"),
+        "corp.extractor.doc_type_classifier.should_extract_deep": MagicMock(return_value=False),
+        "corp.extractor.freshness.compute_freshness_fields": MagicMock(return_value={}),
+        "corp.extractor.extract.extract_source_date": MagicMock(return_value=None),
+        "corp.extractor.extract._enrich_facts": MagicMock(return_value=[]),
+        "corp.extractor.extract._haiku_enrichment": MagicMock(return_value=[]),
+        "corp.extractor.extract.get_taxonomy_for_prompt": MagicMock(return_value="TAXONOMY"),
     }
 
 
 class TestPdfMultimodalUpload:
     def test_pdf_multimodal_returns_result(self, tmp_path):
         """Mock Gemini upload + generate → returns ExtractionResult."""
-        from corp_knowledge_extractor.extract import _try_pdf_multimodal
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.text_extract import TextExtractionResult
+        from corp.extractor.extract import _try_pdf_multimodal
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.text_extract import TextExtractionResult
 
         pdf_file = tmp_path / "test.pdf"
         pdf_file.write_bytes(b"%PDF-1.4 dummy content for testing " * 200)
@@ -111,8 +111,8 @@ class TestPdfMultimodalUpload:
         mock_client.models.generate_content.return_value = _make_fake_gemini_response(response_json)
 
         patches = _mock_pdf_extraction_deps()
-        patches["corp_knowledge_extractor.extract._get_client"] = MagicMock(return_value=mock_client)
-        patches["corp_knowledge_extractor.providers.router.select_model"] = MagicMock(
+        patches["corp.extractor.extract._get_client"] = MagicMock(return_value=mock_client)
+        patches["corp.extractor.providers.router.select_model"] = MagicMock(
             return_value=("gemini-3.1-pro-preview", "pdf_multimodal")
         )
 
@@ -141,10 +141,10 @@ class TestPdfMultimodalUpload:
 class TestPdfMultimodalFallback:
     def test_fallback_to_text_on_failure(self):
         """When PDF multimodal fails, extract_from_text falls back to text-only."""
-        from corp_knowledge_extractor.extract import extract_from_text
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.providers.base import ExtractionResponse
-        from corp_knowledge_extractor.text_extract import TextExtractionResult
+        from corp.extractor.extract import extract_from_text
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.providers.base import ExtractionResponse
+        from corp.extractor.text_extract import TextExtractionResult
 
         source = SourceFile(path=Path("report.pdf"), type=FileType.DOCUMENT, size_bytes=50000, name="report")
         text_result = TextExtractionResult(text="Content", char_count=7, extractor="pdfplumber")
@@ -162,21 +162,21 @@ class TestPdfMultimodalFallback:
 
         with (
             # _try_pdf_multimodal raises → fallback
-            patch("corp_knowledge_extractor.extract._try_pdf_multimodal", side_effect=Exception("upload failed")),
-            patch("corp_knowledge_extractor.doc_type_classifier.classify_doc_type", return_value="general"),
-            patch("corp_knowledge_extractor.doc_type_classifier.should_extract_deep", return_value=False),
-            patch("corp_knowledge_extractor.freshness.compute_freshness_fields", return_value={}),
-            patch("corp_knowledge_extractor.extract.extract_source_date", return_value=None),
-            patch("corp_knowledge_extractor.extract._enrich_facts", return_value=[]),
-            patch("corp_knowledge_extractor.extract.get_taxonomy_for_prompt", return_value="TAX"),
+            patch("corp.extractor.extract._try_pdf_multimodal", side_effect=Exception("upload failed")),
+            patch("corp.extractor.doc_type_classifier.classify_doc_type", return_value="general"),
+            patch("corp.extractor.doc_type_classifier.should_extract_deep", return_value=False),
+            patch("corp.extractor.freshness.compute_freshness_fields", return_value={}),
+            patch("corp.extractor.extract.extract_source_date", return_value=None),
+            patch("corp.extractor.extract._enrich_facts", return_value=[]),
+            patch("corp.extractor.extract.get_taxonomy_for_prompt", return_value="TAX"),
             patch(
-                "corp_knowledge_extractor.providers.router.route_model",
+                "corp.extractor.providers.router.route_model",
                 return_value=("claude-haiku-4-5-20251001", "text_default"),
             ),
-            patch("corp_knowledge_extractor.providers.router.get_provider", return_value=FakeProvider()),
-            patch("corp_knowledge_extractor.providers.router.has_anthropic_key", return_value=True),
+            patch("corp.extractor.providers.router.get_provider", return_value=FakeProvider()),
+            patch("corp.extractor.providers.router.has_anthropic_key", return_value=True),
             patch(
-                "corp_knowledge_extractor.providers.validator.validate_and_retry", side_effect=lambda r, req: (r, False)
+                "corp.extractor.providers.validator.validate_and_retry", side_effect=lambda r, req: (r, False)
             ),
         ):
             result = extract_from_text(source, {"prompts": {"extract": "Extract."}}, text_result)
@@ -188,9 +188,9 @@ class TestPdfMultimodalFallback:
 class TestPdfLargeTruncation:
     def test_truncation_flag_set(self, tmp_path):
         """100-page PDF → multimodal_truncated: true in raw_json."""
-        from corp_knowledge_extractor.extract import _try_pdf_multimodal
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.text_extract import TextExtractionResult
+        from corp.extractor.extract import _try_pdf_multimodal
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.text_extract import TextExtractionResult
 
         pdf_file = tmp_path / "big.pdf"
         pdf_file.write_bytes(b"%PDF-1.4 big " * 5000)
@@ -231,8 +231,8 @@ class TestPdfLargeTruncation:
         mock_doc.__getitem__.return_value.get_pixmap.return_value = mock_pix
 
         patches = _mock_pdf_extraction_deps()
-        patches["corp_knowledge_extractor.extract._get_client"] = MagicMock(return_value=mock_client)
-        patches["corp_knowledge_extractor.providers.router.select_model"] = MagicMock(
+        patches["corp.extractor.extract._get_client"] = MagicMock(return_value=mock_client)
+        patches["corp.extractor.providers.router.select_model"] = MagicMock(
             return_value=("gemini-3.1-pro-preview", "pdf_multimodal")
         )
 
@@ -257,9 +257,9 @@ class TestPdfLargeTruncation:
 class TestPdfTextGrounding:
     def test_pdfplumber_text_in_prompt(self, tmp_path):
         """Text from pdfplumber is included in the prompt as grounding."""
-        from corp_knowledge_extractor.extract import _try_pdf_multimodal
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.text_extract import TextExtractionResult
+        from corp.extractor.extract import _try_pdf_multimodal
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.text_extract import TextExtractionResult
 
         pdf_file = tmp_path / "grounded.pdf"
         pdf_file.write_bytes(b"%PDF-1.4 content " * 200)
@@ -297,8 +297,8 @@ class TestPdfTextGrounding:
         mock_client.models.generate_content.side_effect = capture_generate
 
         patches = _mock_pdf_extraction_deps()
-        patches["corp_knowledge_extractor.extract._get_client"] = MagicMock(return_value=mock_client)
-        patches["corp_knowledge_extractor.providers.router.select_model"] = MagicMock(
+        patches["corp.extractor.extract._get_client"] = MagicMock(return_value=mock_client)
+        patches["corp.extractor.providers.router.select_model"] = MagicMock(
             return_value=("gemini-3.1-pro-preview", "pdf_multimodal")
         )
 
@@ -334,9 +334,9 @@ class TestPdfCoverRendered:
     def test_cover_in_slide_image_paths(self, tmp_path):
         """PDF extraction sets slide_image_paths with cover PNG."""
         import fitz as real_fitz
-        from corp_knowledge_extractor.extract import _try_pdf_multimodal
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.text_extract import TextExtractionResult
+        from corp.extractor.extract import _try_pdf_multimodal
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.text_extract import TextExtractionResult
 
         # Create a real single-page PDF with PyMuPDF
         try:
@@ -375,8 +375,8 @@ class TestPdfCoverRendered:
         mock_client.models.generate_content.return_value = _make_fake_gemini_response(response_json)
 
         patches = _mock_pdf_extraction_deps()
-        patches["corp_knowledge_extractor.extract._get_client"] = MagicMock(return_value=mock_client)
-        patches["corp_knowledge_extractor.providers.router.select_model"] = MagicMock(
+        patches["corp.extractor.extract._get_client"] = MagicMock(return_value=mock_client)
+        patches["corp.extractor.providers.router.select_model"] = MagicMock(
             return_value=("gemini-3.1-pro-preview", "pdf_multimodal")
         )
 
@@ -403,9 +403,9 @@ class TestPdfCoverRendered:
 class TestPdfHaikuEnrichment:
     def test_haiku_enrichment_called_for_pdf(self, tmp_path):
         """PDF multimodal path calls _haiku_enrichment."""
-        from corp_knowledge_extractor.extract import _try_pdf_multimodal
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.text_extract import TextExtractionResult
+        from corp.extractor.extract import _try_pdf_multimodal
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.text_extract import TextExtractionResult
 
         pdf_file = tmp_path / "enriched.pdf"
         pdf_file.write_bytes(b"%PDF-1.4 enriched " * 200)
@@ -438,11 +438,11 @@ class TestPdfHaikuEnrichment:
         )
 
         patches = _mock_pdf_extraction_deps()
-        patches["corp_knowledge_extractor.extract._get_client"] = MagicMock(return_value=mock_client)
-        patches["corp_knowledge_extractor.providers.router.select_model"] = MagicMock(
+        patches["corp.extractor.extract._get_client"] = MagicMock(return_value=mock_client)
+        patches["corp.extractor.providers.router.select_model"] = MagicMock(
             return_value=("gemini-3.1-pro-preview", "pdf_multimodal")
         )
-        patches["corp_knowledge_extractor.extract._haiku_enrichment"] = mock_haiku
+        patches["corp.extractor.extract._haiku_enrichment"] = mock_haiku
 
         mock_fitz = MagicMock()
         mock_fitz.open.return_value.__len__ = MagicMock(return_value=5)

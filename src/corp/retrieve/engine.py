@@ -27,7 +27,7 @@ def _get_client_variants(client: str) -> list[str]:
     and vice versa. Falls back to [client] if config is unavailable.
     """
     try:
-        from corp_by_os.ingest.naming_config import get_client_variants
+        from corp.ingest.naming_config import get_client_variants
 
         return get_client_variants(client)
     except Exception:
@@ -126,7 +126,7 @@ def retrieve(
     # Expand product queries using corp-os-meta taxonomy
     if filters.products:
         try:
-            from corp_os_meta.products import expand_product_query
+            from corp.schema.products import expand_product_query
 
             expanded: list[str] = []
             for p in filters.products:

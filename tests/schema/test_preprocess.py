@@ -1,6 +1,6 @@
 """Tests for preprocessing layer."""
 
-from corp_os_meta.normalize import load_taxonomy, normalize_terms, preprocess
+from corp.schema.normalize import load_taxonomy, normalize_terms, preprocess
 
 
 class TestPreprocess:

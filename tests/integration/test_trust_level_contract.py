@@ -1,6 +1,6 @@
 """Trust level protection works across the ingest boundary."""
 
-from corp_os_meta.models import DocumentType, NoteFrontmatter
+from corp.schema.models import DocumentType, NoteFrontmatter
 
 
 def test_trust_levels_are_accepted():

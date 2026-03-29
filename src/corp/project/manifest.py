@@ -12,9 +12,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Callable, Optional
 
-from corp_project_extractor.classifier import EXTRACTABLE_EXTENSIONS, classify_file
-from corp_project_extractor.config import get_settings
-from corp_project_extractor.models import FileEntry, Manifest
+from corp.project.classifier import EXTRACTABLE_EXTENSIONS, classify_file
+from corp.project.config import get_settings
+from corp.project.models import FileEntry, Manifest
 
 log = logging.getLogger(__name__)
 

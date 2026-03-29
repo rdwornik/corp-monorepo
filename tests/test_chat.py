@@ -5,11 +5,11 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import pytest
-from corp_by_os.chat import (
+from corp.chat import (
     QUIT_COMMANDS,
     _handle_special_command,
 )
-from corp_by_os.models import Workflow
+from corp.models import Workflow
 
 # --- Fixtures ---
 
@@ -53,11 +53,11 @@ class TestSpecialCommands:
         assert _handle_special_command("help", sample_workflows) is True
 
     def test_status_command(self, sample_workflows) -> None:
-        with patch("corp_by_os.chat._show_status"):
+        with patch("corp.chat._show_status"):
             assert _handle_special_command("status", sample_workflows) is True
 
     def test_direct_command(self, sample_workflows) -> None:
-        with patch("corp_by_os.chat._run_direct_command") as mock_run:
+        with patch("corp.chat._run_direct_command") as mock_run:
             assert _handle_special_command("!project list", sample_workflows) is True
             mock_run.assert_called_once_with("project list")
 
@@ -72,43 +72,43 @@ class TestSpecialCommands:
 
 
 class TestChatLoop:
-    @patch("corp_by_os.chat.console")
+    @patch("corp.chat.console")
     def test_quit_exits_loop(self, mock_console) -> None:
-        from corp_by_os.chat import chat_loop
+        from corp.chat import chat_loop
 
         mock_console.input.return_value = "quit"
         chat_loop(use_llm=False)
         # Should exit without error
 
-    @patch("corp_by_os.chat.console")
+    @patch("corp.chat.console")
     def test_empty_input_continues(self, mock_console) -> None:
-        from corp_by_os.chat import chat_loop
+        from corp.chat import chat_loop
 
         mock_console.input.side_effect = ["", "quit"]
         chat_loop(use_llm=False)
 
-    @patch("corp_by_os.chat.console")
+    @patch("corp.chat.console")
     def test_eof_exits(self, mock_console) -> None:
-        from corp_by_os.chat import chat_loop
+        from corp.chat import chat_loop
 
         mock_console.input.side_effect = EOFError()
         chat_loop(use_llm=False)
 
-    @patch("corp_by_os.chat.console")
+    @patch("corp.chat.console")
     def test_keyboard_interrupt_exits(self, mock_console) -> None:
-        from corp_by_os.chat import chat_loop
+        from corp.chat import chat_loop
 
         mock_console.input.side_effect = KeyboardInterrupt()
         chat_loop(use_llm=False)
 
-    @patch("corp_by_os.chat.console")
-    @patch("corp_by_os.chat.route")
-    @patch("corp_by_os.chat.execute_workflow")
-    @patch("corp_by_os.chat.load_workflows")
+    @patch("corp.chat.console")
+    @patch("corp.chat.route")
+    @patch("corp.chat.execute_workflow")
+    @patch("corp.chat.load_workflows")
     def test_workflow_execution(self, mock_load, mock_exec, mock_route, mock_console) -> None:
-        from corp_by_os.chat import chat_loop
-        from corp_by_os.intent_router import Intent
-        from corp_by_os.models import StepResult, WorkflowResult
+        from corp.chat import chat_loop
+        from corp.intent_router import Intent
+        from corp.models import StepResult, WorkflowResult
 
         mock_load.return_value = {
             "attention_scan": Workflow(

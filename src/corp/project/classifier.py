@@ -28,7 +28,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from corp_project_extractor.models import Classification
+from corp.project.models import Classification
 
 # Confidence levels
 HIGH = 1.0

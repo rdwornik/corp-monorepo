@@ -6,7 +6,7 @@ import sqlite3
 from pathlib import Path
 
 import yaml
-from corp_by_os.integrity import (
+from corp.integrity import (
     IntegrityReport,
     _check_config_files,
     _check_inbox,

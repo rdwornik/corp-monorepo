@@ -1,6 +1,6 @@
 """Tests for dynamic token budget computation."""
 
-from corp_knowledge_extractor.extract import compute_token_budget
+from corp.extractor.extract import compute_token_budget
 
 
 class TestComputeTokenBudget:

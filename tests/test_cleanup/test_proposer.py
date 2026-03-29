@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
-from corp_by_os.cleanup.classifier import Classification
-from corp_by_os.cleanup.proposer import generate_proposals
-from corp_by_os.cleanup.scanner import FileInfo
+from corp.cleanup.classifier import Classification
+from corp.cleanup.proposer import generate_proposals
+from corp.cleanup.scanner import FileInfo
 
 
 def _make_classification(name: str, action: str, dest: str, confidence: float) -> Classification:

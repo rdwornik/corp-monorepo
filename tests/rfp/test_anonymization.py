@@ -9,8 +9,8 @@ from __future__ import annotations
 from unittest.mock import patch
 
 # Patch targets — core.py imports from .config, so patch at the usage site
-CORE_BLOCKLIST = "corp_rfp_agent.anonymization.core.get_blocklist"
-CORE_SESSION = "corp_rfp_agent.anonymization.core.get_session"
+CORE_BLOCKLIST = "corp.rfp.anonymization.core.get_blocklist"
+CORE_SESSION = "corp.rfp.anonymization.core.get_session"
 
 DEFAULT_SESSION = {"customer_name": "", "placeholder": "[CUSTOMER]"}
 
@@ -35,7 +35,7 @@ def _patch(blocklist: list[str], session: dict | None = None):
 
 
 def test_anonymize_empty_string_returns_unchanged():
-    from corp_rfp_agent.anonymization.core import anonymize
+    from corp.rfp.anonymization.core import anonymize
 
     with (
         patch(CORE_BLOCKLIST, return_value=["Acme"]),
@@ -47,7 +47,7 @@ def test_anonymize_empty_string_returns_unchanged():
 
 
 def test_anonymize_no_match_returns_original_text():
-    from corp_rfp_agent.anonymization.core import anonymize
+    from corp.rfp.anonymization.core import anonymize
 
     bl_patch, sess_patch = _patch(["Acme"])
     with bl_patch, sess_patch:
@@ -58,7 +58,7 @@ def test_anonymize_no_match_returns_original_text():
 
 
 def test_anonymize_single_term_replaces_with_placeholder():
-    from corp_rfp_agent.anonymization.core import anonymize
+    from corp.rfp.anonymization.core import anonymize
 
     bl_patch, sess_patch = _patch(["Acme"])
     with bl_patch, sess_patch:
@@ -70,7 +70,7 @@ def test_anonymize_single_term_replaces_with_placeholder():
 
 
 def test_anonymize_two_terms_get_numbered_placeholders():
-    from corp_rfp_agent.anonymization.core import anonymize
+    from corp.rfp.anonymization.core import anonymize
 
     bl_patch, sess_patch = _patch(["Acme", "GlobalCorp"])
     with bl_patch, sess_patch:
@@ -86,7 +86,7 @@ def test_anonymize_two_terms_get_numbered_placeholders():
 
 
 def test_anonymize_case_insensitive():
-    from corp_rfp_agent.anonymization.core import anonymize
+    from corp.rfp.anonymization.core import anonymize
 
     bl_patch, sess_patch = _patch(["Acme"])
     with bl_patch, sess_patch:
@@ -98,7 +98,7 @@ def test_anonymize_case_insensitive():
 
 def test_anonymize_word_boundary_no_partial_match():
     """'Acme' should NOT replace inside 'AcmeCorp' — word boundary \b applies."""
-    from corp_rfp_agent.anonymization.core import anonymize
+    from corp.rfp.anonymization.core import anonymize
 
     bl_patch, sess_patch = _patch(["Acme"])
     with bl_patch, sess_patch:
@@ -110,7 +110,7 @@ def test_anonymize_word_boundary_no_partial_match():
 
 
 def test_anonymize_empty_blocklist_is_passthrough():
-    from corp_rfp_agent.anonymization.core import anonymize
+    from corp.rfp.anonymization.core import anonymize
 
     bl_patch, sess_patch = _patch([])
     with bl_patch, sess_patch:
@@ -121,7 +121,7 @@ def test_anonymize_empty_blocklist_is_passthrough():
 
 
 def test_anonymize_blank_term_in_blocklist_skipped():
-    from corp_rfp_agent.anonymization.core import anonymize
+    from corp.rfp.anonymization.core import anonymize
 
     bl_patch, sess_patch = _patch(["", "Acme", ""])
     with bl_patch, sess_patch:
@@ -138,7 +138,7 @@ def test_anonymize_blank_term_in_blocklist_skipped():
 
 
 def test_deanonymize_empty_string_returns_unchanged():
-    from corp_rfp_agent.anonymization.core import deanonymize
+    from corp.rfp.anonymization.core import deanonymize
 
     with patch(CORE_SESSION, return_value=DEFAULT_SESSION):
         result = deanonymize("")
@@ -146,7 +146,7 @@ def test_deanonymize_empty_string_returns_unchanged():
 
 
 def test_deanonymize_mapping_restores_original():
-    from corp_rfp_agent.anonymization.core import deanonymize
+    from corp.rfp.anonymization.core import deanonymize
 
     mapping = {"[CUSTOMER]": "Acme"}
     with patch(CORE_SESSION, return_value=DEFAULT_SESSION):
@@ -156,7 +156,7 @@ def test_deanonymize_mapping_restores_original():
 
 
 def test_deanonymize_without_mapping_uses_session_customer():
-    from corp_rfp_agent.anonymization.core import deanonymize
+    from corp.rfp.anonymization.core import deanonymize
 
     session = {"customer_name": "GlobalCorp", "placeholder": "[CUSTOMER]"}
     with patch(CORE_SESSION, return_value=session):
@@ -166,7 +166,7 @@ def test_deanonymize_without_mapping_uses_session_customer():
 
 
 def test_deanonymize_no_placeholder_in_text_unchanged():
-    from corp_rfp_agent.anonymization.core import deanonymize
+    from corp.rfp.anonymization.core import deanonymize
 
     mapping = {"[CUSTOMER]": "Acme"}
     with patch(CORE_SESSION, return_value=DEFAULT_SESSION):
@@ -176,7 +176,7 @@ def test_deanonymize_no_placeholder_in_text_unchanged():
 
 
 def test_deanonymize_numbered_placeholders_restored():
-    from corp_rfp_agent.anonymization.core import deanonymize
+    from corp.rfp.anonymization.core import deanonymize
 
     mapping = {"[CUSTOMER_1]": "Acme", "[CUSTOMER_2]": "GlobalCorp"}
     with patch(CORE_SESSION, return_value=DEFAULT_SESSION):
@@ -191,7 +191,7 @@ def test_deanonymize_numbered_placeholders_restored():
 
 
 def test_check_empty_text_returns_empty_list():
-    from corp_rfp_agent.anonymization.core import check
+    from corp.rfp.anonymization.core import check
 
     with patch(CORE_BLOCKLIST, return_value=["Acme"]):
         result = check("")
@@ -199,7 +199,7 @@ def test_check_empty_text_returns_empty_list():
 
 
 def test_check_returns_found_terms():
-    from corp_rfp_agent.anonymization.core import check
+    from corp.rfp.anonymization.core import check
 
     with patch(CORE_BLOCKLIST, return_value=["Acme", "GlobalCorp"]):
         result = check("Acme needs WMS")
@@ -209,7 +209,7 @@ def test_check_returns_found_terms():
 
 
 def test_check_multiple_occurrences_all_reported():
-    from corp_rfp_agent.anonymization.core import check
+    from corp.rfp.anonymization.core import check
 
     with patch(CORE_BLOCKLIST, return_value=["Acme"]):
         result = check("Acme asked about Acme licensing")
@@ -218,7 +218,7 @@ def test_check_multiple_occurrences_all_reported():
 
 
 def test_check_no_terms_found_returns_empty_list():
-    from corp_rfp_agent.anonymization.core import check
+    from corp.rfp.anonymization.core import check
 
     with patch(CORE_BLOCKLIST, return_value=["Acme"]):
         result = check("Blue Yonder provides the solution")
@@ -228,7 +228,7 @@ def test_check_no_terms_found_returns_empty_list():
 
 def test_check_does_not_modify_text():
     """check() is read-only — original text untouched."""
-    from corp_rfp_agent.anonymization.core import check
+    from corp.rfp.anonymization.core import check
 
     original = "Acme needs WMS integration"
     with patch(CORE_BLOCKLIST, return_value=["Acme"]):
@@ -243,7 +243,7 @@ def test_check_does_not_modify_text():
 
 
 def test_middleware_before_returns_anonymized_text_and_context():
-    from corp_rfp_agent.anonymization.middleware import AnonymizationMiddleware
+    from corp.rfp.anonymization.middleware import AnonymizationMiddleware
 
     mw = AnonymizationMiddleware(enabled=True)
     bl_patch, sess_patch = _patch(["Acme"])
@@ -257,7 +257,7 @@ def test_middleware_before_returns_anonymized_text_and_context():
 
 
 def test_middleware_after_restores_original_term():
-    from corp_rfp_agent.anonymization.middleware import AnonymizationMiddleware
+    from corp.rfp.anonymization.middleware import AnonymizationMiddleware
 
     mw = AnonymizationMiddleware(enabled=True)
     bl_patch, sess_patch = _patch(["Acme"])
@@ -272,7 +272,7 @@ def test_middleware_after_restores_original_term():
 
 
 def test_middleware_before_disabled_is_passthrough():
-    from corp_rfp_agent.anonymization.middleware import AnonymizationMiddleware
+    from corp.rfp.anonymization.middleware import AnonymizationMiddleware
 
     mw = AnonymizationMiddleware(enabled=False)
     text, ctx = mw.before("Acme needs WMS")
@@ -282,7 +282,7 @@ def test_middleware_before_disabled_is_passthrough():
 
 
 def test_middleware_after_disabled_is_passthrough():
-    from corp_rfp_agent.anonymization.middleware import AnonymizationMiddleware
+    from corp.rfp.anonymization.middleware import AnonymizationMiddleware
 
     mw = AnonymizationMiddleware(enabled=False)
     result = mw.after("some llm answer [CUSTOMER]", {"mapping": {"[CUSTOMER]": "Acme"}})
@@ -291,7 +291,7 @@ def test_middleware_after_disabled_is_passthrough():
 
 
 def test_middleware_after_empty_context_is_passthrough():
-    from corp_rfp_agent.anonymization.middleware import AnonymizationMiddleware
+    from corp.rfp.anonymization.middleware import AnonymizationMiddleware
 
     mw = AnonymizationMiddleware(enabled=True)
     result = mw.after("answer with [CUSTOMER]", {})
@@ -302,7 +302,7 @@ def test_middleware_after_empty_context_is_passthrough():
 
 def test_middleware_roundtrip_preserves_semantics():
     """before() + after() round-trip: final answer has original client name restored."""
-    from corp_rfp_agent.anonymization.middleware import AnonymizationMiddleware
+    from corp.rfp.anonymization.middleware import AnonymizationMiddleware
 
     mw = AnonymizationMiddleware(enabled=True)
     question = "What WMS features does Acme need?"
@@ -323,7 +323,7 @@ def test_middleware_roundtrip_preserves_semantics():
 
 def test_middleware_no_blocklist_terms_round_trip_unchanged():
     """When no terms match, before+after leaves text identical."""
-    from corp_rfp_agent.anonymization.middleware import AnonymizationMiddleware
+    from corp.rfp.anonymization.middleware import AnonymizationMiddleware
 
     mw = AnonymizationMiddleware(enabled=True)
     question = "What does Blue Yonder offer for WMS?"

@@ -15,8 +15,8 @@ Record mode (--record): live mode + saves each extraction to a fixture JSON
 
 Usage::
 
-    from corp_by_os.test_pipeline import run_pipeline_test
-    from corp_os_meta.pipeline_config import PipelineConfig
+    from corp.test_pipeline import run_pipeline_test
+    from corp.schema.pipeline_config import PipelineConfig
     report = run_pipeline_test(PipelineConfig.production())
     if not report.all_passed:
         for step in report.steps:
@@ -35,7 +35,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
-from corp_os_meta.pipeline_config import PipelineConfig
+from corp.schema.pipeline_config import PipelineConfig
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ CHECK = "[bold green]PASS[/bold green]"
 CROSS = "[bold red]FAIL[/bold red]"
 
 # Path to recorded-fixture directory, relative to this source file.
-# src/corp_by_os/test_pipeline.py  ->  ../../tests/fixtures/pipeline/recorded
+# src/corp/test_pipeline.py  ->  ../../tests/fixtures/pipeline/recorded
 _RECORDED_DIR = Path(__file__).parent.parent.parent / "tests" / "fixtures" / "pipeline" / "recorded"
 _CORPUS_DIR = _RECORDED_DIR.parent / "corpus"
 
@@ -109,9 +109,9 @@ def run_pipeline_test(
         PipelineTestReport with a StepResult for each pipeline stage.
     """
     if verbose:
-        logging.getLogger("corp_by_os").setLevel(logging.DEBUG)
+        logging.getLogger("corp").setLevel(logging.DEBUG)
 
-    from corp_by_os.sandbox import SandboxManager
+    from corp.sandbox import SandboxManager
 
     _owns_tmp = tmp_root is None
     if _owns_tmp:
@@ -252,7 +252,7 @@ def _test_classify_and_rename(
     _record_state: dict | None = None,
 ) -> str:
     """Verify type code and client alias resolution against naming_config.yaml."""
-    from corp_by_os.ingest.naming_config import get_client_alias, get_type_code
+    from corp.ingest.naming_config import get_client_alias, get_type_code
 
     checks = [
         # (label, actual, expected)
@@ -289,7 +289,7 @@ def _test_vault_ingest(
 
     Live / record mode: invokes real CKE on corpus fixture files.
     """
-    from corp_by_os.ingest.extractions import ingest_extractions
+    from corp.ingest.extractions import ingest_extractions
 
     if not fixture_mode:
         return _test_extract(sb, record=record, _record_state=_record_state)
@@ -335,7 +335,7 @@ def _test_index_rebuild(
     _record_state: dict | None = None,
 ) -> str:
     """Rebuild the SQLite search index against the sandbox vault."""
-    from corp_by_os.index_builder import rebuild_index
+    from corp.index_builder import rebuild_index
 
     stats = rebuild_index(config=sb.config)
 
@@ -353,7 +353,7 @@ def _test_retrieve(
     _record_state: dict | None = None,
 ) -> str:
     """Run a search query against the sandbox index to verify the query engine."""
-    from corp_by_os.query_engine import search_facts
+    from corp.query_engine import search_facts
 
     results = search_facts(query="test", db_path=sb.config.index_db_path)
 
@@ -380,10 +380,10 @@ def _test_extract(
     When record=True, saves per-file fixture JSONs to _RECORDED_DIR and
     writes a manifest.json with model, date, and total cost.
     """
-    from corp_by_os.extraction.manifest_emitter import _resolve_doc_type
-    from corp_by_os.ingest.extractions import ingest_extractions
-    from corp_by_os.ingest.router import compute_file_hash
-    from corp_by_os.overnight.cke_client import extract_sync, is_available, scan_local
+    from corp.extraction.manifest_emitter import _resolve_doc_type
+    from corp.ingest.extractions import ingest_extractions
+    from corp.ingest.router import compute_file_hash
+    from corp.overnight.cke_client import extract_sync, is_available, scan_local
 
     ok, err = is_available()
     if not ok:
@@ -499,7 +499,7 @@ def _replay_recorded_fixtures(sb, manifest_path: Path) -> str:
 
     This is the fast, free replay path used when recorded fixtures exist.
     """
-    from corp_by_os.ingest.extractions import ingest_extractions
+    from corp.ingest.extractions import ingest_extractions
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     fixture_dir = manifest_path.parent
@@ -540,7 +540,7 @@ def _replay_recorded_fixtures(sb, manifest_path: Path) -> str:
 def _get_cke_model() -> str:
     """Best-effort read of the active model name from CKE config."""
     try:
-        from corp_by_os.overnight.cke_client import load_cke_config
+        from corp.overnight.cke_client import load_cke_config
 
         cfg = load_cke_config()
         return cfg.get("model_override") or cfg.get("default_model") or cfg.get("model") or "gemini"

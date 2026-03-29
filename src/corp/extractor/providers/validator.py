@@ -3,7 +3,7 @@
 import json
 import logging
 
-from corp_knowledge_extractor.providers.base import (
+from corp.extractor.providers.base import (
     ExtractionRequest,
     ExtractionResponse,
 )
@@ -37,7 +37,7 @@ def validate_and_retry(
         response.provider,
     )
 
-    from corp_knowledge_extractor.providers.router import ESCALATION_MODEL, get_provider
+    from corp.extractor.providers.router import ESCALATION_MODEL, get_provider
 
     escalation_request = ExtractionRequest(
         system_prompt=original_request.system_prompt,

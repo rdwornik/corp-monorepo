@@ -3,8 +3,8 @@
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from corp_knowledge_extractor.batch import BatchProcessor
-from corp_knowledge_extractor.manifest import (
+from corp.extractor.batch import BatchProcessor
+from corp.extractor.manifest import (
     FileStatus,
     Manifest,
     ManifestEntry,
@@ -62,7 +62,7 @@ class TestBatchProcessorForce:
 
 class TestBatchJobRunnerForce:
     def test_runner_accepts_force(self):
-        from corp_knowledge_extractor.batch_api import BatchJobRunner
+        from corp.extractor.batch_api import BatchJobRunner
 
         manifest = MagicMock()
         manifest.files = []
@@ -71,7 +71,7 @@ class TestBatchJobRunnerForce:
         assert runner.force is True
 
     def test_runner_default_no_force(self):
-        from corp_knowledge_extractor.batch_api import BatchJobRunner
+        from corp.extractor.batch_api import BatchJobRunner
 
         manifest = MagicMock()
         manifest.files = []

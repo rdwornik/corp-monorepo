@@ -10,7 +10,7 @@ import logging
 from dataclasses import dataclass
 from pathlib import Path
 
-from corp_by_os.retrieve.engine import (
+from corp.retrieve.engine import (
     RetrievalFilter,
     RetrievalResult,
     retrieve,
@@ -98,7 +98,7 @@ def answer_rfp(
     3. LLM synthesis into structured RFP answer
     4. Assess confidence based on retrieval quality
     """
-    from corp_by_os.retrieve.prep import _call_llm, build_notes_context
+    from corp.retrieve.prep import _call_llm, build_notes_context
 
     # --- Step 1: Retrieve ---
     filters = RetrievalFilter(

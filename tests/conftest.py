@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 import yaml
-from corp_by_os.config import get_config
-from corp_by_os.sandbox import SandboxManager
+from corp.config import get_config
+from corp.sandbox import SandboxManager
 
 
 @pytest.fixture()

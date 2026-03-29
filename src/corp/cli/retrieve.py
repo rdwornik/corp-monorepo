@@ -4,9 +4,10 @@ import logging
 from pathlib import Path
 
 import click
-from corp_by_os.cli._common import DASH, console
-from corp_by_os.config import get_config
 from rich.table import Table
+
+from corp.cli._common import DASH, console
+from corp.config import get_config
 
 
 @click.command("retrieve")
@@ -44,8 +45,8 @@ def retrieve_cmd(
 
         corp retrieve "demand planning" --format json
     """
-    from corp_by_os.index_builder import get_index_path
-    from corp_by_os.retrieve.engine import RetrievalFilter, retrieve
+    from corp.index_builder import get_index_path
+    from corp.retrieve.engine import RetrievalFilter, retrieve
 
     cfg = get_config()
     filters = RetrievalFilter(
@@ -174,8 +175,8 @@ def prep_cmd(client: str, model: str, output: str | None) -> None:
 
         corp prep "Alfa Laval"
     """
-    from corp_by_os.index_builder import get_index_path
-    from corp_by_os.retrieve.prep import generate_prep
+    from corp.index_builder import get_index_path
+    from corp.retrieve.prep import generate_prep
 
     cfg = get_config()
 

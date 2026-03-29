@@ -2,7 +2,7 @@
 
 import json
 
-from corp_rfp_agent.answer_selector import (
+from corp.rfp.answer_selector import (
     _count_deprecated,
     _count_red_flags,
     _parse_llm_json_obj,

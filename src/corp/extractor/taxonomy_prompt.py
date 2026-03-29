@@ -1,6 +1,6 @@
 """Generate canonical taxonomy terms for injection into extraction prompts."""
 
-from corp_os_meta.normalize import load_taxonomy
+from corp.schema.normalize import load_taxonomy
 
 
 def get_taxonomy_for_prompt() -> str:

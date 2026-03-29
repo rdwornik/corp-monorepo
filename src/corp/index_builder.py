@@ -16,9 +16,10 @@ from datetime import datetime
 from pathlib import Path
 
 import yaml
-from corp_by_os.config import get_config
-from corp_by_os.models import IndexStats
-from corp_os_meta.pipeline_config import PipelineConfig
+
+from corp.config import get_config
+from corp.models import IndexStats
+from corp.schema.pipeline_config import PipelineConfig
 
 logger = logging.getLogger(__name__)
 
@@ -359,7 +360,7 @@ def _collect_project_dirs(cfg) -> dict[str, dict]:
                 _enrich_from_onedrive(projects[pid], folder)
 
     # Scan vault
-    from corp_by_os.models import VaultZone
+    from corp.models import VaultZone
 
     vault_projects = cfg.vault_path / VaultZone.PROJECTS.value
     if vault_projects.exists():

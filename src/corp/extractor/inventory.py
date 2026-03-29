@@ -2,7 +2,7 @@
 Input file scanning and classification.
 
 Usage:
-    from corp_knowledge_extractor.inventory import scan_input, FileType, SourceFile
+    from corp.extractor.inventory import scan_input, FileType, SourceFile
 
     config = load_config()
     files = scan_input(Path("data/input"), config)

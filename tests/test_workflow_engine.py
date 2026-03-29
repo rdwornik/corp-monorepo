@@ -7,13 +7,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
-from corp_by_os.models import (
+from corp.models import (
     StepResult,
     Workflow,
     WorkflowParam,
     WorkflowStep,
 )
-from corp_by_os.workflow_engine import (
+from corp.workflow_engine import (
     _build_agent_command,
     _interpolate,
     execute_workflow,
@@ -185,7 +185,7 @@ class TestExecuteWorkflow:
             ],
         )
         # Should not fail — default should be applied
-        with patch("corp_by_os.workflow_engine._execute_python_step") as mock_exec:
+        with patch("corp.workflow_engine._execute_python_step") as mock_exec:
             mock_exec.return_value = StepResult(
                 step_index=0,
                 description="Step",
@@ -214,15 +214,15 @@ class TestExecuteWorkflow:
             got = params.get("_shared", "MISSING")
             return StepResult(step_index=1, description="B", success=True, output=got)
 
-        with patch("corp_by_os.built_in_actions.get_action") as mock_get:
+        with patch("corp.built_in_actions.get_action") as mock_get:
             mock_get.side_effect = lambda name: {"step_a": step_a, "step_b": step_b}.get(name)
             result = execute_workflow(wf, {})
 
         assert result.success is True
         assert result.steps[1].output == "hello"
 
-    @patch("corp_by_os.workflow_engine._execute_agent_step")
-    @patch("corp_by_os.workflow_engine._execute_python_step")
+    @patch("corp.workflow_engine._execute_agent_step")
+    @patch("corp.workflow_engine._execute_python_step")
     def test_sequential_execution(self, mock_python, mock_agent, sample_workflow: Workflow) -> None:
         mock_agent.return_value = StepResult(step_index=0, description="Agent", success=True)
         mock_python.return_value = StepResult(step_index=1, description="Python", success=True)
@@ -233,8 +233,8 @@ class TestExecuteWorkflow:
         mock_agent.assert_called_once()
         mock_python.assert_called_once()
 
-    @patch("corp_by_os.workflow_engine._execute_agent_step")
-    @patch("corp_by_os.workflow_engine._execute_python_step")
+    @patch("corp.workflow_engine._execute_agent_step")
+    @patch("corp.workflow_engine._execute_python_step")
     def test_stops_on_failure(self, mock_python, mock_agent, sample_workflow: Workflow) -> None:
         mock_agent.return_value = StepResult(
             step_index=0,
@@ -248,7 +248,7 @@ class TestExecuteWorkflow:
         assert len(result.steps) == 1  # stopped after first failure
         mock_python.assert_not_called()
 
-    @patch("corp_by_os.workflow_engine._execute_agent_step")
+    @patch("corp.workflow_engine._execute_agent_step")
     def test_exception_in_step(self, mock_agent, sample_workflow: Workflow) -> None:
         mock_agent.side_effect = RuntimeError("boom")
 
@@ -267,7 +267,7 @@ class TestExecuteWorkflow:
 class TestAgentStep:
     @patch("subprocess.run")
     def test_successful_agent_step(self, mock_run) -> None:
-        from corp_by_os.workflow_engine import _execute_agent_step
+        from corp.workflow_engine import _execute_agent_step
 
         mock_run.return_value = MagicMock(returncode=0, stdout="OK", stderr="")
         step = WorkflowStep(
@@ -283,7 +283,7 @@ class TestAgentStep:
 
     @patch("subprocess.run")
     def test_failed_agent_step(self, mock_run) -> None:
-        from corp_by_os.workflow_engine import _execute_agent_step
+        from corp.workflow_engine import _execute_agent_step
 
         mock_run.return_value = MagicMock(returncode=1, stdout="", stderr="Error occurred")
         step = WorkflowStep(
@@ -298,7 +298,7 @@ class TestAgentStep:
 
     @patch("subprocess.run")
     def test_command_not_found(self, mock_run) -> None:
-        from corp_by_os.workflow_engine import _execute_agent_step
+        from corp.workflow_engine import _execute_agent_step
 
         mock_run.side_effect = FileNotFoundError("not found")
         step = WorkflowStep(
@@ -315,7 +315,7 @@ class TestAgentStep:
     def test_timeout(self, mock_run) -> None:
         import subprocess as sp
 
-        from corp_by_os.workflow_engine import _execute_agent_step
+        from corp.workflow_engine import _execute_agent_step
 
         mock_run.side_effect = sp.TimeoutExpired(cmd="test", timeout=300)
         step = WorkflowStep(
@@ -334,7 +334,7 @@ class TestAgentStep:
 
 class TestPythonStep:
     def test_unknown_action(self) -> None:
-        from corp_by_os.workflow_engine import _execute_python_step
+        from corp.workflow_engine import _execute_python_step
 
         step = WorkflowStep(
             type="python",
@@ -346,16 +346,16 @@ class TestPythonStep:
         assert "Unknown action" in result.error
 
     def test_no_action_specified(self) -> None:
-        from corp_by_os.workflow_engine import _execute_python_step
+        from corp.workflow_engine import _execute_python_step
 
         step = WorkflowStep(type="python", description="Test")
         result = _execute_python_step(step, {})
         assert result.success is False
         assert "No action specified" in result.error
 
-    @patch("corp_by_os.built_in_actions.get_action")
+    @patch("corp.built_in_actions.get_action")
     def test_action_dispatched(self, mock_get) -> None:
-        from corp_by_os.workflow_engine import _execute_python_step
+        from corp.workflow_engine import _execute_python_step
 
         mock_fn = MagicMock(
             return_value=StepResult(

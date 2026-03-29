@@ -9,4 +9,4 @@ CHECK = "Y"
 DASH = "-"
 
 console = Console()
-logger = logging.getLogger("corp_by_os.cli")
+logger = logging.getLogger("corp.cli")

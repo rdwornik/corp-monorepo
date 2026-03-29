@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-# Keys this repo actually uses (found via audit of src/corp_by_os/):
+# Keys this repo actually uses (found via audit of src/corp/):
 #   GEMINI_API_KEY — audit.py, cleanup/classifier.py, llm_router.py,
 #                    overnight/preflight.py, overnight/cke_client.py
 REQUIRED_KEYS = [

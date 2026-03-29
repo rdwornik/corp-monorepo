@@ -3,10 +3,11 @@
 import subprocess
 
 import click
-from corp_by_os.cli._common import console
-from corp_by_os.config import get_config
-from corp_os_meta.pipeline_config import PipelineConfig
 from rich.table import Table
+
+from corp.cli._common import console
+from corp.config import get_config
+from corp.schema.pipeline_config import PipelineConfig
 
 
 @click.command()
@@ -58,9 +59,9 @@ def doctor() -> None:
     console.print(table)
 
     # --- System Integrity Checks ---
-    from corp_by_os.index_builder import get_index_path
-    from corp_by_os.integrity import check_all
-    from corp_by_os.ops.database import get_ops_db_path
+    from corp.index_builder import get_index_path
+    from corp.integrity import check_all
+    from corp.ops.database import get_ops_db_path
 
     console.print("\n[bold]System Integrity[/bold]")
 
@@ -174,7 +175,7 @@ def trust_status() -> None:
 @click.pass_obj
 def routing_review(obj: dict) -> None:
     """Show routing override patterns for manual rule updates."""
-    from corp_by_os.ops.database import OpsDB
+    from corp.ops.database import OpsDB
 
     config = (obj or {}).get("config") or PipelineConfig.production()
     try:
@@ -224,7 +225,7 @@ def routing_review(obj: dict) -> None:
 @click.pass_obj
 def routing_mark_reviewed(obj: dict) -> None:
     """Mark all current routing feedback as reviewed."""
-    from corp_by_os.ops.database import OpsDB
+    from corp.ops.database import OpsDB
 
     config = (obj or {}).get("config") or PipelineConfig.production()
     try:

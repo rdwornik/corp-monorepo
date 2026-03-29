@@ -6,7 +6,7 @@ sampled video frames (i.e., slide transitions). Returns sequential
 frame paths (frame_001.png, frame_002.png, ...) sorted by timestamp.
 
 Usage:
-    from corp_knowledge_extractor.frames.extractor import extract_frames
+    from corp.extractor.frames.extractor import extract_frames
     from pathlib import Path
 
     frames = extract_frames(video_path, output_dir, config)

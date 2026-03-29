@@ -6,7 +6,7 @@ import hashlib
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from corp_by_os.freshness_scanner import (
+from corp.freshness_scanner import (
     REVIEW_AGE_DAYS,
     SKIP_FILENAMES,
     compute_hash,

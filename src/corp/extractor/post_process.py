@@ -1,6 +1,6 @@
 """
 Post-processor for extraction results.
-Delegates to corp_os_meta for normalization, validation, and link generation.
+Delegates to corp.schema for normalization, validation, and link generation.
 Adds CKE-specific logic: unknown term logging to local file.
 """
 
@@ -11,16 +11,17 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
-from corp_os_meta import (
+
+from corp.schema import (
     ValidationResult,
     generate_links_line,
     normalize_frontmatter,
     validate_frontmatter,
 )
-from corp_os_meta.models import NoteFrontmatter
-from corp_os_meta.normalize import load_taxonomy
-from corp_os_meta.utils import normalize_string_list
-from corp_os_meta.validate import validate_against_schema
+from corp.schema.models import NoteFrontmatter
+from corp.schema.normalize import load_taxonomy
+from corp.schema.utils import normalize_string_list
+from corp.schema.validate import validate_against_schema
 
 logger = logging.getLogger(__name__)
 
@@ -604,7 +605,7 @@ def _get_known_values(taxonomy: dict, prefix: str) -> set:
 
 def _log_unknown_terms(terms: list[str]):
     """Append unknown terms to local review file for batch approval."""
-    from corp_knowledge_extractor._paths import CONFIG_DIR
+    from corp.extractor._paths import CONFIG_DIR
 
     review_path = CONFIG_DIR / "taxonomy_review.yaml"
     data = {"pending": []}

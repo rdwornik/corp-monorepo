@@ -21,7 +21,8 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from corp_by_os.models import (
+
+from corp.models import (
     ZONE_MUTABILITY,
     Mutability,
     ProjectInfo,
@@ -31,7 +32,7 @@ from corp_by_os.models import (
     VaultPath,
     VaultZone,
 )
-from corp_os_meta.pipeline_config import PipelineConfig
+from corp.schema.pipeline_config import PipelineConfig
 
 logger = logging.getLogger(__name__)
 
@@ -483,8 +484,8 @@ def _validate_project_info(path: Path, report: ValidationReport) -> None:
 def _validate_note_frontmatter(path: Path, report: ValidationReport) -> None:
     """Validate a single .md note's frontmatter using corp-os-meta."""
     try:
-        from corp_os_meta import ValidationResult as VR
-        from corp_os_meta import validate_frontmatter
+        from corp.schema import ValidationResult as VR
+        from corp.schema import validate_frontmatter
 
         content = path.read_text(encoding="utf-8")
         fm, _ = _parse_frontmatter(content)

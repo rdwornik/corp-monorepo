@@ -126,7 +126,7 @@ def classify_doc_type_hybrid(
     # --- TF-IDF hybrid (primary) ---
     if USE_TFIDF:
         try:
-            from corp_knowledge_extractor.hybrid_loader import (
+            from corp.extractor.hybrid_loader import (
                 get_cached_model,
                 predict_hybrid,
             )

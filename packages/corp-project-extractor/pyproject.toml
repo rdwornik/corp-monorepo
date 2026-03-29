@@ -26,7 +26,7 @@ dev = [
 ]
 
 [project.scripts]
-cpe = "corp_project_extractor.cli:cli"
+cpe = "corp.project.cli:cli"
 
 [tool.setuptools.packages.find]
 where = ["src"]

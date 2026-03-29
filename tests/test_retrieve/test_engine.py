@@ -8,7 +8,7 @@ import sqlite3
 from pathlib import Path
 
 import pytest
-from corp_by_os.retrieve.engine import (
+from corp.retrieve.engine import (
     RetrievalFilter,
     RetrievalResult,
     RetrievedNote,
@@ -450,9 +450,9 @@ class TestProductExpansion:
                 return ["wms", "wms_billing", "wms_native", "wms_labor"]
             return [product]
 
-        import corp_os_meta.products
+        import corp.schema.products
 
-        monkeypatch.setattr(corp_os_meta.products, "expand_product_query", mock_expand)
+        monkeypatch.setattr(corp.schema.products, "expand_product_query", mock_expand)
 
         filters = RetrievalFilter(products=["wms"])
         result = retrieve("warehouse", test_db, vault_root, filters=filters)
@@ -467,12 +467,12 @@ class TestProductExpansion:
         def mock_expand(product: str) -> list[str]:
             return ["wms", "wms", "wms_billing"]
 
-        import corp_os_meta.products
+        import corp.schema.products
 
-        monkeypatch.setattr(corp_os_meta.products, "expand_product_query", mock_expand)
+        monkeypatch.setattr(corp.schema.products, "expand_product_query", mock_expand)
 
         # Just verify the filter expansion logic (don't need full DB)
-        from corp_by_os.retrieve.engine import RetrievalFilter
+        from corp.retrieve.engine import RetrievalFilter
 
         filters = RetrievalFilter(products=["wms"])
 
@@ -584,14 +584,14 @@ class TestRfpOnlyFilter:
 class TestRetrieveLogging:
     def test_retrieve_logs_query(self, test_db: Path, vault_root: Path, caplog) -> None:
         """Retrieve query is logged with result count for audit trail."""
-        with caplog.at_level(logging.INFO, logger="corp_by_os.retrieve.engine"):
+        with caplog.at_level(logging.INFO, logger="corp.retrieve.engine"):
             retrieve("Lenzing", test_db, vault_root)
         assert "retrieve query=" in caplog.text
         assert "results=" in caplog.text
 
     def test_retrieve_logs_filters(self, test_db: Path, vault_root: Path, caplog) -> None:
         """Retrieve log includes filter details."""
-        with caplog.at_level(logging.INFO, logger="corp_by_os.retrieve.engine"):
+        with caplog.at_level(logging.INFO, logger="corp.retrieve.engine"):
             retrieve(
                 "planning",
                 test_db,

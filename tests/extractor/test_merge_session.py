@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from corp_knowledge_extractor.merge_session import (
+from corp.extractor.merge_session import (
     _dedupe_list,
     deduplicate_facts,
     merge_correlated,

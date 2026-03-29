@@ -4,17 +4,17 @@ import json
 from unittest.mock import MagicMock
 
 import pytest
-from corp_knowledge_extractor.batch_api import (
+from corp.extractor.batch_api import (
     BatchJobRunner,
     build_batch_jsonl,
     parse_batch_results,
     poll_batch_job,
     submit_batch_job,
 )
-from corp_knowledge_extractor.extract import ExtractionError
-from corp_knowledge_extractor.manifest import Manifest, ManifestEntry
-from corp_knowledge_extractor.text_extract import TextExtractionResult
-from corp_knowledge_extractor.tier_router import Tier, TierDecision
+from corp.extractor.extract import ExtractionError
+from corp.extractor.manifest import Manifest, ManifestEntry
+from corp.extractor.text_extract import TextExtractionResult
+from corp.extractor.tier_router import Tier, TierDecision
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -335,7 +335,7 @@ class TestParseBatchResults:
 class TestCostDiscount:
     def test_tier2_batch_cost_is_half(self):
         """Tier 2 batch cost should be 50% of synchronous."""
-        from corp_knowledge_extractor.tier_router import TIER_COSTS, Tier
+        from corp.extractor.tier_router import TIER_COSTS, Tier
 
         sync_cost = TIER_COSTS[Tier.TEXT_AI]
         batch_cost = sync_cost * 0.5

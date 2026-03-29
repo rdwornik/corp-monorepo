@@ -3,7 +3,7 @@
 Resolution order: ENV_VAR > config/paths.toml > defaults.
 
 Usage:
-    from corp_os_meta.config import vault_path, mywork_path, get_path
+    from corp.schema.config import vault_path, mywork_path, get_path
     vault = vault_path()
     custom = get_path("rfp_kb", env_var="RFP_KB_PATH")
 """

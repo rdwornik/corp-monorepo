@@ -14,8 +14,8 @@ import os
 from datetime import date
 from pathlib import Path
 
-from corp_by_os.intent_router import Intent
-from corp_by_os.models import Workflow
+from corp.intent_router import Intent
+from corp.models import Workflow
 
 logger = logging.getLogger(__name__)
 
@@ -128,7 +128,7 @@ def _build_workflows_summary(workflows: dict[str, Workflow]) -> str:
 def _build_project_list() -> str:
     """Build a comma-separated list of known projects."""
     try:
-        from corp_by_os.project_resolver import list_all_project_ids
+        from corp.project_resolver import list_all_project_ids
 
         projects = list_all_project_ids()
         return ", ".join(projects[:30])  # limit to avoid token bloat

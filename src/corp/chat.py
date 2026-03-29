@@ -9,10 +9,11 @@ from __future__ import annotations
 import logging
 import shlex
 
-from corp_by_os.intent_router import Intent, route
-from corp_by_os.workflow_engine import execute_workflow, load_workflows
 from rich.console import Console
 from rich.panel import Panel
+
+from corp.intent_router import Intent, route
+from corp.workflow_engine import execute_workflow, load_workflows
 
 logger = logging.getLogger(__name__)
 console = Console()
@@ -126,7 +127,7 @@ def _handle_intent(intent: Intent, workflows: dict, history: list) -> None:
     # Resolve project path if needed
     if "project" in params:
         try:
-            from corp_by_os.project_resolver import resolve_project
+            from corp.project_resolver import resolve_project
 
             resolved = resolve_project(params["project"])
             if resolved and resolved.onedrive_path:
@@ -201,8 +202,8 @@ def _show_help(workflows: dict) -> None:
 def _show_status() -> None:
     """Show quick status summary."""
     try:
-        from corp_by_os.task_manager import list_tasks
-        from corp_by_os.vault_io import list_projects
+        from corp.task_manager import list_tasks
+        from corp.vault_io import list_projects
 
         projects = list_projects()
         tasks = list_tasks(status_filter="todo")

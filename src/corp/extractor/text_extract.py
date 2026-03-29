@@ -6,7 +6,7 @@ using local libraries. Returns structured result with quality metrics
 so the tier router can decide whether AI extraction is needed.
 
 Usage:
-    from corp_knowledge_extractor.text_extract import extract_text, TextExtractionResult
+    from corp.extractor.text_extract import extract_text, TextExtractionResult
 
     result = extract_text(Path("report.pdf"))
     if result.extraction_quality == "good":

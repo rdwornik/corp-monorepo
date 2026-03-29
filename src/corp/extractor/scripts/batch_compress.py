@@ -32,7 +32,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from compress_video import VideoCompressor
 
-from config.config_loader import get
+from corp.extractor.config_loader import get
 
 
 class BatchCompressor:

@@ -15,8 +15,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
-from corp_by_os.ops.database import OpsDB
-from corp_by_os.ops.registry import ContentRegistry
+from corp.ops.database import OpsDB
+from corp.ops.registry import ContentRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -602,18 +602,18 @@ def _run_package_extraction(
 
     Returns total API cost.
     """
-    from corp_by_os.extraction.manifest_emitter import (
+    from corp.extraction.manifest_emitter import (
         _make_entry_id,
         _resolve_doc_type,
     )
-    from corp_by_os.overnight.cke_client import extract_sync, is_available
+    from corp.overnight.cke_client import extract_sync, is_available
 
     ok, err = is_available()
     if not ok:
         logger.warning("CKE not available, skipping package extraction: %s", err)
         return 0.0
 
-    from corp_os_meta.pipeline_config import PipelineConfig
+    from corp.schema.pipeline_config import PipelineConfig
 
     if config is None:
         config = PipelineConfig.production()
@@ -665,7 +665,7 @@ def _run_package_extraction(
         return cost
 
     # Move to vault — Council Decision #7: all extractions go to flat 01_Knowledge/
-    from corp_by_os.extraction.vault_writer import move_to_vault
+    from corp.extraction.vault_writer import move_to_vault
 
     vault_target = "01_Knowledge"
     move_to_vault(staging_dir, config.vault_path, vault_target)
@@ -692,18 +692,18 @@ def _run_extraction(
 
     Returns (vault_note_path | None, cost).
     """
-    from corp_by_os.extraction.manifest_emitter import (
+    from corp.extraction.manifest_emitter import (
         _make_entry_id,
         _resolve_doc_type,
     )
-    from corp_by_os.overnight.cke_client import extract_sync, is_available
+    from corp.overnight.cke_client import extract_sync, is_available
 
     ok, err = is_available()
     if not ok:
         logger.warning("CKE not available, skipping extraction: %s", err)
         return None, 0.0
 
-    from corp_os_meta.pipeline_config import PipelineConfig
+    from corp.schema.pipeline_config import PipelineConfig
 
     if config is None:
         config = PipelineConfig.production()
@@ -745,7 +745,7 @@ def _run_extraction(
         return None, cost
 
     # Move to vault — Council Decision #7: all extractions go to flat 01_Knowledge/
-    from corp_by_os.extraction.vault_writer import move_to_vault
+    from corp.extraction.vault_writer import move_to_vault
 
     vault_target = "01_Knowledge"
     moved = move_to_vault(staging_dir, config.vault_path, vault_target)

@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import pytest
-from corp_knowledge_extractor.inventory import FileType, scan_input
+from corp.extractor.inventory import FileType, scan_input
 
 # Minimal config matching settings.yaml file_types section
 MINIMAL_CONFIG = {

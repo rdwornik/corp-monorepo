@@ -49,7 +49,7 @@ def test_tag_is_well_formed(tag_entry: dict) -> None:
 )
 def test_tag_normalization_idempotent(tag_entry: dict) -> None:
     """Normalizing an already-normalized tag slug produces the same result."""
-    from corp_knowledge_extractor.post_process import _normalize_tag
+    from corp.extractor.post_process import _normalize_tag
 
     tag = tag_entry["tag"]
     _, slug = tag.split("/", 1)
@@ -66,7 +66,7 @@ def test_golden_set_exists() -> None:
 
 def test_high_frequency_tags_stable() -> None:
     """Top tags by frequency should be canonical forms (no normalization needed)."""
-    from corp_knowledge_extractor.post_process import _normalize_tag
+    from corp.extractor.post_process import _normalize_tag
 
     # Top 10 most frequent tags
     top_tags = sorted(GOLDEN_TAGS, key=lambda t: -t["count"])[:10]

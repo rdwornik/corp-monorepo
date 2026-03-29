@@ -6,10 +6,11 @@ from datetime import datetime
 from pathlib import Path
 
 import click
-from corp_by_os.cli._common import console
-from corp_by_os.config import get_config
 from rich.panel import Panel
 from rich.table import Table
+
+from corp.cli._common import console
+from corp.config import get_config
 
 
 @click.command("cleanup-scan")
@@ -22,9 +23,9 @@ from rich.table import Table
 )
 def cleanup_scan_command(output: str | None) -> None:
     """Scan MyWork for misplaced files and generate move proposals."""
-    from corp_by_os.cleanup.classifier import classify_batch as cleanup_classify
-    from corp_by_os.cleanup.proposer import generate_proposals
-    from corp_by_os.cleanup.scanner import scan_problematic_files
+    from corp.cleanup.classifier import classify_batch as cleanup_classify
+    from corp.cleanup.proposer import generate_proposals
+    from corp.cleanup.scanner import scan_problematic_files
 
     cfg = get_config()
     mywork_root = cfg.mywork_root
@@ -68,7 +69,7 @@ def cleanup_scan_command(output: str | None) -> None:
 @click.option("--dry-run", is_flag=True, help="Preview without executing")
 def apply_moves_command(moves_file: str | None, dry_run: bool) -> None:
     """Execute approved moves from moves.yaml."""
-    from corp_by_os.cleanup.executor import execute_moves
+    from corp.cleanup.executor import execute_moves
 
     cfg = get_config()
     mywork_root = cfg.mywork_root
@@ -120,7 +121,7 @@ def cleanup_cmd(scope: str, execute: bool) -> None:
 
         corp cleanup --scope artifacts --execute  # Clean extraction artifacts
     """
-    from corp_by_os.cleanup.disk import (
+    from corp.cleanup.disk import (
         APPDATA_GUIDANCE,
         PAGEFILE_GUIDANCE,
         CleanupPlan,
@@ -245,7 +246,7 @@ def cleanup_cmd(scope: str, execute: bool) -> None:
 def audit_command(skip_gemini: bool, budget: float, model: str) -> None:
     """Full read-only audit of MyWork — scan, analyze, report."""
 
-    from corp_by_os.audit import (
+    from corp.audit import (
         ANALYSIS_FOLDERS,
         analyze_folder,
         build_report,
@@ -292,7 +293,7 @@ def audit_command(skip_gemini: bool, budget: float, model: str) -> None:
         )
 
         try:
-            from corp_by_os.audit import _get_gemini_client
+            from corp.audit import _get_gemini_client
 
             client = _get_gemini_client()
         except RuntimeError as exc:

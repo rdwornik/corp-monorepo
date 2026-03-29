@@ -28,11 +28,11 @@ dev = [
 ]
 
 [project.scripts]
-corp = "corp_by_os.cli:cli"
+corp = "corp.cli:cli"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["corp_by_os*"]
+include = ["corp*"]
 
 [tool.ruff]
 line-length = 100

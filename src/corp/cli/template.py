@@ -1,9 +1,10 @@
 """Template CLI commands."""
 
 import click
-from corp_by_os.cli._common import console
-from corp_by_os.config import get_config
 from rich.table import Table
+
+from corp.cli._common import console
+from corp.config import get_config
 
 
 @click.group("template")
@@ -14,7 +15,7 @@ def template_group() -> None:
 @template_group.command("list")
 def template_list() -> None:
     """Show all registered templates."""
-    from corp_by_os.template_manager import load_registry
+    from corp.template_manager import load_registry
 
     templates = load_registry()
     if not templates:
@@ -45,7 +46,7 @@ def template_list() -> None:
 @template_group.command("scan")
 def template_scan() -> None:
     """Scan 30_Templates/, update registry."""
-    from corp_by_os.template_manager import save_registry, scan_templates
+    from corp.template_manager import save_registry, scan_templates
 
     cfg = get_config()
     console.print(f"[dim]Scanning {cfg.templates_root}...[/dim]")
@@ -70,7 +71,7 @@ def template_scan() -> None:
 @click.argument("goal")
 def template_select(goal: str) -> None:
     """Show which template would be selected for a goal."""
-    from corp_by_os.template_manager import load_registry, select_template
+    from corp.template_manager import load_registry, select_template
 
     templates = load_registry()
     if not templates:

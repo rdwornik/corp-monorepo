@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "corp_os_meta"
+name = "corp.schema"
 version = "1.0.0"
 description = "Shared metadata schema and taxonomy for corp-by-os agent ecosystem"
 requires-python = ">=3.11"
@@ -17,10 +17,10 @@ dependencies = [
 ]
 
 [tool.setuptools.package-data]
-corp_os_meta = ["data/*.yaml"]
+corp.schema = ["data/*.yaml"]
 
 [project.scripts]
-corp-meta = "corp_os_meta.cli:main"
+corp-meta = "corp.schema.cli:main"
 
 [tool.ruff]
 line-length = 120

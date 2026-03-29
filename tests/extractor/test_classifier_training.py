@@ -33,7 +33,7 @@ def test_doc_type_coverage() -> None:
 
 def test_classify_from_filename_no_crashes() -> None:
     """classify_from_filename handles all real filenames without error."""
-    from corp_knowledge_extractor.doc_type_classifier import classify_from_filename
+    from corp.extractor.doc_type_classifier import classify_from_filename
 
     for fixture in ALL_FIXTURES:
         # Should not raise
@@ -47,7 +47,7 @@ def test_classifier_agreement_rate() -> None:
     content analysis in addition to filename patterns. This test tracks the
     agreement rate as a quality metric.
     """
-    from corp_knowledge_extractor.doc_type_classifier import classify_from_filename
+    from corp.extractor.doc_type_classifier import classify_from_filename
 
     agreed = 0
     disagreed = 0
@@ -74,7 +74,7 @@ def test_classifier_agreement_rate() -> None:
 
 def test_rfp_keywords_classified_correctly() -> None:
     """Files with explicit RFP/RFI keywords should classify as rfp_response."""
-    from corp_knowledge_extractor.doc_type_classifier import classify_from_filename
+    from corp.extractor.doc_type_classifier import classify_from_filename
 
     rfp_fixtures = [
         f
@@ -89,7 +89,7 @@ def test_rfp_keywords_classified_correctly() -> None:
 
 def test_training_keywords_classified() -> None:
     """Files with explicit training keywords should classify as training."""
-    from corp_knowledge_extractor.doc_type_classifier import classify_from_filename
+    from corp.extractor.doc_type_classifier import classify_from_filename
 
     training_fixtures = [
         f
@@ -105,7 +105,7 @@ def test_training_keywords_classified() -> None:
 
 def test_security_assessment_keywords_classified() -> None:
     """Files with security assessment keywords classify correctly."""
-    from corp_knowledge_extractor.doc_type_classifier import classify_from_filename
+    from corp.extractor.doc_type_classifier import classify_from_filename
 
     # classify_from_filename only detects "security assessment" for
     # vendor_assessment. Other security keywords are handled by

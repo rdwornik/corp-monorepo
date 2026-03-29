@@ -6,13 +6,13 @@ import json
 from pathlib import Path
 
 import pytest
-from corp_project_extractor.manifest_generator import (
+from corp.project.manifest_generator import (
     CATEGORY_TO_DOC_TYPE,
     _resolve_client,
     _slugify,
     generate_cke_manifest,
 )
-from corp_project_extractor.models import FileEntry, Manifest
+from corp.project.models import FileEntry, Manifest
 
 
 def _make_manifest(entries: list[FileEntry]) -> Manifest:

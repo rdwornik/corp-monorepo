@@ -17,7 +17,7 @@ try:
 except ImportError:  # pragma: no cover
     _HAS_DOTENV = False
 
-_PACKAGE_ROOT = Path(__file__).parent  # src/corp_project_extractor/
+_PACKAGE_ROOT = Path(__file__).parent  # src/corp.project/
 _PROJECT_ROOT = _PACKAGE_ROOT.parent.parent  # repo root
 CONFIG_DIR = _PROJECT_ROOT / "config"
 DEFAULT_CONFIG_PATH = CONFIG_DIR / "default.yaml"

@@ -45,21 +45,22 @@ from __future__ import annotations
 import logging
 
 import click
-from corp_by_os.cli.analytics import (
+
+from corp.cli.analytics import (
     analytics_group,
     dedup_report_command,
     files_stats_command,
     naming_stats_command,
 )
-from corp_by_os.cli.cleanup import (
+from corp.cli.cleanup import (
     apply_moves_command,
     audit_command,
     cleanup_cmd,
     cleanup_scan_command,
 )
-from corp_by_os.cli.extract import extract_command
-from corp_by_os.cli.index import index_group
-from corp_by_os.cli.ingest import (
+from corp.cli.extract import extract_command
+from corp.cli.index import index_group
+from corp.cli.ingest import (
     classify_command,
     finalize_command,
     freshness_cmd,
@@ -67,23 +68,23 @@ from corp_by_os.cli.ingest import (
     ingest_extractions_cmd,
     ingest_inbox_command,
 )
-from corp_by_os.cli.misc import chat_command, test_pipeline_command
-from corp_by_os.cli.overnight import overnight_command
-from corp_by_os.cli.project import project
-from corp_by_os.cli.query import folder_review_command, query_command
-from corp_by_os.cli.retrieve import prep_cmd, retrieve_cmd
-from corp_by_os.cli.rfp import rfp_group
-from corp_by_os.cli.system import (
+from corp.cli.misc import chat_command, test_pipeline_command
+from corp.cli.overnight import overnight_command
+from corp.cli.project import project
+from corp.cli.query import folder_review_command, query_command
+from corp.cli.retrieve import prep_cmd, retrieve_cmd
+from corp.cli.rfp import rfp_group
+from corp.cli.system import (
     doctor,
     routing_mark_reviewed,
     routing_review,
     trust_status,
 )
-from corp_by_os.cli.task import task_group, tasks_shortcut
-from corp_by_os.cli.template import template_group
-from corp_by_os.cli.vault import vault
-from corp_by_os.cli.workflow import run_workflow
-from corp_os_meta.pipeline_config import PipelineConfig
+from corp.cli.task import task_group, tasks_shortcut
+from corp.cli.template import template_group
+from corp.cli.vault import vault
+from corp.cli.workflow import run_workflow
+from corp.schema.pipeline_config import PipelineConfig
 
 
 @click.group()

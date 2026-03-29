@@ -12,8 +12,9 @@ import shutil
 from pathlib import Path
 
 import yaml
-from corp_by_os.config import get_config
-from corp_by_os.models import TemplateInfo
+
+from corp.config import get_config
+from corp.models import TemplateInfo
 
 logger = logging.getLogger(__name__)
 

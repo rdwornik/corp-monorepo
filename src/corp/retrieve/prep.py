@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
-from corp_by_os.retrieve.engine import (
+from corp.retrieve.engine import (
     RetrievalFilter,
     RetrievalResult,
     RetrievedNote,

@@ -4,8 +4,9 @@ import sys
 from pathlib import Path
 
 import click
-from corp_by_os.cli._common import console
-from corp_by_os.config import get_config
+
+from corp.cli._common import console
+from corp.config import get_config
 
 EXTRACT_EXTENSIONS = [
     ".pptx",
@@ -40,11 +41,11 @@ def extract_command(
     output_dir: str | None,
 ) -> None:
     """Extract knowledge from a MyWork folder via CKE."""
-    from corp_by_os.extraction.folder_policy import load_policy
-    from corp_by_os.extraction.manifest_emitter import build_manifest, write_manifest
-    from corp_by_os.extraction.routing import resolve_route
-    from corp_by_os.extraction.scanner import scan_folder
-    from corp_by_os.overnight.cke_client import is_available
+    from corp.extraction.folder_policy import load_policy
+    from corp.extraction.manifest_emitter import build_manifest, write_manifest
+    from corp.extraction.routing import resolve_route
+    from corp.extraction.scanner import scan_folder
+    from corp.overnight.cke_client import is_available
 
     cfg = get_config()
     folder_path = Path(folder).resolve()
@@ -107,7 +108,7 @@ def extract_command(
         console.print(f"[red]CKE not available: {err}[/red]")
         sys.exit(1)
 
-    from corp_by_os.overnight.cke_client import extract_batch, extract_sync
+    from corp.overnight.cke_client import extract_batch, extract_sync
 
     console.print(f"[bold]Starting extraction ({'batch' if batch else 'sync'})...[/bold]")
     if batch:
@@ -124,7 +125,7 @@ def extract_command(
 
     # Move to vault
     if done > 0:
-        from corp_by_os.extraction.vault_writer import move_to_vault
+        from corp.extraction.vault_writer import move_to_vault
 
         moved = move_to_vault(out_dir, cfg.vault_path, route.vault_target)
         console.print(f"[green]Moved {moved} files to vault ({route.vault_target})[/green]")

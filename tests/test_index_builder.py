@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 import yaml
-from corp_by_os.index_builder import (
+from corp.index_builder import (
     _compute_rfp_visible,
     _connect,
     _dedup_notes_by_hash,
@@ -477,7 +477,7 @@ Blue Yonder provides 99.97% SLA with multi-region deployment.
         (rfp_kb / "ha-sla.md").write_text(kb_note, encoding="utf-8")
 
         monkeypatch.setenv("INDEX_EXTRA_ROOTS", str(rfp_kb))
-        from corp_by_os.config import get_config
+        from corp.config import get_config
 
         get_config.cache_clear()
 
@@ -595,7 +595,7 @@ Some content without title or id.
     ) -> None:
         """Non-existent extra root is skipped with warning, not crash."""
         monkeypatch.setenv("INDEX_EXTRA_ROOTS", str(tmp_path / "nonexistent_kb"))
-        from corp_by_os.config import get_config
+        from corp.config import get_config
 
         get_config.cache_clear()
 

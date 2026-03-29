@@ -21,7 +21,7 @@ from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
 
-from corp_os_meta.pipeline_config import PipelineConfig
+from corp.schema.pipeline_config import PipelineConfig
 
 logger = logging.getLogger(__name__)
 
@@ -63,9 +63,9 @@ class SandboxManager:
         Delegates to the real schema code in each module so DDL is never
         duplicated here.
         """
-        from corp_by_os.index_builder import _SCHEMA as INDEX_SCHEMA
-        from corp_by_os.ops.database import OpsDB
-        from corp_by_os.overnight.state import OvernightState
+        from corp.index_builder import _SCHEMA as INDEX_SCHEMA
+        from corp.ops.database import OpsDB
+        from corp.overnight.state import OvernightState
 
         # ops.db — touch conn to trigger _init_schema()
         ops = OpsDB(config=self.config)

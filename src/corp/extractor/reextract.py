@@ -5,7 +5,7 @@ The source/ directory is immutable — only extract/ is regenerated.
 Previous extracts are archived in .history/{date}_{model}/.
 
 Usage:
-    from corp_knowledge_extractor.reextract import reextract_package
+    from corp.extractor.reextract import reextract_package
     from pathlib import Path
 
     reextract_package(Path("output/My Meeting"), config)
@@ -39,10 +39,10 @@ def reextract_package(package_path: Path, config: dict) -> None:
         config: Unified config dict from load_config()
     """
     # Inline imports to avoid circular imports at module level
-    from corp_knowledge_extractor.correlate import correlate_files
-    from corp_knowledge_extractor.extract import ExtractionError, extract_knowledge
-    from corp_knowledge_extractor.inventory import scan_input
-    from corp_knowledge_extractor.synthesize import build_package
+    from corp.extractor.correlate import correlate_files
+    from corp.extractor.extract import ExtractionError, extract_knowledge
+    from corp.extractor.inventory import scan_input
+    from corp.extractor.synthesize import build_package
 
     source_dir = package_path / "source"
     extract_dir = package_path / "extract"

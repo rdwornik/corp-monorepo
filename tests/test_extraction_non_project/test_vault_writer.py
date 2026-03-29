@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from corp_by_os.extraction.vault_writer import _read_trust_level, move_to_vault
+from corp.extraction.vault_writer import _read_trust_level, move_to_vault
 
 
 def _make_package(staging: Path, pkg_name: str, files: dict[str, bytes]) -> None:
@@ -157,7 +157,7 @@ def test_move_to_vault_raises_on_move_failure(tmp_path):
     _make_package(staging, "pkg-001", {"extract/note.md": b"content"})
     vault = tmp_path / "vault"
 
-    with patch("corp_by_os.extraction.vault_writer.shutil.move", side_effect=OSError("disk full")):
+    with patch("corp.extraction.vault_writer.shutil.move", side_effect=OSError("disk full")):
         with pytest.raises(OSError, match="disk full"):
             move_to_vault(staging, vault, "target")
 
@@ -173,7 +173,7 @@ def test_move_to_vault_merge_raises_on_move_failure(tmp_path):
     _make_package(staging, "pkg-001", {"extract/note.md": b"new content"})
 
     with patch(
-        "corp_by_os.extraction.vault_writer.shutil.move", side_effect=OSError("permission denied")
+        "corp.extraction.vault_writer.shutil.move", side_effect=OSError("permission denied")
     ):
         with pytest.raises(OSError, match="permission denied"):
             move_to_vault(staging, vault, "target")
@@ -185,7 +185,7 @@ def test_move_to_vault_logs_error_on_failure(tmp_path, caplog):
     _make_package(staging, "pkg-001", {"extract/note.md": b"content"})
     vault = tmp_path / "vault"
 
-    with patch("corp_by_os.extraction.vault_writer.shutil.move", side_effect=OSError("boom")):
+    with patch("corp.extraction.vault_writer.shutil.move", side_effect=OSError("boom")):
         with caplog.at_level(logging.ERROR):
             with pytest.raises(OSError):
                 move_to_vault(staging, vault, "target")

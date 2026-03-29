@@ -38,7 +38,7 @@ CKE_ALIASES_PATH = (
     / "packages"
     / "corp-knowledge-extractor"
     / "src"
-    / "corp_knowledge_extractor"
+    / "corp.extractor"
     / "data"
     / "client_aliases.yaml"
 )
@@ -239,7 +239,7 @@ def _rebuild_index() -> None:
 def _get_vault_path() -> Path:
     """Resolve vault path via corp-by-os AppConfig."""
     try:
-        from corp_by_os.config import get_config
+        from corp.config import get_config
 
         return get_config().vault_path
     except Exception as exc:

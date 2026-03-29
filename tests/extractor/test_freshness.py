@@ -4,7 +4,7 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-from corp_knowledge_extractor.freshness import (
+from corp.extractor.freshness import (
     compute_freshness_fields,
     compute_source_hash,
 )

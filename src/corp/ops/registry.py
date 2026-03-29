@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 def get_content_registry_path() -> Path:
     """Default content_registry.yaml path from config."""
-    from corp_by_os.config import get_config
+    from corp.config import get_config
 
     return get_config().mywork_root / "90_System" / "content_registry.yaml"
 

@@ -12,7 +12,7 @@ _global_env = Path.home() / "Documents" / ".secrets" / ".env"
 if _global_env.exists():
     load_dotenv(_global_env, override=False)
 
-from corp_opportunity_manager.config import AppConfig  # noqa: E402
+from corp.opportunity.config import AppConfig  # noqa: E402
 
 
 @pytest.fixture

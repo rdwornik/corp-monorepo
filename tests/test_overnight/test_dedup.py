@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from corp_by_os.overnight.dedup import DuplicateGroup, _select_canonical, deduplicate
+from corp.overnight.dedup import DuplicateGroup, _select_canonical, deduplicate
 
 
 def _make_scan_result(

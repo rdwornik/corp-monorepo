@@ -5,14 +5,14 @@ from __future__ import annotations
 import json
 
 import pytest
-from corp_by_os.extraction.folder_policy import ExtractionPolicy
-from corp_by_os.extraction.manifest_emitter import (
+from corp.extraction.folder_policy import ExtractionPolicy
+from corp.extraction.manifest_emitter import (
     _make_entry_id,
     build_manifest,
     write_manifest,
 )
-from corp_by_os.extraction.routing import RouteInfo
-from corp_by_os.extraction.scanner import ScanResult, scan_folder
+from corp.extraction.routing import RouteInfo
+from corp.extraction.scanner import ScanResult, scan_folder
 
 
 @pytest.fixture()

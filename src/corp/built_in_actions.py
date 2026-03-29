@@ -13,8 +13,9 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import yaml
-from corp_by_os.config import get_config
-from corp_by_os.models import StepResult, VaultZone
+
+from corp.config import get_config
+from corp.models import StepResult, VaultZone
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +106,7 @@ def create_vault_skeleton(params: dict[str, str]) -> StepResult:
 @register_action("validate_project")
 def validate_project(params: dict[str, str]) -> StepResult:
     """Validate a project's vault structure."""
-    from corp_by_os.vault_io import validate_vault
+    from corp.vault_io import validate_vault
 
     project = params.get("project", params.get("client", ""))
     project_id = _resolve_project_id(project, params)
@@ -133,7 +134,7 @@ def validate_project(params: dict[str, str]) -> StepResult:
 @register_action("copy_to_vault")
 def copy_to_vault_action(params: dict[str, str]) -> StepResult:
     """Copy _knowledge/ and notes to vault zones."""
-    from corp_by_os.vault_io import copy_to_vault
+    from corp.vault_io import copy_to_vault
 
     project = params.get("project", "")
     project_id = _resolve_project_id(project, params)
@@ -172,7 +173,7 @@ def copy_to_vault_action(params: dict[str, str]) -> StepResult:
 @register_action("scan_attention")
 def scan_attention(params: dict[str, str]) -> StepResult:
     """Scan all projects for stale/missing/incomplete items."""
-    from corp_by_os.vault_io import list_projects, read_project_info
+    from corp.vault_io import list_projects, read_project_info
 
     projects = list_projects()
     issues: list[dict[str, str]] = []
@@ -362,7 +363,7 @@ def scan_inbox(params: dict[str, str]) -> StepResult:
 @register_action("generate_project_brief")
 def generate_project_brief(params: dict[str, str]) -> StepResult:
     """Read facts.yaml + project-info.yaml, generate 1-pager markdown."""
-    from corp_by_os.vault_io import read_project_info
+    from corp.vault_io import read_project_info
 
     cfg = get_config()
     project = params.get("project", "")
@@ -558,7 +559,7 @@ def update_archive_metadata(params: dict[str, str]) -> StepResult:
 @register_action("add_task")
 def add_task_action(params: dict[str, str]) -> StepResult:
     """Create a task note — delegates to task_manager."""
-    from corp_by_os.task_manager import add_task
+    from corp.task_manager import add_task
 
     title = params.get("title", "")
     if not title:
@@ -587,7 +588,7 @@ def add_task_action(params: dict[str, str]) -> StepResult:
 @register_action("list_tasks")
 def list_tasks_action(params: dict[str, str]) -> StepResult:
     """List tasks — delegates to task_manager."""
-    from corp_by_os.task_manager import list_tasks
+    from corp.task_manager import list_tasks
 
     tasks = list_tasks(
         status_filter=params.get("status", "todo"),
@@ -619,7 +620,7 @@ def list_tasks_action(params: dict[str, str]) -> StepResult:
 @register_action("select_template_for_deck")
 def select_template_for_deck(params: dict[str, str]) -> StepResult:
     """Select the best template for a presentation topic."""
-    from corp_by_os.template_manager import load_registry, select_template
+    from corp.template_manager import load_registry, select_template
 
     topic = params.get("topic", "")
     template_id = params.get("template_id", "")
@@ -672,7 +673,7 @@ def select_template_for_deck(params: dict[str, str]) -> StepResult:
 @register_action("copy_deck_to_project")
 def copy_deck_to_project(params: dict[str, str]) -> StepResult:
     """Copy selected template to project folder with naming convention."""
-    from corp_by_os.template_manager import copy_template, load_registry
+    from corp.template_manager import copy_template, load_registry
 
     template_id = params.get("_selected_template_id", "")
     if not template_id:
@@ -741,7 +742,7 @@ def copy_deck_to_project(params: dict[str, str]) -> StepResult:
 @register_action("rebuild_index")
 def rebuild_index_action(params: dict[str, str]) -> StepResult:
     """Rebuild the cross-project SQLite index."""
-    from corp_by_os.index_builder import rebuild_index
+    from corp.index_builder import rebuild_index
 
     stats = rebuild_index()
     return StepResult(
@@ -758,7 +759,7 @@ def rebuild_index_action(params: dict[str, str]) -> StepResult:
 @register_action("query_knowledge")
 def query_knowledge_action(params: dict[str, str]) -> StepResult:
     """Search facts across all projects."""
-    from corp_by_os.query_engine import search_facts
+    from corp.query_engine import search_facts
 
     query = params.get("query", params.get("title", ""))
     if not query:
@@ -797,7 +798,7 @@ def query_knowledge_action(params: dict[str, str]) -> StepResult:
 @register_action("show_analytics")
 def show_analytics_action(params: dict[str, str]) -> StepResult:
     """Generate cross-project analytics and write dashboard."""
-    from corp_by_os.query_engine import get_analytics
+    from corp.query_engine import get_analytics
 
     report = get_analytics()
     _write_analytics_dashboard(report)
@@ -911,7 +912,7 @@ def _resolve_project_id(project: str, params: dict[str, str]) -> str:
 
     # Try fuzzy resolution
     try:
-        from corp_by_os.project_resolver import resolve_project
+        from corp.project_resolver import resolve_project
 
         resolved = resolve_project(project)
         if resolved:
@@ -934,7 +935,7 @@ def _resolve_project_path(project: str, params: dict[str, str]) -> Path | None:
         return None
 
     try:
-        from corp_by_os.project_resolver import resolve_project
+        from corp.project_resolver import resolve_project
 
         resolved = resolve_project(project)
         if resolved and resolved.onedrive_path:

@@ -2,7 +2,7 @@
 
 from unittest.mock import MagicMock, patch
 
-from corp_knowledge_extractor.text_extract import extract_source_date
+from corp.extractor.text_extract import extract_source_date
 
 
 class TestPdfSourceDate:

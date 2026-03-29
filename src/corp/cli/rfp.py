@@ -1,8 +1,9 @@
 """RFP CLI commands."""
 
 import click
-from corp_by_os.cli._common import console
-from corp_by_os.config import get_config
+
+from corp.cli._common import console
+from corp.config import get_config
 
 
 @click.group("rfp")
@@ -34,8 +35,8 @@ def rfp_answer_cmd(
 
         corp rfp answer "What AI/ML capabilities?" --product "Cognitive Demand Planning"
     """
-    from corp_by_os.index_builder import get_index_path
-    from corp_by_os.retrieve.rfp import answer_rfp
+    from corp.index_builder import get_index_path
+    from corp.retrieve.rfp import answer_rfp
 
     cfg = get_config()
 

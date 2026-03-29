@@ -1,6 +1,6 @@
 """Tests for deep prompt builder."""
 
-from corp_knowledge_extractor.deep_prompt import build_deep_prompt
+from corp.extractor.deep_prompt import build_deep_prompt
 
 
 def test_build_deep_prompt_architecture():

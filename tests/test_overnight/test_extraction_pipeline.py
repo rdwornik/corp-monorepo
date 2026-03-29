@@ -13,8 +13,8 @@ from pathlib import Path
 
 import pytest
 import yaml
-from corp_by_os.overnight.monitor import OvernightMonitor
-from corp_by_os.overnight.state import OvernightState
+from corp.overnight.monitor import OvernightMonitor
+from corp.overnight.state import OvernightState
 
 
 @pytest.fixture()
@@ -73,7 +73,7 @@ class TestExtractionPipeline:
 
         # Register files (simulating what _run_folder_extraction does)
         folder_path = mywork_tree / "60_Source_Library"
-        from corp_by_os.extraction.scanner import scan_folder
+        from corp.extraction.scanner import scan_folder
 
         EXTENSIONS = [".pptx", ".pdf", ".docx"]
         results = scan_folder(folder_path, allow_extensions=EXTENSIONS)
@@ -90,14 +90,14 @@ class TestExtractionPipeline:
         state_db: Path,
     ) -> None:
         """After extraction, files must move from pending → done."""
-        from corp_by_os.cli.overnight import _update_folder_file_statuses
+        from corp.cli.overnight import _update_folder_file_statuses
 
         state = OvernightState(db_path=state_db)
         run_id = "test-run-002"
         state.create_run(run_id, scope="source-library", budget=0.10)
 
         folder_path = mywork_tree / "60_Source_Library"
-        from corp_by_os.extraction.scanner import scan_folder
+        from corp.extraction.scanner import scan_folder
 
         results = scan_folder(folder_path, allow_extensions=[".pptx", ".pdf"])
         for sr in results:
@@ -128,14 +128,14 @@ class TestExtractionPipeline:
         state_db: Path,
     ) -> None:
         """On extraction failure, files must be marked as error."""
-        from corp_by_os.cli.overnight import _update_folder_file_statuses
+        from corp.cli.overnight import _update_folder_file_statuses
 
         state = OvernightState(db_path=state_db)
         run_id = "test-run-003"
         state.create_run(run_id, scope="source-library", budget=0.10)
 
         folder_path = mywork_tree / "60_Source_Library"
-        from corp_by_os.extraction.scanner import scan_folder
+        from corp.extraction.scanner import scan_folder
 
         results = scan_folder(folder_path, allow_extensions=[".pptx", ".pdf"])
         for sr in results:
@@ -208,7 +208,7 @@ class TestExtractionPipeline:
         state_db: Path,
     ) -> None:
         """_update_folder_file_statuses must only update files in the target folder."""
-        from corp_by_os.cli.overnight import _update_folder_file_statuses
+        from corp.cli.overnight import _update_folder_file_statuses
 
         state = OvernightState(db_path=state_db)
         run_id = "test-run-prefix"

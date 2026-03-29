@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from corp_by_os.retrieve.rfp import RFPAnswer, answer_rfp
+from corp.retrieve.rfp import RFPAnswer, answer_rfp
 
 # --- Schema (same as test_prep.py) ---
 
@@ -155,8 +155,8 @@ def rfp_db(tmp_path: Path) -> tuple[Path, Path]:
 
 def _mock_llm(text: str = "**Answer:** Test answer."):
     """Return context managers that mock genai for _call_llm."""
-    mock_genai = patch("corp_by_os.retrieve.prep.genai")
-    mock_types = patch("corp_by_os.retrieve.prep.genai_types")
+    mock_genai = patch("corp.retrieve.prep.genai")
+    mock_types = patch("corp.retrieve.prep.genai_types")
 
     genai_cm = mock_genai.start()
     types_cm = mock_types.start()
@@ -340,8 +340,8 @@ class TestLLMFailure:
         db_path, vault = rfp_db
 
         with (
-            patch("corp_by_os.retrieve.prep.genai") as mock_genai,
-            patch("corp_by_os.retrieve.prep.genai_types") as mock_types,
+            patch("corp.retrieve.prep.genai") as mock_genai,
+            patch("corp.retrieve.prep.genai_types") as mock_types,
         ):
             mock_client = MagicMock()
             mock_client.models.generate_content.side_effect = RuntimeError("API down")
@@ -361,7 +361,7 @@ class TestLLMFailure:
         """Missing genai SDK returns unavailable message."""
         db_path, vault = rfp_db
 
-        with patch("corp_by_os.retrieve.prep.genai", None):
+        with patch("corp.retrieve.prep.genai", None):
             result = answer_rfp(
                 question="SaaS deployment",
                 db_path=db_path,

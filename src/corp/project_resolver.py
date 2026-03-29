@@ -10,8 +10,8 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from corp_by_os.config import get_config
-from corp_by_os.models import ResolvedProject, VaultZone
+from corp.config import get_config
+from corp.models import ResolvedProject, VaultZone
 
 logger = logging.getLogger(__name__)
 

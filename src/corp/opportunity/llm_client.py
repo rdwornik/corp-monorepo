@@ -6,7 +6,7 @@ import json
 import logging
 import os
 
-from corp_opportunity_manager.models import IntentResult
+from corp.opportunity.models import IntentResult
 
 logger = logging.getLogger(__name__)
 

@@ -14,15 +14,16 @@ from datetime import datetime
 from pathlib import Path
 
 import click
-from corp_by_os.ingest.classifier import Classification, classify
-from corp_by_os.ingest.renamer import RenameProposal, propose_name
-from corp_by_os.ingest.router import _SKIP_EXTENSIONS, _SKIP_NAMES, compute_file_hash
-from corp_by_os.ops.database import OpsDB
-from corp_by_os.ops.registry import ContentRegistry
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt
 from rich.table import Table
+
+from corp.ingest.classifier import Classification, classify
+from corp.ingest.renamer import RenameProposal, propose_name
+from corp.ingest.router import _SKIP_EXTENSIONS, _SKIP_NAMES, compute_file_hash
+from corp.ops.database import OpsDB
+from corp.ops.registry import ContentRegistry
 
 logger = logging.getLogger(__name__)
 console = Console()
@@ -291,7 +292,7 @@ def _log_ingest_event(
 
 def _remove_vault_package(vault_note_path: str, config=None) -> None:
     """Remove existing vault package to make way for re-extraction."""
-    from corp_os_meta.pipeline_config import PipelineConfig
+    from corp.schema.pipeline_config import PipelineConfig
 
     if config is None:
         config = PipelineConfig.production()
@@ -347,7 +348,7 @@ def _check_dedup(
         None       — proceed with route + extract
         "skip"     — file already handled, skip entirely
     """
-    from corp_by_os.ops.file_registry import FileRegistry
+    from corp.ops.file_registry import FileRegistry
 
     content_hash = compute_file_hash(file_path)
     registry = FileRegistry(ops.conn)
@@ -430,7 +431,7 @@ def _log_dedup_skip(
 
 def _register_file(file_path: Path, ops: OpsDB) -> None:
     """Register a routed file in the FileRegistry. Call AFTER move."""
-    from corp_by_os.ops.file_registry import FileRegistry
+    from corp.ops.file_registry import FileRegistry
 
     content_hash = compute_file_hash(file_path)
     source_path = str(file_path.resolve()).replace("\\", "/")
@@ -492,10 +493,10 @@ def _trigger_extraction(
 
     Assumes file is already registered and dedup was checked earlier.
     """
-    from corp_by_os.ops.file_registry import FileRegistry
+    from corp.ops.file_registry import FileRegistry
 
     try:
-        from corp_by_os.ingest.router import _run_extraction
+        from corp.ingest.router import _run_extraction
 
         content_hash = compute_file_hash(file_path)
         mtime_str = datetime.fromtimestamp(file_path.stat().st_mtime).isoformat(timespec="seconds")
@@ -504,7 +505,7 @@ def _trigger_extraction(
         asset = ops.get_asset(rel_path)
         asset_id = asset["id"] if asset else None
 
-        from corp_os_meta.pipeline_config import PipelineConfig
+        from corp.schema.pipeline_config import PipelineConfig
 
         if config is None:
             config = PipelineConfig.production()
@@ -717,7 +718,7 @@ def _full_revert(
     vault_path and app_data_path default to values from PipelineConfig.production().
     """
     if vault_path is None or app_data_path is None:
-        from corp_os_meta.pipeline_config import PipelineConfig
+        from corp.schema.pipeline_config import PipelineConfig
 
         if config is None:
             config = PipelineConfig.production()
@@ -755,7 +756,7 @@ def _full_revert(
 
     # Step 3: Rebuild index
     try:
-        from corp_by_os.index_builder import rebuild_index
+        from corp.index_builder import rebuild_index
 
         console.print("  [dim]Rebuilding index...[/dim]")
         stats = rebuild_index()
@@ -778,8 +779,8 @@ def _check_near_dup(
     Logs info-only for similarity 0.6–0.8. Below 0.6: silent.
     Fails open — any error returns False so the pipeline continues normally.
     """
-    from corp_by_os.ingest.dedup import check_near_duplicate
-    from corp_by_os.ingest.light_scan import light_scan
+    from corp.ingest.dedup import check_near_duplicate
+    from corp.ingest.light_scan import light_scan
 
     _HIGH_SIM = 0.8
 
@@ -1052,8 +1053,8 @@ def ingest_inbox(
     Processes one file at a time with Rich UI: classify, confirm
     destination, rename, move, then trigger CKE extraction.
     """
-    from corp_by_os.ops.registry import get_content_registry_path
-    from corp_os_meta.pipeline_config import PipelineConfig
+    from corp.ops.registry import get_content_registry_path
+    from corp.schema.pipeline_config import PipelineConfig
 
     cfg = PipelineConfig.production()
     ops = OpsDB()

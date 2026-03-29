@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from corp_by_os.cli.overnight import _execute_reshape_actions
-from corp_by_os.overnight.classifier import ClassificationResult, classify_batch
-from corp_by_os.overnight.dedup import deduplicate
+from corp.cli.overnight import _execute_reshape_actions
+from corp.overnight.classifier import ClassificationResult, classify_batch
+from corp.overnight.dedup import deduplicate
 
 
 def _make_files(n: int, prefix: str = "file") -> list[dict]:
@@ -209,7 +209,7 @@ class TestExecuteReshapeActions:
 class TestSafetyInReshape:
     def test_safety_gate_filters_before_dedup(self) -> None:
         """Safety gate should run before dedup — blocked files never reach dedup."""
-        from corp_by_os.overnight.safety import is_safe_for_upload
+        from corp.overnight.safety import is_safe_for_upload
 
         files = _make_files(3)
         files.append(

@@ -5,7 +5,7 @@ Tags each fact as positive/negative/unknown using keyword pattern matching.
 No LLM — purely regex-based. Conservative: defaults to unknown.
 
 Usage:
-    from corp_knowledge_extractor.polarity import detect_polarity
+    from corp.extractor.polarity import detect_polarity
 
     detect_polarity("WMS supports REST API")        # "positive"
     detect_polarity("WMS does NOT use Snowflake")    # "negative"

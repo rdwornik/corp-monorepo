@@ -1,6 +1,6 @@
 """Tests for hierarchical tag generation (Council Decision #7)."""
 
-from corp_knowledge_extractor.post_process import _normalize_tag, generate_tags
+from corp.extractor.post_process import _normalize_tag, generate_tags
 
 
 class TestNormalizeTag:

@@ -6,7 +6,7 @@ import json
 import sqlite3
 from pathlib import Path
 
-from corp_by_os.retrieve.engine import (
+from corp.retrieve.engine import (
     CONFIDENCE_BOOST,
     RetrievedNote,
     _apply_confidence_ranking,

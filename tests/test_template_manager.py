@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 import yaml
-from corp_by_os.models import TemplateInfo
-from corp_by_os.template_manager import (
+from corp.models import TemplateInfo
+from corp.template_manager import (
     _make_id,
     copy_template,
     load_registry,
@@ -290,7 +290,7 @@ class TestCopy:
         self, templates_dir: Path, tmp_path: Path, app_config, monkeypatch
     ) -> None:
         monkeypatch.setenv("TEMPLATES_ROOT", str(templates_dir))
-        from corp_by_os.config import get_config
+        from corp.config import get_config
 
         get_config.cache_clear()
 
@@ -311,7 +311,7 @@ class TestCopy:
 
     def test_copy_missing_source(self, tmp_path: Path, app_config, monkeypatch) -> None:
         monkeypatch.setenv("TEMPLATES_ROOT", str(tmp_path / "empty"))
-        from corp_by_os.config import get_config
+        from corp.config import get_config
 
         get_config.cache_clear()
 

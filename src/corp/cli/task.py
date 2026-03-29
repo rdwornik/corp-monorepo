@@ -3,9 +3,10 @@
 import sys
 
 import click
-from corp_by_os.cli._common import console
-from corp_by_os.project_resolver import resolve_project
 from rich.panel import Panel
+
+from corp.cli._common import console
+from corp.project_resolver import resolve_project
 
 
 @click.group("task")
@@ -20,7 +21,7 @@ def task_group() -> None:
 @click.option("--priority", default="medium", type=click.Choice(["high", "medium", "low"]))
 def task_add(title: str, project: str | None, deadline: str | None, priority: str) -> None:
     """Create a new task."""
-    from corp_by_os.task_manager import add_task
+    from corp.task_manager import add_task
 
     project_id = None
     if project:
@@ -37,7 +38,7 @@ def task_add(title: str, project: str | None, deadline: str | None, priority: st
 @click.option("--all", "show_all", is_flag=True, help="Show all statuses")
 def task_list(status: str, project: str | None, show_all: bool) -> None:
     """List tasks sorted by priority and deadline."""
-    from corp_by_os.task_manager import list_tasks
+    from corp.task_manager import list_tasks
 
     status_filter = None if show_all else status
     tasks = list_tasks(status_filter=status_filter, project_filter=project)
@@ -77,7 +78,7 @@ def task_list(status: str, project: str | None, show_all: bool) -> None:
 @click.argument("title")
 def task_done(title: str) -> None:
     """Mark a task as complete (fuzzy title match)."""
-    from corp_by_os.task_manager import complete_task
+    from corp.task_manager import complete_task
 
     if complete_task(title):
         console.print(f"[green]Completed:[/green] {title}")
@@ -91,7 +92,7 @@ def task_done(title: str) -> None:
 @click.option("--all", "show_all", is_flag=True, help="Show all statuses")
 def tasks_shortcut(status: str, show_all: bool) -> None:
     """Shortcut for 'corp task list'."""
-    from corp_by_os.task_manager import list_tasks
+    from corp.task_manager import list_tasks
 
     status_filter = None if show_all else status
     tasks = list_tasks(status_filter=status_filter)

@@ -159,7 +159,7 @@ CREATE TABLE IF NOT EXISTS registry_suggestions (
 
 def get_ops_db_path() -> Path:
     """Default ops.db path from config."""
-    from corp_by_os.config import get_config
+    from corp.config import get_config
 
     return get_config().app_data_path / "ops.db"
 

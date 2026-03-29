@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
-from corp_knowledge_extractor.manifest import (
+from corp.extractor.manifest import (
     FileStatus,
     Manifest,
     ManifestEntry,

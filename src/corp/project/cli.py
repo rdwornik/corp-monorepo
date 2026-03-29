@@ -75,7 +75,7 @@ def cli(ctx: click.Context, verbose: bool, config_path: str | None) -> None:
     logging.basicConfig(level=level, format="%(levelname)s %(name)s: %(message)s")
     # Force config reload with custom path if provided
     if config_path:
-        from corp_project_extractor.config import get_settings, reset_cache
+        from corp.project.config import get_settings, reset_cache
 
         reset_cache()
         get_settings(Path(config_path))
@@ -89,7 +89,7 @@ def cli(ctx: click.Context, verbose: bool, config_path: str | None) -> None:
 @click.pass_context
 def scan(ctx: click.Context, project_path: str) -> None:
     """Classify all files in PROJECT_PATH and save _knowledge/manifest.yaml."""
-    from corp_project_extractor import manifest as m
+    from corp.project import manifest as m
 
     path = Path(project_path)
     console.print("\n[bold]Corp Project Extractor — Scan[/bold]")
@@ -113,8 +113,8 @@ def scan(ctx: click.Context, project_path: str) -> None:
 @click.pass_context
 def extract(ctx: click.Context, project_path: str, force: bool, skip_junk: bool) -> None:
     """Scan + extract text from all supported files in PROJECT_PATH."""
-    from corp_project_extractor import extractors
-    from corp_project_extractor import manifest as m
+    from corp.project import extractors
+    from corp.project import manifest as m
 
     path = Path(project_path)
     console.print("\n[bold]Corp Project Extractor — Extract[/bold]")
@@ -190,9 +190,9 @@ def extract_cke(
         cpe extract-cke "C:\\path\\to\\Lenzing_Planning" --dry-run
         cpe extract-cke "C:\\path\\to\\Lenzing_Planning" --max-rpm 50
     """
-    from corp_project_extractor.cke_invoker import invoke_cke_batch
-    from corp_project_extractor.manifest import load_manifest, scan_and_save
-    from corp_project_extractor.manifest_generator import generate_cke_manifest
+    from corp.project.cke_invoker import invoke_cke_batch
+    from corp.project.manifest import load_manifest, scan_and_save
+    from corp.project.manifest_generator import generate_cke_manifest
 
     path = Path(project_path)
     console.print("\n[bold]Corp Project Extractor — Extract via CKE[/bold]")
@@ -256,7 +256,7 @@ def render(ctx: click.Context, project_path: str, copy_to_vault: str | None) -> 
     Generates project-info.yaml (com compatible), facts.yaml,
     and index.md (Obsidian) from CKE extract.json files.
     """
-    from corp_project_extractor.renderer import render_project
+    from corp.project.renderer import render_project
 
     path = Path(project_path)
     console.print("\n[bold]Corp Project Extractor — Render[/bold]")
@@ -275,7 +275,7 @@ def render(ctx: click.Context, project_path: str, copy_to_vault: str | None) -> 
     console.print(f"  People:      {stats['people']}")
     console.print(f"  Facts:       {stats['facts']}")
 
-    from corp_project_extractor.config import get_settings
+    from corp.project.config import get_settings
 
     knowledge_dir = path / get_settings().knowledge_dir
     console.print(f"\n  [dim]{knowledge_dir / 'project-info.yaml'}[/dim]")
@@ -299,8 +299,8 @@ def render(ctx: click.Context, project_path: str, copy_to_vault: str | None) -> 
 @click.pass_context
 def show(ctx: click.Context, project_path: str) -> None:
     """Display existing manifest as a Rich table (no rescan)."""
-    from corp_project_extractor import manifest as m
-    from corp_project_extractor.config import get_settings
+    from corp.project import manifest as m
+    from corp.project.config import get_settings
 
     path = Path(project_path)
     settings = get_settings()

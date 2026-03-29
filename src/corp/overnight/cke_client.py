@@ -1,7 +1,7 @@
 """Subprocess wrapper around CKE CLI.
 
 Enforces the corp-by-os → CKE process boundary (Architecture Rule,
-ECOSYSTEM.md): no direct Python imports from corp_knowledge_extractor.
+ECOSYSTEM.md): no direct Python imports from corp.extractor.
 All operations invoke `cke` via subprocess.
 """
 

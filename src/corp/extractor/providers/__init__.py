@@ -3,12 +3,12 @@
 Routes text extraction to Claude Haiku 4.5, multimodal to Gemini Flash.
 """
 
-from corp_knowledge_extractor.providers.base import (
+from corp.extractor.providers.base import (
     ExtractionProvider,
     ExtractionRequest,
     ExtractionResponse,
 )
-from corp_knowledge_extractor.providers.router import get_provider, route_model
+from corp.extractor.providers.router import get_provider, route_model
 
 __all__ = [
     "ExtractionProvider",

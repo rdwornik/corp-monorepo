@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from corp_by_os.cleanup.disk import (
+from corp.cleanup.disk import (
     CleanupItem,
     CleanupPlan,
     execute_plan,

@@ -9,17 +9,18 @@ from datetime import date, datetime
 from pathlib import Path
 
 import click
-from corp_opportunity_manager.config import load_config
-from corp_opportunity_manager.folder_manager import create_opportunity
-from corp_opportunity_manager.models import OpportunityConfig
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from corp.opportunity.config import load_config
+from corp.opportunity.folder_manager import create_opportunity
+from corp.opportunity.models import OpportunityConfig
+
 # Force UTF-8 output on Windows to handle international characters in data
 _stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 console = Console(file=_stdout)
-logger = logging.getLogger("corp_opportunity_manager")
+logger = logging.getLogger("corp.opportunity")
 
 
 @click.group()
@@ -109,7 +110,7 @@ def list_cmd() -> None:
         _list_from_folders(config)
         return
 
-    from corp_opportunity_manager.excel_manager import list_projects
+    from corp.opportunity.excel_manager import list_projects
 
     rows = list_projects(config.project_codes_excel)
     if not rows:
@@ -177,7 +178,7 @@ def prep_deck(client: str, topic: str, date_str: str | None) -> None:
             console.print("[red]Invalid date format. Use YYYY-MM-DD.[/red]")
             sys.exit(1)
 
-    from corp_opportunity_manager.templates import deck_filename
+    from corp.opportunity.templates import deck_filename
 
     template_name = config.templates.get("discovery_deck", "")
     source = config.templates_root / template_name if template_name else None
@@ -239,7 +240,7 @@ def chat() -> None:
     config = load_config()
 
     try:
-        from corp_opportunity_manager.chat import ChatSession
+        from corp.opportunity.chat import ChatSession
     except ImportError as e:
         console.print(f"[red]Missing dependency for chat: {e}[/red]")
         console.print("[yellow]Install with: pip install -e '.[llm]'[/yellow]")
@@ -254,7 +255,7 @@ def _try_update_excel(config, client: str, folder_path: Path) -> None:
     if not config.project_codes_excel or not config.project_codes_excel.exists():
         return
 
-    from corp_opportunity_manager.excel_manager import (
+    from corp.opportunity.excel_manager import (
         find_row_by_client,
         update_folder_link,
     )

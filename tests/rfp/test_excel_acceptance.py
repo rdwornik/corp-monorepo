@@ -1,6 +1,6 @@
 """Acceptance tests for Excel agent -- structure checks only (no LLM calls)."""
 
-from corp_rfp_agent.rfp_excel_agent import (
+from corp.rfp.rfp_excel_agent import (
     detect_answer_column,
     detect_question_column,
     find_header_row,

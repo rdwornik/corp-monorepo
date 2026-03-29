@@ -21,7 +21,7 @@ import pytest
 # Helpers / constants
 # ---------------------------------------------------------------------------
 
-DATA_DIR = Path(__file__).resolve().parents[1] / "src/corp_knowledge_extractor/data"
+DATA_DIR = Path(__file__).resolve().parents[1] / "src/corp.extractor/data"
 MODEL_PATH = DATA_DIR / "hybrid_classifier.json"
 
 TRAINING_FILENAME = "2024-01_TRAINING_Lenzing_Demand-Planning-Fundamentals.pptx"
@@ -41,7 +41,7 @@ SECURITY_FILENAME = "2024-02_SECURITY_Lenzing_SOC2-Type2-Audit-Report.pdf"
 @pytest.mark.skipif(not MODEL_PATH.exists(), reason="Model file not present")
 def test_hybrid_loader_from_json():
     """Model loads from JSON without pickle, returns correct types."""
-    from corp_knowledge_extractor.hybrid_loader import load_hybrid_classifier
+    from corp.extractor.hybrid_loader import load_hybrid_classifier
     from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.linear_model import LogisticRegression
 
@@ -57,7 +57,7 @@ def test_hybrid_loader_from_json():
 @pytest.mark.skipif(not MODEL_PATH.exists(), reason="Model file not present")
 def test_separate_feature_spaces():
     """Filename vectorizer uses char n-grams; content uses word n-grams — never mixed."""
-    from corp_knowledge_extractor.hybrid_loader import load_hybrid_classifier
+    from corp.extractor.hybrid_loader import load_hybrid_classifier
 
     tfidf_fn, tfidf_ct, _clf, _meta = load_hybrid_classifier(MODEL_PATH)
 
@@ -71,7 +71,7 @@ def test_separate_feature_spaces():
 @pytest.mark.skipif(not MODEL_PATH.exists(), reason="Model file not present")
 def test_predict_with_content():
     """Prediction with filename + content returns (str, float) contract."""
-    from corp_knowledge_extractor.hybrid_loader import (
+    from corp.extractor.hybrid_loader import (
         load_hybrid_classifier,
         predict_hybrid,
     )
@@ -87,7 +87,7 @@ def test_predict_with_content():
 @pytest.mark.skipif(not MODEL_PATH.exists(), reason="Model file not present")
 def test_predict_without_content():
     """Filename-only prediction (empty content string) still returns valid output."""
-    from corp_knowledge_extractor.hybrid_loader import (
+    from corp.extractor.hybrid_loader import (
         load_hybrid_classifier,
         predict_hybrid,
     )
@@ -102,7 +102,7 @@ def test_predict_without_content():
 @pytest.mark.skipif(not MODEL_PATH.exists(), reason="Model file not present")
 def test_balanced_class_weights():
     """Model metadata records training parameters (class_weight=balanced)."""
-    from corp_knowledge_extractor.hybrid_loader import load_hybrid_classifier
+    from corp.extractor.hybrid_loader import load_hybrid_classifier
 
     _fn, _ct, clf, meta = load_hybrid_classifier(MODEL_PATH)
     # coef_ shape: (n_classes, n_features) — balanced weighting produces non-trivial coefficients
@@ -113,7 +113,7 @@ def test_balanced_class_weights():
 @pytest.mark.skipif(not MODEL_PATH.exists(), reason="Model file not present")
 def test_high_confidence_correct():
     """High-confidence prediction for an archetypal training file should be 'training'."""
-    from corp_knowledge_extractor.hybrid_loader import (
+    from corp.extractor.hybrid_loader import (
         load_hybrid_classifier,
         predict_hybrid,
     )
@@ -134,7 +134,7 @@ def test_high_confidence_correct():
 @pytest.mark.skipif(not MODEL_PATH.exists(), reason="Model file not present")
 def test_classify_doc_type_hybrid_returns_tuple():
     """classify_doc_type_hybrid returns (doc_type, conf, method) for any input."""
-    from corp_knowledge_extractor.doc_type_classifier import classify_doc_type_hybrid
+    from corp.extractor.doc_type_classifier import classify_doc_type_hybrid
 
     result = classify_doc_type_hybrid(TRAINING_FILENAME, TRAINING_CONTENT)
 
@@ -148,7 +148,7 @@ def test_classify_doc_type_hybrid_returns_tuple():
 @pytest.mark.skipif(not MODEL_PATH.exists(), reason="Model file not present")
 def test_classify_returns_tfidf_method_when_confident():
     """When TF-IDF fires above threshold, method == 'tfidf'."""
-    from corp_knowledge_extractor.doc_type_classifier import classify_doc_type_hybrid
+    from corp.extractor.doc_type_classifier import classify_doc_type_hybrid
 
     # A very archetypal security filename should produce high TF-IDF confidence
     doc_type, conf, method = classify_doc_type_hybrid(
@@ -162,13 +162,13 @@ def test_classify_returns_tfidf_method_when_confident():
 
 def test_feature_flag_off_skips_tfidf():
     """When USE_TFIDF=False, classify_doc_type_hybrid never calls the model."""
-    import corp_knowledge_extractor.doc_type_classifier as dtc
-    from corp_knowledge_extractor.doc_type_classifier import classify_doc_type_hybrid
+    import corp.extractor.doc_type_classifier as dtc
+    from corp.extractor.doc_type_classifier import classify_doc_type_hybrid
 
     original = dtc.USE_TFIDF
     try:
         dtc.USE_TFIDF = False
-        with patch("corp_knowledge_extractor.hybrid_loader.get_cached_model") as mock_model:
+        with patch("corp.extractor.hybrid_loader.get_cached_model") as mock_model:
             doc_type, conf, method = classify_doc_type_hybrid(MEETING_FILENAME, "")
             mock_model.assert_not_called()
         # Regex should have fired on MEETING_FILENAME (contains "MEETING" and "Notes")
@@ -179,9 +179,9 @@ def test_feature_flag_off_skips_tfidf():
 
 def test_model_missing_graceful():
     """Missing model file → FileNotFoundError caught → falls back to regex, no crash."""
-    from corp_knowledge_extractor.doc_type_classifier import classify_doc_type_hybrid
+    from corp.extractor.doc_type_classifier import classify_doc_type_hybrid
 
-    with patch("corp_knowledge_extractor.hybrid_loader.get_cached_model") as mock_model:
+    with patch("corp.extractor.hybrid_loader.get_cached_model") as mock_model:
         mock_model.side_effect = FileNotFoundError("model not found")
         doc_type, conf, method = classify_doc_type_hybrid(MEETING_FILENAME, "")
 
@@ -192,17 +192,17 @@ def test_model_missing_graceful():
 
 def test_regex_fallback_when_tfidf_low_confidence():
     """When TF-IDF confidence is below threshold, method falls through to regex."""
-    from corp_knowledge_extractor.doc_type_classifier import classify_doc_type_hybrid
+    from corp.extractor.doc_type_classifier import classify_doc_type_hybrid
 
     # Filename that clearly matches a regex pattern (training)
     training_fn = "2024-01_TRAINING_Lenzing_Enablement-Bootcamp.pptx"
 
-    with patch("corp_knowledge_extractor.hybrid_loader.get_cached_model") as mock_get:
+    with patch("corp.extractor.hybrid_loader.get_cached_model") as mock_get:
         mock_predict = MagicMock(return_value=("general", 0.3))
         mock_get.return_value = (MagicMock(), MagicMock(), MagicMock(), {})
 
         with patch(
-            "corp_knowledge_extractor.hybrid_loader.predict_hybrid",
+            "corp.extractor.hybrid_loader.predict_hybrid",
             mock_predict,
         ):
             doc_type, conf, method = classify_doc_type_hybrid(training_fn, "")

@@ -16,8 +16,8 @@ from datetime import date, timedelta
 from itertools import combinations
 from pathlib import Path
 
-from corp_by_os.index_builder import _connect, _ensure_schema
-from corp_by_os.models import AnalyticsReport, FactResult, ProjectResult
+from corp.index_builder import _connect, _ensure_schema
+from corp.models import AnalyticsReport, FactResult, ProjectResult
 
 logger = logging.getLogger(__name__)
 

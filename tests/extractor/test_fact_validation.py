@@ -1,7 +1,7 @@
 """Tests for fact validation — number normalizer, source cross-reference, anomaly detection."""
 
-from corp_knowledge_extractor.extract import _enrich_facts
-from corp_knowledge_extractor.fact_validation import (
+from corp.extractor.extract import _enrich_facts
+from corp.extractor.fact_validation import (
     check_anomalies,
     extract_numbers_from_text,
     normalize_number,
@@ -160,8 +160,8 @@ class TestValidationWired:
         """Enriched facts include verification_status when source text available."""
         from pathlib import Path
 
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.text_extract import TextExtractionResult
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.text_extract import TextExtractionResult
 
         sf = SourceFile(
             path=Path("test.pptx"),
@@ -192,8 +192,8 @@ class TestValidationWired:
         """Magnitude error fact gets flagged_mismatch with anomalies."""
         from pathlib import Path
 
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.text_extract import TextExtractionResult
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.text_extract import TextExtractionResult
 
         sf = SourceFile(
             path=Path("test.pptx"),

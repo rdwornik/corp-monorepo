@@ -29,12 +29,11 @@ if _global_env.exists():
 # Local .env (project-specific vars only)
 load_dotenv(override=False)
 
-from corp_knowledge_extractor.compress import (  # noqa: E402
+from corp.extractor.compress import (  # noqa: E402
     compress_video,
     needs_compression,
 )
-
-from config.config_loader import load_config  # noqa: E402
+from corp.extractor.config_loader import load_config  # noqa: E402
 
 
 def get_video_info(video_path: str) -> dict:

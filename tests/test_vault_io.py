@@ -6,8 +6,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from corp_by_os.models import VaultZone
-from corp_by_os.vault_io import (
+from corp.models import VaultZone
+from corp.vault_io import (
     _parse_frontmatter,
     _render_note,
     _write_with_retry,

@@ -7,14 +7,14 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
-from corp_by_os.ingest.llm_classifier import (
+from corp.ingest.llm_classifier import (
     _get_all_destinations,
     _parse_llm_json,
     classify_file_llm,
     classify_quarantined_batch,
 )
-from corp_by_os.ops.database import OpsDB
-from corp_by_os.ops.registry import ContentRegistry
+from corp.ops.database import OpsDB
+from corp.ops.registry import ContentRegistry
 
 
 @pytest.fixture()
@@ -98,7 +98,7 @@ class TestClassifyFileLlm:
         mock_client = MagicMock()
         mock_client.models.generate_content.return_value = mock_response
 
-        with patch("corp_by_os.ingest.llm_classifier.genai") as mock_genai:
+        with patch("corp.ingest.llm_classifier.genai") as mock_genai:
             mock_genai.Client.return_value = mock_client
             result = classify_file_llm(
                 "Architecture_Overview.pdf",
@@ -123,7 +123,7 @@ class TestClassifyFileLlm:
         mock_client = MagicMock()
         mock_client.models.generate_content.return_value = mock_response
 
-        with patch("corp_by_os.ingest.llm_classifier.genai") as mock_genai:
+        with patch("corp.ingest.llm_classifier.genai") as mock_genai:
             mock_genai.Client.return_value = mock_client
             result = classify_file_llm(
                 "test.pdf",
@@ -144,7 +144,7 @@ class TestClassifyFileLlm:
         mock_client = MagicMock()
         mock_client.models.generate_content.return_value = mock_response
 
-        with patch("corp_by_os.ingest.llm_classifier.genai") as mock_genai:
+        with patch("corp.ingest.llm_classifier.genai") as mock_genai:
             mock_genai.Client.return_value = mock_client
             result = classify_file_llm(
                 "mystery.bin",
@@ -163,7 +163,7 @@ class TestClassifyFileLlm:
         mock_client = MagicMock()
         mock_client.models.generate_content.side_effect = RuntimeError("API down")
 
-        with patch("corp_by_os.ingest.llm_classifier.genai") as mock_genai:
+        with patch("corp.ingest.llm_classifier.genai") as mock_genai:
             mock_genai.Client.return_value = mock_client
             result = classify_file_llm(
                 "test.pdf",
@@ -180,7 +180,7 @@ class TestClassifyFileLlm:
 
     def test_handles_missing_sdk(self) -> None:
         """Missing google-genai SDK returns graceful fallback."""
-        with patch("corp_by_os.ingest.llm_classifier.genai", None):
+        with patch("corp.ingest.llm_classifier.genai", None):
             result = classify_file_llm(
                 "test.pdf",
                 ".pdf",
@@ -228,7 +228,7 @@ class TestClassifyQuarantinedBatch:
         mock_client = MagicMock()
         mock_client.models.generate_content.return_value = mock_response
 
-        with patch("corp_by_os.ingest.llm_classifier.genai") as mock_genai:
+        with patch("corp.ingest.llm_classifier.genai") as mock_genai:
             mock_genai.Client.return_value = mock_client
             # Budget of $0.002 → should process only 2 files (at $0.001 each)
             results = classify_quarantined_batch(
@@ -263,7 +263,7 @@ class TestClassifyQuarantinedBatch:
         mock_client = MagicMock()
         mock_client.models.generate_content.return_value = mock_response
 
-        with patch("corp_by_os.ingest.llm_classifier.genai") as mock_genai:
+        with patch("corp.ingest.llm_classifier.genai") as mock_genai:
             mock_genai.Client.return_value = mock_client
             results = classify_quarantined_batch(
                 ops,

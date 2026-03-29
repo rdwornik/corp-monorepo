@@ -11,7 +11,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-from corp_knowledge_extractor.manifest import (
+from corp.extractor.manifest import (
     FileStatus,
     Manifest,
     ManifestEntry,
@@ -59,18 +59,18 @@ class BatchProcessor:
 
     def process_all(self) -> dict:
         """Process all files in manifest. Returns summary dict."""
-        from corp_knowledge_extractor.compress import compress_video, needs_compression
-        from corp_knowledge_extractor.correlate import correlate_files
-        from corp_knowledge_extractor.extract import (
+        from corp.extractor.compress import compress_video, needs_compression
+        from corp.extractor.correlate import correlate_files
+        from corp.extractor.extract import (
             extract_from_text,
             extract_knowledge,
             extract_local,
             extract_pptx_multimodal,
         )
-        from corp_knowledge_extractor.frames.sampler import sample_frames
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.synthesize import build_package
-        from corp_knowledge_extractor.tier_router import Tier, route_tier
+        from corp.extractor.frames.sampler import sample_frames
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.synthesize import build_package
+        from corp.extractor.tier_router import Tier, route_tier
 
         output_dir = self.manifest.output_dir
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -141,8 +141,8 @@ class BatchProcessor:
                 }
                 summary["done"] += 1
                 summary["tiers"][tier_used] = summary["tiers"].get(tier_used, 0) + 1
-                from corp_knowledge_extractor.tier_router import TIER_COSTS
-                from corp_knowledge_extractor.tier_router import Tier as _T
+                from corp.extractor.tier_router import TIER_COSTS
+                from corp.extractor.tier_router import Tier as _T
 
                 summary["cost"] += TIER_COSTS[_T(tier_used)]
                 logger.info("  Done (Tier %d): %s", tier_used, entry.name)
@@ -226,7 +226,7 @@ class BatchProcessor:
             result = extract_from_text(source_file, self.config, decision.text_result, user_context=entry.user_context)
         elif source_file.path.suffix.lower() == ".pptx" and decision.tier == Tier.MULTIMODAL:
             # PPTX multimodal: render slides as PNG, send to Gemini
-            from corp_knowledge_extractor.slides.renderer import render_slides
+            from corp.extractor.slides.renderer import render_slides
 
             temp_slides_dir = pkg_dir / "temp_slides" / source_file.name
             rendered = render_slides(source_file.path, temp_slides_dir)
@@ -291,7 +291,7 @@ class BatchProcessor:
 
     def _write_extract_json(self, entry: ManifestEntry, result, pkg_dir: Path):
         """Write machine-readable extract.json for CPE consumption."""
-        from corp_knowledge_extractor.post_process import post_process_extraction
+        from corp.extractor.post_process import post_process_extraction
 
         pp = post_process_extraction(
             raw_result=dict(result.raw_json),

@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pytest
 import yaml
-from corp_by_os.overnight.preflight import run_preflight
+from corp.overnight.preflight import run_preflight
 
 
 @pytest.fixture()
@@ -110,7 +110,7 @@ class TestPreflightDiskSpace:
     def test_low_disk_space(self, valid_env: dict) -> None:
         # Mock shutil.disk_usage to report low space
         fake_usage = type("Usage", (), {"free": 1024**3})()  # 1GB
-        with patch("corp_by_os.overnight.preflight.shutil.disk_usage", return_value=fake_usage):
+        with patch("corp.overnight.preflight.shutil.disk_usage", return_value=fake_usage):
             errors = run_preflight(
                 valid_env["mywork"],
                 valid_env["vault"],

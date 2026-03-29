@@ -3,8 +3,8 @@
 from unittest.mock import patch
 
 import pytest
-from corp_knowledge_extractor.frames.sampler import SampledFrame
-from corp_knowledge_extractor.frames.scene_detect import (
+from corp.extractor.frames.sampler import SampledFrame
+from corp.extractor.frames.scene_detect import (
     DYNAMIC_CAP_MAX,
     MIN_FRAMES_FLOOR,
     scene_detect,
@@ -35,10 +35,10 @@ class TestSceneDetectCreatesFrames:
         _make_ffmpeg_stderr(timestamps)
 
         with (
-            patch("corp_knowledge_extractor.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
-            patch("corp_knowledge_extractor.frames.scene_detect._get_video_duration", return_value=120.0),
-            patch("corp_knowledge_extractor.frames.scene_detect._extract_frame_at") as mock_extract,
-            patch("corp_knowledge_extractor.frames.scene_detect._histogram_correlation", return_value=0.5),
+            patch("corp.extractor.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
+            patch("corp.extractor.frames.scene_detect._get_video_duration", return_value=120.0),
+            patch("corp.extractor.frames.scene_detect._extract_frame_at") as mock_extract,
+            patch("corp.extractor.frames.scene_detect._histogram_correlation", return_value=0.5),
         ):
             # Make extract_frame_at create dummy files
             def fake_extract(vp, ts, out):
@@ -66,10 +66,10 @@ class TestSceneDetectFloor:
         timestamps = [10.0, 200.0, 400.0]  # Only 3 scenes
 
         with (
-            patch("corp_knowledge_extractor.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
-            patch("corp_knowledge_extractor.frames.scene_detect._get_video_duration", return_value=900.0),  # 15 min
-            patch("corp_knowledge_extractor.frames.scene_detect._extract_frame_at") as mock_extract,
-            patch("corp_knowledge_extractor.frames.scene_detect._histogram_correlation", return_value=0.3),
+            patch("corp.extractor.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
+            patch("corp.extractor.frames.scene_detect._get_video_duration", return_value=900.0),  # 15 min
+            patch("corp.extractor.frames.scene_detect._extract_frame_at") as mock_extract,
+            patch("corp.extractor.frames.scene_detect._histogram_correlation", return_value=0.3),
         ):
 
             def fake_extract(vp, ts, out):
@@ -94,10 +94,10 @@ class TestSceneDetectCircuitBreaker:
         timestamps = [float(i) for i in range(100)]
 
         with (
-            patch("corp_knowledge_extractor.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
-            patch("corp_knowledge_extractor.frames.scene_detect._get_video_duration", return_value=300.0),
-            patch("corp_knowledge_extractor.frames.scene_detect._extract_frame_at") as mock_extract,
-            patch("corp_knowledge_extractor.frames.scene_detect._histogram_correlation", return_value=0.3),
+            patch("corp.extractor.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
+            patch("corp.extractor.frames.scene_detect._get_video_duration", return_value=300.0),
+            patch("corp.extractor.frames.scene_detect._extract_frame_at") as mock_extract,
+            patch("corp.extractor.frames.scene_detect._histogram_correlation", return_value=0.3),
         ):
 
             def fake_extract(vp, ts, out):
@@ -131,10 +131,10 @@ class TestSceneDetectDedup:
             return 0.3  # different
 
         with (
-            patch("corp_knowledge_extractor.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
-            patch("corp_knowledge_extractor.frames.scene_detect._get_video_duration", return_value=60.0),
-            patch("corp_knowledge_extractor.frames.scene_detect._extract_frame_at") as mock_extract,
-            patch("corp_knowledge_extractor.frames.scene_detect._histogram_correlation", side_effect=fake_corr),
+            patch("corp.extractor.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
+            patch("corp.extractor.frames.scene_detect._get_video_duration", return_value=60.0),
+            patch("corp.extractor.frames.scene_detect._extract_frame_at") as mock_extract,
+            patch("corp.extractor.frames.scene_detect._histogram_correlation", side_effect=fake_corr),
         ):
 
             def fake_extract(vp, ts, out):
@@ -160,10 +160,10 @@ class TestSceneDetectDynamicCap:
         timestamps = [float(i * 10) for i in range(20)]
 
         with (
-            patch("corp_knowledge_extractor.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
-            patch("corp_knowledge_extractor.frames.scene_detect._get_video_duration", return_value=300.0),
-            patch("corp_knowledge_extractor.frames.scene_detect._extract_frame_at") as mock_extract,
-            patch("corp_knowledge_extractor.frames.scene_detect._histogram_correlation", return_value=0.3),
+            patch("corp.extractor.frames.scene_detect._run_ffmpeg_scene_detect", return_value=timestamps),
+            patch("corp.extractor.frames.scene_detect._get_video_duration", return_value=300.0),
+            patch("corp.extractor.frames.scene_detect._extract_frame_at") as mock_extract,
+            patch("corp.extractor.frames.scene_detect._histogram_correlation", return_value=0.3),
         ):
 
             def fake_extract(vp, ts, out):
@@ -190,10 +190,10 @@ class TestSceneDetectFallback:
 
         with (
             patch(
-                "corp_knowledge_extractor.frames.scene_detect._run_ffmpeg_scene_detect",
+                "corp.extractor.frames.scene_detect._run_ffmpeg_scene_detect",
                 side_effect=FileNotFoundError("ffmpeg not found"),
             ),
-            patch("corp_knowledge_extractor.frames.sampler.sample_frames", return_value=mock_frames) as mock_sampler,
+            patch("corp.extractor.frames.sampler.sample_frames", return_value=mock_frames) as mock_sampler,
         ):
             frames = scene_detect(video, out_dir, config)
 

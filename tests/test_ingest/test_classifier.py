@@ -6,12 +6,12 @@ from pathlib import Path
 
 import pytest
 import yaml
-from corp_by_os.ingest.classifier import (
+from corp.ingest.classifier import (
     _human_size,
     classify,
     detect_file_info,
 )
-from corp_by_os.ops.registry import ContentRegistry
+from corp.ops.registry import ContentRegistry
 
 
 @pytest.fixture()

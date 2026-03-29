@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date, timedelta
 
 import pytest
-from corp_by_os.intent_router import (
+from corp.intent_router import (
     _extract_date,
     _extract_priority,
     _extract_product,
@@ -16,7 +16,7 @@ from corp_by_os.intent_router import (
     _strip_diacritics,
     route,
 )
-from corp_by_os.models import Workflow, WorkflowParam
+from corp.models import Workflow, WorkflowParam
 
 # --- Fixtures ---
 

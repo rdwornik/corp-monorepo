@@ -23,7 +23,7 @@ def _make_client_mock(response_data: dict) -> MagicMock:
 class TestParseIntent:
     """Test intent parsing with mocked Gemini."""
 
-    @patch("corp_opportunity_manager.llm_client._get_client")
+    @patch("corp.opportunity.llm_client._get_client")
     def test_create_opportunity_english(self, mock_get_client):
         mock_get_client.return_value = _make_client_mock(
             {
@@ -39,7 +39,7 @@ class TestParseIntent:
             }
         )
 
-        from corp_opportunity_manager.llm_client import parse_intent
+        from corp.opportunity.llm_client import parse_intent
 
         result = parse_intent("New opportunity: Lenzing, IBP, contact Jan Kowalski", [])
         assert result.intent == "create_opportunity"
@@ -47,7 +47,7 @@ class TestParseIntent:
         assert result.entities["product"] == "Planning"
         assert result.confidence == 0.95
 
-    @patch("corp_opportunity_manager.llm_client._get_client")
+    @patch("corp.opportunity.llm_client._get_client")
     def test_create_opportunity_polish(self, mock_get_client):
         mock_get_client.return_value = _make_client_mock(
             {
@@ -63,13 +63,13 @@ class TestParseIntent:
             }
         )
 
-        from corp_opportunity_manager.llm_client import parse_intent
+        from corp.opportunity.llm_client import parse_intent
 
         result = parse_intent("Mam nowe opportunity, firma Siemens, WMS, kontakt Hans Mueller", [])
         assert result.intent == "create_opportunity"
         assert result.entities["client"] == "Siemens"
 
-    @patch("corp_opportunity_manager.llm_client._get_client")
+    @patch("corp.opportunity.llm_client._get_client")
     def test_prep_deck(self, mock_get_client):
         mock_get_client.return_value = _make_client_mock(
             {
@@ -85,13 +85,13 @@ class TestParseIntent:
             }
         )
 
-        from corp_opportunity_manager.llm_client import parse_intent
+        from corp.opportunity.llm_client import parse_intent
 
         result = parse_intent("Prepare a technical deep dive deck for Honda, March 15", [])
         assert result.intent == "prep_deck"
         assert result.entities["date"] == "2026-03-15"
 
-    @patch("corp_opportunity_manager.llm_client._get_client")
+    @patch("corp.opportunity.llm_client._get_client")
     def test_list_projects(self, mock_get_client):
         mock_get_client.return_value = _make_client_mock(
             {
@@ -103,12 +103,12 @@ class TestParseIntent:
             }
         )
 
-        from corp_opportunity_manager.llm_client import parse_intent
+        from corp.opportunity.llm_client import parse_intent
 
         result = parse_intent("Show me all my projects", [])
         assert result.intent == "list_projects"
 
-    @patch("corp_opportunity_manager.llm_client._get_client")
+    @patch("corp.opportunity.llm_client._get_client")
     def test_ambiguous_input(self, mock_get_client):
         mock_get_client.return_value = _make_client_mock(
             {
@@ -120,13 +120,13 @@ class TestParseIntent:
             }
         )
 
-        from corp_opportunity_manager.llm_client import parse_intent
+        from corp.opportunity.llm_client import parse_intent
 
         result = parse_intent("Zrob cos z Lenzing", [])
         assert result.intent == "clarify"
         assert result.confidence < 0.5
 
-    @patch("corp_opportunity_manager.llm_client._get_client")
+    @patch("corp.opportunity.llm_client._get_client")
     def test_malformed_json_response(self, mock_get_client):
         client = MagicMock()
         mock_resp = MagicMock()
@@ -134,25 +134,25 @@ class TestParseIntent:
         client.models.generate_content.return_value = mock_resp
         mock_get_client.return_value = client
 
-        from corp_opportunity_manager.llm_client import parse_intent
+        from corp.opportunity.llm_client import parse_intent
 
         result = parse_intent("test", [])
         assert result.intent == "clarify"
         assert result.confidence == 0.0
 
-    @patch("corp_opportunity_manager.llm_client._get_client")
+    @patch("corp.opportunity.llm_client._get_client")
     def test_api_error(self, mock_get_client):
         client = MagicMock()
         client.models.generate_content.side_effect = RuntimeError("API unavailable")
         mock_get_client.return_value = client
 
-        from corp_opportunity_manager.llm_client import parse_intent
+        from corp.opportunity.llm_client import parse_intent
 
         result = parse_intent("test", [])
         assert result.intent == "clarify"
         assert "error" in result.response_text.lower()
 
-    @patch("corp_opportunity_manager.llm_client._get_client")
+    @patch("corp.opportunity.llm_client._get_client")
     def test_create_subfolder(self, mock_get_client):
         mock_get_client.return_value = _make_client_mock(
             {
@@ -164,13 +164,13 @@ class TestParseIntent:
             }
         )
 
-        from corp_opportunity_manager.llm_client import parse_intent
+        from corp.opportunity.llm_client import parse_intent
 
         result = parse_intent("Dostalem RFP od Lenzing", [])
         assert result.intent == "create_subfolder"
         assert result.entities["folder_type"] == "rfp"
 
-    @patch("corp_opportunity_manager.llm_client._get_client")
+    @patch("corp.opportunity.llm_client._get_client")
     def test_check_structure(self, mock_get_client):
         mock_get_client.return_value = _make_client_mock(
             {
@@ -182,12 +182,12 @@ class TestParseIntent:
             }
         )
 
-        from corp_opportunity_manager.llm_client import parse_intent
+        from corp.opportunity.llm_client import parse_intent
 
         result = parse_intent("Sprawdz strukture Lenzing", [])
         assert result.intent == "check_structure"
 
-    @patch("corp_opportunity_manager.llm_client._get_client")
+    @patch("corp.opportunity.llm_client._get_client")
     def test_conversation_history_passed(self, mock_get_client):
         mock_get_client.return_value = _make_client_mock(
             {
@@ -199,7 +199,7 @@ class TestParseIntent:
             }
         )
 
-        from corp_opportunity_manager.llm_client import parse_intent
+        from corp.opportunity.llm_client import parse_intent
 
         history = [
             {"role": "user", "text": "Hi"},

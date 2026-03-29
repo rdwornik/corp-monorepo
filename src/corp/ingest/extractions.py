@@ -21,7 +21,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
-from corp_by_os.vault_io import read_frontmatter, write_note
+
+from corp.vault_io import read_frontmatter, write_note
 
 logger = logging.getLogger(__name__)
 

@@ -4,7 +4,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from corp_knowledge_extractor.slides.renderer import (
+from corp.extractor.slides.renderer import (
     MAX_SLIDES,
     RenderedSlide,
     can_render,
@@ -130,7 +130,7 @@ class TestCanRender:
 
     def test_can_render_no_backends(self):
         """can_render returns False when no backends available."""
-        with patch("corp_knowledge_extractor.slides.renderer._find_libreoffice", return_value=None):
+        with patch("corp.extractor.slides.renderer._find_libreoffice", return_value=None):
             with patch.dict("sys.modules", {"comtypes": None, "comtypes.client": None}):
                 # Force ImportError for comtypes
                 import builtins
@@ -170,8 +170,8 @@ class TestTierRouterPptx:
 
     def test_text_heavy_pptx_stays_tier2(self):
         """PPTX with lots of text stays at Tier 2."""
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.tier_router import Tier, route_tier
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.tier_router import Tier, route_tier
 
         long_text = "Detailed content with many words per slide. " * 10
         path = self._make_pptx(10, long_text)
@@ -184,13 +184,13 @@ class TestTierRouterPptx:
 
     def test_image_heavy_pptx_routes_tier3_if_renderer(self):
         """Image-heavy PPTX routes to Tier 3 when renderer is available."""
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.tier_router import Tier, route_tier
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.tier_router import Tier, route_tier
 
         path = self._make_pptx(10, "")  # no text
         try:
             sf = SourceFile(path=path, type=FileType.SLIDES, size_bytes=path.stat().st_size, name=path.stem)
-            with patch("corp_knowledge_extractor.slides.renderer.can_render", return_value=True):
+            with patch("corp.extractor.slides.renderer.can_render", return_value=True):
                 decision = route_tier(sf)
                 assert decision.tier == Tier.MULTIMODAL
         finally:
@@ -198,13 +198,13 @@ class TestTierRouterPptx:
 
     def test_image_heavy_pptx_falls_back_tier2_no_renderer(self):
         """Image-heavy PPTX falls back to Tier 2 when no renderer available."""
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.tier_router import Tier, route_tier
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.tier_router import Tier, route_tier
 
         path = self._make_pptx(10, "")
         try:
             sf = SourceFile(path=path, type=FileType.SLIDES, size_bytes=path.stat().st_size, name=path.stem)
-            with patch("corp_knowledge_extractor.slides.renderer.can_render", return_value=False):
+            with patch("corp.extractor.slides.renderer.can_render", return_value=False):
                 decision = route_tier(sf)
                 assert decision.tier == Tier.TEXT_AI
         finally:

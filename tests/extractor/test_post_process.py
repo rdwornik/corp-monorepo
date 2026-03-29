@@ -4,8 +4,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 import yaml
-from corp_knowledge_extractor.post_process import post_process_extraction
-from corp_os_meta import ValidationResult
+from corp.extractor.post_process import post_process_extraction
+from corp.schema import ValidationResult
 
 
 def test_basic_normalization():
@@ -157,13 +157,13 @@ def test_unknown_terms_logged(tmp_path):
     review_path = tmp_path / "config" / "taxonomy_review.yaml"
     (tmp_path / "config").mkdir()
 
-    with patch("corp_knowledge_extractor.post_process.Path") as MockPath:
+    with patch("corp.extractor.post_process.Path") as MockPath:
         # Make Path(__file__).parent.parent / "config" / ... resolve to tmp_path
         MockPath.return_value.parent.parent.__truediv__ = lambda self, x: tmp_path / x
         # But keep real Path for everything else
         MockPath.side_effect = lambda *a, **k: Path(*a, **k) if a else MockPath.return_value
         # Directly patch the function to use our tmp path
-        import corp_knowledge_extractor.post_process as pp_mod
+        import corp.extractor.post_process as pp_mod
 
         orig_fn = pp_mod._log_unknown_terms
 
@@ -208,7 +208,7 @@ def test_unknown_terms_not_duplicated(tmp_path):
     review_path = tmp_path / "config" / "taxonomy_review.yaml"
     (tmp_path / "config").mkdir()
 
-    import corp_knowledge_extractor.post_process as pp_mod
+    import corp.extractor.post_process as pp_mod
 
     orig_fn = pp_mod._log_unknown_terms
 
@@ -474,7 +474,7 @@ def test_quality_passthrough_valid_value():
 
 def test_no_unicode_escape_in_frontmatter():
     """Domains with & should not be escaped to \\u0026 in tojson_raw."""
-    from corp_knowledge_extractor.synthesize import _tojson_raw
+    from corp.extractor.synthesize import _tojson_raw
 
     result = _tojson_raw(["Platform & Architecture"])
     assert "&" in result
@@ -494,7 +494,7 @@ def test_backslash_normalized_in_source():
 # ---------------------------------------------------------------------------
 
 
-from corp_knowledge_extractor.post_process import normalize_company_names  # noqa: E402
+from corp.extractor.post_process import normalize_company_names  # noqa: E402
 
 
 def test_normalize_blue_blue():
@@ -538,7 +538,7 @@ def test_normalize_no_false_positive():
 # Type enforcement from file extension (BUG 1: JLR pilot)
 # ---------------------------------------------------------------------------
 
-from corp_knowledge_extractor.post_process import (  # noqa: E402
+from corp.extractor.post_process import (  # noqa: E402
     enforce_type_from_extension,
     validate_tags,
 )
@@ -633,7 +633,7 @@ def test_validate_tags_no_taxonomy():
     """If taxonomy loading fails, all tags return unvalidated, no crash."""
     from unittest.mock import patch
 
-    with patch("corp_knowledge_extractor.post_process.load_taxonomy", side_effect=Exception("no taxonomy")):
+    with patch("corp.extractor.post_process.load_taxonomy", side_effect=Exception("no taxonomy")):
         results = validate_tags(["product/test", "topic/test"])
     assert len(results) == 2
     assert all(r["valid"] for r in results)
@@ -651,7 +651,7 @@ def test_validate_tags_empty():
 # ---------------------------------------------------------------------------
 
 
-from corp_knowledge_extractor.post_process import normalize_product_names  # noqa: E402
+from corp.extractor.post_process import normalize_product_names  # noqa: E402
 
 
 def test_normalize_short_product():
@@ -705,7 +705,7 @@ def test_normalize_products_in_post_process():
 # Fix 1: Product exclusion list (competitors, infrastructure, generic)
 # ---------------------------------------------------------------------------
 
-from corp_knowledge_extractor.post_process import filter_products  # noqa: E402
+from corp.extractor.post_process import filter_products  # noqa: E402
 
 
 def test_sap_excluded_from_products():
@@ -786,7 +786,7 @@ def test_normalize_unknown_product_passes_through():
 # Fix 3: People field cleanup
 # ---------------------------------------------------------------------------
 
-from corp_knowledge_extractor.post_process import filter_people  # noqa: E402
+from corp.extractor.post_process import filter_people  # noqa: E402
 
 
 def test_role_filtered():
@@ -846,7 +846,7 @@ def test_people_filter_in_post_process():
 # Fix 4: Client alias normalization
 # ---------------------------------------------------------------------------
 
-from corp_knowledge_extractor.post_process import normalize_client  # noqa: E402
+from corp.extractor.post_process import normalize_client  # noqa: E402
 
 
 def test_client_alias_lenzing_ag():
@@ -915,7 +915,7 @@ def test_client_alias_purehealth_variants():
 # Fix 5: Tag ceiling
 # ---------------------------------------------------------------------------
 
-from corp_knowledge_extractor.post_process import cap_tags, generate_tags  # noqa: E402
+from corp.extractor.post_process import cap_tags, generate_tags  # noqa: E402
 
 
 def test_cap_tags_under_limit():
@@ -990,7 +990,7 @@ def test_doxis4_excluded_from_products():
 # Fix 2 (extended): filter_product_tags — slug-level non-BY tag removal
 # ---------------------------------------------------------------------------
 
-from corp_knowledge_extractor.post_process import filter_product_tags  # noqa: E402
+from corp.extractor.post_process import filter_product_tags  # noqa: E402
 
 
 def test_filter_product_tags_removes_lenzing():

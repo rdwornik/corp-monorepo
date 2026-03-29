@@ -13,7 +13,7 @@ import pytest
 datasketch = pytest.importorskip("datasketch")
 
 
-from corp_by_os.ingest.dedup import (  # noqa: E402
+from corp.ingest.dedup import (  # noqa: E402
     NUM_PERM,
     DupPair,
     NearDupCandidate,
@@ -57,7 +57,7 @@ _DIFFERENT_TEXT = (
 @pytest.fixture()
 def ops_db(tmp_path: Path):
     """Temporary OpsDB for testing."""
-    from corp_by_os.ops.database import OpsDB
+    from corp.ops.database import OpsDB
 
     db = OpsDB(db_path=tmp_path / "ops.db")
     yield db

@@ -46,7 +46,7 @@ try:
 except ImportError:
     CHROMADB_AVAILABLE = False
 
-from corp_rfp_agent.vault_adapter import retrieve as vault_retrieve  # noqa: E402
+from corp.rfp.vault_adapter import retrieve as vault_retrieve  # noqa: E402
 
 logger = logging.getLogger(__name__)
 

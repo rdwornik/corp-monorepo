@@ -4,8 +4,8 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from corp_knowledge_extractor.extract import _prepend_user_context
-from corp_knowledge_extractor.manifest import Manifest
+from corp.extractor.extract import _prepend_user_context
+from corp.extractor.manifest import Manifest
 
 # ---------------------------------------------------------------------------
 # Unit: _prepend_user_context helper
@@ -86,12 +86,12 @@ class TestUserContextFromManifest:
 
 
 class TestUserContextInPrompt:
-    @patch("corp_knowledge_extractor.extract.get_taxonomy_for_prompt", return_value="TAXONOMY_BLOCK")
-    @patch("corp_knowledge_extractor.doc_type_classifier.classify_doc_type", return_value="general")
-    @patch("corp_knowledge_extractor.doc_type_classifier.should_extract_deep", return_value=False)
-    @patch("corp_knowledge_extractor.freshness.compute_freshness_fields", return_value={})
-    @patch("corp_knowledge_extractor.extract.extract_source_date", return_value=None)
-    @patch("corp_knowledge_extractor.extract._enrich_facts", return_value=[])
+    @patch("corp.extractor.extract.get_taxonomy_for_prompt", return_value="TAXONOMY_BLOCK")
+    @patch("corp.extractor.doc_type_classifier.classify_doc_type", return_value="general")
+    @patch("corp.extractor.doc_type_classifier.should_extract_deep", return_value=False)
+    @patch("corp.extractor.freshness.compute_freshness_fields", return_value={})
+    @patch("corp.extractor.extract.extract_source_date", return_value=None)
+    @patch("corp.extractor.extract._enrich_facts", return_value=[])
     def test_user_context_appears_in_prompt(
         self,
         mock_enrich,
@@ -102,15 +102,15 @@ class TestUserContextInPrompt:
         mock_taxonomy,
     ):
         """When user_context is provided, it appears in the prompt sent to the LLM."""
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.text_extract import TextExtractionResult
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.text_extract import TextExtractionResult
 
         captured_prompt = {}
 
         class FakeProvider:
             def extract(self, request):
                 captured_prompt["user_prompt"] = request.user_prompt
-                from corp_knowledge_extractor.providers.base import ExtractionResponse
+                from corp.extractor.providers.base import ExtractionResponse
 
                 return ExtractionResponse(
                     text='{"title": "Test", "summary": "Test summary", "topics": [], "products": [], "people": []}',
@@ -125,16 +125,16 @@ class TestUserContextInPrompt:
 
         with (
             patch(
-                "corp_knowledge_extractor.providers.router.route_model",
+                "corp.extractor.providers.router.route_model",
                 return_value=("gemini-3-flash-preview", "text_default"),
             ),
-            patch("corp_knowledge_extractor.providers.router.get_provider", return_value=fake_provider),
-            patch("corp_knowledge_extractor.providers.router.has_anthropic_key", return_value=False),
+            patch("corp.extractor.providers.router.get_provider", return_value=fake_provider),
+            patch("corp.extractor.providers.router.has_anthropic_key", return_value=False),
             patch(
-                "corp_knowledge_extractor.providers.validator.validate_and_retry", side_effect=lambda r, req: (r, False)
+                "corp.extractor.providers.validator.validate_and_retry", side_effect=lambda r, req: (r, False)
             ),
         ):
-            from corp_knowledge_extractor.extract import extract_from_text
+            from corp.extractor.extract import extract_from_text
 
             source = SourceFile(
                 path=Path("test.docx"),
@@ -155,12 +155,12 @@ class TestUserContextInPrompt:
         assert "JLR TMS RFP" in captured_prompt["user_prompt"]
         assert "prioritize facts relevant to this context" in captured_prompt["user_prompt"]
 
-    @patch("corp_knowledge_extractor.extract.get_taxonomy_for_prompt", return_value="TAXONOMY_BLOCK")
-    @patch("corp_knowledge_extractor.doc_type_classifier.classify_doc_type", return_value="general")
-    @patch("corp_knowledge_extractor.doc_type_classifier.should_extract_deep", return_value=False)
-    @patch("corp_knowledge_extractor.freshness.compute_freshness_fields", return_value={})
-    @patch("corp_knowledge_extractor.extract.extract_source_date", return_value=None)
-    @patch("corp_knowledge_extractor.extract._enrich_facts", return_value=[])
+    @patch("corp.extractor.extract.get_taxonomy_for_prompt", return_value="TAXONOMY_BLOCK")
+    @patch("corp.extractor.doc_type_classifier.classify_doc_type", return_value="general")
+    @patch("corp.extractor.doc_type_classifier.should_extract_deep", return_value=False)
+    @patch("corp.extractor.freshness.compute_freshness_fields", return_value={})
+    @patch("corp.extractor.extract.extract_source_date", return_value=None)
+    @patch("corp.extractor.extract._enrich_facts", return_value=[])
     def test_empty_context_no_prefix(
         self,
         mock_enrich,
@@ -171,15 +171,15 @@ class TestUserContextInPrompt:
         mock_taxonomy,
     ):
         """When user_context is empty, prompt is unchanged."""
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.text_extract import TextExtractionResult
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.text_extract import TextExtractionResult
 
         captured_prompt = {}
 
         class FakeProvider:
             def extract(self, request):
                 captured_prompt["user_prompt"] = request.user_prompt
-                from corp_knowledge_extractor.providers.base import ExtractionResponse
+                from corp.extractor.providers.base import ExtractionResponse
 
                 return ExtractionResponse(
                     text='{"title": "Test", "summary": "Test summary", "topics": [], "products": [], "people": []}',
@@ -194,16 +194,16 @@ class TestUserContextInPrompt:
 
         with (
             patch(
-                "corp_knowledge_extractor.providers.router.route_model",
+                "corp.extractor.providers.router.route_model",
                 return_value=("gemini-3-flash-preview", "text_default"),
             ),
-            patch("corp_knowledge_extractor.providers.router.get_provider", return_value=fake_provider),
-            patch("corp_knowledge_extractor.providers.router.has_anthropic_key", return_value=False),
+            patch("corp.extractor.providers.router.get_provider", return_value=fake_provider),
+            patch("corp.extractor.providers.router.has_anthropic_key", return_value=False),
             patch(
-                "corp_knowledge_extractor.providers.validator.validate_and_retry", side_effect=lambda r, req: (r, False)
+                "corp.extractor.providers.validator.validate_and_retry", side_effect=lambda r, req: (r, False)
             ),
         ):
-            from corp_knowledge_extractor.extract import extract_from_text
+            from corp.extractor.extract import extract_from_text
 
             source = SourceFile(
                 path=Path("test.docx"),
@@ -250,12 +250,12 @@ class TestUserContextCLIFlag:
 
 
 class TestEscalationModelUsed:
-    @patch("corp_knowledge_extractor.extract.get_taxonomy_for_prompt", return_value="TAXONOMY_BLOCK")
-    @patch("corp_knowledge_extractor.doc_type_classifier.classify_doc_type", return_value="general")
-    @patch("corp_knowledge_extractor.doc_type_classifier.should_extract_deep", return_value=False)
-    @patch("corp_knowledge_extractor.freshness.compute_freshness_fields", return_value={})
-    @patch("corp_knowledge_extractor.extract.extract_source_date", return_value=None)
-    @patch("corp_knowledge_extractor.extract._enrich_facts", return_value=[])
+    @patch("corp.extractor.extract.get_taxonomy_for_prompt", return_value="TAXONOMY_BLOCK")
+    @patch("corp.extractor.doc_type_classifier.classify_doc_type", return_value="general")
+    @patch("corp.extractor.doc_type_classifier.should_extract_deep", return_value=False)
+    @patch("corp.extractor.freshness.compute_freshness_fields", return_value={})
+    @patch("corp.extractor.extract.extract_source_date", return_value=None)
+    @patch("corp.extractor.extract._enrich_facts", return_value=[])
     def test_escalation_model_used_is_sonnet(
         self,
         mock_enrich,
@@ -266,9 +266,9 @@ class TestEscalationModelUsed:
         mock_taxonomy,
     ):
         """After Haiku→Sonnet escalation, model_used reflects the Sonnet model string."""
-        from corp_knowledge_extractor.inventory import FileType, SourceFile
-        from corp_knowledge_extractor.providers.base import ExtractionResponse
-        from corp_knowledge_extractor.text_extract import TextExtractionResult
+        from corp.extractor.inventory import FileType, SourceFile
+        from corp.extractor.providers.base import ExtractionResponse
+        from corp.extractor.text_extract import TextExtractionResult
 
         haiku_response = ExtractionResponse(
             text='{"title": "Test", "summary": "Test", "topics": [], "products": [], "people": []}',
@@ -300,16 +300,16 @@ class TestEscalationModelUsed:
 
         with (
             patch(
-                "corp_knowledge_extractor.providers.router.route_model",
+                "corp.extractor.providers.router.route_model",
                 return_value=("claude-haiku-4-5-20251001", "text_default"),
             ),
-            patch("corp_knowledge_extractor.providers.router.get_provider", return_value=fake_provider),
-            patch("corp_knowledge_extractor.providers.router.has_anthropic_key", return_value=True),
+            patch("corp.extractor.providers.router.get_provider", return_value=fake_provider),
+            patch("corp.extractor.providers.router.has_anthropic_key", return_value=True),
             patch(
-                "corp_knowledge_extractor.providers.validator.validate_and_retry", side_effect=mock_validate_and_retry
+                "corp.extractor.providers.validator.validate_and_retry", side_effect=mock_validate_and_retry
             ),
         ):
-            from corp_knowledge_extractor.extract import extract_from_text
+            from corp.extractor.extract import extract_from_text
 
             source = SourceFile(
                 path=Path("test.docx"),

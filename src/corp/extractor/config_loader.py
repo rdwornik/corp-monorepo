@@ -2,7 +2,7 @@
 Universal configuration loader with caching.
 
 Usage:
-    from config.config_loader import get
+    from corp.extractor.config_loader import get
 
     # Get nested value using dot notation
     sample_rate = get("processing", "frames.sample_rate")

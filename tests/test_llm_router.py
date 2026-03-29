@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from corp_by_os.llm_router import (
+from corp.llm_router import (
     _build_workflows_summary,
     _check_daily_cap,
     _extract_json,
@@ -16,7 +16,7 @@ from corp_by_os.llm_router import (
     _save_usage,
     classify_intent,
 )
-from corp_by_os.models import Workflow, WorkflowParam
+from corp.models import Workflow, WorkflowParam
 
 # --- Fixtures ---
 
@@ -136,14 +136,14 @@ class TestUsageTracking:
         data = _load_usage(tmp_path / "nonexistent.json")
         assert data == {}
 
-    @patch("corp_by_os.llm_router._get_usage_path")
+    @patch("corp.llm_router._get_usage_path")
     def test_daily_cap_under(self, mock_path, tmp_path: Path) -> None:
         path = tmp_path / "usage.json"
         _save_usage(path, {"date": "2026-03-09", "calls": 5})
         mock_path.return_value = path
         assert _check_daily_cap() is True
 
-    @patch("corp_by_os.llm_router._get_usage_path")
+    @patch("corp.llm_router._get_usage_path")
     def test_daily_cap_reached(self, mock_path, tmp_path: Path, monkeypatch) -> None:
         monkeypatch.setenv("LLM_DAILY_CAP", "3")
         path = tmp_path / "usage.json"
@@ -153,7 +153,7 @@ class TestUsageTracking:
         mock_path.return_value = path
         assert _check_daily_cap() is False
 
-    @patch("corp_by_os.llm_router._get_usage_path")
+    @patch("corp.llm_router._get_usage_path")
     def test_new_day_resets(self, mock_path, tmp_path: Path) -> None:
         path = tmp_path / "usage.json"
         _save_usage(path, {"date": "2026-03-01", "calls": 100})
@@ -177,21 +177,21 @@ class TestWorkflowsSummary:
 
 
 class TestClassifyIntent:
-    @patch("corp_by_os.llm_router._check_daily_cap", return_value=False)
+    @patch("corp.llm_router._check_daily_cap", return_value=False)
     def test_cap_reached(self, mock_cap, simple_workflows) -> None:
         intent = classify_intent("hello", simple_workflows)
         assert intent.workflow_id is None
         assert "Limit" in intent.response_text or "limit" in intent.response_text.lower()
 
     @patch.dict("os.environ", {"GEMINI_API_KEY": ""})
-    @patch("corp_by_os.llm_router._check_daily_cap", return_value=True)
+    @patch("corp.llm_router._check_daily_cap", return_value=True)
     def test_missing_api_key(self, mock_cap, simple_workflows) -> None:
         intent = classify_intent("hello", simple_workflows)
         assert intent.workflow_id is None
         assert "GEMINI_API_KEY" in intent.response_text
 
-    @patch("corp_by_os.llm_router._check_daily_cap", return_value=True)
-    @patch("corp_by_os.llm_router._increment_usage")
+    @patch("corp.llm_router._check_daily_cap", return_value=True)
+    @patch("corp.llm_router._increment_usage")
     def test_successful_call(self, mock_incr, mock_cap, simple_workflows, monkeypatch) -> None:
         monkeypatch.setenv("GEMINI_API_KEY", "fake-key")
 
@@ -215,7 +215,7 @@ class TestClassifyIntent:
         assert intent.source == "llm"
         mock_incr.assert_called_once()
 
-    @patch("corp_by_os.llm_router._check_daily_cap", return_value=True)
+    @patch("corp.llm_router._check_daily_cap", return_value=True)
     def test_api_failure(self, mock_cap, simple_workflows, monkeypatch) -> None:
         monkeypatch.setenv("GEMINI_API_KEY", "fake-key")
 

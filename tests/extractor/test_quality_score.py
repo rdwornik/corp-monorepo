@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from corp_knowledge_extractor.synthesize import compute_quality_score
+from corp.extractor.synthesize import compute_quality_score
 from jinja2 import Environment, FileSystemLoader
 
 

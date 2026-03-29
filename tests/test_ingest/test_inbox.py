@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
-from corp_by_os.ingest.inbox import (
+from corp.ingest.inbox import (
     _get_custom_destination,
     _list_events,
     _log_ingest_event,
@@ -17,9 +17,9 @@ from corp_by_os.ingest.inbox import (
     _undo_event,
     process_file,
 )
-from corp_by_os.ops.database import OpsDB
-from corp_by_os.ops.file_registry import FileRegistry
-from corp_by_os.ops.registry import ContentRegistry
+from corp.ops.database import OpsDB
+from corp.ops.file_registry import FileRegistry
+from corp.ops.registry import ContentRegistry
 
 
 @pytest.fixture()
@@ -177,7 +177,7 @@ class TestLogIngestEvent:
         f = inbox / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"x" * 100)
 
-        from corp_by_os.ingest.classifier import classify
+        from corp.ingest.classifier import classify
 
         classification = classify(f, registry)
 
@@ -238,7 +238,7 @@ class TestProcessFile:
         f.write_bytes(b"x" * 100)
 
         # Mock the interactive prompt to return 's' (skip)
-        with patch("corp_by_os.ingest.inbox._prompt_action", return_value="s"):
+        with patch("corp.ingest.inbox._prompt_action", return_value="s"):
             action = process_file(
                 f,
                 mywork,
@@ -273,7 +273,7 @@ class TestProcessFile:
         f = inbox / "RFP_Database_WMS.xlsx"
         f.write_bytes(b"x" * 100)
 
-        with patch("corp_by_os.ingest.inbox._prompt_action", return_value="a"):
+        with patch("corp.ingest.inbox._prompt_action", return_value="a"):
             action = process_file(
                 f,
                 mywork,
@@ -290,7 +290,7 @@ class TestProcessFile:
         f = inbox / "test.pdf"
         f.write_bytes(b"x" * 100)
 
-        with patch("corp_by_os.ingest.inbox._prompt_action", return_value="s"):
+        with patch("corp.ingest.inbox._prompt_action", return_value="s"):
             action = process_file(
                 f,
                 mywork,
@@ -307,7 +307,7 @@ class TestProcessFile:
         f = inbox / "test.pdf"
         f.write_bytes(b"x" * 100)
 
-        with patch("corp_by_os.ingest.inbox._prompt_action", return_value="q"):
+        with patch("corp.ingest.inbox._prompt_action", return_value="q"):
             action = process_file(
                 f,
                 mywork,
@@ -406,10 +406,10 @@ class TestUserContext:
             return None, 0.0
 
         with patch(
-            "corp_by_os.ingest.router._run_extraction",
+            "corp.ingest.router._run_extraction",
             side_effect=mock_run_extraction,
         ):
-            from corp_by_os.ingest.inbox import _trigger_extraction
+            from corp.ingest.inbox import _trigger_extraction
 
             # Route the file first so it has a destination
             dest_dir = mywork / "60_Source_Library" / "Training"
@@ -453,10 +453,10 @@ class TestUserContext:
             return None, 0.0
 
         with patch(
-            "corp_by_os.ingest.router._run_extraction",
+            "corp.ingest.router._run_extraction",
             side_effect=mock_run_extraction,
         ):
-            from corp_by_os.ingest.inbox import _trigger_extraction
+            from corp.ingest.inbox import _trigger_extraction
 
             dest_dir = mywork / "60_Source_Library"
             dest_dir.mkdir(parents=True)
@@ -557,7 +557,7 @@ class TestFullUndo:
         )
         ops.conn.commit()
 
-        with patch("corp_by_os.index_builder.rebuild_index") as mock_rebuild:
+        with patch("corp.index_builder.rebuild_index") as mock_rebuild:
             mock_rebuild.return_value = MagicMock(notes_indexed=0)
             _undo_event(
                 event_id,
@@ -584,7 +584,7 @@ class TestFullUndo:
         route_events = [e for e in events if e["action"] == "ingest_inbox_route"]
         event_id = route_events[0]["id"]
 
-        with patch("corp_by_os.index_builder.rebuild_index") as mock_rebuild:
+        with patch("corp.index_builder.rebuild_index") as mock_rebuild:
             mock_rebuild.return_value = MagicMock(notes_indexed=42)
             _undo_event(
                 event_id,
@@ -612,7 +612,7 @@ class TestFullUndo:
         event_id = route_events[0]["id"]
 
         # vault_note_path is NULL — should not crash
-        with patch("corp_by_os.index_builder.rebuild_index") as mock_rebuild:
+        with patch("corp.index_builder.rebuild_index") as mock_rebuild:
             mock_rebuild.return_value = MagicMock(notes_indexed=0)
             result = _undo_event(
                 event_id,
@@ -827,7 +827,7 @@ class TestRegistrationAtRouteTime:
         # Second: interactive, dedup prompt returns "s"
         f2 = inbox / "Cognitive_Friday_S4_v2.pptx"
         f2.write_bytes(content)
-        with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
+        with patch("corp.ingest.inbox.Prompt") as mock_prompt:
             mock_prompt.ask.return_value = "s"
             action = process_file(
                 f2,
@@ -882,9 +882,9 @@ class TestContextBehavior:
                 return "c"  # First: add context
             return "a"  # Second: accept
 
-        with patch("corp_by_os.ingest.inbox._prompt_action", side_effect=mock_prompt_action):
+        with patch("corp.ingest.inbox._prompt_action", side_effect=mock_prompt_action):
             with patch(
-                "corp_by_os.ingest.inbox._get_user_context",
+                "corp.ingest.inbox._get_user_context",
                 return_value="This is an RFI from the client",
             ):
                 action = process_file(
@@ -922,8 +922,8 @@ class TestContextBehavior:
                 return "c"
             return "a"
 
-        with patch("corp_by_os.ingest.inbox._prompt_action", side_effect=mock_prompt_action):
-            with patch("corp_by_os.ingest.inbox._get_user_context", return_value="test context"):
+        with patch("corp.ingest.inbox._prompt_action", side_effect=mock_prompt_action):
+            with patch("corp.ingest.inbox._get_user_context", return_value="test context"):
                 action = process_file(
                     f,
                     mywork,
@@ -943,7 +943,7 @@ class TestCustomDestination:
         dest_dir = mywork / "10_Projects" / "TestProject"
         dest_dir.mkdir(parents=True)
 
-        with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
+        with patch("corp.ingest.inbox.Prompt") as mock_prompt:
             mock_prompt.ask.return_value = "10_Projects/TestProject"
             result = _get_custom_destination(mywork)
 
@@ -951,7 +951,7 @@ class TestCustomDestination:
 
     def test_destination_creates_folder(self, mywork: Path) -> None:
         """[d] with new path and [y] creates the folder."""
-        with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
+        with patch("corp.ingest.inbox.Prompt") as mock_prompt:
             # First ask: path input. Second ask: create confirmation.
             mock_prompt.ask.side_effect = [
                 "10_Projects/NewProject",
@@ -964,7 +964,7 @@ class TestCustomDestination:
 
     def test_destination_create_declined(self, mywork: Path) -> None:
         """[d] with new path and [n] cancels."""
-        with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
+        with patch("corp.ingest.inbox.Prompt") as mock_prompt:
             mock_prompt.ask.side_effect = ["10_Projects/Nope", "n"]
             result = _get_custom_destination(mywork)
 
@@ -972,7 +972,7 @@ class TestCustomDestination:
 
     def test_destination_empty_cancels(self, mywork: Path) -> None:
         """[d] with empty input returns None."""
-        with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
+        with patch("corp.ingest.inbox.Prompt") as mock_prompt:
             mock_prompt.ask.return_value = ""
             result = _get_custom_destination(mywork)
 
@@ -982,7 +982,7 @@ class TestCustomDestination:
 class TestPromptAction:
     def test_low_confidence_no_dest_hides_accept(self) -> None:
         """Unclassified files with no destination don't show [a]ccept."""
-        with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
+        with patch("corp.ingest.inbox.Prompt") as mock_prompt:
             mock_prompt.ask.return_value = "d"
             result = _prompt_action(needs_human=True, has_destination=False)
         assert result == "d"
@@ -992,7 +992,7 @@ class TestPromptAction:
 
     def test_low_confidence_with_dest_shows_accept(self) -> None:
         """After destination is set, [a]ccept is available."""
-        with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
+        with patch("corp.ingest.inbox.Prompt") as mock_prompt:
             mock_prompt.ask.return_value = "a"
             result = _prompt_action(needs_human=True, has_destination=True)
         assert result == "a"
@@ -1001,7 +1001,7 @@ class TestPromptAction:
 
     def test_high_confidence_shows_all_options(self) -> None:
         """Normal files show all options including [a]ccept."""
-        with patch("corp_by_os.ingest.inbox.Prompt") as mock_prompt:
+        with patch("corp.ingest.inbox.Prompt") as mock_prompt:
             mock_prompt.ask.return_value = "a"
             result = _prompt_action(needs_human=False, has_destination=True)
         assert result == "a"
@@ -1053,7 +1053,7 @@ class TestDefaultDestination:
         dest_dir = mywork / "10_Projects" / "JLR"
         dest_dir.mkdir(parents=True)
 
-        with patch("corp_by_os.ingest.inbox._prompt_action") as mock_prompt:
+        with patch("corp.ingest.inbox._prompt_action") as mock_prompt:
             mock_prompt.return_value = "a"
             action = process_file(
                 f,
@@ -1085,8 +1085,8 @@ class TestDefaultDestination:
                 return "d"  # Override destination
             return "a"
 
-        with patch("corp_by_os.ingest.inbox._prompt_action", side_effect=mock_prompt):
-            with patch("corp_by_os.ingest.inbox._get_custom_destination", return_value="50_RFP"):
+        with patch("corp.ingest.inbox._prompt_action", side_effect=mock_prompt):
+            with patch("corp.ingest.inbox._get_custom_destination", return_value="50_RFP"):
                 action = process_file(
                     f,
                     mywork,

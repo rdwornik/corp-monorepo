@@ -3,7 +3,7 @@
 from datetime import date
 
 import pytest
-from corp_os_meta import DocumentType, NoteFrontmatter
+from corp.schema import DocumentType, NoteFrontmatter
 
 
 def test_valid_note():

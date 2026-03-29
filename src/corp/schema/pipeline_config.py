@@ -51,7 +51,7 @@ class PipelineConfig:
         Never hardcodes user-specific paths — all defaults are relative to
         Path.home() or %LOCALAPPDATA%, which resolve correctly on any machine.
         """
-        from corp_os_meta.config import get_path
+        from corp.schema.config import get_path
 
         # vault and mywork use get_path() (paths.toml-aware)
         vault = get_path(

@@ -5,11 +5,11 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
-from corp_knowledge_extractor.fact_validation import (
+from corp.extractor.fact_validation import (
     _numbers_match,
     extract_numbers_from_text,
 )
-from corp_os_meta.utils import normalize_string_list
+from corp.schema.utils import normalize_string_list
 
 logger = logging.getLogger(__name__)
 

@@ -13,8 +13,9 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from corp_by_os.config import get_config
-from corp_by_os.models import (
+
+from corp.config import get_config
+from corp.models import (
     StepResult,
     Workflow,
     WorkflowParam,
@@ -282,7 +283,7 @@ def _execute_agent_step(step: WorkflowStep, params: dict[str, str]) -> StepResul
 
 def _execute_python_step(step: WorkflowStep, params: dict[str, str]) -> StepResult:
     """Execute a built-in Python action."""
-    from corp_by_os.built_in_actions import get_action
+    from corp.built_in_actions import get_action
 
     action_name = step.action
     if not action_name:

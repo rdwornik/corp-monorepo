@@ -15,7 +15,7 @@ import unicodedata
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 
-from corp_by_os.models import Workflow
+from corp.models import Workflow
 
 logger = logging.getLogger(__name__)
 
@@ -155,7 +155,7 @@ def route(
 
     if use_llm:
         try:
-            from corp_by_os.llm_router import classify_intent
+            from corp.llm_router import classify_intent
 
             return classify_intent(user_input, workflows, context)
         except Exception as e:
@@ -309,7 +309,7 @@ def _extract_parameters(
 def _extract_client(normalized: str, raw: str) -> str | None:
     """Extract client name — check against known projects or capitalized words."""
     try:
-        from corp_by_os.project_resolver import list_all_project_ids
+        from corp.project_resolver import list_all_project_ids
 
         projects = list_all_project_ids()
         for proj in projects:
@@ -363,7 +363,7 @@ def _extract_product(normalized: str) -> str | None:
 def _extract_project_ref(normalized: str) -> str | None:
     """Extract project reference — fuzzy match against known projects."""
     try:
-        from corp_by_os.project_resolver import list_all_project_ids, resolve_project
+        from corp.project_resolver import list_all_project_ids, resolve_project
 
         projects = list_all_project_ids()
         for proj in projects:

@@ -4,11 +4,12 @@ import json
 import sys
 
 import click
-from corp_by_os.cli._common import console
-from corp_by_os.config import get_config
-from corp_os_meta.pipeline_config import PipelineConfig
 from rich.panel import Panel
 from rich.table import Table
+
+from corp.cli._common import console
+from corp.config import get_config
+from corp.schema.pipeline_config import PipelineConfig
 
 
 @click.group("analytics")
@@ -19,8 +20,8 @@ def analytics_group() -> None:
 @analytics_group.command("report")
 def analytics_report_command() -> None:
     """Show cross-project analytics dashboard (facts + projects)."""
-    from corp_by_os.index_builder import get_index_path
-    from corp_by_os.query_engine import get_analytics
+    from corp.index_builder import get_index_path
+    from corp.query_engine import get_analytics
 
     if not get_index_path().exists():
         console.print("[yellow]No index. Run `corp index rebuild` first.[/yellow]")
@@ -29,7 +30,7 @@ def analytics_report_command() -> None:
     report = get_analytics()
 
     # Write dashboard
-    from corp_by_os.built_in_actions import _write_analytics_dashboard
+    from corp.built_in_actions import _write_analytics_dashboard
 
     _write_analytics_dashboard(report)
 
@@ -84,8 +85,8 @@ def analytics_report_command() -> None:
 @click.option("--client", required=True, help="Client name (exact match)")
 def analytics_products(client: str) -> None:
     """Q1: Distinct products mentioned in notes for a client."""
-    from corp_by_os.index_builder import get_index_path
-    from corp_by_os.query_engine import notes_products_for_client
+    from corp.index_builder import get_index_path
+    from corp.query_engine import notes_products_for_client
 
     if not get_index_path().exists():
         console.print("[yellow]No index. Run `corp index rebuild` first.[/yellow]")
@@ -108,8 +109,8 @@ def analytics_products(client: str) -> None:
 @click.option("--client", required=True, help="Client name (exact match)")
 def analytics_timeline(client: str) -> None:
     """Q2: Notes for a client ordered by date."""
-    from corp_by_os.index_builder import get_index_path
-    from corp_by_os.query_engine import notes_timeline_for_client
+    from corp.index_builder import get_index_path
+    from corp.query_engine import notes_timeline_for_client
 
     if not get_index_path().exists():
         console.print("[yellow]No index. Run `corp index rebuild` first.[/yellow]")
@@ -135,8 +136,8 @@ def analytics_timeline(client: str) -> None:
 @click.option("--product", required=True, help="Product name (substring match)")
 def analytics_clients(product: str) -> None:
     """Q3: Distinct clients whose notes mention a product."""
-    from corp_by_os.index_builder import get_index_path
-    from corp_by_os.query_engine import notes_clients_for_product
+    from corp.index_builder import get_index_path
+    from corp.query_engine import notes_clients_for_product
 
     if not get_index_path().exists():
         console.print("[yellow]No index. Run `corp index rebuild` first.[/yellow]")
@@ -159,8 +160,8 @@ def analytics_clients(product: str) -> None:
 @click.option("--product", required=True, help="Product name (substring match)")
 def analytics_overlap(product: str) -> None:
     """Q6: Clients sharing interest in a product, with note counts."""
-    from corp_by_os.index_builder import get_index_path
-    from corp_by_os.query_engine import notes_overlap_for_product
+    from corp.index_builder import get_index_path
+    from corp.query_engine import notes_overlap_for_product
 
     if not get_index_path().exists():
         console.print("[yellow]No index. Run `corp index rebuild` first.[/yellow]")
@@ -184,8 +185,8 @@ def analytics_overlap(product: str) -> None:
 @click.option("--clients", required=True, help="Comma-separated client names")
 def analytics_compare(clients: str) -> None:
     """Q9: Side-by-side product sets for multiple clients."""
-    from corp_by_os.index_builder import get_index_path
-    from corp_by_os.query_engine import notes_compare_clients
+    from corp.index_builder import get_index_path
+    from corp.query_engine import notes_compare_clients
 
     if not get_index_path().exists():
         console.print("[yellow]No index. Run `corp index rebuild` first.[/yellow]")
@@ -224,8 +225,8 @@ def analytics_compare(clients: str) -> None:
 @analytics_group.command("recent")
 def analytics_recent() -> None:
     """Q10: Most recent note per client."""
-    from corp_by_os.index_builder import get_index_path
-    from corp_by_os.query_engine import notes_recent
+    from corp.index_builder import get_index_path
+    from corp.query_engine import notes_recent
 
     if not get_index_path().exists():
         console.print("[yellow]No index. Run `corp index rebuild` first.[/yellow]")
@@ -271,12 +272,12 @@ def dedup_report_command(obj: dict, threshold: float, fmt: str) -> None:
     No files are deleted — this is a report only.
     """
     try:
-        from corp_by_os.ingest.dedup import get_dedup_report
+        from corp.ingest.dedup import get_dedup_report
     except ImportError:
         console.print('[red]datasketch not installed.[/red] Run: pip install "corp-by-os[dedup]"')
         return
 
-    from corp_by_os.ops.database import OpsDB
+    from corp.ops.database import OpsDB
 
     config = (obj or {}).get("config") or PipelineConfig.production()
     db = OpsDB(config=config)
@@ -334,7 +335,7 @@ def dedup_report_command(obj: dict, threshold: float, fmt: str) -> None:
 
 def _count_signatures(config) -> int:
     """Return number of stored content signatures (fail-open → 0)."""
-    from corp_by_os.ops.database import OpsDB
+    from corp.ops.database import OpsDB
 
     db = OpsDB(config=config)
     try:
@@ -349,7 +350,7 @@ def _count_signatures(config) -> int:
 @click.pass_obj
 def files_stats_command(obj: dict) -> None:
     """Show file registry statistics."""
-    from corp_by_os.ops.database import OpsDB
+    from corp.ops.database import OpsDB
 
     config = (obj or {}).get("config") or PipelineConfig.production()
     ops = OpsDB(config=config)
@@ -384,8 +385,8 @@ def naming_stats_command(obj: dict) -> None:
     """Show naming convention type code distribution from routing feedback."""
     from collections import Counter
 
-    from corp_by_os.ingest.naming_config import get_type_code, load_naming_config
-    from corp_by_os.ops.database import OpsDB
+    from corp.ingest.naming_config import get_type_code, load_naming_config
+    from corp.ops.database import OpsDB
 
     pipeline_config = (obj or {}).get("config") or PipelineConfig.production()
     ops = OpsDB(config=pipeline_config)

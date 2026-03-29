@@ -1,6 +1,6 @@
 """Tests for deterministic polarity detection."""
 
-from corp_knowledge_extractor.polarity import detect_polarity
+from corp.extractor.polarity import detect_polarity
 
 
 class TestPositivePolarity:

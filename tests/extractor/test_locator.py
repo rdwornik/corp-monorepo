@@ -3,9 +3,9 @@
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from corp_knowledge_extractor.extract import _build_locator, _enrich_facts
-from corp_knowledge_extractor.inventory import SourceFile
-from corp_knowledge_extractor.text_extract import TextExtractionResult
+from corp.extractor.extract import _build_locator, _enrich_facts
+from corp.extractor.inventory import SourceFile
+from corp.extractor.text_extract import TextExtractionResult
 
 
 class TestBuildLocator:

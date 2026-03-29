@@ -2,7 +2,7 @@
 
 from datetime import date
 
-from corp_opportunity_manager.templates import deck_filename, folder_name
+from corp.opportunity.templates import deck_filename, folder_name
 
 
 def test_folder_name_default():

@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
-from corp_by_os.built_in_actions import (
+from corp.built_in_actions import (
     _slugify,
     archive_project,
     copy_to_vault_action,
@@ -16,8 +16,8 @@ from corp_by_os.built_in_actions import (
     scan_attention,
     scan_inbox,
 )
-from corp_by_os.config import get_config
-from corp_by_os.models import VaultZone
+from corp.config import get_config
+from corp.models import VaultZone
 
 # --- Test: Action Registry ---
 

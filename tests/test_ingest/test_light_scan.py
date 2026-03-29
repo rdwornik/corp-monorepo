@@ -1,7 +1,7 @@
 """Tests for light_scan module — format scanners and ScanResult contract."""
 from unittest.mock import MagicMock, patch
 
-from corp_by_os.ingest.light_scan import ScanResult, light_scan
+from corp.ingest.light_scan import ScanResult, light_scan
 
 # ---------------------------------------------------------------------------
 # ScanResult contract

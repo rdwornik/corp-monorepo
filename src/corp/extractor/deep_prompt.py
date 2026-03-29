@@ -8,7 +8,8 @@ doc_types without overlay mappings.
 import logging
 
 import yaml
-from corp_knowledge_extractor._paths import PROMPTS_DIR
+
+from corp.extractor._paths import PROMPTS_DIR
 
 log = logging.getLogger(__name__)
 

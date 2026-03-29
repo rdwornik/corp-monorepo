@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
-from corp_by_os.cli import cli
+from corp.cli import cli
 
 _TEST_SCHEMA = """\
 CREATE TABLE IF NOT EXISTS notes (
@@ -92,13 +92,13 @@ def json_db(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 
     # Patch get_index_path and get_config
     monkeypatch.setattr(
-        "corp_by_os.cli.retrieve.get_config",
+        "corp.cli.retrieve.get_config",
         lambda: type("Cfg", (), {"vault_path": vault, "mywork_root": tmp_path})(),
     )
 
-    import corp_by_os.index_builder
+    import corp.index_builder
 
-    monkeypatch.setattr(corp_by_os.index_builder, "get_index_path", lambda: db_path)
+    monkeypatch.setattr(corp.index_builder, "get_index_path", lambda: db_path)
 
     return db_path
 

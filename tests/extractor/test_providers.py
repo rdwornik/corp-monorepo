@@ -7,11 +7,11 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from corp_knowledge_extractor.providers.base import (
+from corp.extractor.providers.base import (
     ExtractionRequest,
     ExtractionResponse,
 )
-from corp_knowledge_extractor.providers.router import (
+from corp.extractor.providers.router import (
     ANTHROPIC_MODELS,
     DEFAULT_LARGE_CONTEXT_MODEL,
     DEFAULT_MULTIMODAL_MODEL,
@@ -80,7 +80,7 @@ class TestGetProvider:
             os.environ["GEMINI_API_KEY"] = "test-gemini-key"
             provider = get_provider("claude-haiku-4-5-20251001")
             # Should be a GeminiProvider (fallback)
-            from corp_knowledge_extractor.providers.gemini_provider import (
+            from corp.extractor.providers.gemini_provider import (
                 GeminiProvider,
             )
 
@@ -95,7 +95,7 @@ class TestGetProvider:
         """Gemini model creates GeminiProvider."""
         with patch.dict(os.environ, {"GEMINI_API_KEY": "test-key"}):
             provider = get_provider("gemini-3-flash-preview")
-            from corp_knowledge_extractor.providers.gemini_provider import (
+            from corp.extractor.providers.gemini_provider import (
                 GeminiProvider,
             )
 
@@ -155,7 +155,7 @@ class TestValidator:
 
     def test_accepts_good_json(self):
         """Valid structured JSON passes validation."""
-        from corp_knowledge_extractor.providers.validator import (
+        from corp.extractor.providers.validator import (
             _parse_json,
             _validate_structure,
         )
@@ -166,19 +166,19 @@ class TestValidator:
 
     def test_rejects_no_title(self):
         """Missing title fails validation."""
-        from corp_knowledge_extractor.providers.validator import _validate_structure
+        from corp.extractor.providers.validator import _validate_structure
 
         assert _validate_structure({"summary": "text"}) is False
 
     def test_rejects_no_content(self):
         """Missing both summary and key_points fails validation."""
-        from corp_knowledge_extractor.providers.validator import _validate_structure
+        from corp.extractor.providers.validator import _validate_structure
 
         assert _validate_structure({"title": "Test"}) is False
 
     def test_parse_json_strips_fences(self):
         """JSON parsing handles markdown code fences."""
-        from corp_knowledge_extractor.providers.validator import _parse_json
+        from corp.extractor.providers.validator import _parse_json
 
         fenced = '```json\n{"title": "Test"}\n```'
         parsed = _parse_json(fenced)
@@ -186,7 +186,7 @@ class TestValidator:
 
     def test_parse_json_plain(self):
         """Plain JSON parses correctly."""
-        from corp_knowledge_extractor.providers.validator import _parse_json
+        from corp.extractor.providers.validator import _parse_json
 
         plain = '{"title": "Test", "summary": "ok"}'
         parsed = _parse_json(plain)
@@ -201,7 +201,7 @@ class TestCostTracker:
 
     def test_log_and_read_cost(self):
         """Costs logged to JSONL and monthly total computed."""
-        from corp_knowledge_extractor.providers import cost_tracker
+        from corp.extractor.providers import cost_tracker
 
         with tempfile.NamedTemporaryFile(suffix=".jsonl", delete=False, mode="w") as f:
             tmp_path = Path(f.name)
@@ -249,7 +249,7 @@ class TestCostTracker:
 
     def test_budget_check(self):
         """Budget check returns False when exceeded."""
-        from corp_knowledge_extractor.providers import cost_tracker
+        from corp.extractor.providers import cost_tracker
 
         with tempfile.NamedTemporaryFile(suffix=".jsonl", delete=False, mode="w") as f:
             tmp_path = Path(f.name)

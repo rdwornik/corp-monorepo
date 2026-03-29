@@ -4,8 +4,9 @@ import sys
 from pathlib import Path
 
 import click
-from corp_by_os.cli._common import console
-from corp_os_meta.pipeline_config import PipelineConfig
+
+from corp.cli._common import console
+from corp.schema.pipeline_config import PipelineConfig
 
 
 @click.command("test-pipeline")
@@ -56,7 +57,7 @@ def test_pipeline_command(
     import json as _json
     from dataclasses import asdict
 
-    from corp_by_os.test_pipeline import format_report, run_pipeline_test
+    from corp.test_pipeline import format_report, run_pipeline_test
 
     config = (obj or {}).get("config") or PipelineConfig.production()
 
@@ -98,6 +99,6 @@ def test_pipeline_command(
 @click.option("--no-llm", is_flag=True, help="Keyword matching only, no Gemini calls")
 def chat_command(no_llm: bool) -> None:
     """Interactive chat — natural language workflow routing."""
-    from corp_by_os.chat import chat_loop
+    from corp.chat import chat_loop
 
     chat_loop(use_llm=not no_llm)

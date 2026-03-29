@@ -7,13 +7,14 @@ import shutil
 from pathlib import Path
 
 import yaml
-from corp_opportunity_manager.config import AppConfig
-from corp_opportunity_manager.models import (
+
+from corp.opportunity.config import AppConfig
+from corp.opportunity.models import (
     CreationResult,
     OpportunityConfig,
     ProjectInfo,
 )
-from corp_opportunity_manager.templates import deck_filename, folder_name
+from corp.opportunity.templates import deck_filename, folder_name
 
 logger = logging.getLogger(__name__)
 

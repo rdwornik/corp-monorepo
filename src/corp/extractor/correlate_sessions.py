@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from difflib import SequenceMatcher
 from pathlib import Path
 
-from corp_os_meta.utils import normalize_string_list
+from corp.schema.utils import normalize_string_list
 
 logger = logging.getLogger(__name__)
 

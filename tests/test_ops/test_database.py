@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from corp_by_os.ops.database import OpsDB
+from corp.ops.database import OpsDB
 
 
 @pytest.fixture()
