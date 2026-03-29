@@ -459,7 +459,7 @@ def freshness_cmd(verbose: bool) -> None:
 
         corp freshness --verbose
     """
-    from corp_by_os.freshness.scanner import scan_vault_freshness
+    from corp_by_os.freshness_scanner import scan_vault_freshness
 
     cfg = get_config()
 
