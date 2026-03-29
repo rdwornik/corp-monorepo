@@ -14,6 +14,7 @@ from corp.ingest.extractions import (
     _validate_note,
     ingest_extractions,
 )
+from corp.schema.folder_names import QUARANTINE
 
 
 def _make_note(
@@ -320,7 +321,7 @@ class TestQualityGate:
 
         assert result.notes_quarantined == 1
         assert result.notes_ingested == 0
-        assert (vault / "_quarantine" / "low.md").exists()
+        assert (vault / QUARANTINE / "low.md").exists()
 
     def test_quality_gate_accepts_high_note(self, tmp_path):
         """High quality note passes gate."""
@@ -365,9 +366,9 @@ class TestValidation:
         result = ingest_extractions(out, vault)
 
         assert result.notes_quarantined == 1
-        assert (vault / "_quarantine" / "bad.md").exists()
+        assert (vault / QUARANTINE / "bad.md").exists()
         # Quarantine note has reason in frontmatter
-        content = (vault / "_quarantine" / "bad.md").read_text(encoding="utf-8")
+        content = (vault / QUARANTINE / "bad.md").read_text(encoding="utf-8")
         assert "quarantine_reason" in content
 
 
@@ -426,7 +427,7 @@ class TestQuarantine:
 
         _quarantine_note(md_file, {"title": "Bad"}, "Body.\n", "test reason", vault)
 
-        q_file = vault / "_quarantine" / "note.md"
+        q_file = vault / QUARANTINE / "note.md"
         assert q_file.exists()
         content = q_file.read_text(encoding="utf-8")
         assert "quarantine_reason: test reason" in content
@@ -438,5 +439,5 @@ class TestQuarantine:
 
         _quarantine_note(md_file, {"title": "Bad"}, "Body.\n", "test reason", vault)
 
-        content = (vault / "_quarantine" / "note.md").read_text(encoding="utf-8")
+        content = (vault / QUARANTINE / "note.md").read_text(encoding="utf-8")
         assert "trust_level: draft" in content

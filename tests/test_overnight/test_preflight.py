@@ -8,6 +8,7 @@ from unittest.mock import patch
 import pytest
 import yaml
 from corp.overnight.preflight import run_preflight
+from corp.schema.folder_names import SYSTEM, TEMPLATES
 
 
 @pytest.fixture()
@@ -22,11 +23,11 @@ def valid_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, Path
     appdata.mkdir()
 
     # Create valid routing_map.yaml
-    routing_dir = mywork / "90_System"
+    routing_dir = mywork / SYSTEM
     routing_dir.mkdir(parents=True)
     routing_map = routing_dir / "routing_map.yaml"
     routing_map.write_text(
-        yaml.dump({"folders": {"30_Templates": {"vault_target": "05_templates"}}}),
+        yaml.dump({"folders": {TEMPLATES: {"vault_target": "05_templates"}}}),
         encoding="utf-8",
     )
 
@@ -87,7 +88,7 @@ class TestPreflightPaths:
 
 class TestPreflightRoutingMap:
     def test_missing_routing_map(self, valid_env: dict) -> None:
-        (valid_env["mywork"] / "90_System" / "routing_map.yaml").unlink()
+        (valid_env["mywork"] / SYSTEM / "routing_map.yaml").unlink()
         errors = run_preflight(
             valid_env["mywork"],
             valid_env["vault"],
@@ -96,7 +97,7 @@ class TestPreflightRoutingMap:
         assert any("routing_map.yaml not found" in e for e in errors)
 
     def test_invalid_routing_map(self, valid_env: dict) -> None:
-        rm = valid_env["mywork"] / "90_System" / "routing_map.yaml"
+        rm = valid_env["mywork"] / SYSTEM / "routing_map.yaml"
         rm.write_text("- not\n- a\n- dict\n", encoding="utf-8")
         errors = run_preflight(
             valid_env["mywork"],

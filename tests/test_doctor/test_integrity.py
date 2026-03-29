@@ -16,6 +16,16 @@ from corp.integrity import (
     _check_vault_index,
     check_all,
 )
+from corp.schema.folder_names import (
+    ADMIN,
+    INBOX,
+    PROJECTS,
+    RFP,
+    SOURCE_LIBRARY,
+    SYSTEM,
+    TEMPLATES,
+    UNMATCHED,
+)
 
 
 def _write_yaml(path: Path, data: dict) -> None:
@@ -27,14 +37,14 @@ def _make_mywork(tmp_path: Path) -> Path:
     """Create a valid MyWork structure."""
     mywork = tmp_path / "mywork"
     for folder in [
-        "00_Inbox",
-        "10_Projects",
+        INBOX,
+        PROJECTS,
         "20_Extra_Initiatives",
-        "30_Templates",
-        "50_RFP",
-        "60_Source_Library",
-        "70_Admin",
-        "90_System",
+        TEMPLATES,
+        RFP,
+        SOURCE_LIBRARY,
+        ADMIN,
+        SYSTEM,
     ]:
         (mywork / folder).mkdir(parents=True, exist_ok=True)
     return mywork
@@ -138,7 +148,7 @@ class TestCheckRegistryPaths:
         """All registry destinations exist -> passed."""
         mywork = _make_mywork(tmp_path)
         registry = tmp_path / "registry.yaml"
-        (mywork / "60_Source_Library" / "Training").mkdir(parents=True)
+        (mywork / SOURCE_LIBRARY / "Training").mkdir(parents=True)
         _write_yaml(
             registry,
             {
@@ -187,7 +197,7 @@ class TestCheckOpsDb:
     def test_all_assets_present(self, tmp_path: Path) -> None:
         """Assets in ops.db exist on disk -> passed."""
         mywork = _make_mywork(tmp_path)
-        test_file = mywork / "10_Projects" / "doc.txt"
+        test_file = mywork / PROJECTS / "doc.txt"
         test_file.write_text("test", encoding="utf-8")
 
         ops_db = tmp_path / "ops.db"
@@ -312,8 +322,8 @@ class TestCheckMyworkStructure:
         mywork = tmp_path / "mywork"
         mywork.mkdir()
         # Only create some folders
-        (mywork / "00_Inbox").mkdir()
-        (mywork / "10_Projects").mkdir()
+        (mywork / INBOX).mkdir()
+        (mywork / PROJECTS).mkdir()
 
         report = IntegrityReport()
         _check_mywork_structure(report, mywork)
@@ -335,7 +345,7 @@ class TestCheckInbox:
     def test_files_in_inbox(self, tmp_path: Path) -> None:
         """Files in inbox -> info with hint."""
         mywork = _make_mywork(tmp_path)
-        (mywork / "00_Inbox" / "new_file.pdf").write_text("data", encoding="utf-8")
+        (mywork / INBOX / "new_file.pdf").write_text("data", encoding="utf-8")
 
         report = IntegrityReport()
         _check_inbox(report, mywork)
@@ -345,8 +355,8 @@ class TestCheckInbox:
     def test_skips_system_files(self, tmp_path: Path) -> None:
         """System files in inbox are ignored."""
         mywork = _make_mywork(tmp_path)
-        (mywork / "00_Inbox" / "_triage_log.jsonl").write_text("{}", encoding="utf-8")
-        (mywork / "00_Inbox" / "folder_manifest.yaml").write_text("", encoding="utf-8")
+        (mywork / INBOX / "_triage_log.jsonl").write_text("{}", encoding="utf-8")
+        (mywork / INBOX / "folder_manifest.yaml").write_text("", encoding="utf-8")
 
         report = IntegrityReport()
         _check_inbox(report, mywork)
@@ -355,14 +365,14 @@ class TestCheckInbox:
     def test_quarantine_dirs(self, tmp_path: Path) -> None:
         """Files in _Unmatched -> info."""
         mywork = _make_mywork(tmp_path)
-        unmatched = mywork / "00_Inbox" / "_Unmatched"
+        unmatched = mywork / INBOX / UNMATCHED
         unmatched.mkdir()
         (unmatched / "mystery.docx").write_text("data", encoding="utf-8")
 
         report = IntegrityReport()
         _check_inbox(report, mywork)
         assert len(report.issues) == 1
-        assert "_Unmatched" in report.issues[0].description
+        assert UNMATCHED in report.issues[0].description
 
     def test_no_inbox_dir(self, tmp_path: Path) -> None:
         """No inbox directory -> no crash."""
@@ -385,7 +395,7 @@ class TestCheckAll:
 
         registry = tmp_path / "registry.yaml"
         _write_yaml(registry, {"series": {}})
-        routing = mywork / "90_System" / "routing_map.yaml"
+        routing = mywork / SYSTEM / "routing_map.yaml"
         _write_yaml(routing, {"folders": {}})
 
         index_db = tmp_path / "index.db"

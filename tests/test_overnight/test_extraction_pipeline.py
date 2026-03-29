@@ -15,6 +15,7 @@ import pytest
 import yaml
 from corp.overnight.monitor import OvernightMonitor
 from corp.overnight.state import OvernightState
+from corp.schema.folder_names import SOURCE_LIBRARY, SYSTEM, TEMPLATES
 
 
 @pytest.fixture()
@@ -23,17 +24,17 @@ def mywork_tree(tmp_path: Path) -> Path:
     mywork = tmp_path / "MyWork"
 
     # Create folder with test files
-    source_lib = mywork / "60_Source_Library"
+    source_lib = mywork / SOURCE_LIBRARY
     source_lib.mkdir(parents=True)
     (source_lib / "platform_overview.pptx").write_bytes(b"PK\x03\x04fake-pptx")
     (source_lib / "integration_guide.pdf").write_bytes(b"%PDF-1.4 fake-pdf")
 
-    # Create 90_System with routing_map
-    system = mywork / "90_System"
+    # Create SYSTEM with routing_map
+    system = mywork / SYSTEM
     system.mkdir(parents=True)
     routing = {
         "folders": {
-            "60_Source_Library": {
+            SOURCE_LIBRARY: {
                 "vault_target": "02_sources",
                 "content_origin": "internal",
                 "source_category": "source-library",
@@ -72,7 +73,7 @@ class TestExtractionPipeline:
         state.create_run(run_id, scope="source-library", budget=0.10)
 
         # Register files (simulating what _run_folder_extraction does)
-        folder_path = mywork_tree / "60_Source_Library"
+        folder_path = mywork_tree / SOURCE_LIBRARY
         from corp.extraction.scanner import scan_folder
 
         EXTENSIONS = [".pptx", ".pdf", ".docx"]
@@ -96,7 +97,7 @@ class TestExtractionPipeline:
         run_id = "test-run-002"
         state.create_run(run_id, scope="source-library", budget=0.10)
 
-        folder_path = mywork_tree / "60_Source_Library"
+        folder_path = mywork_tree / SOURCE_LIBRARY
         from corp.extraction.scanner import scan_folder
 
         results = scan_folder(folder_path, allow_extensions=[".pptx", ".pdf"])
@@ -134,7 +135,7 @@ class TestExtractionPipeline:
         run_id = "test-run-003"
         state.create_run(run_id, scope="source-library", budget=0.10)
 
-        folder_path = mywork_tree / "60_Source_Library"
+        folder_path = mywork_tree / SOURCE_LIBRARY
         from corp.extraction.scanner import scan_folder
 
         results = scan_folder(folder_path, allow_extensions=[".pptx", ".pdf"])
@@ -167,7 +168,7 @@ class TestExtractionPipeline:
 
         # Add and complete files
         f1 = state.add_file(
-            run_id, str(mywork_tree / "60_Source_Library" / "a.pptx"), "", "pending"
+            run_id, str(mywork_tree / SOURCE_LIBRARY / "a.pptx"), "", "pending"
         )
         state.update_file_status(f1, "done", cost=0.01)
         state.sync_run_counters(run_id)
@@ -215,12 +216,12 @@ class TestExtractionPipeline:
         state.create_run(run_id, scope="all-non-project", budget=1.0)
 
         # Files from two different folders
-        folder_60 = mywork_tree / "60_Source_Library"
+        folder_60 = mywork_tree / SOURCE_LIBRARY
         state.add_file(run_id, str(folder_60 / "file1.pdf"), "", "pending")
         state.add_file(run_id, str(folder_60 / "file2.pptx"), "", "pending")
 
         # Create another folder
-        folder_30 = mywork_tree / "30_Templates"
+        folder_30 = mywork_tree / TEMPLATES
         folder_30.mkdir(exist_ok=True)
         state.add_file(run_id, str(folder_30 / "template.pptx"), "", "pending")
 
@@ -236,5 +237,5 @@ class TestExtractionPipeline:
         assert updated == 2
         pending = state.get_pending_files(run_id)
         assert len(pending) == 1
-        assert "30_Templates" in pending[0]["path"]
+        assert TEMPLATES in pending[0]["path"]
         state.close()

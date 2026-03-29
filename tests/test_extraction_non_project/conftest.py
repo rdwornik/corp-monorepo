@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+from corp.schema.folder_names import INBOX, SOURCE_LIBRARY, TEMPLATES
 
 
 @pytest.fixture()
@@ -11,7 +12,7 @@ def routing_map() -> dict:
     return {
         "version": "1.0",
         "routes": {
-            "30_Templates": {
+            TEMPLATES: {
                 "description": "Templates",
                 "vault_target": "04_evergreen/_generated/template",
                 "provenance": "template",
@@ -21,7 +22,7 @@ def routing_map() -> dict:
                     "03_Discovery_Tools": {"content_type": "discovery"},
                 },
             },
-            "60_Source_Library": {
+            SOURCE_LIBRARY: {
                 "description": "Source library",
                 "vault_target": "04_evergreen/_generated/evergreen",
                 "provenance": "evergreen",
@@ -31,7 +32,7 @@ def routing_map() -> dict:
                     "03_Competitive": {"content_type": "competitive"},
                 },
             },
-            "00_Inbox": {
+            INBOX: {
                 "description": "Inbox",
                 "vault_target": None,
                 "provenance": None,
@@ -51,8 +52,8 @@ def mywork_tree(tmp_path):
     """Create a minimal MyWork-like directory structure with test files."""
     mywork = tmp_path / "MyWork"
 
-    # 30_Templates with subfolders
-    templates = mywork / "30_Templates"
+    # TEMPLATES with subfolders
+    templates = mywork / TEMPLATES
     decks = templates / "01_Presentation_Decks"
     demos = templates / "02_Demo_Scripts"
     decks.mkdir(parents=True)
@@ -98,14 +99,14 @@ def mywork_tree(tmp_path):
         encoding="utf-8",
     )
 
-    # 60_Source_Library
-    source_lib = mywork / "60_Source_Library"
+    # SOURCE_LIBRARY
+    source_lib = mywork / SOURCE_LIBRARY
     prod_docs = source_lib / "01_Product_Docs"
     prod_docs.mkdir(parents=True)
     (prod_docs / "platform_spec.pdf").write_bytes(b"fake-pdf")
 
-    # 00_Inbox (extraction disabled)
-    inbox = mywork / "00_Inbox"
+    # INBOX (extraction disabled)
+    inbox = mywork / INBOX
     inbox.mkdir(parents=True)
     (inbox / "folder_manifest.yaml").write_text(
         "purpose: Inbox\nextraction:\n  enabled: false\n",

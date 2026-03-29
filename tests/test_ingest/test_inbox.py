@@ -20,6 +20,7 @@ from corp.ingest.inbox import (
 from corp.ops.database import OpsDB
 from corp.ops.file_registry import FileRegistry
 from corp.ops.registry import ContentRegistry
+from corp.schema.folder_names import INBOX, PROJECTS, RFP, SOURCE_LIBRARY, UNMATCHED
 
 
 @pytest.fixture()
@@ -30,7 +31,7 @@ def registry_path(tmp_path: Path) -> Path:
         "series": {
             "cognitive_friday": {
                 "display_name": "Cognitive Friday",
-                "destination": "60_Source_Library/02_Training_Enablement/Cognitive_Friday",
+                "destination": f"{SOURCE_LIBRARY}/02_Training_Enablement/Cognitive_Friday",
                 "naming_patterns": ["Cognitive_Friday*", "CF_S[0-9]*"],
                 "expected_extensions": [".mp4", ".pptx"],
                 "default_metadata": {
@@ -46,7 +47,7 @@ def registry_path(tmp_path: Path) -> Path:
                     "filename_contains": ["RFP_Database"],
                     "extensions": [".xlsx"],
                 },
-                "destination": "50_RFP/_databases",
+                "destination": f"{RFP}/_databases",
                 "metadata": {"source_category": "rfp"},
             },
         ],
@@ -54,7 +55,7 @@ def registry_path(tmp_path: Path) -> Path:
             {"pattern": "Lenzing", "project": "Lenzing_Planning"},
         ],
         "fallback": {
-            "unknown_destination": "00_Inbox/_Unmatched",
+            "unknown_destination": f"{INBOX}/{UNMATCHED}",
             "confidence_threshold": 0.75,
         },
     }
@@ -79,21 +80,21 @@ def ops(tmp_path: Path) -> OpsDB:
 def mywork(tmp_path: Path) -> Path:
     """Create a minimal MyWork structure."""
     root = tmp_path / "MyWork"
-    inbox = root / "00_Inbox"
+    inbox = root / INBOX
     inbox.mkdir(parents=True)
     return root
 
 
 class TestScanInboxFiles:
     def test_finds_files(self, mywork: Path) -> None:
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         (inbox / "test.pptx").write_bytes(b"x" * 100)
         (inbox / "test2.xlsx").write_bytes(b"x" * 100)
         files = _scan_inbox_files(inbox)
         assert len(files) == 2
 
     def test_skips_gitkeep(self, mywork: Path) -> None:
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         (inbox / ".gitkeep").write_bytes(b"")
         (inbox / "test.pptx").write_bytes(b"x" * 100)
         files = _scan_inbox_files(inbox)
@@ -101,26 +102,26 @@ class TestScanInboxFiles:
         assert files[0].name == "test.pptx"
 
     def test_skips_hidden_files(self, mywork: Path) -> None:
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         (inbox / ".DS_Store").write_bytes(b"")
         files = _scan_inbox_files(inbox)
         assert len(files) == 0
 
     def test_skips_temp_extensions(self, mywork: Path) -> None:
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         (inbox / "download.crdownload").write_bytes(b"x" * 100)
         files = _scan_inbox_files(inbox)
         assert len(files) == 0
 
     def test_skips_directories(self, mywork: Path) -> None:
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         (inbox / "subfolder").mkdir()
         (inbox / "test.pptx").write_bytes(b"x" * 100)
         files = _scan_inbox_files(inbox)
         assert len(files) == 1
 
     def test_empty_inbox(self, mywork: Path) -> None:
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         files = _scan_inbox_files(inbox)
         assert len(files) == 0
 
@@ -129,7 +130,7 @@ class TestScanInboxFiles:
         assert len(files) == 0
 
     def test_skips_infrastructure_names(self, mywork: Path) -> None:
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         (inbox / "desktop.ini").write_bytes(b"")
         (inbox / "Thumbs.db").write_bytes(b"")
         (inbox / "real_file.pdf").write_bytes(b"x" * 100)
@@ -139,41 +140,41 @@ class TestScanInboxFiles:
 
 class TestMoveFile:
     def test_moves_file(self, mywork: Path) -> None:
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "test.pptx"
         f.write_bytes(b"x" * 100)
 
-        dest = _move_file(f, "60_Source_Library/Training", "renamed.pptx", mywork)
+        dest = _move_file(f, f"{SOURCE_LIBRARY}/Training", "renamed.pptx", mywork)
         assert dest.exists()
         assert dest.name == "renamed.pptx"
         assert not f.exists()
 
     def test_creates_destination_dir(self, mywork: Path) -> None:
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "test.pptx"
         f.write_bytes(b"x" * 100)
 
-        dest = _move_file(f, "60_Source_Library/New_Folder", "test.pptx", mywork)
+        dest = _move_file(f, f"{SOURCE_LIBRARY}/New_Folder", "test.pptx", mywork)
         assert dest.parent.exists()
 
     def test_handles_collision(self, mywork: Path) -> None:
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "test.pptx"
         f.write_bytes(b"x" * 100)
 
         # Pre-create collision
-        dest_dir = mywork / "60_Source_Library"
+        dest_dir = mywork / SOURCE_LIBRARY
         dest_dir.mkdir(parents=True)
         (dest_dir / "test.pptx").write_bytes(b"y" * 100)
 
-        dest = _move_file(f, "60_Source_Library", "test.pptx", mywork)
+        dest = _move_file(f, SOURCE_LIBRARY, "test.pptx", mywork)
         assert dest.exists()
         assert dest.name == "test_1.pptx"
 
 
 class TestLogIngestEvent:
     def test_logs_event(self, mywork: Path, registry: ContentRegistry, ops: OpsDB) -> None:
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"x" * 100)
 
@@ -182,7 +183,7 @@ class TestLogIngestEvent:
         classification = classify(f, registry)
 
         # Move file first (log needs dest_file)
-        dest_dir = mywork / "60_Source_Library" / "Training"
+        dest_dir = mywork / SOURCE_LIBRARY / "Training"
         dest_dir.mkdir(parents=True)
         dest_file = dest_dir / "renamed.pptx"
         import shutil
@@ -214,7 +215,7 @@ class TestProcessFile:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """Auto mode accepts high-confidence matches without prompting."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "Cognitive_Friday_S4_Test.pptx"
         f.write_bytes(b"x" * 100)
 
@@ -233,7 +234,7 @@ class TestProcessFile:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """Auto mode doesn't auto-accept low-confidence matches."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "random_file.txt"
         f.write_bytes(b"x" * 100)
 
@@ -251,7 +252,7 @@ class TestProcessFile:
 
     def test_dry_run_no_move(self, mywork: Path, registry: ContentRegistry, ops: OpsDB) -> None:
         """Dry run doesn't move files."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "Cognitive_Friday_S4_Test.pptx"
         f.write_bytes(b"x" * 100)
 
@@ -269,7 +270,7 @@ class TestProcessFile:
 
     def test_interactive_accept(self, mywork: Path, registry: ContentRegistry, ops: OpsDB) -> None:
         """Interactive mode: user accepts suggestion."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "RFP_Database_WMS.xlsx"
         f.write_bytes(b"x" * 100)
 
@@ -286,7 +287,7 @@ class TestProcessFile:
 
     def test_interactive_skip(self, mywork: Path, registry: ContentRegistry, ops: OpsDB) -> None:
         """Interactive mode: user skips file."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "test.pdf"
         f.write_bytes(b"x" * 100)
 
@@ -303,7 +304,7 @@ class TestProcessFile:
 
     def test_interactive_quit(self, mywork: Path, registry: ContentRegistry, ops: OpsDB) -> None:
         """Interactive mode: user quits."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "test.pdf"
         f.write_bytes(b"x" * 100)
 
@@ -323,7 +324,7 @@ class TestUndoEvent:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """Undo moves file back to Inbox."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"x" * 100)
 
@@ -363,7 +364,7 @@ class TestUndoEvent:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """Undo of already-reverted event returns False."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"x" * 100)
 
@@ -386,7 +387,7 @@ class TestUserContext:
     ) -> None:
         """Verify user_context is included in the CKE manifest when passed."""
 
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"x" * 100)
 
@@ -412,7 +413,7 @@ class TestUserContext:
             from corp.ingest.inbox import _trigger_extraction
 
             # Route the file first so it has a destination
-            dest_dir = mywork / "60_Source_Library" / "Training"
+            dest_dir = mywork / SOURCE_LIBRARY / "Training"
             dest_dir.mkdir(parents=True)
             import shutil
 
@@ -433,7 +434,7 @@ class TestUserContext:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """user_context is None when not provided by user."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "test.pptx"
         f.write_bytes(b"x" * 100)
 
@@ -458,7 +459,7 @@ class TestUserContext:
         ):
             from corp.ingest.inbox import _trigger_extraction
 
-            dest_dir = mywork / "60_Source_Library"
+            dest_dir = mywork / SOURCE_LIBRARY
             dest_dir.mkdir(parents=True)
             import shutil
 
@@ -475,7 +476,7 @@ class TestListEvents:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """--list shows ingest-inbox events."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
 
         # Create 2 events via auto mode (unique content per file)
         for i, name in enumerate(["Cognitive_Friday_S4.pptx", "Cognitive_Friday_S5.pptx"]):
@@ -493,7 +494,7 @@ class TestListEvents:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """Undone events have reverted=1 in the database."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"x" * 100)
         process_file(f, mywork, registry, ops, auto=True, skip_extract=True)
@@ -516,7 +517,7 @@ class TestListEvents:
 
     def test_list_respects_limit(self, mywork: Path, registry: ContentRegistry, ops: OpsDB) -> None:
         """--list with limit returns at most N events."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         for i in range(5):
             f = inbox / f"Cognitive_Friday_S{i}.pptx"
             f.write_bytes(f"unique_content_{i}".encode())
@@ -535,7 +536,7 @@ class TestFullUndo:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB, tmp_path: Path
     ) -> None:
         """--full undo removes vault package when vault_note_path is recorded."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"x" * 100)
 
@@ -574,7 +575,7 @@ class TestFullUndo:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB, tmp_path: Path
     ) -> None:
         """--full undo triggers index rebuild."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"x" * 100)
 
@@ -601,7 +602,7 @@ class TestFullUndo:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB, tmp_path: Path
     ) -> None:
         """--full undo handles missing vault_note_path gracefully."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"x" * 100)
 
@@ -629,7 +630,7 @@ class TestFullUndo:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """Normal (non-full) undo does NOT rebuild index."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"x" * 100)
 
@@ -654,7 +655,7 @@ class TestVaultNotePathStored:
         """log_event with vault_note_path stores it in the database."""
         event_id = ops.log_event(
             action="ingest_inbox_route",
-            source_path="00_Inbox/test.pptx",
+            source_path=f"{INBOX}/test.pptx",
             destination_path="30_Reference/test.pptx",
             vault_note_path="01_Knowledge/test_pkg",
         )
@@ -669,7 +670,7 @@ class TestVaultNotePathStored:
         """vault_note_path defaults to NULL when not provided."""
         event_id = ops.log_event(
             action="ingest_inbox_route",
-            source_path="00_Inbox/test.pptx",
+            source_path=f"{INBOX}/test.pptx",
         )
 
         row = ops.conn.execute(
@@ -686,7 +687,7 @@ class TestRegistrationAtRouteTime:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """--skip-extract routes file AND registers it in files table."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"x" * 100)
 
@@ -708,7 +709,7 @@ class TestRegistrationAtRouteTime:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """Same file --skip-extract twice → second time dedup fires."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         content = b"x" * 100
 
         # First ingest: route + register, NO extraction
@@ -742,7 +743,7 @@ class TestRegistrationAtRouteTime:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """Same file with extraction record → dedup shows model info."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         content = b"x" * 100
 
         # First ingest + fake extraction
@@ -770,7 +771,7 @@ class TestRegistrationAtRouteTime:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """Dedup skip leaves file in Inbox (not moved)."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         content = b"unique_content_123"
 
         # Register + fake-extract a file (use auto-matched name)
@@ -794,7 +795,7 @@ class TestRegistrationAtRouteTime:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """Different content → no dedup, routes normally."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"brand_new_content")
 
@@ -813,7 +814,7 @@ class TestRegistrationAtRouteTime:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """Interactive mode: user picks [s]kip on dedup → skipped."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         content = b"dupe_content"
 
         # First: register + fake extract (auto mode)
@@ -842,7 +843,7 @@ class TestRegistrationAtRouteTime:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """Dedup skip creates a dedup_skip event in ops.db."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         content = b"logged_dedup_content"
 
         # First: register + fake extract (auto mode)
@@ -869,7 +870,7 @@ class TestContextBehavior:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """Adding context preserves original proposed name."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "RFP_Database_WMS.xlsx"
         f.write_bytes(b"unique_rfp_content")
 
@@ -910,7 +911,7 @@ class TestContextBehavior:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """After [c], returns to prompt. [a] proceeds normally."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "RFP_Database_WMS.xlsx"
         f.write_bytes(b"unique_context_test")
 
@@ -940,32 +941,32 @@ class TestContextBehavior:
 class TestCustomDestination:
     def test_destination_override_sets_path(self, mywork: Path) -> None:
         """[d] with valid path returns the path."""
-        dest_dir = mywork / "10_Projects" / "TestProject"
+        dest_dir = mywork / PROJECTS / "TestProject"
         dest_dir.mkdir(parents=True)
 
         with patch("corp.ingest.inbox.Prompt") as mock_prompt:
-            mock_prompt.ask.return_value = "10_Projects/TestProject"
+            mock_prompt.ask.return_value = f"{PROJECTS}/TestProject"
             result = _get_custom_destination(mywork)
 
-        assert result == "10_Projects/TestProject"
+        assert result == f"{PROJECTS}/TestProject"
 
     def test_destination_creates_folder(self, mywork: Path) -> None:
         """[d] with new path and [y] creates the folder."""
         with patch("corp.ingest.inbox.Prompt") as mock_prompt:
             # First ask: path input. Second ask: create confirmation.
             mock_prompt.ask.side_effect = [
-                "10_Projects/NewProject",
+                f"{PROJECTS}/NewProject",
                 "y",
             ]
             result = _get_custom_destination(mywork)
 
-        assert result == "10_Projects/NewProject"
-        assert (mywork / "10_Projects" / "NewProject").exists()
+        assert result == f"{PROJECTS}/NewProject"
+        assert (mywork / PROJECTS / "NewProject").exists()
 
     def test_destination_create_declined(self, mywork: Path) -> None:
         """[d] with new path and [n] cancels."""
         with patch("corp.ingest.inbox.Prompt") as mock_prompt:
-            mock_prompt.ask.side_effect = ["10_Projects/Nope", "n"]
+            mock_prompt.ask.side_effect = [f"{PROJECTS}/Nope", "n"]
             result = _get_custom_destination(mywork)
 
         assert result is None
@@ -1017,11 +1018,11 @@ class TestDefaultDestination:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """--destination overrides classifier in auto mode."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "random_unclassified_file.docx"
         f.write_bytes(b"unique_dest_test")
 
-        dest_dir = mywork / "10_Projects" / "JLR"
+        dest_dir = mywork / PROJECTS / "JLR"
         dest_dir.mkdir(parents=True)
 
         action = process_file(
@@ -1031,7 +1032,7 @@ class TestDefaultDestination:
             ops,
             auto=True,
             skip_extract=True,
-            default_destination="10_Projects/JLR",
+            default_destination=f"{PROJECTS}/JLR",
         )
         assert action == "routed"
         assert not f.exists()
@@ -1040,17 +1041,17 @@ class TestDefaultDestination:
         events = ops.get_recent_events(5)
         route = [e for e in events if e["action"] == "ingest_inbox_route"]
         assert len(route) >= 1
-        assert "10_Projects/JLR" in route[0]["destination_path"]
+        assert f"{PROJECTS}/JLR" in route[0]["destination_path"]
 
     def test_interactive_uses_default_destination(
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """--destination pre-fills current_dest in interactive mode."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "unknown_file.pdf"
         f.write_bytes(b"unique_interactive_dest")
 
-        dest_dir = mywork / "10_Projects" / "JLR"
+        dest_dir = mywork / PROJECTS / "JLR"
         dest_dir.mkdir(parents=True)
 
         with patch("corp.ingest.inbox._prompt_action") as mock_prompt:
@@ -1061,7 +1062,7 @@ class TestDefaultDestination:
                 registry,
                 ops,
                 skip_extract=True,
-                default_destination="10_Projects/JLR",
+                default_destination=f"{PROJECTS}/JLR",
             )
 
         assert action == "routed"
@@ -1070,12 +1071,12 @@ class TestDefaultDestination:
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """[d] override takes priority over --destination."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         f = inbox / "specific_file.xlsx"
         f.write_bytes(b"unique_override_test")
 
-        (mywork / "10_Projects" / "JLR").mkdir(parents=True)
-        (mywork / "50_RFP").mkdir(parents=True)
+        (mywork / PROJECTS / "JLR").mkdir(parents=True)
+        (mywork / RFP).mkdir(parents=True)
 
         call_count = [0]
 
@@ -1086,31 +1087,31 @@ class TestDefaultDestination:
             return "a"
 
         with patch("corp.ingest.inbox._prompt_action", side_effect=mock_prompt):
-            with patch("corp.ingest.inbox._get_custom_destination", return_value="50_RFP"):
+            with patch("corp.ingest.inbox._get_custom_destination", return_value=RFP):
                 action = process_file(
                     f,
                     mywork,
                     registry,
                     ops,
                     skip_extract=True,
-                    default_destination="10_Projects/JLR",
+                    default_destination=f"{PROJECTS}/JLR",
                 )
 
         assert action == "routed"
         events = ops.get_recent_events(5)
         route = [e for e in events if e["action"] == "ingest_inbox_route"]
-        assert "50_RFP" in route[0]["destination_path"]
+        assert RFP in route[0]["destination_path"]
 
     def test_destination_overrides_classifier(
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB
     ) -> None:
         """--destination overrides even a high-confidence classifier match."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         # Cognitive Friday has 0.95 confidence series match
         f = inbox / "Cognitive_Friday_S4.pptx"
         f.write_bytes(b"unique_override_classifier")
 
-        (mywork / "10_Projects" / "JLR").mkdir(parents=True)
+        (mywork / PROJECTS / "JLR").mkdir(parents=True)
 
         action = process_file(
             f,
@@ -1119,10 +1120,10 @@ class TestDefaultDestination:
             ops,
             auto=True,
             skip_extract=True,
-            default_destination="10_Projects/JLR",
+            default_destination=f"{PROJECTS}/JLR",
         )
         assert action == "routed"
         events = ops.get_recent_events(5)
         route = [e for e in events if e["action"] == "ingest_inbox_route"]
         # Should go to JLR, not Cognitive_Friday training folder
-        assert "10_Projects/JLR" in route[0]["destination_path"]
+        assert f"{PROJECTS}/JLR" in route[0]["destination_path"]

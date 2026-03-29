@@ -17,18 +17,26 @@ from corp.ingest.router import (
 )
 from corp.ops.database import OpsDB
 from corp.ops.registry import ContentRegistry
+from corp.schema.folder_names import (
+    INBOX,
+    PROJECTS,
+    RFP,
+    SOURCE_LIBRARY,
+    STAGING,
+    UNMATCHED,
+)
 
 
 @pytest.fixture()
 def mywork(tmp_path: Path) -> Path:
     """Create a minimal MyWork directory structure."""
-    inbox = tmp_path / "00_Inbox"
+    inbox = tmp_path / INBOX
     inbox.mkdir()
-    (tmp_path / "10_Projects").mkdir()
-    (tmp_path / "60_Source_Library" / "02_Training_Enablement" / "Cognitive_Friday").mkdir(
+    (tmp_path / PROJECTS).mkdir()
+    (tmp_path / SOURCE_LIBRARY / "02_Training_Enablement" / "Cognitive_Friday").mkdir(
         parents=True
     )
-    (tmp_path / "50_RFP" / "_databases").mkdir(parents=True)
+    (tmp_path / RFP / "_databases").mkdir(parents=True)
     return tmp_path
 
 
@@ -40,7 +48,7 @@ def registry_path(tmp_path: Path) -> Path:
         "series": {
             "cognitive_friday": {
                 "display_name": "Cognitive Friday",
-                "destination": "60_Source_Library/02_Training_Enablement/Cognitive_Friday",
+                "destination": f"{SOURCE_LIBRARY}/02_Training_Enablement/Cognitive_Friday",
                 "naming_patterns": [
                     "Cognitive_Friday*",
                     "CF_S[0-9]*",
@@ -59,7 +67,7 @@ def registry_path(tmp_path: Path) -> Path:
                     "filename_contains": ["RFP_Database"],
                     "extensions": [".xlsx", ".csv"],
                 },
-                "destination": "50_RFP/_databases",
+                "destination": f"{RFP}/_databases",
                 "metadata": {"source_category": "rfp"},
             },
         ],
@@ -67,7 +75,7 @@ def registry_path(tmp_path: Path) -> Path:
             {"pattern": "Lenzing", "project": "Lenzing_Planning"},
         ],
         "fallback": {
-            "unknown_destination": "00_Inbox/_Unmatched",
+            "unknown_destination": f"{INBOX}/{UNMATCHED}",
             "confidence_threshold": 0.75,
             "llm_escalation_threshold": 0.50,
         },
@@ -96,8 +104,8 @@ def ops(tmp_path: Path) -> OpsDB:
 class TestScanInbox:
     def test_finds_files_in_inbox(self, mywork: Path) -> None:
         """scan_inbox returns loose files as InboxItems."""
-        (mywork / "00_Inbox" / "report.pdf").write_bytes(b"pdf content")
-        (mywork / "00_Inbox" / "deck.pptx").write_bytes(b"pptx content")
+        (mywork / INBOX / "report.pdf").write_bytes(b"pdf content")
+        (mywork / INBOX / "deck.pptx").write_bytes(b"pptx content")
 
         items = scan_inbox(mywork)
         assert len(items) == 2
@@ -108,7 +116,7 @@ class TestScanInbox:
 
     def test_detects_folders(self, mywork: Path) -> None:
         """scan_inbox detects depth-1 folders as InboxItems."""
-        sub = mywork / "00_Inbox" / "Workshop_Materials"
+        sub = mywork / INBOX / "Workshop_Materials"
         sub.mkdir()
         (sub / "slides.pptx").write_bytes(b"slides")
         (sub / "notes.docx").write_bytes(b"notes")
@@ -121,7 +129,7 @@ class TestScanInbox:
 
     def test_folder_stats(self, mywork: Path) -> None:
         """Folder InboxItem has correct file_count, total_size, depth."""
-        sub = mywork / "00_Inbox" / "Deep_Folder"
+        sub = mywork / INBOX / "Deep_Folder"
         nested = sub / "level1" / "level2"
         nested.mkdir(parents=True)
         (sub / "top.txt").write_bytes(b"1234567890")  # 10 bytes
@@ -136,8 +144,8 @@ class TestScanInbox:
 
     def test_mixed_files_and_folders(self, mywork: Path) -> None:
         """Inbox with both files and folders returns both types."""
-        (mywork / "00_Inbox" / "loose.pdf").write_bytes(b"loose")
-        sub = mywork / "00_Inbox" / "Pkg_Folder"
+        (mywork / INBOX / "loose.pdf").write_bytes(b"loose")
+        sub = mywork / INBOX / "Pkg_Folder"
         sub.mkdir()
         (sub / "inside.pptx").write_bytes(b"inside")
 
@@ -152,7 +160,7 @@ class TestScanInbox:
 
     def test_files_inside_folders_not_listed_separately(self, mywork: Path) -> None:
         """Files inside depth-1 folders do NOT appear as separate items."""
-        sub = mywork / "00_Inbox" / "My_Package"
+        sub = mywork / INBOX / "My_Package"
         sub.mkdir()
         (sub / "a.pdf").write_bytes(b"a")
         (sub / "b.pdf").write_bytes(b"b")
@@ -164,9 +172,9 @@ class TestScanInbox:
 
     def test_skips_infrastructure(self, mywork: Path) -> None:
         """scan_inbox skips desktop.ini, Thumbs.db, etc."""
-        (mywork / "00_Inbox" / "real_file.pdf").write_bytes(b"real")
-        (mywork / "00_Inbox" / "desktop.ini").write_bytes(b"ini")
-        (mywork / "00_Inbox" / "Thumbs.db").write_bytes(b"thumbs")
+        (mywork / INBOX / "real_file.pdf").write_bytes(b"real")
+        (mywork / INBOX / "desktop.ini").write_bytes(b"ini")
+        (mywork / INBOX / "Thumbs.db").write_bytes(b"thumbs")
 
         items = scan_inbox(mywork)
         assert len(items) == 1
@@ -174,8 +182,8 @@ class TestScanInbox:
 
     def test_skips_temp_extensions(self, mywork: Path) -> None:
         """scan_inbox skips .tmp, .crdownload, .partial files."""
-        (mywork / "00_Inbox" / "download.crdownload").write_bytes(b"partial")
-        (mywork / "00_Inbox" / "real.pdf").write_bytes(b"real")
+        (mywork / INBOX / "download.crdownload").write_bytes(b"partial")
+        (mywork / INBOX / "real.pdf").write_bytes(b"real")
 
         items = scan_inbox(mywork)
         assert len(items) == 1
@@ -183,7 +191,7 @@ class TestScanInbox:
     def test_skips_triage_and_manifest_files(self, mywork: Path) -> None:
         """Regression: scan_inbox skips _triage_log.jsonl, _triage_schema.yaml,
         folder_manifest.yaml."""
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         (inbox / "real_file.pdf").write_bytes(b"real")
         (inbox / "_triage_log.jsonl").write_bytes(b"log")
         (inbox / "_triage_schema.yaml").write_bytes(b"schema")
@@ -194,12 +202,12 @@ class TestScanInbox:
         assert items[0].path.name == "real_file.pdf"
 
     def test_skips_infrastructure_dirs(self, mywork: Path) -> None:
-        """scan_inbox skips _Unmatched, _Staging, .corp directories."""
-        (mywork / "00_Inbox" / "real.pdf").write_bytes(b"real")
-        unmatched = mywork / "00_Inbox" / "_Unmatched"
+        """scan_inbox skips UNMATCHED, STAGING, .corp directories."""
+        (mywork / INBOX / "real.pdf").write_bytes(b"real")
+        unmatched = mywork / INBOX / UNMATCHED
         unmatched.mkdir()
         (unmatched / "quarantined.txt").write_bytes(b"q")
-        staging = mywork / "00_Inbox" / "_Staging"
+        staging = mywork / INBOX / STAGING
         staging.mkdir()
         (staging / "staged.txt").write_bytes(b"s")
 
@@ -213,7 +221,7 @@ class TestScanInbox:
         assert items == []
 
     def test_missing_inbox(self, tmp_path: Path) -> None:
-        """scan_inbox returns empty list when 00_Inbox doesn't exist."""
+        """scan_inbox returns empty list when INBOX doesn't exist."""
         items = scan_inbox(tmp_path)
         assert items == []
 
@@ -251,7 +259,7 @@ class TestIngestFile:
         registry: ContentRegistry,
     ) -> None:
         """File matching a series (high confidence) is routed directly."""
-        inbox_file = mywork / "00_Inbox" / "Cognitive_Friday_S12.pptx"
+        inbox_file = mywork / INBOX / "Cognitive_Friday_S12.pptx"
         inbox_file.write_bytes(b"pptx content")
 
         result = ingest_file(
@@ -266,7 +274,7 @@ class TestIngestFile:
         assert result.match_series == "cognitive_friday"
         assert result.confidence >= 0.9
         assert (
-            result.destination_path == "60_Source_Library/02_Training_Enablement/Cognitive_Friday"
+            result.destination_path == f"{SOURCE_LIBRARY}/02_Training_Enablement/Cognitive_Friday"
         )
         # File should have been moved
         assert not inbox_file.exists()
@@ -278,7 +286,7 @@ class TestIngestFile:
         registry: ContentRegistry,
     ) -> None:
         """Client match (0.80 confidence, >= 0.75 threshold) is routed."""
-        inbox_file = mywork / "00_Inbox" / "Lenzing_Notes.docx"
+        inbox_file = mywork / INBOX / "Lenzing_Notes.docx"
         inbox_file.write_bytes(b"docx content")
 
         result = ingest_file(
@@ -298,8 +306,8 @@ class TestIngestFile:
         ops: OpsDB,
         registry: ContentRegistry,
     ) -> None:
-        """Unrecognized file is quarantined to _Unmatched."""
-        inbox_file = mywork / "00_Inbox" / "random_stuff.txt"
+        """Unrecognized file is quarantined to UNMATCHED."""
+        inbox_file = mywork / INBOX / "random_stuff.txt"
         inbox_file.write_bytes(b"random content")
 
         result = ingest_file(
@@ -312,7 +320,7 @@ class TestIngestFile:
         assert result.action == "quarantined"
         assert result.match_method == "none"
         assert result.confidence == 0.0
-        assert result.destination_path == "00_Inbox/_Unmatched"
+        assert result.destination_path == f"{INBOX}/{UNMATCHED}"
 
     def test_file_not_found(
         self,
@@ -322,7 +330,7 @@ class TestIngestFile:
     ) -> None:
         """Non-existent file returns error result."""
         result = ingest_file(
-            mywork / "00_Inbox" / "ghost.pdf",
+            mywork / INBOX / "ghost.pdf",
             mywork,
             ops,
             registry,
@@ -338,7 +346,7 @@ class TestIngestFile:
         registry: ContentRegistry,
     ) -> None:
         """Dry run matches but doesn't move files or update ops.db."""
-        inbox_file = mywork / "00_Inbox" / "Cognitive_Friday_S15.mp4"
+        inbox_file = mywork / INBOX / "Cognitive_Friday_S15.mp4"
         inbox_file.write_bytes(b"mp4 content")
 
         result = ingest_file(
@@ -363,7 +371,7 @@ class TestIngestFile:
         registry: ContentRegistry,
     ) -> None:
         """Routed file is recorded in ops.db with correct status."""
-        inbox_file = mywork / "00_Inbox" / "Cognitive_Friday_S20.pptx"
+        inbox_file = mywork / INBOX / "Cognitive_Friday_S20.pptx"
         inbox_file.write_bytes(b"pptx content")
 
         ingest_file(inbox_file, mywork, ops, registry, extract=False)
@@ -380,14 +388,14 @@ class TestIngestFile:
     ) -> None:
         """Regression: after move, asset path in ops.db reflects the new
         location so subsequent lookups (e.g. extraction) succeed."""
-        inbox_file = mywork / "00_Inbox" / "Cognitive_Friday_S25.pptx"
+        inbox_file = mywork / INBOX / "Cognitive_Friday_S25.pptx"
         inbox_file.write_bytes(b"pptx content")
 
         ingest_file(inbox_file, mywork, ops, registry, extract=False)
 
-        old_path = "00_Inbox/Cognitive_Friday_S25.pptx"
+        old_path = f"{INBOX}/Cognitive_Friday_S25.pptx"
         new_path = (
-            "60_Source_Library/02_Training_Enablement/Cognitive_Friday/Cognitive_Friday_S25.pptx"
+            f"{SOURCE_LIBRARY}/02_Training_Enablement/Cognitive_Friday/Cognitive_Friday_S25.pptx"
         )
 
         # Old path should no longer exist in ops.db
@@ -405,11 +413,11 @@ class TestIngestFile:
         registry: ContentRegistry,
     ) -> None:
         """File with same name at destination gets a suffix."""
-        dest = mywork / "00_Inbox" / "_Unmatched"
+        dest = mywork / INBOX / UNMATCHED
         dest.mkdir(parents=True)
         (dest / "file.txt").write_bytes(b"existing")
 
-        inbox_file = mywork / "00_Inbox" / "file.txt"
+        inbox_file = mywork / INBOX / "file.txt"
         inbox_file.write_bytes(b"new content")
 
         result = ingest_file(
@@ -435,9 +443,9 @@ class TestIngestAll:
         ops: OpsDB,
         registry: ContentRegistry,
     ) -> None:
-        """ingest_all processes every file in 00_Inbox."""
-        (mywork / "00_Inbox" / "Cognitive_Friday_S10.pptx").write_bytes(b"a")
-        (mywork / "00_Inbox" / "random.txt").write_bytes(b"b")
+        """ingest_all processes every file in INBOX."""
+        (mywork / INBOX / "Cognitive_Friday_S10.pptx").write_bytes(b"a")
+        (mywork / INBOX / "random.txt").write_bytes(b"b")
 
         file_results, package_results = ingest_all(
             mywork,
@@ -458,8 +466,8 @@ class TestIngestAll:
         registry: ContentRegistry,
     ) -> None:
         """ingest_all returns both file and package results."""
-        (mywork / "00_Inbox" / "loose.txt").write_bytes(b"loose")
-        sub = mywork / "00_Inbox" / "Some_Folder"
+        (mywork / INBOX / "loose.txt").write_bytes(b"loose")
+        sub = mywork / INBOX / "Some_Folder"
         sub.mkdir()
         (sub / "inside.pdf").write_bytes(b"inside")
 
@@ -502,7 +510,7 @@ class TestIngestFolder:
         registry: ContentRegistry,
     ) -> None:
         """Folder matching Cognitive Friday series routes correctly."""
-        sub = mywork / "00_Inbox" / "Cognitive_Friday_S15_Materials"
+        sub = mywork / INBOX / "Cognitive_Friday_S15_Materials"
         sub.mkdir()
         (sub / "slides.pptx").write_bytes(b"slides")
         (sub / "recording.mp4").write_bytes(b"recording")
@@ -528,7 +536,7 @@ class TestIngestFolder:
         registry: ContentRegistry,
     ) -> None:
         """Internal folder structure is preserved after routing."""
-        sub = mywork / "00_Inbox" / "Cognitive_Friday_S20_Bundle"
+        sub = mywork / INBOX / "Cognitive_Friday_S20_Bundle"
         nested = sub / "extras"
         nested.mkdir(parents=True)
         (sub / "main.pptx").write_bytes(b"main")
@@ -554,7 +562,7 @@ class TestIngestFolder:
         registry: ContentRegistry,
     ) -> None:
         """Spaces in folder name converted to underscores."""
-        sub = mywork / "00_Inbox" / "My  Folder  Name"
+        sub = mywork / INBOX / "My  Folder  Name"
         sub.mkdir()
         (sub / "file.txt").write_bytes(b"content")
 
@@ -576,7 +584,7 @@ class TestIngestFolder:
         registry: ContentRegistry,
     ) -> None:
         """Package record created in ops.db with correct metadata."""
-        sub = mywork / "00_Inbox" / "Lenzing_Workshop"
+        sub = mywork / INBOX / "Lenzing_Workshop"
         sub.mkdir()
         (sub / "deck.pptx").write_bytes(b"deck")
         (sub / "notes.docx").write_bytes(b"notes")
@@ -602,7 +610,7 @@ class TestIngestFolder:
         registry: ContentRegistry,
     ) -> None:
         """All files inside folder registered as assets linked to package."""
-        sub = mywork / "00_Inbox" / "Lenzing_Materials"
+        sub = mywork / INBOX / "Lenzing_Materials"
         sub.mkdir()
         (sub / "a.pdf").write_bytes(b"a")
         (sub / "b.docx").write_bytes(b"b")
@@ -623,7 +631,7 @@ class TestIngestFolder:
         registry: ContentRegistry,
     ) -> None:
         """Unknown folder name goes to _Unmatched."""
-        sub = mywork / "00_Inbox" / "Random_Stuff"
+        sub = mywork / INBOX / "Random_Stuff"
         sub.mkdir()
         (sub / "file.txt").write_bytes(b"content")
 
@@ -635,7 +643,7 @@ class TestIngestFolder:
             extract=False,
         )
         assert result.action == "quarantined"
-        assert "00_Inbox/_Unmatched" in result.destination_path
+        assert f"{INBOX}/{UNMATCHED}" in result.destination_path
 
     def test_dry_run(
         self,
@@ -644,7 +652,7 @@ class TestIngestFolder:
         registry: ContentRegistry,
     ) -> None:
         """Dry run reports without moving."""
-        sub = mywork / "00_Inbox" / "Cognitive_Friday_S30"
+        sub = mywork / INBOX / "Cognitive_Friday_S30"
         sub.mkdir()
         (sub / "file.pptx").write_bytes(b"content")
 
@@ -667,7 +675,7 @@ class TestIngestFolder:
         registry: ContentRegistry,
     ) -> None:
         """Empty folder returns error result."""
-        sub = mywork / "00_Inbox" / "Empty_Folder"
+        sub = mywork / INBOX / "Empty_Folder"
         sub.mkdir()
 
         result = ingest_folder(
@@ -690,7 +698,7 @@ class TestIngestFolder:
         """Folder with depth > 3 logs warning but still proceeds."""
         import logging
 
-        sub = mywork / "00_Inbox" / "Deep_Folder"
+        sub = mywork / INBOX / "Deep_Folder"
         deep = sub / "l1" / "l2" / "l3" / "l4"
         deep.mkdir(parents=True)
         (deep / "file.txt").write_bytes(b"deep")
@@ -715,11 +723,11 @@ class TestIngestFolder:
     ) -> None:
         """Destination folder already exists → adds timestamp suffix."""
         # Pre-create destination
-        dest = mywork / "00_Inbox" / "_Unmatched" / "Existing_Folder"
+        dest = mywork / INBOX / UNMATCHED / "Existing_Folder"
         dest.mkdir(parents=True)
         (dest / "existing.txt").write_bytes(b"existing")
 
-        sub = mywork / "00_Inbox" / "Existing_Folder"
+        sub = mywork / INBOX / "Existing_Folder"
         sub.mkdir()
         (sub / "new.txt").write_bytes(b"new")
 
@@ -743,19 +751,19 @@ class TestIngestFolder:
 class TestStagingAndFinalize:
     def test_get_staged_files(self, mywork: Path) -> None:
         """get_staged_files finds files in _Staging directories."""
-        staging = mywork / "60_Source_Library" / "02_Training_Enablement" / "_Staging"
+        staging = mywork / SOURCE_LIBRARY / "02_Training_Enablement" / STAGING
         staging.mkdir(parents=True)
         (staging / "review_me.pptx").write_bytes(b"staged content")
 
         staged = get_staged_files(mywork)
         assert len(staged) == 1
         assert staged[0]["filename"] == "review_me.pptx"
-        assert "60_Source_Library/02_Training_Enablement" in staged[0]["parent_destination"]
+        assert f"{SOURCE_LIBRARY}/02_Training_Enablement" in staged[0]["parent_destination"]
 
     def test_finalize_moves_to_parent(self, mywork: Path, ops: OpsDB) -> None:
         """finalize_file moves file from _Staging to parent."""
-        dest = mywork / "50_RFP" / "_databases"
-        staging = dest / "_Staging"
+        dest = mywork / RFP / "_databases"
+        staging = dest / STAGING
         staging.mkdir(parents=True)
         staged_file = staging / "data.xlsx"
         staged_file.write_bytes(b"data content")
@@ -772,7 +780,7 @@ class TestStagingAndFinalize:
 
     def test_finalize_not_in_staging(self, mywork: Path, ops: OpsDB) -> None:
         """finalize_file returns False if file is not in _Staging dir."""
-        f = mywork / "00_Inbox" / "file.txt"
+        f = mywork / INBOX / "file.txt"
         f.write_bytes(b"not staged")
         ok = finalize_file(f, mywork, ops)
         assert ok is False

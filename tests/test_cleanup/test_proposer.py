@@ -8,6 +8,7 @@ import yaml
 from corp.cleanup.classifier import Classification
 from corp.cleanup.proposer import generate_proposals
 from corp.cleanup.scanner import FileInfo
+from corp.schema.folder_names import INBOX, TEMPLATES
 
 
 def _make_classification(name: str, action: str, dest: str, confidence: float) -> Classification:
@@ -18,8 +19,8 @@ def _make_classification(name: str, action: str, dest: str, confidence: float) -
             name=name,
             extension=Path(name).suffix,
             size_bytes=1024,
-            current_folder="00_Inbox",
-            relative_path=f"00_Inbox/{name}",
+            current_folder=INBOX,
+            relative_path=f"{INBOX}/{name}",
         ),
         action=action,
         destination_folder=dest,
@@ -32,9 +33,9 @@ def _make_classification(name: str, action: str, dest: str, confidence: float) -
 def test_generate_proposals_yaml(tmp_path):
     """Proposals written as valid YAML with required fields."""
     classifications = [
-        _make_classification("a.pptx", "move", "30_Templates/01_Presentation_Decks", 0.9),
+        _make_classification("a.pptx", "move", f"{TEMPLATES}/01_Presentation_Decks", 0.9),
         _make_classification("b.log", "delete", "DELETE", 0.8),
-        _make_classification("c.txt", "keep", "00_Inbox", 0.5),
+        _make_classification("c.txt", "keep", INBOX, 0.5),
     ]
 
     out = tmp_path / "moves.yaml"
@@ -76,7 +77,7 @@ def test_proposals_summary(tmp_path):
     classifications = [
         _make_classification("a.pptx", "move", "dest", 0.9),
         _make_classification("b.log", "delete", "DELETE", 0.8),
-        _make_classification("c.txt", "keep", "00_Inbox", 0.5),
+        _make_classification("c.txt", "keep", INBOX, 0.5),
         _make_classification("d.pptx", "move", "dest", 0.7),
     ]
 

@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 from corp.cleanup.executor import _guard_onedrive, execute_moves
+from corp.schema.folder_names import ADMIN, INBOX, RFP, SOURCE_LIBRARY
 
 
 def _write_moves(path, entries):
@@ -22,23 +23,23 @@ def test_execute_approved_only(mywork_cleanup, tmp_path):
         moves_file,
         [
             {
-                "source": "00_Inbox/Sprint Planning.pptx",
+                "source": f"{INBOX}/Sprint Planning.pptx",
                 "action": "move",
                 "destination": "20_Extra_Initiatives",
                 "proposed_name": "Sprint Planning.pptx",
                 "approved": True,
             },
             {
-                "source": "00_Inbox/MeetingNotes_Q4_Review.txt",
+                "source": f"{INBOX}/MeetingNotes_Q4_Review.txt",
                 "action": "move",
                 "destination": "20_Extra_Initiatives",
                 "proposed_name": "MeetingNotes_Q4_Review.txt",
                 "approved": False,
             },
             {
-                "source": "00_Inbox/RFP_Response_Final.txt",
+                "source": f"{INBOX}/RFP_Response_Final.txt",
                 "action": "move",
-                "destination": "50_RFP",
+                "destination": RFP,
                 "proposed_name": "RFP_Response_Final.txt",
                 "approved": None,
             },
@@ -52,8 +53,8 @@ def test_execute_approved_only(mywork_cleanup, tmp_path):
     # Approved file was moved
     assert (mywork_cleanup / "20_Extra_Initiatives" / "Sprint Planning.pptx").exists()
     # Non-approved files stay
-    assert (mywork_cleanup / "00_Inbox" / "MeetingNotes_Q4_Review.txt").exists()
-    assert (mywork_cleanup / "00_Inbox" / "RFP_Response_Final.txt").exists()
+    assert (mywork_cleanup / INBOX / "MeetingNotes_Q4_Review.txt").exists()
+    assert (mywork_cleanup / INBOX / "RFP_Response_Final.txt").exists()
 
 
 def test_execute_dry_run(mywork_cleanup, tmp_path):
@@ -63,7 +64,7 @@ def test_execute_dry_run(mywork_cleanup, tmp_path):
         moves_file,
         [
             {
-                "source": "00_Inbox/Sprint Planning.pptx",
+                "source": f"{INBOX}/Sprint Planning.pptx",
                 "action": "move",
                 "destination": "20_Extra_Initiatives",
                 "proposed_name": "Sprint Planning.pptx",
@@ -76,7 +77,7 @@ def test_execute_dry_run(mywork_cleanup, tmp_path):
 
     assert result.moved == 1  # counted but not actually moved
     # File still in original location
-    assert (mywork_cleanup / "00_Inbox" / "Sprint Planning.pptx").exists()
+    assert (mywork_cleanup / INBOX / "Sprint Planning.pptx").exists()
     assert not (mywork_cleanup / "20_Extra_Initiatives" / "Sprint Planning.pptx").exists()
 
 
@@ -87,7 +88,7 @@ def test_execute_creates_destination(mywork_cleanup, tmp_path):
         moves_file,
         [
             {
-                "source": "00_Inbox/Sprint Planning.pptx",
+                "source": f"{INBOX}/Sprint Planning.pptx",
                 "action": "move",
                 "destination": "20_Extra_Initiatives/Sprint_Planning_2026",
                 "proposed_name": "Sprint Planning.pptx",
@@ -110,7 +111,7 @@ def test_execute_delete_action(mywork_cleanup, tmp_path):
         moves_file,
         [
             {
-                "source": "60_Source_Library/02_Training_Enablement/bookmark.url",
+                "source": f"{SOURCE_LIBRARY}/02_Training_Enablement/bookmark.url",
                 "action": "delete",
                 "destination": "DELETE",
                 "proposed_name": "bookmark.url",
@@ -123,7 +124,7 @@ def test_execute_delete_action(mywork_cleanup, tmp_path):
 
     assert result.deleted == 1
     assert not (
-        mywork_cleanup / "60_Source_Library" / "02_Training_Enablement" / "bookmark.url"
+        mywork_cleanup / SOURCE_LIBRARY / "02_Training_Enablement" / "bookmark.url"
     ).exists()
 
 
@@ -134,9 +135,9 @@ def test_execute_missing_source(mywork_cleanup, tmp_path):
         moves_file,
         [
             {
-                "source": "00_Inbox/nonexistent.txt",
+                "source": f"{INBOX}/nonexistent.txt",
                 "action": "move",
-                "destination": "70_Admin",
+                "destination": ADMIN,
                 "proposed_name": "nonexistent.txt",
                 "approved": True,
             },
@@ -165,7 +166,7 @@ def test_execute_blocks_onedrive_source(tmp_path):
     """Execute refuses to act on OneDrive source paths."""
     # Create a fake mywork root that contains "OneDrive - Blue Yonder"
     onedrive_root = tmp_path / "OneDrive - Blue Yonder" / "MyWork"
-    inbox = onedrive_root / "00_Inbox"
+    inbox = onedrive_root / INBOX
     inbox.mkdir(parents=True)
     (inbox / "test.txt").write_text("test", encoding="utf-8")
 
@@ -174,7 +175,7 @@ def test_execute_blocks_onedrive_source(tmp_path):
         moves_file,
         [
             {
-                "source": "00_Inbox/test.txt",
+                "source": f"{INBOX}/test.txt",
                 "action": "delete",
                 "destination": "DELETE",
                 "proposed_name": "test.txt",
