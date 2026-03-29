@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import json
 import statistics
-import sys
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -29,11 +28,8 @@ MONOREPO = Path(__file__).resolve().parents[1]
 import logging  # noqa: E402
 
 logging.getLogger("corp.extractor.post_process").setLevel(logging.ERROR)
-FIXTURES = MONOREPO / "packages/corp-knowledge-extractor/tests/fixtures"
+FIXTURES = MONOREPO / "tests/extractor/fixtures"
 EVAL_DIR = MONOREPO / "eval"
-
-sys.path.insert(0, str(MONOREPO / "packages/corp-knowledge-extractor/src"))
-sys.path.insert(0, str(MONOREPO / "packages/corp-os-meta"))
 
 from corp.extractor.doc_type_classifier import (  # noqa: E402
     classify_doc_type_hybrid,

@@ -16,7 +16,7 @@ from pathlib import Path
 from sklearn.model_selection import train_test_split
 
 MONOREPO = Path(__file__).resolve().parents[1]
-FIXTURE = MONOREPO / "packages/corp-knowledge-extractor/tests/fixtures/classifier_training_enriched.json"
+FIXTURE = MONOREPO / "tests/extractor/fixtures/classifier_training_enriched.json"
 MODELS_DIR = MONOREPO / "models"
 
 
