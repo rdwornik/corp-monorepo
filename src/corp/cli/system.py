@@ -7,7 +7,7 @@ from rich.table import Table
 
 from corp.cli._common import console
 from corp.config import get_config
-from corp.schema.folder_names import SYSTEM
+from corp.schema.folder_names import CORP_INFRA
 from corp.schema.pipeline_config import PipelineConfig
 
 
@@ -72,7 +72,7 @@ def doctor() -> None:
         index_db_path=get_index_path(),
         ops_db_path=get_ops_db_path(),
         registry_path=cfg.repo_path / "config" / "content_registry.yaml",
-        routing_map_path=cfg.mywork_root / SYSTEM / "routing_map.yaml",
+        routing_map_path=cfg.mywork_root / CORP_INFRA / "routing_map.yaml",
     )
 
     if integrity.issues:

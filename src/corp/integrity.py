@@ -14,14 +14,14 @@ from pathlib import Path
 
 from corp.schema.folder_names import (
     ADMIN,
+    ARCHIVE,
+    COMPLIANCE,
     INBOX,
     PROJECTS,
-    RFP,
-    SOURCE_LIBRARY,
+    REFERENCE,
     STAGING,
-    SYSTEM,
-    TEMPLATES,
     UNMATCHED,
+    WORKFLOWS,
 )
 
 logger = logging.getLogger(__name__)
@@ -381,12 +381,11 @@ def _check_mywork_structure(
     required_folders = [
         INBOX,
         PROJECTS,
-        "20_Extra_Initiatives",
-        TEMPLATES,
-        RFP,
-        SOURCE_LIBRARY,
+        WORKFLOWS,
+        REFERENCE,
         ADMIN,
-        SYSTEM,
+        COMPLIANCE,
+        ARCHIVE,
     ]
 
     for folder in required_folders:

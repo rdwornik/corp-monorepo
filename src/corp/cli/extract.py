@@ -7,7 +7,7 @@ import click
 
 from corp.cli._common import console
 from corp.config import get_config
-from corp.schema.folder_names import SYSTEM
+from corp.schema.folder_names import CORP_INFRA
 
 EXTRACT_EXTENSIONS = [
     ".pptx",
@@ -53,7 +53,7 @@ def extract_command(
     mywork_root = cfg.mywork_root
 
     # Load routing
-    routing_map_path = mywork_root / SYSTEM / "routing_map.yaml"
+    routing_map_path = mywork_root / CORP_INFRA / "routing_map.yaml"
     if not routing_map_path.exists():
         console.print(f"[red]routing_map.yaml not found: {routing_map_path}[/red]")
         sys.exit(1)

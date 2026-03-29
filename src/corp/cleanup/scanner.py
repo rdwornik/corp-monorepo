@@ -11,7 +11,7 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-from corp.schema.folder_names import INBOX, RFP, SOURCE_LIBRARY
+from corp.schema.folder_names import INBOX, REF_RFP_LIBRARY, REFERENCE
 
 log = logging.getLogger(__name__)
 
@@ -77,14 +77,14 @@ def _scan_inbox(mywork_root: Path) -> list[FileInfo]:
     return results
 
 
-def _scan_source_library_junk(mywork_root: Path) -> list[FileInfo]:
-    """Scan 60_Source_Library for .url, .log, and other junk files."""
-    source_lib = mywork_root / SOURCE_LIBRARY
-    if not source_lib.is_dir():
+def _scan_reference_junk(mywork_root: Path) -> list[FileInfo]:
+    """Scan 60_Reference for .url, .log, and other junk files."""
+    reference = mywork_root / REFERENCE
+    if not reference.is_dir():
         return []
 
     results: list[FileInfo] = []
-    for dirpath, dirnames, filenames in os.walk(source_lib):
+    for dirpath, dirnames, filenames in os.walk(reference):
         # Prune skip dirs
         dirnames[:] = [d for d in dirnames if d.lower() not in _SKIP_DIRS]
         for fname in filenames:
@@ -105,21 +105,21 @@ def _scan_source_library_junk(mywork_root: Path) -> list[FileInfo]:
                     name=fname,
                     extension=ext,
                     size_bytes=size,
-                    current_folder=SOURCE_LIBRARY,
+                    current_folder=REFERENCE,
                     relative_path=rel,
                 )
             )
     return results
 
 
-def _scan_rfp_loose_files(mywork_root: Path) -> list[FileInfo]:
-    """Scan 50_RFP root for loose files (not in subfolders)."""
-    rfp = mywork_root / RFP
-    if not rfp.is_dir():
+def _scan_rfp_library_loose_files(mywork_root: Path) -> list[FileInfo]:
+    """Scan RFP_Library root for loose files (not in subfolders)."""
+    rfp_library = mywork_root / REFERENCE / REF_RFP_LIBRARY
+    if not rfp_library.is_dir():
         return []
 
     results: list[FileInfo] = []
-    for entry in sorted(rfp.iterdir()):
+    for entry in sorted(rfp_library.iterdir()):
         if not entry.is_file():
             continue
         if _is_infrastructure(entry.name):
@@ -131,7 +131,7 @@ def _scan_rfp_loose_files(mywork_root: Path) -> list[FileInfo]:
                 name=entry.name,
                 extension=entry.suffix.lower(),
                 size_bytes=entry.stat().st_size,
-                current_folder=RFP,
+                current_folder=f"{REFERENCE}/{REF_RFP_LIBRARY}",
                 relative_path=rel,
             )
         )
@@ -143,8 +143,8 @@ def scan_problematic_files(mywork_root: Path) -> list[FileInfo]:
 
     Scans:
     1. All files in 00_Inbox (except infrastructure)
-    2. Junk extension files (.url, .log, etc.) in 60_Source_Library
-    3. Loose files at root of 50_RFP
+    2. Junk extension files (.url, .log, etc.) in 60_Reference
+    3. Loose files at root of RFP_Library
     """
     mywork_root = mywork_root.resolve()
     results: list[FileInfo] = []
@@ -153,12 +153,12 @@ def scan_problematic_files(mywork_root: Path) -> list[FileInfo]:
     log.info("Inbox: %d files to triage", len(results))
 
     junk_count_before = len(results)
-    results.extend(_scan_source_library_junk(mywork_root))
-    log.info("Source Library junk: %d files", len(results) - junk_count_before)
+    results.extend(_scan_reference_junk(mywork_root))
+    log.info("Reference junk: %d files", len(results) - junk_count_before)
 
     rfp_count_before = len(results)
-    results.extend(_scan_rfp_loose_files(mywork_root))
-    log.info("RFP loose files: %d files", len(results) - rfp_count_before)
+    results.extend(_scan_rfp_library_loose_files(mywork_root))
+    log.info("RFP_Library loose files: %d files", len(results) - rfp_count_before)
 
     log.info("Total problematic files: %d", len(results))
     return results

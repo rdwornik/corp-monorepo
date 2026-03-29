@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
-from corp.schema.folder_names import SYSTEM
+from corp.schema.folder_names import CORP_INFRA
 
 logger = logging.getLogger(__name__)
 
@@ -218,7 +218,7 @@ def find_extraction_artifacts(mywork_root: Path) -> CleanupPlan:
     """
     plan = CleanupPlan()
 
-    run_dir = mywork_root / SYSTEM / ".corp" / "run"
+    run_dir = mywork_root / CORP_INFRA / "run"
     if not run_dir.exists():
         logger.info("No .corp/run/ directory found")
         return plan
