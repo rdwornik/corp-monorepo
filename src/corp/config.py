@@ -14,6 +14,8 @@ from typing import Any
 import yaml
 from dotenv import load_dotenv
 
+from corp.schema.folder_names import ARCHIVE, PROJECTS, TEMPLATES
+
 
 @dataclass(frozen=True)
 class AppConfig:
@@ -75,15 +77,15 @@ def get_config() -> AppConfig:
     )
     projects_root = os.environ.get(
         "PROJECTS_ROOT",
-        str(_home_docs / "MyWork" / "10_Projects"),
+        str(_home_docs / "MyWork" / PROJECTS),
     )
     templates_root = os.environ.get(
         "TEMPLATES_ROOT",
-        str(_home_docs / "MyWork" / "30_Templates"),
+        str(_home_docs / "MyWork" / TEMPLATES),
     )
     archive_root = os.environ.get(
         "ARCHIVE_ROOT",
-        str(_home_docs / "MyWork" / "80_Archive"),
+        str(_home_docs / "MyWork" / ARCHIVE),
     )
     app_data_path = os.environ.get(
         "APP_DATA_PATH",
