@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import pytest
+from corp.schema.folder_names import INBOX
 from corp.schema.pipeline_config import PipelineConfig
 
 
@@ -26,9 +27,9 @@ class TestSandbox:
             assert str(p).startswith(str(tmp_path)), f"{attr}={p!r} is not under tmp_root={tmp_path!r}"
 
     def test_inbox_is_derived_from_mywork(self, tmp_path):
-        """inbox_path == mywork_root / '00_Inbox'."""
+        """inbox_path == mywork_root / INBOX."""
         cfg = PipelineConfig.sandbox(tmp_path)
-        assert cfg.inbox_path == cfg.mywork_root / "00_Inbox"
+        assert cfg.inbox_path == cfg.mywork_root / INBOX
 
     def test_db_paths_derived_from_app_data(self, tmp_path):
         """All DB paths live under app_data_path."""
@@ -74,7 +75,7 @@ class TestProduction:
         monkeypatch.setenv("MYWORK_ROOT", str(tmp_path / "mw"))
         monkeypatch.setenv("APP_DATA_PATH", str(tmp_path / "ad"))
         cfg = PipelineConfig.production()
-        assert cfg.inbox_path == cfg.mywork_root / "00_Inbox"
+        assert cfg.inbox_path == cfg.mywork_root / INBOX
         assert cfg.index_db_path == cfg.app_data_path / "index.db"
 
 

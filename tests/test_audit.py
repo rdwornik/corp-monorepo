@@ -15,6 +15,14 @@ from corp.audit import (
     check_vault_coverage,
     scan_mywork,
 )
+from corp.schema.folder_names import (
+    ARCHIVE,
+    INBOX,
+    PROJECTS,
+    SOURCE_LIBRARY,
+    SYSTEM,
+    TEMPLATES,
+)
 
 
 @pytest.fixture()
@@ -22,39 +30,39 @@ def mywork_tree(tmp_path: Path) -> Path:
     """Minimal MyWork folder structure for testing."""
     mywork = tmp_path / "MyWork"
 
-    # 00_Inbox
-    inbox = mywork / "00_Inbox"
+    # INBOX
+    inbox = mywork / INBOX
     inbox.mkdir(parents=True)
     (inbox / "random_file.pptx").write_bytes(b"PK\x03\x04fake")
     (inbox / "notes.txt").write_text("Some notes", encoding="utf-8")
 
-    # 10_Projects
-    proj = mywork / "10_Projects" / "Lenzing_Planning"
+    # PROJECTS
+    proj = mywork / PROJECTS / "Lenzing_Planning"
     proj.mkdir(parents=True)
     (proj / "discovery.pptx").write_bytes(b"PK\x03\x04pptx")
     (proj / "proposal.docx").write_bytes(b"PK\x03\x04docx")
 
-    proj2 = mywork / "10_Projects" / "Honda_Planning"
+    proj2 = mywork / PROJECTS / "Honda_Planning"
     proj2.mkdir(parents=True)
     (proj2 / "demo.mp4").write_bytes(b"\x00" * 1024)
 
-    # 30_Templates
-    templates = mywork / "30_Templates" / "01_Presentations"
+    # TEMPLATES
+    templates = mywork / TEMPLATES / "01_Presentations"
     templates.mkdir(parents=True)
     (templates / "Platform Overview.pptx").write_bytes(b"PK\x03\x04tmpl")
 
-    # 60_Source_Library
-    source = mywork / "60_Source_Library"
+    # SOURCE_LIBRARY
+    source = mywork / SOURCE_LIBRARY
     source.mkdir(parents=True)
     (source / "product_docs.pdf").write_bytes(b"%PDF-1.4fake")
 
-    # 80_Archive (should be skipped)
-    archive = mywork / "80_Archive"
+    # ARCHIVE (should be skipped)
+    archive = mywork / ARCHIVE
     archive.mkdir(parents=True)
     (archive / "old_stuff.pdf").write_bytes(b"archived")
 
-    # 90_System
-    system = mywork / "90_System"
+    # SYSTEM
+    system = mywork / SYSTEM
     system.mkdir(parents=True)
 
     return mywork
@@ -96,20 +104,20 @@ class TestScan:
     def test_skips_archive(self, mywork_tree: Path) -> None:
         files = scan_mywork(mywork_tree)
         paths = [f["path"] for f in files]
-        assert not any("80_Archive" in p for p in paths)
+        assert not any(ARCHIVE in p for p in paths)
 
     def test_file_metadata(self, mywork_tree: Path) -> None:
         files = scan_mywork(mywork_tree)
         pptx = next(f for f in files if f["name"] == "random_file.pptx")
         assert pptx["ext"] == ".pptx"
-        assert pptx["folder_l1"] == "00_Inbox"
+        assert pptx["folder_l1"] == INBOX
         assert pptx["size_bytes"] > 0
         assert "modified" in pptx
 
     def test_folder_levels(self, mywork_tree: Path) -> None:
         files = scan_mywork(mywork_tree)
         disc = next(f for f in files if f["name"] == "discovery.pptx")
-        assert disc["folder_l1"] == "10_Projects"
+        assert disc["folder_l1"] == PROJECTS
         assert disc["folder_l2"] == "Lenzing_Planning"
 
     def test_forward_slashes_in_path(self, mywork_tree: Path) -> None:
@@ -162,7 +170,7 @@ class TestBuildReport:
 
     def test_duplicate_detection(self, mywork_tree: Path, vault_tree: Path) -> None:
         # Add a duplicate filename
-        dup = mywork_tree / "60_Source_Library" / "notes.txt"
+        dup = mywork_tree / SOURCE_LIBRARY / "notes.txt"
         dup.write_text("Duplicate", encoding="utf-8")
 
         files = scan_mywork(mywork_tree)

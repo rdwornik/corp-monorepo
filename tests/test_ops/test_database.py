@@ -6,6 +6,12 @@ from pathlib import Path
 
 import pytest
 from corp.ops.database import OpsDB
+from corp.schema.folder_names import (
+    INBOX,
+    PROJECTS,
+    SOURCE_LIBRARY,
+    TEMPLATES,
+)
 
 
 @pytest.fixture()
@@ -39,21 +45,21 @@ class TestAssets:
     def test_upsert_asset_new(self, db: OpsDB) -> None:
         """New asset is inserted with correct fields."""
         aid = db.upsert_asset(
-            path="10_Projects/Lenzing/demo.pptx",
+            path=f"{PROJECTS}/Lenzing/demo.pptx",
             filename="demo.pptx",
             extension=".pptx",
             size_bytes=5000,
             mtime="2026-03-14T10:00:00",
-            folder_l1="10_Projects",
+            folder_l1=PROJECTS,
             folder_l2="Lenzing",
         )
         assert isinstance(aid, int)
-        asset = db.get_asset("10_Projects/Lenzing/demo.pptx")
+        asset = db.get_asset(f"{PROJECTS}/Lenzing/demo.pptx")
         assert asset is not None
         assert asset["filename"] == "demo.pptx"
         assert asset["size_bytes"] == 5000
         assert asset["status"] == "discovered"
-        assert asset["folder_l1"] == "10_Projects"
+        assert asset["folder_l1"] == PROJECTS
         assert asset["folder_l2"] == "Lenzing"
 
     def test_upsert_asset_existing(self, db: OpsDB) -> None:
@@ -64,7 +70,7 @@ class TestAssets:
             ".txt",
             100,
             "2026-03-14T10:00:00",
-            "10_Projects",
+            PROJECTS,
         )
         db.upsert_asset(
             "test/file.txt",
@@ -72,7 +78,7 @@ class TestAssets:
             ".txt",
             200,
             "2026-03-14T11:00:00",
-            "10_Projects",
+            PROJECTS,
         )
         asset = db.get_asset("test/file.txt")
         assert asset is not None
@@ -89,20 +95,20 @@ class TestAssets:
 
     def test_get_assets_by_status(self, db: OpsDB) -> None:
         """Filter assets by status."""
-        db.upsert_asset("a.txt", "a.txt", ".txt", 10, "2026-01-01T00:00:00", "00_Inbox")
-        db.upsert_asset("b.txt", "b.txt", ".txt", 20, "2026-01-01T00:00:00", "00_Inbox")
+        db.upsert_asset("a.txt", "a.txt", ".txt", 10, "2026-01-01T00:00:00", INBOX)
+        db.upsert_asset("b.txt", "b.txt", ".txt", 20, "2026-01-01T00:00:00", INBOX)
         assets = db.get_assets_by_status("discovered")
         assert len(assets) == 2
 
     def test_get_assets_by_folder(self, db: OpsDB) -> None:
         """Filter assets by L1 folder."""
         db.upsert_asset(
-            "10_Projects/a.pdf", "a.pdf", ".pdf", 10, "2026-01-01T00:00:00", "10_Projects"
+            f"{PROJECTS}/a.pdf", "a.pdf", ".pdf", 10, "2026-01-01T00:00:00", PROJECTS
         )
         db.upsert_asset(
-            "30_Templates/b.pptx", "b.pptx", ".pptx", 20, "2026-01-01T00:00:00", "30_Templates"
+            f"{TEMPLATES}/b.pptx", "b.pptx", ".pptx", 20, "2026-01-01T00:00:00", TEMPLATES
         )
-        projects = db.get_assets_by_folder("10_Projects")
+        projects = db.get_assets_by_folder(PROJECTS)
         assert len(projects) == 1
         assert projects[0]["filename"] == "a.pdf"
 
@@ -110,11 +116,11 @@ class TestAssets:
 class TestStatusChangeLogsEvent:
     def test_asset_status_change_logs_event(self, db: OpsDB) -> None:
         """Changing asset status always creates an ingest_event."""
-        db.upsert_asset("x.pptx", "x.pptx", ".pptx", 100, "2026-01-01T00:00:00", "30_Templates")
+        db.upsert_asset("x.pptx", "x.pptx", ".pptx", 100, "2026-01-01T00:00:00", TEMPLATES)
         db.update_asset_status(
             "x.pptx",
             "routed",
-            routed_to="60_Source_Library/01_Product_Docs",
+            routed_to=f"{SOURCE_LIBRARY}/01_Product_Docs",
             routed_method="heuristic",
             routed_confidence=0.9,
             reasoning="Matched product doc pattern",
@@ -123,7 +129,7 @@ class TestStatusChangeLogsEvent:
         asset = db.get_asset("x.pptx")
         assert asset is not None
         assert asset["status"] == "routed"
-        assert asset["routed_to"] == "60_Source_Library/01_Product_Docs"
+        assert asset["routed_to"] == f"{SOURCE_LIBRARY}/01_Product_Docs"
         assert asset["routed_method"] == "heuristic"
 
         events = db.get_events_for_asset(asset["id"])
@@ -142,9 +148,9 @@ class TestUpdateAssetPath:
     def test_update_path_after_move(self, db: OpsDB) -> None:
         """Regression: update_asset_path changes the canonical path so
         subsequent lookups by new path succeed."""
-        old = "00_Inbox/report.pdf"
-        new = "60_Source_Library/01_Product_Docs/report.pdf"
-        db.upsert_asset(old, "report.pdf", ".pdf", 100, "2026-01-01T00:00:00", "00_Inbox")
+        old = f"{INBOX}/report.pdf"
+        new = f"{SOURCE_LIBRARY}/01_Product_Docs/report.pdf"
+        db.upsert_asset(old, "report.pdf", ".pdf", 100, "2026-01-01T00:00:00", INBOX)
 
         ok = db.update_asset_path(old, new)
         assert ok is True
@@ -158,9 +164,9 @@ class TestUpdateAssetPath:
 
     def test_update_path_then_status(self, db: OpsDB) -> None:
         """Regression: update_asset_status works after path is updated."""
-        old = "00_Inbox/deck.pptx"
-        new = "60_Source_Library/02_Training/deck.pptx"
-        db.upsert_asset(old, "deck.pptx", ".pptx", 500, "2026-01-01T00:00:00", "00_Inbox")
+        old = f"{INBOX}/deck.pptx"
+        new = f"{SOURCE_LIBRARY}/02_Training/deck.pptx"
+        db.upsert_asset(old, "deck.pptx", ".pptx", 500, "2026-01-01T00:00:00", INBOX)
 
         db.update_asset_path(old, new)
         db.update_asset_status(
@@ -183,20 +189,20 @@ class TestUpdateAssetPath:
     def test_update_path_normalizes_backslashes(self, db: OpsDB) -> None:
         """Backslashes in paths are normalized to forward slashes."""
         db.upsert_asset(
-            "00_Inbox/file.txt", "file.txt", ".txt", 10, "2026-01-01T00:00:00", "00_Inbox"
+            f"{INBOX}/file.txt", "file.txt", ".txt", 10, "2026-01-01T00:00:00", INBOX
         )
         ok = db.update_asset_path(
-            "00_Inbox\\file.txt",
-            "10_Projects\\file.txt",
+            f"{INBOX}\\file.txt",
+            f"{PROJECTS}\\file.txt",
         )
         assert ok is True
-        assert db.get_asset("10_Projects/file.txt") is not None
+        assert db.get_asset(f"{PROJECTS}/file.txt") is not None
 
 
 class TestRevertEvent:
     def test_revert_event(self, db: OpsDB) -> None:
         """Reverting an event marks it as reverted."""
-        db.upsert_asset("r.txt", "r.txt", ".txt", 50, "2026-01-01T00:00:00", "00_Inbox")
+        db.upsert_asset("r.txt", "r.txt", ".txt", 50, "2026-01-01T00:00:00", INBOX)
         db.update_asset_status("r.txt", "routed", routed_to="somewhere")
 
         asset = db.get_asset("r.txt")
@@ -230,7 +236,7 @@ class TestPackages:
         """Package creation with file count and size."""
         pid = db.create_package(
             folder_name="Cognitive_Friday_S12",
-            source_path="60_Source_Library/Cognitive_Friday_S12",
+            source_path=f"{SOURCE_LIBRARY}/Cognitive_Friday_S12",
             file_count=5,
             total_size=1024000,
             inferred_topic="Cognitive Planning",
@@ -257,15 +263,15 @@ class TestPackages:
 class TestStats:
     def test_get_stats(self, db: OpsDB) -> None:
         """Stats returns counts by status."""
-        db.upsert_asset("a.pdf", "a.pdf", ".pdf", 100, "2026-01-01T00:00:00", "10_Projects")
-        db.upsert_asset("b.txt", "b.txt", ".txt", 200, "2026-01-01T00:00:00", "00_Inbox")
+        db.upsert_asset("a.pdf", "a.pdf", ".pdf", 100, "2026-01-01T00:00:00", PROJECTS)
+        db.upsert_asset("b.txt", "b.txt", ".txt", 200, "2026-01-01T00:00:00", INBOX)
         db.update_asset_status("b.txt", "routed")
 
         stats = db.get_stats()
         assert stats["total_assets"] == 2
         assert stats["by_status"]["discovered"] == 1
         assert stats["by_status"]["routed"] == 1
-        assert "10_Projects" in stats["by_folder"]
+        assert PROJECTS in stats["by_folder"]
         assert ".pdf" in stats["top_extensions"]
         assert stats["total_events"] == 1  # one from update_asset_status
 
@@ -274,14 +280,14 @@ class TestForwardSlashPaths:
     def test_forward_slash_paths(self, db: OpsDB) -> None:
         """All paths stored with forward slashes, even on Windows."""
         db.upsert_asset(
-            r"10_Projects\Lenzing\file.pdf",  # Windows-style input
+            rf"{PROJECTS}\Lenzing\file.pdf",  # Windows-style input
             "file.pdf",
             ".pdf",
             100,
             "2026-01-01T00:00:00",
-            "10_Projects",
+            PROJECTS,
         )
-        asset = db.get_asset("10_Projects/Lenzing/file.pdf")
+        asset = db.get_asset(f"{PROJECTS}/Lenzing/file.pdf")
         assert asset is not None
         assert "\\" not in asset["path"]
 
@@ -299,7 +305,7 @@ class TestSuggestions:
         sid = db.add_suggestion(
             pattern="Cognitive_Friday*",
             proposed_series="cognitive_friday",
-            proposed_destination="60_Source_Library/02_Training/CF",
+            proposed_destination=f"{SOURCE_LIBRARY}/02_Training/CF",
             evidence='{"files": ["CF_S12.mp4", "CF_S13.mp4"], "count": 2}',
         )
         assert isinstance(sid, int)

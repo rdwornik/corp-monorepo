@@ -8,13 +8,14 @@ import pytest
 from corp.cli.overnight import _execute_reshape_actions
 from corp.overnight.classifier import ClassificationResult, classify_batch
 from corp.overnight.dedup import deduplicate
+from corp.schema.folder_names import INBOX, PROJECTS, RFP, SOURCE_LIBRARY, TEMPLATES
 
 
 def _make_files(n: int, prefix: str = "file") -> list[dict]:
     """Generate n scan result dicts."""
     return [
         {
-            "path": f"60_Source_Library/{prefix}_{i}.pptx",
+            "path": f"{SOURCE_LIBRARY}/{prefix}_{i}.pptx",
             "filename": f"{prefix}_{i}.pptx",
             "extension": ".pptx",
             "size_bytes": 1000 + i * 100,
@@ -40,7 +41,7 @@ class TestFullReshapeDryRun:
         files.append(
             {
                 **files[0],
-                "path": "30_Templates/file_0_copy.pptx",
+                "path": f"{TEMPLATES}/file_0_copy.pptx",
                 "filename": "file_0_copy.pptx",
             }
         )
@@ -106,13 +107,13 @@ class TestExecuteReshapeActions:
     def test_rename_uses_mywork_root(self, tmp_path: Path) -> None:
         """Rename must join mywork_root + relative current_path."""
         mywork = tmp_path / "MyWork"
-        project_dir = mywork / "10_Projects" / "Test_Client"
+        project_dir = mywork / PROJECTS / "Test_Client"
         project_dir.mkdir(parents=True)
         test_file = project_dir / "Budget Report Q2.pptx"
         test_file.write_text("test")
 
         action = ClassificationResult(
-            current_path="10_Projects/Test_Client/Budget Report Q2.pptx",
+            current_path=f"{PROJECTS}/Test_Client/Budget Report Q2.pptx",
             proposed_name="Budget_Report_Q2.pptx",
             proposed_folder=None,
             confidence=0.95,
@@ -127,15 +128,15 @@ class TestExecuteReshapeActions:
     def test_move_uses_mywork_root(self, tmp_path: Path) -> None:
         """Move must resolve both source and destination via mywork_root."""
         mywork = tmp_path / "MyWork"
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         inbox.mkdir(parents=True)
         test_file = inbox / "training_doc.pptx"
         test_file.write_text("test")
 
         action = ClassificationResult(
-            current_path="00_Inbox/training_doc.pptx",
+            current_path=f"{INBOX}/training_doc.pptx",
             proposed_name=None,
-            proposed_folder="60_Source_Library/02_Training_Enablement",
+            proposed_folder=f"{SOURCE_LIBRARY}/02_Training_Enablement",
             confidence=0.95,
             reasoning="move",
         )
@@ -143,21 +144,21 @@ class TestExecuteReshapeActions:
         _execute_reshape_actions([action], mywork)
 
         assert not test_file.exists(), "Source should be moved"
-        dest = mywork / "60_Source_Library" / "02_Training_Enablement" / "training_doc.pptx"
+        dest = mywork / SOURCE_LIBRARY / "02_Training_Enablement" / "training_doc.pptx"
         assert dest.exists(), "File should be at destination"
 
     def test_rename_and_move_combined(self, tmp_path: Path) -> None:
         """File gets renamed then moved in one action."""
         mywork = tmp_path / "MyWork"
-        inbox = mywork / "00_Inbox"
+        inbox = mywork / INBOX
         inbox.mkdir(parents=True)
         test_file = inbox / "Copy of Budget.xlsx"
         test_file.write_text("test")
 
         action = ClassificationResult(
-            current_path="00_Inbox/Copy of Budget.xlsx",
+            current_path=f"{INBOX}/Copy of Budget.xlsx",
             proposed_name="Budget.xlsx",
-            proposed_folder="50_RFP",
+            proposed_folder=RFP,
             confidence=0.92,
             reasoning="remove_copy, move",
         )
@@ -166,16 +167,16 @@ class TestExecuteReshapeActions:
 
         assert not test_file.exists()
         assert not (inbox / "Budget.xlsx").exists(), "Renamed file should also be moved"
-        assert (mywork / "50_RFP" / "Budget.xlsx").exists()
+        assert (mywork / RFP / "Budget.xlsx").exists()
 
     def test_relative_path_alone_does_not_resolve(self, tmp_path: Path) -> None:
         """Verify that relative paths alone can't accidentally find files."""
         mywork = tmp_path / "MyWork"
-        project_dir = mywork / "10_Projects" / "Client"
+        project_dir = mywork / PROJECTS / "Client"
         project_dir.mkdir(parents=True)
         (project_dir / "file.pptx").write_text("test")
 
-        relative = Path("10_Projects/Client/file.pptx")
+        relative = Path(f"{PROJECTS}/Client/file.pptx")
         assert not relative.exists(), "Relative path must not resolve without mywork_root"
 
     def test_rejects_non_absolute_mywork_root(self, tmp_path: Path) -> None:

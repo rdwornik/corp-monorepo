@@ -18,6 +18,7 @@ from corp.built_in_actions import (
 )
 from corp.config import get_config
 from corp.models import VaultZone
+from corp.schema.folder_names import INBOX
 
 # --- Test: Action Registry ---
 
@@ -258,7 +259,7 @@ class TestScanInbox:
 
     def test_scan_with_files(self, app_config, tmp_path: Path) -> None:
         # Create a fake inbox
-        inbox = get_config().projects_root.parent / "00_Inbox"
+        inbox = get_config().projects_root.parent / INBOX
         inbox.mkdir(parents=True, exist_ok=True)
         (inbox / "test.pdf").write_text("fake pdf", encoding="utf-8")
         (inbox / "notes.md").write_text("# Notes", encoding="utf-8")

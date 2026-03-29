@@ -15,6 +15,14 @@ from corp.ingest.llm_classifier import (
 )
 from corp.ops.database import OpsDB
 from corp.ops.registry import ContentRegistry
+from corp.schema.folder_names import (
+    ADMIN,
+    INBOX,
+    PROJECTS,
+    RFP,
+    SOURCE_LIBRARY,
+    UNMATCHED,
+)
 
 
 @pytest.fixture()
@@ -24,7 +32,7 @@ def registry(tmp_path: Path) -> ContentRegistry:
         "series": {
             "cognitive_friday": {
                 "display_name": "Cognitive Friday",
-                "destination": "60_Source_Library/02_Training_Enablement/Cognitive_Friday",
+                "destination": f"{SOURCE_LIBRARY}/02_Training_Enablement/Cognitive_Friday",
                 "naming_patterns": ["Cognitive_Friday*"],
             },
         },
@@ -32,12 +40,12 @@ def registry(tmp_path: Path) -> ContentRegistry:
             {
                 "name": "RFP databases",
                 "match": {"filename_contains": ["RFP_Database"]},
-                "destination": "50_RFP/_databases",
+                "destination": f"{RFP}/_databases",
             },
         ],
         "client_patterns": [],
         "fallback": {
-            "unknown_destination": "00_Inbox/_Unmatched",
+            "unknown_destination": f"{INBOX}/{UNMATCHED}",
             "confidence_threshold": 0.75,
         },
     }
@@ -57,23 +65,23 @@ def ops(tmp_path: Path) -> OpsDB:
 class TestParseLlmJson:
     def test_direct_json(self) -> None:
         """Parses plain JSON string."""
-        result = _parse_llm_json('{"destination": "10_Projects", "confidence": 0.8}')
+        result = _parse_llm_json(f'{{"destination": "{PROJECTS}", "confidence": 0.8}}')
         assert result is not None
-        assert result["destination"] == "10_Projects"
+        assert result["destination"] == PROJECTS
 
     def test_code_fence_json(self) -> None:
         """Parses JSON inside markdown code fence."""
-        raw = '```json\n{"destination": "50_RFP", "confidence": 0.7}\n```'
+        raw = f'```json\n{{"destination": "{RFP}", "confidence": 0.7}}\n```'
         result = _parse_llm_json(raw)
         assert result is not None
-        assert result["destination"] == "50_RFP"
+        assert result["destination"] == RFP
 
     def test_json_with_prose(self) -> None:
         """Extracts JSON from surrounding prose."""
-        raw = 'Here is my analysis:\n{"destination": "10_Projects", "confidence": 0.6}\nDone.'
+        raw = f'Here is my analysis:\n{{"destination": "{PROJECTS}", "confidence": 0.6}}\nDone.'
         result = _parse_llm_json(raw)
         assert result is not None
-        assert result["destination"] == "10_Projects"
+        assert result["destination"] == PROJECTS
 
     def test_unparseable(self) -> None:
         """Returns None for garbage input."""
@@ -88,11 +96,13 @@ class TestClassifyFileLlm:
     def test_parses_valid_response(self) -> None:
         """classify_file_llm parses valid JSON from mocked Gemini."""
         mock_response = MagicMock()
+        destination = f"{SOURCE_LIBRARY}/01_Product_Docs"
         mock_response.text = (  # noqa: E501
-            '{"destination": "60_Source_Library/01_Product_Docs", '
+            f'{{"destination": "{destination}", '
             '"series_id": null, "topics": ["WMS"], '
             '"source_category": "product_doc", "confidence": 0.75, '
-            '"reasoning": "Architecture doc"}'
+            '"reasoning": "Architecture doc"'
+            '}'
         )
 
         mock_client = MagicMock()
@@ -104,12 +114,12 @@ class TestClassifyFileLlm:
                 "Architecture_Overview.pdf",
                 ".pdf",
                 2.5,
-                "00_Inbox",
+                INBOX,
                 None,
-                ["60_Source_Library/01_Product_Docs"],
+                [f"{SOURCE_LIBRARY}/01_Product_Docs"],
             )
 
-        assert result.destination == "60_Source_Library/01_Product_Docs"
+        assert result.destination == f"{SOURCE_LIBRARY}/01_Product_Docs"
         assert result.source_category == "product_doc"
         assert result.confidence == 0.75
 
@@ -117,7 +127,7 @@ class TestClassifyFileLlm:
         """LLM confidence is capped at 0.85."""
         mock_response = MagicMock()
         mock_response.text = (
-            '{"destination": "10_Projects", "confidence": 0.99, "reasoning": "Very sure"}'
+            f'{{"destination": "{PROJECTS}", "confidence": 0.99, "reasoning": "Very sure"}}'
         )
 
         mock_client = MagicMock()
@@ -129,7 +139,7 @@ class TestClassifyFileLlm:
                 "test.pdf",
                 ".pdf",
                 1.0,
-                "00_Inbox",
+                INBOX,
                 None,
                 [],
             )
@@ -150,12 +160,12 @@ class TestClassifyFileLlm:
                 "mystery.bin",
                 ".bin",
                 0.5,
-                "00_Inbox",
+                INBOX,
                 None,
                 [],
             )
 
-        assert result.destination == "00_Inbox/_Unmatched"
+        assert result.destination == f"{INBOX}/{UNMATCHED}"
         assert result.confidence == 0.0
 
     def test_handles_api_error(self) -> None:
@@ -169,12 +179,12 @@ class TestClassifyFileLlm:
                 "test.pdf",
                 ".pdf",
                 1.0,
-                "00_Inbox",
+                INBOX,
                 None,
                 [],
             )
 
-        assert result.destination == "00_Inbox/_Unmatched"
+        assert result.destination == f"{INBOX}/{UNMATCHED}"
         assert result.confidence == 0.0
         assert "API error" in result.reasoning
 
@@ -185,11 +195,11 @@ class TestClassifyFileLlm:
                 "test.pdf",
                 ".pdf",
                 1.0,
-                "00_Inbox",
+                INBOX,
                 None,
                 [],
             )
-            assert result.destination == "00_Inbox/_Unmatched"
+            assert result.destination == f"{INBOX}/{UNMATCHED}"
             assert result.confidence == 0.0
 
 
@@ -197,16 +207,16 @@ class TestClassifyQuarantinedBatch:
     def _add_quarantined(self, ops: OpsDB, filename: str) -> None:
         """Helper to add a quarantined asset to ops.db."""
         ops.upsert_asset(
-            path=f"00_Inbox/_Unmatched/{filename}",
+            path=f"{INBOX}/{UNMATCHED}/{filename}",
             filename=filename,
             extension=Path(filename).suffix,
             size_bytes=1024,
             mtime="2026-03-14T10:00:00",
-            folder_l1="00_Inbox",
-            folder_l2="_Unmatched",
+            folder_l1=INBOX,
+            folder_l2=UNMATCHED,
         )
         ops.update_asset_status(
-            f"00_Inbox/_Unmatched/{filename}",
+            f"{INBOX}/{UNMATCHED}/{filename}",
             "quarantined",
         )
 
@@ -223,7 +233,7 @@ class TestClassifyQuarantinedBatch:
 
         mock_response = MagicMock()
         mock_response.text = (
-            '{"destination": "00_Inbox/_Unmatched", "confidence": 0.3, "reasoning": "unsure"}'
+            f'{{"destination": "{INBOX}/{UNMATCHED}", "confidence": 0.3, "reasoning": "unsure"}}'
         )
         mock_client = MagicMock()
         mock_client.models.generate_content.return_value = mock_response
@@ -251,14 +261,15 @@ class TestClassifyQuarantinedBatch:
         self._add_quarantined(ops, "test.pdf")
 
         # Create the actual file
-        unmatched = tmp_path / "00_Inbox" / "_Unmatched"
+        unmatched = tmp_path / INBOX / UNMATCHED
         unmatched.mkdir(parents=True)
         (unmatched / "test.pdf").write_bytes(b"content")
 
         mock_response = MagicMock()
+        destination = f"{SOURCE_LIBRARY}/01_Product_Docs"
         mock_response.text = (  # noqa: E501
-            '{"destination": "60_Source_Library/01_Product_Docs", '
-            '"confidence": 0.7, "reasoning": "looks like product doc"}'
+            f'{{"destination": "{destination}", '
+            f'"confidence": 0.7, "reasoning": "looks like product doc"}}'
         )
         mock_client = MagicMock()
         mock_client.models.generate_content.return_value = mock_response
@@ -276,7 +287,7 @@ class TestClassifyQuarantinedBatch:
         # File should still be in _Unmatched
         assert (unmatched / "test.pdf").exists()
         # Status should still be quarantined
-        asset = ops.get_asset("00_Inbox/_Unmatched/test.pdf")
+        asset = ops.get_asset(f"{INBOX}/{UNMATCHED}/test.pdf")
         assert asset["status"] == "quarantined"
 
     def test_no_quarantined(
@@ -303,12 +314,12 @@ class TestGetAllDestinations:
         """All valid destinations extracted from registry + standard folders."""
         dests = _get_all_destinations(registry)
         # From series
-        assert "60_Source_Library/02_Training_Enablement/Cognitive_Friday" in dests
+        assert f"{SOURCE_LIBRARY}/02_Training_Enablement/Cognitive_Friday" in dests
         # From rules
-        assert "50_RFP/_databases" in dests
+        assert f"{RFP}/_databases" in dests
         # Standard
-        assert "10_Projects" in dests
-        assert "70_Admin" in dests
+        assert PROJECTS in dests
+        assert ADMIN in dests
 
     def test_returns_sorted(self, registry: ContentRegistry) -> None:
         """Destinations are returned sorted."""

@@ -10,10 +10,17 @@ from corp.overnight.classifier import (
     classify_from_metadata,
     generate_filename,
 )
+from corp.schema.folder_names import (
+    INBOX,
+    PROJECTS,
+    RFP,
+    SOURCE_LIBRARY,
+    TEMPLATES,
+)
 
 
 def _make_scan_result(
-    path: str = "60_Source_Library/doc.pptx",
+    path: str = f"{SOURCE_LIBRARY}/doc.pptx",
     extension: str = ".pptx",
     title: str | None = "Platform Architecture Overview",
     text_preview: str = "Blue Yonder platform services architecture",
@@ -43,8 +50,8 @@ def _make_scan_result(
 
 ROUTING_MAP: dict = {
     "folders": {
-        "30_Templates": {"vault_target": "05_templates"},
-        "60_Source_Library": {"vault_target": "04_evergreen"},
+        TEMPLATES: {"vault_target": "05_templates"},
+        SOURCE_LIBRARY: {"vault_target": "04_evergreen"},
     },
 }
 
@@ -59,7 +66,7 @@ class TestProposeRename:
             "Budget Report Q2",
             ".xlsx",
             {},
-            "60_Source_Library/Budget Report Q2.xlsx",
+            f"{SOURCE_LIBRARY}/Budget Report Q2.xlsx",
         )
         assert action == "space_cleanup"
         assert name == "Budget_Report_Q2.xlsx"
@@ -71,7 +78,7 @@ class TestProposeRename:
             "Copy of Budget",
             ".xlsx",
             {},
-            "00_Inbox/Copy of Budget.xlsx",
+            f"{INBOX}/Copy of Budget.xlsx",
         )
         assert action == "remove_copy"
         assert name == "Budget.xlsx"
@@ -83,7 +90,7 @@ class TestProposeRename:
             "Budget - Copy",
             ".xlsx",
             {},
-            "00_Inbox/Budget - Copy.xlsx",
+            f"{INBOX}/Budget - Copy.xlsx",
         )
         assert action == "remove_copy"
         assert name == "Budget.xlsx"
@@ -95,7 +102,7 @@ class TestProposeRename:
             "Budget (1)",
             ".xlsx",
             {},
-            "00_Inbox/Budget (1).xlsx",
+            f"{INBOX}/Budget (1).xlsx",
         )
         assert action == "remove_copy"
         assert name == "Budget.xlsx"
@@ -107,7 +114,7 @@ class TestProposeRename:
             "Presentation",
             ".pptx",
             {},
-            "10_Projects/Lenzing_Planning/Presentation.pptx",
+            f"{PROJECTS}/Lenzing_Planning/Presentation.pptx",
         )
         assert action == "enrich_generic"
         assert "Lenzing_Planning" in name
@@ -120,7 +127,7 @@ class TestProposeRename:
             "WMS_Best_Practices",
             ".pptx",
             {},
-            "60_Source_Library/WMS_Best_Practices.pptx",
+            f"{SOURCE_LIBRARY}/WMS_Best_Practices.pptx",
         )
         assert action == "skip"
         assert name is None
@@ -145,7 +152,7 @@ class TestProposeRename:
             "WMS_Architecture_Deck",
             ".pptx",
             {"title": "Something Completely Different"},
-            "60_Source_Library/WMS_Architecture_Deck.pptx",
+            f"{SOURCE_LIBRARY}/WMS_Architecture_Deck.pptx",
         )
         assert action == "skip"
         assert name is None
@@ -157,7 +164,7 @@ class TestProposeRename:
 class TestFolderRules:
     def test_pinned_project_files_never_move(self) -> None:
         sr = _make_scan_result(
-            path="10_Projects/Lenzing_Planning/demo.pptx",
+            path=f"{PROJECTS}/Lenzing_Planning/demo.pptx",
             text_preview="training exercise lab hands-on",
         )
         result = classify_from_metadata(sr, ROUTING_MAP)
@@ -165,7 +172,7 @@ class TestFolderRules:
 
     def test_pinned_initiative_files_never_move(self) -> None:
         sr = _make_scan_result(
-            path="20_Extra_Initiatives/side_project/notes.docx",
+            path="20_Extra_Initiatives/side_project/notes.docx",  # Extra folder not in constants
             text_preview="rfp request for proposal",
         )
         result = classify_from_metadata(sr, ROUTING_MAP)
@@ -173,7 +180,7 @@ class TestFolderRules:
 
     def test_inbox_files_can_move(self) -> None:
         sr = _make_scan_result(
-            path="00_Inbox/training doc.pptx",
+            path=f"{INBOX}/training doc.pptx",
             text_preview="training exercise lab hands-on workshop",
         )
         result = classify_from_metadata(sr, ROUTING_MAP)
@@ -182,16 +189,16 @@ class TestFolderRules:
 
     def test_inbox_rfp_routes_correctly(self) -> None:
         sr = _make_scan_result(
-            path="00_Inbox/client_rfp.docx",
+            path=f"{INBOX}/client_rfp.docx",
             text_preview="rfp request for proposal response template",
         )
         result = classify_from_metadata(sr, ROUTING_MAP)
-        assert result.proposed_folder == "50_RFP"
+        assert result.proposed_folder == RFP
 
     def test_non_inbox_non_pinned_no_move(self) -> None:
-        """Files in 60_Source_Library etc. shouldn't be moved either."""
+        """Files in SOURCE_LIBRARY etc. shouldn't be moved either."""
         sr = _make_scan_result(
-            path="60_Source_Library/doc.pptx",
+            path=f"{SOURCE_LIBRARY}/doc.pptx",
             text_preview="training exercise lab hands-on workshop",
         )
         result = classify_from_metadata(sr, ROUTING_MAP)
@@ -205,9 +212,9 @@ class TestClassifyBatch:
     def test_batch_only_returns_actionable(self) -> None:
         """classify_batch should only return files that need action."""
         files = [
-            _make_scan_result(path="60_Source_Library/Good_Name.pptx"),
-            _make_scan_result(path="60_Source_Library/Also Fine.pptx"),
-            _make_scan_result(path="60_Source_Library/Another_Clean.pptx"),
+            _make_scan_result(path=f"{SOURCE_LIBRARY}/Good_Name.pptx"),
+            _make_scan_result(path=f"{SOURCE_LIBRARY}/Also Fine.pptx"),
+            _make_scan_result(path=f"{SOURCE_LIBRARY}/Another_Clean.pptx"),
         ]
         results = classify_batch(files, ROUTING_MAP)
         # "Also Fine.pptx" has a space → space_cleanup action
@@ -217,8 +224,8 @@ class TestClassifyBatch:
 
     def test_batch_empty_for_clean_files(self) -> None:
         files = [
-            _make_scan_result(path="60_Source_Library/Clean_Name.pptx"),
-            _make_scan_result(path="60_Source_Library/Another_Clean.pptx"),
+            _make_scan_result(path=f"{SOURCE_LIBRARY}/Clean_Name.pptx"),
+            _make_scan_result(path=f"{SOURCE_LIBRARY}/Another_Clean.pptx"),
         ]
         results = classify_batch(files, ROUTING_MAP)
         assert len(results) == 0
@@ -226,7 +233,7 @@ class TestClassifyBatch:
     def test_batch_includes_moves_from_inbox(self) -> None:
         files = [
             _make_scan_result(
-                path="00_Inbox/demo script.pptx",
+                path=f"{INBOX}/demo script.pptx",
                 text_preview="demo script demo scenario click path",
             ),
         ]

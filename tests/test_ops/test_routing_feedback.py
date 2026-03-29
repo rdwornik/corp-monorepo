@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 from corp.ops.database import OpsDB
+from corp.schema.folder_names import PROJECTS, RFP
 
 
 @pytest.fixture()
@@ -22,9 +23,9 @@ def _log(db: OpsDB, **kwargs) -> None:
         "filename": "test.pdf",
         "extension": ".pdf",
         "file_size_bytes": 1024,
-        "classifier_destination": "50_RFP",
+        "classifier_destination": RFP,
         "classifier_confidence": 0.85,
-        "final_destination": "50_RFP",
+        "final_destination": RFP,
         "was_overridden": False,
         "routing_method": "classifier_auto",
         "user_context": None,
@@ -55,7 +56,7 @@ class TestLogRoutingDecision:
             file_size_bytes=1024,
             classifier_destination=None,
             classifier_confidence=None,
-            final_destination="50_RFP",
+            final_destination=RFP,
             was_overridden=False,
             routing_method="classifier_auto",
         )
@@ -144,21 +145,21 @@ class TestRoutingStats:
         _log(
             db,
             filename="a.pdf",
-            final_destination="50_RFP",
+            final_destination=RFP,
             routing_method="manual_override",
             was_overridden=True,
         )
         _log(
             db,
             filename="b.pdf",
-            final_destination="50_RFP",
+            final_destination=RFP,
             routing_method="manual_override",
             was_overridden=True,
         )
         _log(
             db,
             filename="c.pdf",
-            final_destination="10_Projects/JLR",
+            final_destination=f"{PROJECTS}/JLR",
             routing_method="manual_override",
             was_overridden=True,
         )

@@ -8,27 +8,28 @@ from unittest.mock import MagicMock, patch
 import yaml
 from click.testing import CliRunner
 from corp.cli import cli
+from corp.schema.folder_names import INBOX, PROJECTS, SYSTEM, TEMPLATES
 
 
 def _mock_config(mywork_root: Path) -> MagicMock:
     """Create a mock config pointing at the given MyWork root."""
     cfg = MagicMock()
     cfg.mywork_root = mywork_root
-    cfg.projects_root = mywork_root / "10_Projects"
+    cfg.projects_root = mywork_root / PROJECTS
     cfg.vault_path = mywork_root / "vault"
     cfg.app_data_path = mywork_root / "_appdata"
     return cfg
 
 
 def _write_routing_map(mywork_root: Path, routes: dict | None = None) -> None:
-    """Write routing_map.yaml into 90_System/."""
-    system_dir = mywork_root / "90_System"
+    """Write routing_map.yaml into SYSTEM/."""
+    system_dir = mywork_root / SYSTEM
     system_dir.mkdir(parents=True, exist_ok=True)
     data = {
         "version": "1.0",
         "routes": routes
         or {
-            "30_Templates": {
+            TEMPLATES: {
                 "vault_target": "04_evergreen/_generated/template",
                 "provenance": "template",
                 "subfolders": {
@@ -53,15 +54,15 @@ def test_extract_dry_run_no_cke_call(mock_config, mywork_tree):
     mock_config.return_value = cfg
     _write_routing_map(mywork_tree)
 
-    # Ensure 10_Projects exists for projects_root
-    (mywork_tree / "10_Projects").mkdir(parents=True, exist_ok=True)
+    # Ensure PROJECTS exists for projects_root
+    (mywork_tree / PROJECTS).mkdir(parents=True, exist_ok=True)
 
     runner = CliRunner()
     result = runner.invoke(
         cli,
         [
             "extract",
-            str(mywork_tree / "30_Templates" / "01_Presentation_Decks"),
+            str(mywork_tree / TEMPLATES / "01_Presentation_Decks"),
             "--dry-run",
         ],
     )
@@ -79,17 +80,17 @@ def test_extract_disabled_folder(mock_config, mywork_tree):
     _write_routing_map(
         mywork_tree,
         routes={
-            "00_Inbox": {
+            INBOX: {
                 "vault_target": "inbox",
                 "provenance": "inbox",
             },
         },
     )
 
-    (mywork_tree / "10_Projects").mkdir(parents=True, exist_ok=True)
+    (mywork_tree / PROJECTS).mkdir(parents=True, exist_ok=True)
 
     runner = CliRunner()
-    result = runner.invoke(cli, ["extract", str(mywork_tree / "00_Inbox")])
+    result = runner.invoke(cli, ["extract", str(mywork_tree / INBOX)])
 
     # Should fail because extraction is disabled in folder_manifest.yaml
     assert result.exit_code != 0

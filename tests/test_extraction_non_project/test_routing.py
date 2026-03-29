@@ -7,11 +7,12 @@ from corp.extraction.routing import (
     RoutingError,
     resolve_route,
 )
+from corp.schema.folder_names import SOURCE_LIBRARY, TEMPLATES
 
 
 def test_resolve_route_templates(routing_map, mywork_tree):
-    """30_Templates/ resolves to template provenance."""
-    folder = mywork_tree / "30_Templates"
+    """TEMPLATES/ resolves to template provenance."""
+    folder = mywork_tree / TEMPLATES
     info = resolve_route(folder, routing_map, mywork_root=mywork_tree)
     assert info.provenance_scope == "template"
     assert info.vault_target == "04_evergreen/_generated/template"
@@ -20,8 +21,8 @@ def test_resolve_route_templates(routing_map, mywork_tree):
 
 
 def test_resolve_route_subfolder(routing_map, mywork_tree):
-    """30_Templates/01_Presentation_Decks/ gets subfolder-specific source_category."""
-    folder = mywork_tree / "30_Templates" / "01_Presentation_Decks"
+    """TEMPLATES/01_Presentation_Decks/ gets subfolder-specific source_category."""
+    folder = mywork_tree / TEMPLATES / "01_Presentation_Decks"
     info = resolve_route(folder, routing_map, mywork_root=mywork_tree)
     assert info.source_category == "presentation"
     # presentation maps to template scope via provenance_map
@@ -29,16 +30,16 @@ def test_resolve_route_subfolder(routing_map, mywork_tree):
 
 
 def test_resolve_route_source_library(routing_map, mywork_tree):
-    """60_Source_Library/ resolves to evergreen provenance."""
-    folder = mywork_tree / "60_Source_Library"
+    """SOURCE_LIBRARY/ resolves to evergreen provenance."""
+    folder = mywork_tree / SOURCE_LIBRARY
     info = resolve_route(folder, routing_map, mywork_root=mywork_tree)
     assert info.provenance_scope == "evergreen"
     assert info.source_category == "evergreen"
 
 
 def test_resolve_route_source_library_subfolder(routing_map, mywork_tree):
-    """60_Source_Library/01_Product_Docs/ gets product_doc source_category."""
-    folder = mywork_tree / "60_Source_Library" / "01_Product_Docs"
+    """SOURCE_LIBRARY/01_Product_Docs/ gets product_doc source_category."""
+    folder = mywork_tree / SOURCE_LIBRARY / "01_Product_Docs"
     info = resolve_route(folder, routing_map, mywork_root=mywork_tree)
     assert info.source_category == "product_doc"
     assert info.provenance_scope == "evergreen"

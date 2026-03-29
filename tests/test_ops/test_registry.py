@@ -7,6 +7,13 @@ from pathlib import Path
 import pytest
 import yaml
 from corp.ops.registry import ContentRegistry
+from corp.schema.folder_names import (
+    INBOX,
+    PROJECTS,
+    RFP,
+    SOURCE_LIBRARY,
+    UNMATCHED,
+)
 
 
 @pytest.fixture()
@@ -17,7 +24,7 @@ def registry_path(tmp_path: Path) -> Path:
         "series": {
             "cognitive_friday": {
                 "display_name": "Cognitive Friday",
-                "destination": "60_Source_Library/02_Training_Enablement/Cognitive_Friday",
+                "destination": f"{SOURCE_LIBRARY}/02_Training_Enablement/Cognitive_Friday",
                 "naming_patterns": [
                     "Cognitive_Friday*",
                     "Cognitive_Fridays*",
@@ -31,7 +38,7 @@ def registry_path(tmp_path: Path) -> Path:
             },
             "lighthouse_program": {
                 "display_name": "Lighthouse Program",
-                "destination": "60_Source_Library/02_Training_Enablement/Lighthouse",
+                "destination": f"{SOURCE_LIBRARY}/02_Training_Enablement/Lighthouse",
                 "naming_patterns": ["Lighthouse*"],
                 "default_metadata": {
                     "source_category": "training",
@@ -45,7 +52,7 @@ def registry_path(tmp_path: Path) -> Path:
                     "filename_contains": ["RFP_Database"],
                     "extensions": [".xlsx", ".csv"],
                 },
-                "destination": "50_RFP/_databases",
+                "destination": f"{RFP}/_databases",
                 "metadata": {"source_category": "rfp"},
             },
             {
@@ -54,7 +61,7 @@ def registry_path(tmp_path: Path) -> Path:
                     "filename_contains": ["ISO_27001", "SOC_2"],
                     "extensions": [".pdf"],
                 },
-                "destination": "50_RFP/Certificate",
+                "destination": f"{RFP}/Certificate",
                 "metadata": {"source_category": "security_compliance"},
             },
             {
@@ -64,7 +71,7 @@ def registry_path(tmp_path: Path) -> Path:
                     "extensions": [".pdf", ".pptx"],
                     "folder_hint": "01_Product_Docs",
                 },
-                "destination": "60_Source_Library/01_Product_Docs",
+                "destination": f"{SOURCE_LIBRARY}/01_Product_Docs",
                 "metadata": {"source_category": "product_doc"},
             },
         ],
@@ -74,7 +81,7 @@ def registry_path(tmp_path: Path) -> Path:
             {"pattern": "Jaguar|JLR", "project": "Jaguar_Land_Rover_TMS_WMS_OMS"},
         ],
         "fallback": {
-            "unknown_destination": "00_Inbox/_Unmatched",
+            "unknown_destination": f"{INBOX}/{UNMATCHED}",
             "confidence_threshold": 0.75,
             "llm_escalation_threshold": 0.50,
         },
@@ -97,7 +104,7 @@ class TestSeriesMatch:
         assert result.series_id == "cognitive_friday"
         assert result.confidence >= 0.9
         assert result.method == "series"
-        assert result.destination == "60_Source_Library/02_Training_Enablement/Cognitive_Friday"
+        assert result.destination == f"{SOURCE_LIBRARY}/02_Training_Enablement/Cognitive_Friday"
 
     def test_match_cognitive_friday_space(self, registry: ContentRegistry) -> None:
         """Filename with spaces matches underscore pattern."""
@@ -130,7 +137,7 @@ class TestRuleMatch:
         result = registry.match_file("WMS_RFP_Database_v3.xlsx", ".xlsx")
         assert result.matched is True
         assert result.rule_name == "RFP databases"
-        assert result.destination == "50_RFP/_databases"
+        assert result.destination == f"{RFP}/_databases"
         assert result.method == "rule"
 
     def test_match_security_doc(self, registry: ContentRegistry) -> None:
@@ -194,7 +201,7 @@ class TestRuleMatch:
         result = registry.match_file(
             "Blue_Yonder_Warehouse_Management_Architecture_v2.docx",
             ".docx",
-            folder_context="00_Inbox",
+            folder_context=INBOX,
         )
         assert result.matched is True
         assert result.rule_name == "Product documentation"
@@ -207,7 +214,7 @@ class TestClientMatch:
         result = registry.match_file("Lenzing_Discovery_Notes.docx", ".docx")
         assert result.matched is True
         assert result.method == "client"
-        assert result.destination == "10_Projects/Lenzing_Planning"
+        assert result.destination == f"{PROJECTS}/Lenzing_Planning"
         assert result.confidence == 0.80
 
     def test_match_client_regex(self, registry: ContentRegistry) -> None:
@@ -249,7 +256,7 @@ class TestNoMatch:
         assert result.matched is False
         assert result.confidence == 0.0
         assert result.method == "none"
-        assert result.destination == "00_Inbox/_Unmatched"
+        assert result.destination == f"{INBOX}/{UNMATCHED}"
 
 
 class TestFolderMatch:
