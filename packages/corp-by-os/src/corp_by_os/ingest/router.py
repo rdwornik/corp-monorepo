@@ -602,7 +602,7 @@ def _run_package_extraction(
 
     Returns total API cost.
     """
-    from corp_by_os.extraction.non_project.manifest_emitter import (
+    from corp_by_os.extraction.manifest_emitter import (
         _make_entry_id,
         _resolve_doc_type,
     )
@@ -692,7 +692,7 @@ def _run_extraction(
 
     Returns (vault_note_path | None, cost).
     """
-    from corp_by_os.extraction.non_project.manifest_emitter import (
+    from corp_by_os.extraction.manifest_emitter import (
         _make_entry_id,
         _resolve_doc_type,
     )

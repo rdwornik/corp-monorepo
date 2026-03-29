@@ -110,7 +110,7 @@ def validate_manifest(
         # routing_confidence: 0.0-1.0
         confidence = entry.get("routing_confidence")
         if confidence is not None:
-            if not isinstance(confidence, (int, float)) or not (0.0 <= confidence <= 1.0):
+            if not isinstance(confidence, int | float) or not (0.0 <= confidence <= 1.0):
                 errors.append(f"{prefix}: routing_confidence must be 0.0-1.0, got {confidence!r}")
 
         # File existence check

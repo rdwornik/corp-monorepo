@@ -117,7 +117,7 @@ def _run_folder_extraction(
             console.print(f"  [yellow]Skipping {folder_name} (not found)[/yellow]")
             continue
 
-        from corp_by_os.extraction.non_project.scanner import scan_folder
+        from corp_by_os.extraction.scanner import scan_folder
 
         results = scan_folder(folder_path, allow_extensions=EXTRACT_EXTENSIONS)
         safe_count = 0
@@ -160,9 +160,9 @@ def _run_folder_extraction(
 
     # Build per-folder manifests and extract
     import yaml
-    from corp_by_os.extraction.non_project.folder_policy import PolicyError, load_policy
-    from corp_by_os.extraction.non_project.manifest_emitter import build_manifest, write_manifest
-    from corp_by_os.extraction.non_project.routing import resolve_route
+    from corp_by_os.extraction.folder_policy import PolicyError, load_policy
+    from corp_by_os.extraction.manifest_emitter import build_manifest, write_manifest
+    from corp_by_os.extraction.routing import resolve_route
     from corp_by_os.extraction.vault_writer import move_to_vault
     from corp_by_os.overnight.cke_client import extract_batch, extract_sync
 

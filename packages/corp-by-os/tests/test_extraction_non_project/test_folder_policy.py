@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import pytest
-
-from corp_by_os.extraction.non_project.folder_policy import (
+from corp_by_os.extraction.folder_policy import (
     PolicyError,
     load_policy,
 )

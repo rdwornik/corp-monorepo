@@ -380,7 +380,7 @@ def _test_extract(
     When record=True, saves per-file fixture JSONs to _RECORDED_DIR and
     writes a manifest.json with model, date, and total cost.
     """
-    from corp_by_os.extraction.non_project.manifest_emitter import _resolve_doc_type
+    from corp_by_os.extraction.manifest_emitter import _resolve_doc_type
     from corp_by_os.ingest.extractions import ingest_extractions
     from corp_by_os.ingest.router import compute_file_hash
     from corp_by_os.overnight.cke_client import extract_sync, is_available, scan_local

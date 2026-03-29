@@ -73,7 +73,7 @@ class TestExtractionPipeline:
 
         # Register files (simulating what _run_folder_extraction does)
         folder_path = mywork_tree / "60_Source_Library"
-        from corp_by_os.extraction.non_project.scanner import scan_folder
+        from corp_by_os.extraction.scanner import scan_folder
 
         EXTENSIONS = [".pptx", ".pdf", ".docx"]
         results = scan_folder(folder_path, allow_extensions=EXTENSIONS)
@@ -97,7 +97,7 @@ class TestExtractionPipeline:
         state.create_run(run_id, scope="source-library", budget=0.10)
 
         folder_path = mywork_tree / "60_Source_Library"
-        from corp_by_os.extraction.non_project.scanner import scan_folder
+        from corp_by_os.extraction.scanner import scan_folder
 
         results = scan_folder(folder_path, allow_extensions=[".pptx", ".pdf"])
         for sr in results:
@@ -135,7 +135,7 @@ class TestExtractionPipeline:
         state.create_run(run_id, scope="source-library", budget=0.10)
 
         folder_path = mywork_tree / "60_Source_Library"
-        from corp_by_os.extraction.non_project.scanner import scan_folder
+        from corp_by_os.extraction.scanner import scan_folder
 
         results = scan_folder(folder_path, allow_extensions=[".pptx", ".pdf"])
         for sr in results:

@@ -5,8 +5,7 @@ from __future__ import annotations
 import json
 
 import pytest
-
-from corp_by_os.extraction.non_project.contract import (
+from corp_by_os.extraction.contract import (
     ManifestValidationError,
     validate_manifest,
 )

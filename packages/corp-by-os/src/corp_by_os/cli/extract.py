@@ -40,10 +40,10 @@ def extract_command(
     output_dir: str | None,
 ) -> None:
     """Extract knowledge from a MyWork folder via CKE."""
-    from corp_by_os.extraction.non_project.folder_policy import load_policy
-    from corp_by_os.extraction.non_project.manifest_emitter import build_manifest, write_manifest
-    from corp_by_os.extraction.non_project.routing import resolve_route
-    from corp_by_os.extraction.non_project.scanner import scan_folder
+    from corp_by_os.extraction.folder_policy import load_policy
+    from corp_by_os.extraction.manifest_emitter import build_manifest, write_manifest
+    from corp_by_os.extraction.routing import resolve_route
+    from corp_by_os.extraction.scanner import scan_folder
     from corp_by_os.overnight.cke_client import is_available
 
     cfg = get_config()
