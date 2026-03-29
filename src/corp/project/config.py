@@ -17,9 +17,9 @@ try:
 except ImportError:  # pragma: no cover
     _HAS_DOTENV = False
 
-_PACKAGE_ROOT = Path(__file__).parent  # src/corp.project/
-_PROJECT_ROOT = _PACKAGE_ROOT.parent.parent  # repo root
-CONFIG_DIR = _PROJECT_ROOT / "config"
+_PACKAGE_ROOT = Path(__file__).parent  # src/corp/project/
+_REPO_ROOT = _PACKAGE_ROOT.parent.parent.parent  # repo root (up from project -> corp -> src -> root)
+CONFIG_DIR = _REPO_ROOT / "config" / "project"
 DEFAULT_CONFIG_PATH = CONFIG_DIR / "default.yaml"
 
 _QUESTIONNAIRE_DEFAULTS = [
@@ -106,7 +106,7 @@ def get_settings(config_path: Path | None = None) -> Settings:
         return _cached
 
     # Load .env from repo root
-    env_file = _PROJECT_ROOT / ".env"
+    env_file = _REPO_ROOT / ".env"
     if _HAS_DOTENV and env_file.exists():
         load_dotenv(env_file)
 

@@ -31,7 +31,7 @@ from docx.oxml.ns import qn
 from docx.shared import RGBColor
 
 # Project root setup
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 from dotenv import load_dotenv  # noqa: E402
 

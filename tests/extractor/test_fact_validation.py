@@ -225,7 +225,7 @@ class TestValidationWired:
 
         from jinja2 import Environment, FileSystemLoader
 
-        env = Environment(loader=FileSystemLoader(Path(__file__).parent.parent / "templates"))
+        env = Environment(loader=FileSystemLoader(Path(__file__).parent.parent.parent / "config" / "extractor" / "templates"))
         env.filters["tojson_raw"] = lambda v: str(v)
         tmpl = env.get_template("extract.md.j2")
 

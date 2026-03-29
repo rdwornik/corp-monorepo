@@ -39,7 +39,7 @@ except ImportError:
     OPENPYXL_AVAILABLE = False
 
 # --- PROJECT ROOT AND IMPORTS ---
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 # No sys.path modification needed - imports are local in src/
 
 from dotenv import load_dotenv  # noqa: E402
@@ -97,7 +97,7 @@ def call_llm_with_retry(llm_func, *args, max_retries=3, **kwargs):
 
 
 # --- CONFIGURATION ---
-PLATFORM_MATRIX_PATH = PROJECT_ROOT / "config/platform_matrix.json"
+PLATFORM_MATRIX_PATH = PROJECT_ROOT / "config/rfp/platform_matrix.json"
 
 # Green color constant (ARGB format)
 GREEN_COLOR = "FF00FF00"

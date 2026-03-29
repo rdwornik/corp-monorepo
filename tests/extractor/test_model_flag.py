@@ -5,7 +5,7 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src" / "corp" / "extractor" / "scripts"))
 
 from run import cli
 

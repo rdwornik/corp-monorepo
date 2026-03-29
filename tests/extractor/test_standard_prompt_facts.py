@@ -11,7 +11,7 @@ import yaml
 
 def _load_standard_prompt() -> str:
     """Load the standard extraction prompt from settings.yaml."""
-    config_path = Path(__file__).parent.parent / "config" / "settings.yaml"
+    config_path = Path(__file__).parent.parent.parent / "config" / "extractor" / "settings.yaml"
     with open(config_path, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
     return config["prompts"]["extract"]

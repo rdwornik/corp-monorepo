@@ -21,7 +21,7 @@ import pytest
 # Helpers / constants
 # ---------------------------------------------------------------------------
 
-DATA_DIR = Path(__file__).resolve().parents[1] / "src/corp.extractor/data"
+DATA_DIR = Path(__file__).resolve().parents[2] / "src" / "corp" / "extractor" / "data"
 MODEL_PATH = DATA_DIR / "hybrid_classifier.json"
 
 TRAINING_FILENAME = "2024-01_TRAINING_Lenzing_Demand-Planning-Fundamentals.pptx"

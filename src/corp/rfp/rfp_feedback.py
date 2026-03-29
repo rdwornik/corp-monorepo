@@ -18,13 +18,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 KB_DIR = PROJECT_ROOT / "data" / "kb"
 VERIFIED_DIR = KB_DIR / "verified"
 DRAFTS_DIR = KB_DIR / "drafts"
 REJECTED_DIR = KB_DIR / "rejected"
 FEEDBACK_LOG = KB_DIR / "feedback_log.jsonl"
-PROFILES_DIR = PROJECT_ROOT / "config" / "product_profiles" / "_effective"
+PROFILES_DIR = PROJECT_ROOT / "config" / "rfp" / "product_profiles" / "_effective"
 
 # Feedback ID counter file
 _FB_COUNTER_PATH = KB_DIR / ".fb_counter"

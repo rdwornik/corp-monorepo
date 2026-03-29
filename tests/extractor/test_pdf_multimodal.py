@@ -476,16 +476,16 @@ class TestPdfHaikuEnrichment:
 class TestPromptPdfInstructions:
     def test_deep_multimodal_has_pdf_instructions(self):
         """deep_multimodal.txt contains PDF-specific instructions."""
-        prompt_path = Path(__file__).parent.parent / "config" / "prompts" / "deep_multimodal.txt"
+        prompt_path = Path(__file__).parent.parent.parent / "config" / "extractor" / "prompts" / "deep_multimodal.txt"
         content = prompt_path.read_text(encoding="utf-8")
         assert "PDF document pages" in content
 
     def test_deep_multimodal_has_diagram_instruction(self):
-        prompt_path = Path(__file__).parent.parent / "config" / "prompts" / "deep_multimodal.txt"
+        prompt_path = Path(__file__).parent.parent.parent / "config" / "extractor" / "prompts" / "deep_multimodal.txt"
         content = prompt_path.read_text(encoding="utf-8")
         assert "architecture diagrams" in content
 
     def test_deep_multimodal_has_table_instruction(self):
-        prompt_path = Path(__file__).parent.parent / "config" / "prompts" / "deep_multimodal.txt"
+        prompt_path = Path(__file__).parent.parent.parent / "config" / "extractor" / "prompts" / "deep_multimodal.txt"
         content = prompt_path.read_text(encoding="utf-8")
         assert "table structures" in content

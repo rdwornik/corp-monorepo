@@ -74,7 +74,7 @@ class TestCostInExtractFromText:
 
 class TestCostInFrontmatter:
     def _render(self, cost):
-        templates_dir = Path(__file__).parent.parent / "templates"
+        templates_dir = Path(__file__).parent.parent.parent / "config" / "extractor" / "templates"
         env = Environment(loader=FileSystemLoader(str(templates_dir)), trim_blocks=True, lstrip_blocks=True)
         env.filters["tojson_raw"] = lambda v: json.dumps(v, ensure_ascii=False)
         tmpl = env.get_template("extract.md.j2")

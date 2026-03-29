@@ -9,7 +9,7 @@ from typing import List
 import yaml
 
 PROJECT_ROOT = Path(__file__).resolve().parents[4]
-CONFIG_PATH = PROJECT_ROOT / "config/anonymization.yaml"
+CONFIG_PATH = PROJECT_ROOT / "config/rfp/anonymization.yaml"
 
 DEFAULT_CONFIG = {
     "blocklist": {"kb_sources": [], "customers": [], "projects": [], "internal": []},

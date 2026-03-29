@@ -7,7 +7,7 @@ from jinja2 import Environment, FileSystemLoader
 
 
 def _get_env():
-    templates_dir = Path(__file__).parent.parent / "templates"
+    templates_dir = Path(__file__).parent.parent.parent / "config" / "extractor" / "templates"
     env = Environment(
         loader=FileSystemLoader(str(templates_dir)),
         trim_blocks=True,

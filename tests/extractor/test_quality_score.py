@@ -145,7 +145,7 @@ class TestQualityScoreFactSources:
 
 class TestQualityScoreInFrontmatter:
     def _render(self, quality_score):
-        templates_dir = Path(__file__).parent.parent / "templates"
+        templates_dir = Path(__file__).parent.parent.parent / "config" / "extractor" / "templates"
         env = Environment(
             loader=FileSystemLoader(str(templates_dir)),
             trim_blocks=True,

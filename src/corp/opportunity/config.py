@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
 
-_CONFIG_DIR = Path(__file__).resolve().parent.parent.parent / "config"
+_CONFIG_DIR = Path(__file__).resolve().parent.parent.parent.parent / "config" / "opportunity"
 _DEFAULT_CONFIG = _CONFIG_DIR / "default.yaml"
 
 
@@ -45,7 +45,7 @@ def load_config(config_path: Path | None = None, env_file: Path | None = None) -
         logger.debug("Loaded global .env from %s", _global_env)
 
     # Local .env (project-specific vars only)
-    project_root = Path(__file__).resolve().parent.parent.parent
+    project_root = Path(__file__).resolve().parent.parent.parent.parent
     if env_file is None:
         env_file = project_root / ".env"
     if env_file.exists():

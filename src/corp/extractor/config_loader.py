@@ -13,7 +13,6 @@ Usage:
 """
 
 import os
-from pathlib import Path
 from typing import Any
 
 import yaml
@@ -70,8 +69,10 @@ def get(file: str, key: str = None, default: Any = None) -> Any:
 
 def _load_config(file: str) -> dict:
     """Load YAML config file."""
-    # Get config directory (same directory as this file)
-    config_dir = Path(__file__).parent
+    # Config files live at repo_root/config/extractor/
+    from corp.extractor._paths import CONFIG_DIR
+
+    config_dir = CONFIG_DIR
     config_path = config_dir / f"{file}.yaml"
 
     if not config_path.exists():
@@ -171,6 +172,7 @@ def get_path(file: str, key: str) -> str:
     if os.path.isabs(path):
         return path
 
-    # Resolve relative to project root (parent of config dir)
-    project_root = Path(__file__).parent.parent
-    return str(project_root / path)
+    # Resolve relative to repo root
+    from corp.extractor._paths import REPO_ROOT
+
+    return str(REPO_ROOT / path)

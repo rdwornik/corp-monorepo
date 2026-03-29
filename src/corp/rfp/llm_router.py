@@ -9,7 +9,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Define project root
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 # Global API keys (Documents/.secrets/.env)
 _global_env = Path.home() / "Documents" / ".secrets" / ".env"
@@ -54,7 +54,7 @@ logger = logging.getLogger(__name__)
 KB_JSON_PATH = PROJECT_ROOT / "data/kb/canonical/RFP_Database_UNIFIED_CANONICAL.json"
 DB_PATH = PROJECT_ROOT / "data/kb/chroma_store"
 COLLECTION_NAME = "rfp_knowledge_base"
-SYSTEM_PROMPT_PATH = PROJECT_ROOT / "prompts/rfp_system_prompt_universal.txt"
+SYSTEM_PROMPT_PATH = PROJECT_ROOT / "config/rfp/prompts/rfp_system_prompt_universal.txt"
 DEBUG = (
     os.environ.get("DEBUG_RAG", "0") == "1"
 )  # Set DEBUG_RAG=1 to enable debug logging

@@ -158,7 +158,7 @@ def test_unknown_terms_logged(tmp_path):
     (tmp_path / "config").mkdir()
 
     with patch("corp.extractor.post_process.Path") as MockPath:
-        # Make Path(__file__).parent.parent / "config" / ... resolve to tmp_path
+        # Make Path(__file__).parent.parent.parent / "config" / "extractor" / ... resolve to tmp_path
         MockPath.return_value.parent.parent.__truediv__ = lambda self, x: tmp_path / x
         # But keep real Path for everything else
         MockPath.side_effect = lambda *a, **k: Path(*a, **k) if a else MockPath.return_value

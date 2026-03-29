@@ -1,15 +1,16 @@
-"""Centralized path resolution for corp-knowledge-extractor.
+"""Centralized path resolution for corp.extractor (was corp-knowledge-extractor).
 
-All config/template/prompt paths resolve from here. Only this file
-needs updating when the package moves (e.g., monorepo merge).
+All config/template/prompt paths resolve from here.
+Updated for unified src/corp/ package structure.
 """
 
 from pathlib import Path
 
-PACKAGE_DIR = Path(__file__).parent  # src/corp.extractor/
-SRC_DIR = PACKAGE_DIR.parent  # src/
+PACKAGE_DIR = Path(__file__).parent  # src/corp/extractor/
+CORP_DIR = PACKAGE_DIR.parent  # src/corp/
+SRC_DIR = CORP_DIR.parent  # src/
 REPO_ROOT = SRC_DIR.parent  # repo root
-CONFIG_DIR = REPO_ROOT / "config"
-TEMPLATES_DIR = REPO_ROOT / "templates"
+CONFIG_DIR = REPO_ROOT / "config" / "extractor"
+TEMPLATES_DIR = CONFIG_DIR / "templates"
 PROMPTS_DIR = CONFIG_DIR / "prompts"
-DATA_DIR = REPO_ROOT / "data"
+DATA_DIR = PACKAGE_DIR / "data"  # src/corp/extractor/data/
