@@ -14,6 +14,8 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from corp.schema.folder_names import ARCHIVE, INBOX, PROJECTS, TEMPLATES
+
 
 @dataclass(frozen=True)
 class PipelineConfig:
@@ -39,7 +41,7 @@ class PipelineConfig:
 
     def __post_init__(self) -> None:
         # frozen=True requires object.__setattr__ for derived fields
-        object.__setattr__(self, "inbox_path", self.mywork_root / "00_Inbox")
+        object.__setattr__(self, "inbox_path", self.mywork_root / INBOX)
         object.__setattr__(self, "index_db_path", self.app_data_path / "index.db")
         object.__setattr__(self, "ops_db_path", self.app_data_path / "ops.db")
         object.__setattr__(self, "state_db_path", self.app_data_path / "overnight_state.db")
@@ -78,9 +80,9 @@ class PipelineConfig:
         return cls(
             vault_path=vault,
             mywork_root=mywork,
-            projects_root=_env_or("PROJECTS_ROOT", mywork / "10_Projects"),
-            templates_root=_env_or("TEMPLATES_ROOT", mywork / "30_Templates"),
-            archive_root=_env_or("ARCHIVE_ROOT", mywork / "80_Archive"),
+            projects_root=_env_or("PROJECTS_ROOT", mywork / PROJECTS),
+            templates_root=_env_or("TEMPLATES_ROOT", mywork / TEMPLATES),
+            archive_root=_env_or("ARCHIVE_ROOT", mywork / ARCHIVE),
             app_data_path=_env_or("APP_DATA_PATH", local_appdata / "corp-by-os"),
             index_extra_roots=extra_roots,
         )
@@ -95,8 +97,8 @@ class PipelineConfig:
         return cls(
             vault_path=tmp_root / "vault",
             mywork_root=mywork,
-            projects_root=mywork / "10_Projects",
-            templates_root=mywork / "30_Templates",
-            archive_root=mywork / "80_Archive",
+            projects_root=mywork / PROJECTS,
+            templates_root=mywork / TEMPLATES,
+            archive_root=mywork / ARCHIVE,
             app_data_path=tmp_root / "appdata",
         )
