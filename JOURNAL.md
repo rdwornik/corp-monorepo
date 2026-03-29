@@ -168,3 +168,10 @@ Claude Code: read last 5 entries before starting work.
 - **Did:** Re-extracted 216 vault notes via CKE batch (gemini-3.1-pro-preview, deep mode). Ingested with quality-threshold 25, index rebuilt. Added `include_deprecated` filter to retrieve engine — deprecated notes excluded from all query paths. Added missing Compliance MOC. All 943 corp-by-os tests passing.
 - **Errors:** 41 extraction errors, Haiku enrichment failures on all files (non-fatal, expected — returns empty JSON), `source_type=presentation` schema mismatch (pre-existing warn-only).
 - **Next:** Monitor trust-status drift. Consider `source_type` enum expansion for presentation/workshop. Eval baseline updated.
+
+## 2026-03-29 — refactor/centralize-hardcoded-paths
+
+- **Did:** Zero-blast-radius refactor centralizing all MyWork/vault folder name strings into `src/corp/schema/folder_names.py`. Replaced hardcoded literals across 20+ files in 4 batches (4 commits). Added `INBOX`, `PROJECTS`, `TEMPLATES`, `RFP`, `SOURCE_LIBRARY`, `ADMIN`, `ARCHIVE`, `SYSTEM`, `STAGING`, `UNMATCHED`, `QUARANTINE`, `ALL_MYWORK_FOLDERS`, `SCAN_SKIP_FOLDERS` constants. Final grep confirms zero hardcoded folder literals remain in `src/corp/` outside the canonical module.
+- **Gotcha:** Ruff pre-commit hook reformats import blocks in-place, causing "unstaged files" conflicts. Fix: always re-stage (git add) the modified file after a ruff-failed commit, then recommit. Happened 4× during this session.
+- **Tests:** 2412 passed, 6 skipped throughout all batches (no regressions).
+- **Next:** Step 5 (YAML config annotation), Step 6 (test assertion literals), merge to main.
