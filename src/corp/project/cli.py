@@ -224,8 +224,7 @@ def extract_cke(
     if dry_run:
         console.print(f"\n[yellow]Dry run — manifest saved to {manifest_path}[/yellow]")
         console.print("\nTo process manually:")
-        console.print("  cd C:\\Users\\1028120\\Documents\\Scripts\\corp-monorepo\\packages\\corp-knowledge-extractor")
-        console.print(f'  python scripts/run.py process-manifest "{manifest_path}" --resume')
+        console.print(f'  cke process-manifest "{manifest_path}" --resume')
         return
 
     # Invoke CKE
