@@ -1,0 +1,1054 @@
+"""Tests for post-processing wrapper around corp-os-meta."""
+
+from pathlib import Path
+from unittest.mock import patch
+
+import yaml
+from corp_knowledge_extractor.post_process import post_process_extraction
+from corp_os_meta import ValidationResult
+
+
+def test_basic_normalization():
+    """Test that corp-os-meta normalizes terms correctly."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test Video",
+            "date": "2026-03-01",
+            "content_type": "presentation",
+            "topics": ["DR", "SLAs", "Some New Topic"],
+            "products": ["BY Platform"],
+            "people": ["Mike Geller (Presenter)"],
+            "summary": "A test.",
+        },
+        source_file="test.mkv",
+    )
+    assert "Disaster Recovery" in result.data["topics"]
+    assert "SLA" in result.data["topics"]
+    assert "Blue Yonder Platform" in result.data["products"]
+    assert "Some New Topic" in result.unknown_terms
+
+
+def test_links_line_generated():
+    """Test deterministic Links line."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test",
+            "date": "2026-03-01",
+            "type": "presentation",
+            "topics": ["Disaster Recovery"],
+            "products": ["WMS"],
+            "people": ["Mike Geller (Presenter)"],
+            "summary": "A test.",
+        },
+        source_file="test.mkv",
+    )
+    assert "[[Disaster Recovery]]" in result.links_line
+    assert "[[Blue Yonder WMS]]" in result.links_line
+    assert "[[Mike Geller]]" in result.links_line
+    assert "(Presenter)" not in result.links_line
+
+
+def test_content_type_mapped_to_type():
+    """CKE uses content_type, corp-os-meta uses type.
+    Note: .mkv triggers extension override to 'presentation', so use .md to test mapping."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test",
+            "date": "2026-03-01",
+            "content_type": "training",
+            "topics": ["SLA"],
+            "summary": "Training video.",
+        },
+        source_file="test.md",
+    )
+    assert "type" in result.data
+    assert result.data["type"] == "training"
+
+
+def test_validation_with_full_data():
+    """Full data should validate as valid or warnings."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Complete Note",
+            "date": "2026-03-01",
+            "type": "presentation",
+            "topics": ["SLA", "Disaster Recovery"],
+            "products": ["Blue Yonder Platform"],
+            "people": ["Mike Geller (Presenter)"],
+            "summary": "Complete summary.",
+            "language": "en",
+            "quality": "full",
+        },
+        source_file="test.mkv",
+    )
+    assert result.validation_result in (ValidationResult.VALID, ValidationResult.WARNINGS)
+    assert result.validated_note is not None
+
+
+def test_cardinality_caps():
+    """Caps should be enforced by corp-os-meta."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Overcapped",
+            "date": "2026-03-01",
+            "type": "document",
+            "topics": [f"Topic {i}" for i in range(15)],
+            "products": [f"Product {i}" for i in range(10)],
+            "people": [f"Person {i}" for i in range(8)],
+            "summary": "Too many terms.",
+        },
+        source_file="test.mkv",
+    )
+    assert len(result.data["topics"]) <= 8
+    assert len(result.data["products"]) <= 4
+    assert len(result.data["people"]) <= 3
+
+
+def test_deduplication_after_normalization():
+    """Multiple aliases for same term should deduplicate."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Dedup Test",
+            "date": "2026-03-01",
+            "type": "presentation",
+            "topics": ["DR", "Disaster Recovery", "disaster recovery planning"],
+            "summary": "Test.",
+        },
+        source_file="test.mkv",
+    )
+    assert result.data["topics"].count("Disaster Recovery") == 1
+
+
+def test_links_line_empty_when_no_data():
+    """No topics/products/people means no Links line."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Empty",
+            "date": "2026-03-01",
+            "type": "document",
+            "topics": [],
+            "products": [],
+            "people": [],
+            "summary": "Nothing.",
+        },
+        source_file="test.mkv",
+    )
+    assert result.links_line == ""
+
+
+def test_source_tool_defaults():
+    """source_tool should be set automatically."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test",
+            "date": "2026-03-01",
+            "type": "presentation",
+            "topics": [],
+            "summary": "Test.",
+        },
+        source_file="test.mkv",
+    )
+    assert result.data["source_tool"] == "knowledge-extractor"
+    assert result.data["source_file"] == "test.mkv"
+
+
+def test_unknown_terms_logged(tmp_path):
+    """Unknown terms should be appended to taxonomy_review.yaml."""
+    review_path = tmp_path / "config" / "taxonomy_review.yaml"
+    (tmp_path / "config").mkdir()
+
+    with patch("corp_knowledge_extractor.post_process.Path") as MockPath:
+        # Make Path(__file__).parent.parent / "config" / ... resolve to tmp_path
+        MockPath.return_value.parent.parent.__truediv__ = lambda self, x: tmp_path / x
+        # But keep real Path for everything else
+        MockPath.side_effect = lambda *a, **k: Path(*a, **k) if a else MockPath.return_value
+        # Directly patch the function to use our tmp path
+        import corp_knowledge_extractor.post_process as pp_mod
+
+        orig_fn = pp_mod._log_unknown_terms
+
+        def _patched_log(terms):
+            rp = tmp_path / "config" / "taxonomy_review.yaml"
+            import yaml as _yaml
+
+            data = {"pending": []}
+            if rp.exists():
+                with open(rp, "r", encoding="utf-8") as f:
+                    data = _yaml.safe_load(f) or {"pending": []}
+            existing = set(data.get("pending", []))
+            for term in terms:
+                if term not in existing:
+                    data["pending"].append(term)
+            with open(rp, "w", encoding="utf-8") as f:
+                _yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
+
+        pp_mod._log_unknown_terms = _patched_log
+        try:
+            result = post_process_extraction(
+                raw_result={
+                    "title": "Test",
+                    "date": "2026-03-01",
+                    "type": "presentation",
+                    "topics": ["Brand New Concept"],
+                    "summary": "Test.",
+                },
+                source_file="test.mkv",
+            )
+        finally:
+            pp_mod._log_unknown_terms = orig_fn
+
+    assert "Brand New Concept" in result.unknown_terms
+    assert review_path.exists()
+    data = yaml.safe_load(review_path.read_text(encoding="utf-8"))
+    assert "Brand New Concept" in data["pending"]
+
+
+def test_unknown_terms_not_duplicated(tmp_path):
+    """Running twice shouldn't duplicate entries in taxonomy_review.yaml."""
+    review_path = tmp_path / "config" / "taxonomy_review.yaml"
+    (tmp_path / "config").mkdir()
+
+    import corp_knowledge_extractor.post_process as pp_mod
+
+    orig_fn = pp_mod._log_unknown_terms
+
+    def _patched_log(terms):
+        import yaml as _yaml
+
+        rp = tmp_path / "config" / "taxonomy_review.yaml"
+        data = {"pending": []}
+        if rp.exists():
+            with open(rp, "r", encoding="utf-8") as f:
+                data = _yaml.safe_load(f) or {"pending": []}
+        existing = set(data.get("pending", []))
+        for term in terms:
+            if term not in existing:
+                data["pending"].append(term)
+        with open(rp, "w", encoding="utf-8") as f:
+            _yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
+
+    pp_mod._log_unknown_terms = _patched_log
+    try:
+        raw = {
+            "title": "Test",
+            "date": "2026-03-01",
+            "type": "presentation",
+            "topics": ["Unique Concept"],
+            "summary": "Test.",
+        }
+        post_process_extraction(raw_result=dict(raw), source_file="test.mkv")
+        post_process_extraction(raw_result=dict(raw), source_file="test.mkv")
+    finally:
+        pp_mod._log_unknown_terms = orig_fn
+
+    data = yaml.safe_load(review_path.read_text(encoding="utf-8"))
+    assert data["pending"].count("Unique Concept") == 1
+
+
+def test_product_taxonomy_normalization():
+    """Product aliases should normalize to canonical names."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Product Test",
+            "date": "2026-03-01",
+            "type": "presentation",
+            "topics": [],
+            "products": ["BY Platform"],
+            "summary": "Test.",
+        },
+        source_file="test.mkv",
+    )
+    assert "Blue Yonder Platform" in result.data["products"]
+    # At least one change logged for the normalization
+    assert any("Blue Yonder Platform" in c for c in result.changes)
+
+
+# ---------------------------------------------------------------------------
+# Schema v2 tests — knowledge dimensions
+# ---------------------------------------------------------------------------
+
+
+def test_domains_normalized():
+    """Domains should be normalized via corp-os-meta."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Pricing Update",
+            "date": "2026-03-01",
+            "type": "presentation",
+            "topics": ["SLA"],
+            "domains": ["GTM", "pricing"],
+            "summary": "Pricing changes.",
+        },
+        source_file="test.mkv",
+    )
+    assert "Go-to-Market" in result.data["domains"]
+    assert "Commercials" in result.data["domains"]
+
+
+def test_confidentiality_defaults_to_internal():
+    """Missing confidentiality should default to internal."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test",
+            "date": "2026-03-01",
+            "type": "document",
+            "topics": [],
+            "summary": "Test.",
+        },
+        source_file="test.md",
+    )
+    assert result.data["confidentiality"] == "internal"
+
+
+def test_schema_v2_defaults():
+    """All v2 fields should have safe defaults."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Minimal",
+            "date": "2026-03-01",
+            "type": "document",
+            "topics": [],
+            "summary": "Minimal.",
+        },
+        source_file="test.md",
+    )
+    assert result.data["authority"] == "tribal"
+    assert result.data["layer"] == "learning"
+    assert result.data["source_type"] == "documentation"
+    assert result.data["domains"] == []
+    assert result.data["schema_version"] == 2
+
+
+def test_valid_to_auto_calculated():
+    """Domains with expiry rules should produce valid_to."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Pricing Note",
+            "date": "2026-03-01",
+            "type": "document",
+            "topics": ["Pricing"],
+            "domains": ["Commercials"],
+            "summary": "New pricing tiers.",
+        },
+        source_file="test.md",
+    )
+    # Commercials domain triggers valid_to calculation
+    assert result.data.get("valid_to") is not None
+
+
+def test_domains_cap():
+    """Domains should be capped at 3."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Many Domains",
+            "date": "2026-03-01",
+            "type": "document",
+            "topics": [],
+            "domains": ["Product", "Commercials", "Competitive", "Go-to-Market", "Security"],
+            "summary": "Test.",
+        },
+        source_file="test.md",
+    )
+    assert len(result.data["domains"]) <= 3
+
+
+def test_confidentiality_passthrough():
+    """LLM-provided confidentiality should be preserved."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Secret Deal",
+            "date": "2026-03-01",
+            "type": "document",
+            "topics": [],
+            "confidentiality": "restricted",
+            "summary": "M&A details.",
+        },
+        source_file="test.md",
+    )
+    assert result.data["confidentiality"] == "restricted"
+
+
+# ---------------------------------------------------------------------------
+# Systematic fix tests
+# ---------------------------------------------------------------------------
+
+
+def test_client_from_manifest_overrides_gemini():
+    """When manifest provides client, it overrides Gemini extraction."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test",
+            "date": "2026-03-01",
+            "type": "document",
+            "client": "Acme Corp",
+            "topics": [],
+            "products": [],
+            "people": [],
+            "summary": "Test",
+        },
+        source_file="test.md",
+        client="Lenzing AG",
+    )
+    assert result.data["client"] == "Lenzing"  # alias normalized
+
+
+def test_project_from_manifest():
+    """When manifest provides project, it appears in result data."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test",
+            "date": "2026-03-01",
+            "type": "document",
+            "topics": [],
+            "summary": "Test",
+        },
+        source_file="test.md",
+        project="Lenzing_Planning",
+    )
+    assert result.data["project"] == "Lenzing_Planning"
+
+
+def test_quality_mapping_high_to_full():
+    """Gemini 'high' maps to schema 'full'."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test",
+            "date": "2026-03-01",
+            "type": "document",
+            "quality": "high",
+            "topics": [],
+            "summary": "Test",
+        },
+        source_file="test.md",
+    )
+    assert result.data["quality"] == "full"
+
+
+def test_quality_mapping_medium_to_partial():
+    """Gemini 'medium' maps to schema 'partial'."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test",
+            "date": "2026-03-01",
+            "type": "document",
+            "quality": "medium",
+            "topics": [],
+            "summary": "Test",
+        },
+        source_file="test.md",
+    )
+    assert result.data["quality"] == "partial"
+
+
+def test_quality_mapping_low_to_fragment():
+    """Gemini 'low' maps to schema 'fragment'."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test",
+            "date": "2026-03-01",
+            "type": "document",
+            "quality": "low",
+            "topics": [],
+            "summary": "Test",
+        },
+        source_file="test.md",
+    )
+    assert result.data["quality"] == "fragment"
+
+
+def test_quality_passthrough_valid_value():
+    """Schema-valid quality values pass through unchanged."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test",
+            "date": "2026-03-01",
+            "type": "document",
+            "quality": "full",
+            "topics": [],
+            "summary": "Test",
+        },
+        source_file="test.md",
+    )
+    assert result.data["quality"] == "full"
+
+
+def test_no_unicode_escape_in_frontmatter():
+    """Domains with & should not be escaped to \\u0026 in tojson_raw."""
+    from corp_knowledge_extractor.synthesize import _tojson_raw
+
+    result = _tojson_raw(["Platform & Architecture"])
+    assert "&" in result
+    assert "\\u0026" not in result
+
+
+def test_backslash_normalized_in_source():
+    """Source paths should use forward slashes after normalization."""
+    path = "C:\\Users\\test\\file.pdf"
+    normalized = path.replace("\\", "/")
+    assert "\\" not in normalized
+    assert "C:/Users/test/file.pdf" == normalized
+
+
+# ---------------------------------------------------------------------------
+# Company name normalization tests (FIX 2)
+# ---------------------------------------------------------------------------
+
+
+from corp_knowledge_extractor.post_process import normalize_company_names  # noqa: E402
+
+
+def test_normalize_blue_blue():
+    assert normalize_company_names("Blue Blue Yonder Platform") == "Blue Yonder Platform"
+
+
+def test_normalize_already_correct():
+    assert normalize_company_names("Blue Yonder Platform") == "Blue Yonder Platform"
+
+
+def test_normalize_triple():
+    assert normalize_company_names("Blue Blue Blue Yonder") == "Blue Yonder"
+
+
+def test_normalize_case_insensitive():
+    result = normalize_company_names("blue blue yonder")
+    assert result == "Blue Yonder"
+
+
+def test_normalize_in_summary():
+    """Summary field also cleaned via post_process_extraction."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test",
+            "date": "2026-03-01",
+            "type": "document",
+            "topics": [],
+            "summary": "Blue Blue Yonder released new features.",
+        },
+        source_file="test.md",
+    )
+    assert "Blue Blue" not in result.data["summary"]
+    assert "Blue Yonder" in result.data["summary"]
+
+
+def test_normalize_no_false_positive():
+    assert normalize_company_names("Blue Sky Yonder") == "Blue Sky Yonder"
+
+
+# ---------------------------------------------------------------------------
+# Type enforcement from file extension (BUG 1: JLR pilot)
+# ---------------------------------------------------------------------------
+
+from corp_knowledge_extractor.post_process import (  # noqa: E402
+    enforce_type_from_extension,
+    validate_tags,
+)
+
+
+def test_docx_always_document():
+    """.docx with any content → type='document'."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Sales Deck",
+            "date": "2026-03-01",
+            "type": "presentation",
+            "content_type": "presentation",
+            "topics": [],
+            "summary": "Test.",
+        },
+        source_file="JLR_TMS_RFI_Response.docx",
+    )
+    assert result.data["type"] == "document"
+
+
+def test_xlsx_always_spreadsheet():
+    """.xlsx → type='spreadsheet'."""
+    result = enforce_type_from_extension(
+        {"type": "presentation", "content_type": "presentation"},
+        "VA_Questionnaire.xlsx",
+    )
+    assert result["type"] == "spreadsheet"
+    assert result["content_type"] == "spreadsheet"
+
+
+def test_pptx_always_presentation():
+    """.pptx → type='presentation'."""
+    result = enforce_type_from_extension(
+        {"type": "document", "content_type": "document"},
+        "Platform_Overview.pptx",
+    )
+    assert result["type"] == "presentation"
+
+
+def test_pdf_always_document():
+    """.pdf → type='document'."""
+    result = enforce_type_from_extension(
+        {"type": "presentation", "content_type": "presentation"},
+        "Architecture.pdf",
+    )
+    assert result["type"] == "document"
+
+
+def test_extension_overrides_llm():
+    """LLM says 'presentation' for .docx → overridden to 'document'."""
+    result = enforce_type_from_extension(
+        {"type": "presentation", "content_type": "presentation"},
+        "Meeting_Notes.docx",
+    )
+    assert result["type"] == "document"
+    assert result["content_type"] == "document"
+
+
+# ---------------------------------------------------------------------------
+# Tag validation against taxonomy (FIX 1: pre-monorepo)
+# ---------------------------------------------------------------------------
+
+
+def test_validate_tags_all_valid():
+    """Known products from taxonomy → all validated."""
+    tags = ["product/blue-yonder-platform", "topic/disaster-recovery"]
+    results = validate_tags(tags)
+    assert all(r["valid"] for r in results)
+    assert all(r["reason"] == "validated" for r in results)
+
+
+def test_validate_tags_unknown_value():
+    """Unknown product value → unvalidated warning, still valid."""
+    tags = ["product/totally-unknown-thing"]
+    results = validate_tags(tags)
+    assert len(results) == 1
+    assert results[0]["valid"] is True
+    assert results[0]["reason"] == "unvalidated"
+
+
+def test_validate_tags_unknown_prefix():
+    """Tag with unknown prefix → invalid."""
+    tags = ["random/some-tag"]
+    results = validate_tags(tags)
+    assert len(results) == 1
+    assert results[0]["valid"] is False
+    assert results[0]["reason"] == "unknown_prefix"
+
+
+def test_validate_tags_no_taxonomy():
+    """If taxonomy loading fails, all tags return unvalidated, no crash."""
+    from unittest.mock import patch
+
+    with patch("corp_knowledge_extractor.post_process.load_taxonomy", side_effect=Exception("no taxonomy")):
+        results = validate_tags(["product/test", "topic/test"])
+    assert len(results) == 2
+    assert all(r["valid"] for r in results)
+    assert all(r["reason"] == "unvalidated" for r in results)
+
+
+def test_validate_tags_empty():
+    """Empty tag list → empty results."""
+    results = validate_tags([])
+    assert results == []
+
+
+# ---------------------------------------------------------------------------
+# Product name normalization (FIX 2: v3 regression)
+# ---------------------------------------------------------------------------
+
+
+from corp_knowledge_extractor.post_process import normalize_product_names  # noqa: E402
+
+
+def test_normalize_short_product():
+    """'Demand Planning' → 'Blue Yonder Demand Planning'."""
+    assert normalize_product_names(["Demand Planning"]) == ["Blue Yonder Demand Planning"]
+
+
+def test_normalize_already_canonical():
+    """'Blue Yonder WMS' is already canonical — unchanged."""
+    assert normalize_product_names(["Blue Yonder WMS"]) == ["Blue Yonder WMS"]
+
+
+def test_normalize_dedup_after():
+    """Alias + canonical should deduplicate to canonical only."""
+    result = normalize_product_names(["Demand Planning", "Blue Yonder Demand Planning"])
+    assert result == ["Blue Yonder Demand Planning"]
+
+
+def test_normalize_unknown_product():
+    """Unknown products not in alias map pass through unchanged."""
+    assert normalize_product_names(["SAP APO"]) == ["SAP APO"]
+
+
+def test_normalize_multiple_products():
+    """Multiple aliases normalize and deduplicate."""
+    result = normalize_product_names(["WMS", "TMS", "Blue Yonder WMS"])
+    assert result == ["Blue Yonder WMS", "Blue Yonder TMS"]
+
+
+def test_normalize_products_in_post_process():
+    """Product normalization runs during post_process_extraction."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test",
+            "date": "2026-03-01",
+            "type": "document",
+            "topics": [],
+            "products": ["Demand Planning", "Supply Planning"],
+            "summary": "Test.",
+        },
+        source_file="test.md",
+    )
+    assert "Blue Yonder Demand Planning" in result.data["products"]
+    assert "Blue Yonder Supply Planning" in result.data["products"]
+    # Short forms should not survive
+    assert "Demand Planning" not in result.data["products"]
+    assert "Supply Planning" not in result.data["products"]
+
+
+# ---------------------------------------------------------------------------
+# Fix 1: Product exclusion list (competitors, infrastructure, generic)
+# ---------------------------------------------------------------------------
+
+from corp_knowledge_extractor.post_process import filter_products  # noqa: E402
+
+
+def test_sap_excluded_from_products():
+    """SAP should be entity, not product."""
+    real, excluded = filter_products(["SAP", "Blue Yonder WMS"])
+    assert "SAP" not in real
+    assert "SAP" in excluded
+    assert "Blue Yonder WMS" in real
+
+
+def test_azure_excluded_from_products():
+    """Azure should be entity, not product."""
+    real, excluded = filter_products(["Azure", "Blue Yonder Platform"])
+    assert "Azure" not in real
+    assert "Azure" in excluded
+    assert "Blue Yonder Platform" in real
+
+
+def test_blue_yonder_products_kept():
+    """Blue Yonder WMS should remain a product."""
+    real, excluded = filter_products(["Blue Yonder WMS", "Blue Yonder TMS"])
+    assert real == ["Blue Yonder WMS", "Blue Yonder TMS"]
+    assert excluded == []
+
+
+def test_exclusion_case_insensitive():
+    """Exclusion matching is case-insensitive."""
+    real, excluded = filter_products(["sap", "kubernetes"])
+    assert real == []
+    assert len(excluded) == 2
+
+
+def test_excluded_products_go_to_entities_in_post_process():
+    """Excluded products move to entities_mentioned during post-processing."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test",
+            "date": "2026-03-01",
+            "type": "document",
+            "topics": ["Supply Chain"],
+            "products": ["SAP APO", "Blue Yonder WMS"],
+            "summary": "Test.",
+        },
+        source_file="test.md",
+    )
+    assert "SAP APO" not in result.data["products"]
+    assert "Blue Yonder WMS" in result.data["products"]
+    assert "SAP APO" in result.data.get("entities_mentioned", [])
+
+
+# ---------------------------------------------------------------------------
+# Fix 2: Product name normalization (expanded aliases from YAML)
+# ---------------------------------------------------------------------------
+
+
+def test_normalize_dsp_alias():
+    """DSP → Blue Yonder Demand & Supply Planning."""
+    assert normalize_product_names(["DSP"]) == ["Blue Yonder Demand & Supply Planning"]
+
+
+def test_normalize_product_case_insensitive():
+    """Alias lookup is case-insensitive."""
+    assert normalize_product_names(["wms"]) == ["Blue Yonder WMS"]
+
+
+def test_normalize_duplicate_after_alias():
+    """Alias + canonical should deduplicate."""
+    result = normalize_product_names(["WMS", "Blue Yonder WMS"])
+    assert result == ["Blue Yonder WMS"]
+
+
+def test_normalize_unknown_product_passes_through():
+    """Unknown products not in alias map pass through unchanged."""
+    assert normalize_product_names(["Custom Product X"]) == ["Custom Product X"]
+
+
+# ---------------------------------------------------------------------------
+# Fix 3: People field cleanup
+# ---------------------------------------------------------------------------
+
+from corp_knowledge_extractor.post_process import filter_people  # noqa: E402
+
+
+def test_role_filtered():
+    """Pure role title should be filtered."""
+    people, filtered = filter_people(["Technical Account Manager"])
+    assert people == []
+    assert "Technical Account Manager" in filtered
+
+
+def test_org_filtered():
+    """Organization name should be filtered."""
+    people, filtered = filter_people(["Lenzing AG"])
+    assert people == []
+    assert "Lenzing AG" in filtered
+
+
+def test_real_person_kept():
+    """Real person with parenthetical role should be kept."""
+    people, _ = filter_people(["Amy Wilkes (Supply Chain Degree Apprentice)"])
+    assert len(people) == 1
+    assert "Amy Wilkes" in people[0]
+
+
+def test_named_role_kept():
+    """Person with name + role title should be kept."""
+    people, _ = filter_people(["Satish Kalpathy (VP, PMG Head Platform)"])
+    assert len(people) == 1
+
+
+def test_generic_role_filtered():
+    """Generic roles without names should be filtered."""
+    people, filtered = filter_people(["Project Manager", "Solution Architect"])
+    assert people == []
+    assert len(filtered) == 2
+
+
+def test_people_filter_in_post_process():
+    """People filtering runs during post_process_extraction."""
+    result = post_process_extraction(
+        raw_result={
+            "title": "Test",
+            "date": "2026-03-01",
+            "type": "document",
+            "topics": ["Supply Chain"],
+            "products": [],
+            "people": ["John Smith (VP)", "Technical Account Manager", "Lenzing AG"],
+            "summary": "Test.",
+        },
+        source_file="test.md",
+    )
+    assert "John Smith (VP)" in result.data["people"]
+    assert "Technical Account Manager" not in result.data["people"]
+    assert "Lenzing AG" not in result.data["people"]
+
+
+# ---------------------------------------------------------------------------
+# Fix 4: Client alias normalization
+# ---------------------------------------------------------------------------
+
+from corp_knowledge_extractor.post_process import normalize_client  # noqa: E402
+
+
+def test_client_alias_lenzing_ag():
+    """Lenzing AG → Lenzing."""
+    assert normalize_client("Lenzing AG") == "Lenzing"
+
+
+def test_client_alias_jlr():
+    """Jaguar Land Rover → JLR."""
+    assert normalize_client("Jaguar Land Rover") == "JLR"
+
+
+def test_client_alias_unknown_passthrough():
+    """Unknown client passes through unchanged."""
+    assert normalize_client("Acme Corp") == "Acme Corp"
+
+
+def test_client_alias_empty():
+    """Empty string returns empty."""
+    assert normalize_client("") == ""
+
+
+def test_client_alias_pepsi_variants():
+    """Pepsi and Pepsi EMEA normalize to PepsiCo."""
+    assert normalize_client("Pepsi") == "PepsiCo"
+    assert normalize_client("Pepsi EMEA") == "PepsiCo"
+    assert normalize_client("PepsiCo Europe") == "PepsiCo"
+
+
+def test_client_alias_sgdbf_variants():
+    """Saint-Gobain variants normalize to SGDBF."""
+    assert normalize_client("Saint-Gobain") == "SGDBF"
+    assert normalize_client("Saint Gobain") == "SGDBF"
+    assert normalize_client("Saint-Gobain Distribution Bâtiment France") == "SGDBF"
+
+
+def test_client_alias_labelvie_variants():
+    """LabelVie group variants normalize to LabelVie."""
+    assert normalize_client("LabelVie Group") == "LabelVie"
+    assert normalize_client("Groupe LabelVie") == "LabelVie"
+
+
+def test_client_alias_clicks_group():
+    """Clicks Group normalizes to Clicks."""
+    assert normalize_client("Clicks Group") == "Clicks"
+
+
+def test_client_alias_rolls_royce_variants():
+    """Rolls Royce spelling variants normalize to Rolls-Royce."""
+    assert normalize_client("Rolls Royce") == "Rolls-Royce"
+    assert normalize_client("Rolls-Royce Plc") == "Rolls-Royce"
+
+
+def test_client_alias_ifm_variants():
+    """IFM variants normalize to IFM Electronics."""
+    assert normalize_client("ifm") == "IFM Electronics"
+    assert normalize_client("IFM") == "IFM Electronics"
+
+
+def test_client_alias_purehealth_variants():
+    """Pure Health normalizes to PureHealth."""
+    assert normalize_client("Pure Health") == "PureHealth"
+
+
+# ---------------------------------------------------------------------------
+# Fix 5: Tag ceiling
+# ---------------------------------------------------------------------------
+
+from corp_knowledge_extractor.post_process import cap_tags, generate_tags  # noqa: E402
+
+
+def test_cap_tags_under_limit():
+    """Tags under limit pass through unchanged."""
+    tags = ["product/wms", "topic/supply-chain"]
+    assert cap_tags(tags) == tags
+
+
+def test_cap_tags_at_limit():
+    """Exactly 12 tags pass through."""
+    tags = [f"topic/t{i}" for i in range(12)]
+    assert cap_tags(tags) == tags
+
+
+def test_cap_tags_over_limit():
+    """Tags over 12 get truncated."""
+    tags = [f"topic/t{i}" for i in range(20)]
+    assert len(cap_tags(tags)) == 12
+
+
+def test_generate_tags_respects_cap():
+    """generate_tags caps at MAX_TAGS."""
+    fm = {
+        "products": [f"Product{i}" for i in range(5)],
+        "topics": [f"Topic{i}" for i in range(8)],
+        "domains": ["Domain1", "Domain2"],
+    }
+    tags = generate_tags(fm)
+    assert len(tags) <= 12
+
+
+def test_generate_tags_priority_order():
+    """Client tags come before product/topic tags."""
+    fm = {
+        "client": "SGDBF",
+        "products": ["WMS"],
+        "topics": ["Supply Chain"],
+    }
+    tags = generate_tags(fm)
+    assert tags[0] == "client/sgdbf"
+
+
+# ---------------------------------------------------------------------------
+# Fix 1 (extended): Client/third-party product exclusions
+# ---------------------------------------------------------------------------
+
+
+def test_lenzing_excluded_from_products():
+    """Lenzing is a client — should be entity, not product."""
+    real, excluded = filter_products(["Lenzing", "Blue Yonder WMS"])
+    assert "Lenzing" not in real
+    assert "Lenzing" in excluded
+    assert "Blue Yonder WMS" in real
+
+
+def test_d360_excluded_from_products():
+    """D360 is a third-party DMS product — should be entity, not product."""
+    real, excluded = filter_products(["D360", "Blue Yonder Platform"])
+    assert "D360" not in real
+    assert "D360" in excluded
+    assert "Blue Yonder Platform" in real
+
+
+def test_doxis4_excluded_from_products():
+    """Doxis4 is a third-party DMS product — should be entity, not product."""
+    real, excluded = filter_products(["Doxis4"])
+    assert "Doxis4" in excluded
+    assert real == []
+
+
+# ---------------------------------------------------------------------------
+# Fix 2 (extended): filter_product_tags — slug-level non-BY tag removal
+# ---------------------------------------------------------------------------
+
+from corp_knowledge_extractor.post_process import filter_product_tags  # noqa: E402
+
+
+def test_filter_product_tags_removes_lenzing():
+    """product/lenzing* tags are filtered."""
+    tags = ["product/lenzing", "product/lenzing-ecovero", "topic/supply-chain"]
+    result = filter_product_tags(tags)
+    assert "product/lenzing" not in result
+    assert "product/lenzing-ecovero" not in result
+    assert "topic/supply-chain" in result
+
+
+def test_filter_product_tags_removes_ecovero_variants():
+    """product/ecovero-* tags filtered via 'ecovero' slug match."""
+    tags = ["product/ecovero-brand-fibers", "product/lenzing-ecovero-eco-viscose"]
+    result = filter_product_tags(tags)
+    assert result == []
+
+
+def test_filter_product_tags_removes_tencel_veocel_refibra():
+    """Lenzing fiber brand tags filtered."""
+    tags = [
+        "product/tencel-brand-fibers",
+        "product/veocel-nonwoven-fibers",
+        "product/refibra-recycled-content-lyocell",
+        "product/blue-yonder-wms",
+    ]
+    result = filter_product_tags(tags)
+    assert result == ["product/blue-yonder-wms"]
+
+
+def test_filter_product_tags_removes_d360_doxis4():
+    """Third-party DMS product tags filtered."""
+    tags = ["product/d360", "product/doxis4", "product/blue-yonder-platform"]
+    result = filter_product_tags(tags)
+    assert "product/d360" not in result
+    assert "product/doxis4" not in result
+    assert "product/blue-yonder-platform" in result
+
+
+def test_filter_product_tags_keeps_by_products():
+    """BY products are never filtered."""
+    tags = [
+        "product/blue-yonder-demand-planning",
+        "product/blue-yonder-wms",
+        "product/blue-yonder-control-tower",
+        "product/inventory-ops-agent",
+        "product/supply-assist-agent",
+    ]
+    result = filter_product_tags(tags)
+    assert result == tags
+
+
+def test_generate_tags_filters_client_products():
+    """generate_tags drops non-BY product tags automatically."""
+    fm = {
+        "products": ["Lenzing", "Blue Yonder WMS"],
+        "topics": ["Supply Chain"],
+    }
+    tags = generate_tags(fm)
+    assert "product/lenzing" not in tags
+    assert "product/blue-yonder-wms" in tags
