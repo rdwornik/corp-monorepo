@@ -7,11 +7,11 @@ $root = $PSScriptRoot | Split-Path -Parent
 $failed = @()
 
 Write-Host "`n=== Ruff Format ===" -ForegroundColor Cyan
-ruff format "$root/packages/"
+ruff format "$root/src/"
 if ($LASTEXITCODE -ne 0) { $failed += "ruff-format" }
 
 Write-Host "`n=== Ruff Lint ===" -ForegroundColor Cyan
-ruff check "$root/packages/" --fix
+ruff check "$root/src/" --fix
 if ($LASTEXITCODE -ne 0) { $failed += "ruff-lint" }
 
 Write-Host "`n=== Unit Tests ===" -ForegroundColor Cyan
