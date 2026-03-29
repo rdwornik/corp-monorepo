@@ -60,6 +60,16 @@ src/corp/
 - Test after every change
 - Git feature branches, never commit to main directly
 
+## Learned Rules (project-specific, graduated from corrections)
+- Never run `pip install` from `_archived_*` repos — overwrites monorepo CLI entry points. Only install from corp-monorepo root.
+  verify: Grep("pip install", path="corp-monorepo/") → confirm no install instructions point to archived repos
+- git subtree branches must NEVER be rebased — always merge. Rebase causes duplicate commits and lost history.
+  verify: manual (process rule — check before any rebase on monorepo branches)
+- CKE output must be staged in `scope/client/package/` hierarchy BEFORE running `corp ingest-extractions`. Flat dirs → 0 notes ingested.
+  verify: Grep("ingest-extractions", path="corp-monorepo/") → check any docs/scripts for flat-dir usage
+- status.json concurrent reads must use try/except with 2-3 retries — CKE writes while polling reads cause JSONDecodeError.
+  verify: Grep("json.loads", path="corp-monorepo/packages/corp-by-os/src/") → confirm retry wrapper exists
+
 ## Session Protocol
 1. Read last 5 entries from JOURNAL.md before starting work
 2. After implementation, self-review: focus on error handling, edge cases, gotchas
