@@ -6,6 +6,11 @@ Claude Code: read last 5 entries before starting work.
 ---
 
 
+## 2026-03-29 session 4 — Council #23 Phase 3+4 (ADR-23 Q3/Q4/Q5)
+- **Did:** Flattened 3 sub-packages: `doctor/integrity.py` → `integrity.py`, `freshness/scanner.py` → `freshness_scanner.py`, `extraction/non_project/` (5 files) → `extraction/`. Max path depth 6→3 (relative to src). Centralized `parse_llm_json` + `normalize_string_list` in corp-os-meta: added `log.error` before raise; moved `normalize_string_list` from CKE utils to corp-os-meta; deleted CKE `utils.py` entirely (8 import sites updated). Deleted 4 confirmed dead files in corp-rfp-agent: `clean_kb.py`, `scan_kb.py`, `kb_to_markdown.py`, `_paths.py` (test_cli_smoke.py updated). corp-os-meta: 133 pass; CKE: 863 pass; rfp-agent: 179 pass; corp-by-os: 990 pass.
+- **Failed:** Pre-commit ruff caught `UP038` (`isinstance(x, (int, float))` → `int | float`) in `contract.py` — fixed manually. Cherry-pick workflow needed to align doctor/freshness commits across phase2/phase3 branches due to background task switching branches accidentally.
+- **Next:** Corp-rfp-agent Click CLI migration. 30-day skill eval (due 2026-04-25). MinHash wiring. Ontology Q4.
+
 ## 2026-03-29 session 3 — Phase 2 subprocess boundary fix (ADR-23 Q1)
 - **Did:** Rewrote `overnight/cke_client.py` (180 → 280 lines) to use subprocess instead of direct CKE imports. Enforces architecture rule: corp-by-os → CKE must use process boundary. `is_available()` uses `shutil.which("cke")`; `extract_batch`/`extract_sync` run `cke process-manifest` with `capture_output=True, encoding="utf-8", errors="replace"` and regex-parse stdout summary ("Done: N", "Errors: N", etc.); `scan_local` uses `cke scan -o <tmp.json>`; `load_cke_config()` reads settings.yaml directly; `estimate_cost()` → NotImplementedError (dead function, no callers). 1015 tests pass, 1 skip. Branch: `feat/phase2-subprocess-boundary`, commits `663a05d` + `775a7d3`. Zero remaining `corp_knowledge_extractor` runtime imports in corp-by-os.
 - **Failed:** Ruff E402 (`import os as _os` after constant) — moved `os` import to top-level block.
