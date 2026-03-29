@@ -37,7 +37,7 @@ _ROOT = Path("/fake/project")
 @settings(max_examples=200)
 def test_cpe_classify_file_never_crashes(filename, ext):
     """classify_file must not raise for any filename + extension combination."""
-    from corp_project_extractor.classifier import classify_file
+    from corp.project.classifier import classify_file
 
     file_path = _ROOT / f"{filename}{ext}"
     result = classify_file(file_path, _ROOT)
@@ -53,7 +53,7 @@ def test_cpe_classify_file_never_crashes(filename, ext):
 @settings(max_examples=150)
 def test_cpe_classify_file_always_returns_valid_classification(filename, ext):
     """Every Classification result satisfies the structural contract."""
-    from corp_project_extractor.classifier import DOC_ROLES, classify_file
+    from corp.project.classifier import DOC_ROLES, classify_file
 
     file_path = _ROOT / f"{filename}{ext}"
     r = classify_file(file_path, _ROOT)
@@ -80,7 +80,7 @@ def test_cpe_classify_file_always_returns_valid_classification(filename, ext):
 @settings(max_examples=300)
 def test_clean_description_never_crashes_and_never_returns_empty(stem):
     """clean_description must return a non-empty string for any input."""
-    from corp_by_os.ingest.naming_config import clean_description, load_naming_config
+    from corp.ingest.naming_config import clean_description, load_naming_config
 
     load_naming_config.cache_clear()
     result = clean_description(stem)
@@ -98,8 +98,8 @@ def test_clean_description_never_crashes_and_never_returns_empty(stem):
 _term_st = st.from_regex(r"[A-Za-z][A-Za-z0-9]{2,15}", fullmatch=True)
 _terms_st = st.lists(_term_st, min_size=1, max_size=3, unique=True)
 
-CORE_BLOCKLIST = "corp_rfp_agent.anonymization.core.get_blocklist"
-CORE_SESSION = "corp_rfp_agent.anonymization.core.get_session"
+CORE_BLOCKLIST = "corp.rfp.anonymization.core.get_blocklist"
+CORE_SESSION = "corp.rfp.anonymization.core.get_session"
 _DEFAULT_SESSION = {"customer_name": "", "placeholder": "[CUSTOMER]"}
 
 
@@ -107,7 +107,7 @@ _DEFAULT_SESSION = {"customer_name": "", "placeholder": "[CUSTOMER]"}
 @settings(max_examples=150)
 def test_rfp_anonymize_deanonymize_roundtrip(terms, extra):
     """anonymize followed by deanonymize restores all replaced terms."""
-    from corp_rfp_agent.anonymization.core import anonymize, deanonymize
+    from corp.rfp.anonymization.core import anonymize, deanonymize
 
     # Build input text that definitely contains each term as a whole word
     text = " ".join(terms) + " " + extra
@@ -145,7 +145,7 @@ def test_rfp_anonymize_deanonymize_roundtrip(terms, extra):
 @settings(max_examples=100)
 def test_rfp_anonymize_placeholders_are_well_formed(terms):
     """Every placeholder in the mapping follows the [CUSTOMER*] naming scheme."""
-    from corp_rfp_agent.anonymization.core import anonymize
+    from corp.rfp.anonymization.core import anonymize
 
     text = " ".join(terms)
 

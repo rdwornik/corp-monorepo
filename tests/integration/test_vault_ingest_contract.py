@@ -6,7 +6,7 @@ from pathlib import Path
 
 def test_quality_prediction_fixture_has_required_fields():
     """quality_prediction.json entries have doc_type and quality fields."""
-    fixtures = Path("packages/corp-knowledge-extractor/tests/fixtures")
+    fixtures = Path("tests/extractor/fixtures")
     data = json.loads((fixtures / "quality_prediction.json").read_text())
     assert len(data) > 0
     for entry in data[:10]:
@@ -16,7 +16,7 @@ def test_quality_prediction_fixture_has_required_fields():
 
 def test_classifier_training_doc_types_are_strings():
     """All doc_type values in classifier_training.json are non-empty strings."""
-    fixtures = Path("packages/corp-knowledge-extractor/tests/fixtures")
+    fixtures = Path("tests/extractor/fixtures")
     data = json.loads((fixtures / "classifier_training.json").read_text())
     for entry in data:
         dt = entry.get("doc_type")

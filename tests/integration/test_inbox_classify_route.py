@@ -1,6 +1,6 @@
 """Magistrala classifier produces valid type codes and destinations."""
 
-from corp_by_os.ingest.naming_config import get_type_code, load_naming_config
+from corp.ingest.naming_config import get_type_code, load_naming_config
 
 
 def test_all_type_codes_are_uppercase():

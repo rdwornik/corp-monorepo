@@ -28,7 +28,7 @@ def _build_proposed(
     client: str | None,
 ) -> str:
     """Build YYYY-MM_TYPE_CLIENT_Description.ext without a Classification object."""
-    from corp_by_os.ingest.naming_config import (
+    from corp.ingest.naming_config import (
         clean_description,
         get_client_alias,
         get_type_code,
@@ -56,8 +56,8 @@ def main() -> None:
     if not input_dir.exists():
         raise SystemExit("Sandbox not found — run create_cleanup_sample.py first")
 
-    from corp_by_os.ingest.light_scan import light_scan
-    from corp_knowledge_extractor.doc_type_classifier import classify_doc_type_hybrid
+    from corp.extractor.doc_type_classifier import classify_doc_type_hybrid
+    from corp.ingest.light_scan import light_scan
 
     results: list[dict] = []
 

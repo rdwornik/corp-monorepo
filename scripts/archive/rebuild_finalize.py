@@ -144,7 +144,7 @@ def main() -> None:
     # Git commit
     print("\nStaging files...")
     files_to_add = [
-        "packages/corp-by-os/src/corp_by_os/retrieve/engine.py",
+        "src/corp/retrieve/engine.py",
         ".ecosystem/archive/2026-03-27_VAULT_REBUILD_REPORT.md",
         "JOURNAL.md",
         "scripts/rebuild_complete.py",

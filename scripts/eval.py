@@ -28,18 +28,18 @@ MONOREPO = Path(__file__).resolve().parents[1]
 # Suppress noisy taxonomy "not in taxonomy" warnings during eval
 import logging  # noqa: E402
 
-logging.getLogger("corp_knowledge_extractor.post_process").setLevel(logging.ERROR)
+logging.getLogger("corp.extractor.post_process").setLevel(logging.ERROR)
 FIXTURES = MONOREPO / "packages/corp-knowledge-extractor/tests/fixtures"
 EVAL_DIR = MONOREPO / "eval"
 
 sys.path.insert(0, str(MONOREPO / "packages/corp-knowledge-extractor/src"))
 sys.path.insert(0, str(MONOREPO / "packages/corp-os-meta"))
 
-from corp_knowledge_extractor.doc_type_classifier import (  # noqa: E402
+from corp.extractor.doc_type_classifier import (  # noqa: E402
     classify_doc_type_hybrid,
     classify_from_filename,
 )
-from corp_knowledge_extractor.post_process import (  # noqa: E402
+from corp.extractor.post_process import (  # noqa: E402
     filter_people,
     normalize_product_names,
     validate_tags,

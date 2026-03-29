@@ -1,0 +1,556 @@
+"""Tests for inbox file renamer (Decision #14 naming convention).
+
+Pattern: YYYY-MM_TYPE_CLIENT_Description.ext
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+import yaml
+from corp.ingest.classifier import classify
+from corp.ingest.naming_config import (
+    clean_description,
+    get_client_alias,
+    get_client_variants,
+    get_type_code,
+)
+from corp.ingest.renamer import (
+    _infer_client,
+    _infer_type,
+    _sanitize,
+    propose_folder_name,
+    propose_name,
+)
+from corp.ops.registry import ContentRegistry
+
+
+@pytest.fixture()
+def registry_path(tmp_path: Path) -> Path:
+    """Create a test content_registry.yaml."""
+    data = {
+        "version": "1.0",
+        "series": {
+            "cognitive_friday": {
+                "display_name": "Cognitive Friday",
+                "destination": "60_Source_Library/02_Training_Enablement/Cognitive_Friday",
+                "naming_patterns": ["Cognitive_Friday*", "CF_S[0-9]*"],
+                "expected_extensions": [".mp4", ".pptx"],
+                "default_metadata": {
+                    "source_category": "training",
+                    "topics": ["Cognitive Planning", "AI/ML"],
+                    "products": ["Cognitive Demand Planning"],
+                },
+            },
+        },
+        "destination_rules": [
+            {
+                "name": "RFP databases",
+                "match": {
+                    "filename_contains": ["RFP_Database"],
+                    "extensions": [".xlsx"],
+                },
+                "destination": "50_RFP/_databases",
+                "metadata": {"source_category": "rfp"},
+            },
+            {
+                "name": "Competitive materials",
+                "match": {
+                    "filename_contains": ["Differentiation", "Competitive"],
+                    "extensions": [".pdf", ".pptx"],
+                },
+                "destination": "60_Source_Library/03_Competitive",
+                "metadata": {"source_category": "competitive"},
+            },
+        ],
+        "client_patterns": [
+            {"pattern": "Lenzing", "project": "Lenzing_Planning"},
+            {"pattern": "SGDBF|Saint.Gobain", "project": "SGDBF_Retail"},
+        ],
+        "fallback": {
+            "unknown_destination": "00_Inbox/_Unmatched",
+            "confidence_threshold": 0.75,
+        },
+    }
+    path = tmp_path / "content_registry.yaml"
+    path.write_text(yaml.dump(data, default_flow_style=False), encoding="utf-8")
+    return path
+
+
+@pytest.fixture()
+def registry(registry_path: Path) -> ContentRegistry:
+    return ContentRegistry(registry_path)
+
+
+# -- sanitize --
+
+
+class TestSanitize:
+    def test_spaces_to_underscores(self) -> None:
+        assert _sanitize("hello world") == "hello_world"
+
+    def test_special_chars_removed(self) -> None:
+        assert _sanitize("file@name#v2") == "file_name_v2"
+
+    def test_collapse_underscores(self) -> None:
+        assert _sanitize("hello___world") == "hello_world"
+
+    def test_strip_leading_trailing(self) -> None:
+        assert _sanitize("_hello_") == "hello"
+
+    def test_preserve_hyphens(self) -> None:
+        assert _sanitize("pre-sales-training") == "pre-sales-training"
+
+    def test_preserve_dots(self) -> None:
+        assert _sanitize("v2.1") == "v2.1"
+
+
+# -- type code resolution --
+
+
+class TestGetTypeCode:
+    def test_rfi_from_filename(self) -> None:
+        assert get_type_code(filename="Digital Property RFI - Transport.docx") == "RFI"
+
+    def test_rfp_from_doc_type(self) -> None:
+        assert get_type_code(doc_type="rfp_response") == "RFP"
+
+    def test_rfi_beats_rfp_doc_type(self) -> None:
+        """Filename hint for RFI overrides doc_type rfp_response."""
+        assert get_type_code(doc_type="rfp_response", filename="RFI_Overview.docx") == "RFI"
+
+    def test_va_from_filename(self) -> None:
+        assert get_type_code(filename="VA_Questionnaire_WMS.xlsx") == "VA"
+
+    def test_sow_from_filename(self) -> None:
+        assert get_type_code(filename="SOW_Implementation_Phase1.docx") == "SOW"
+
+    def test_training_from_source_category(self) -> None:
+        assert get_type_code(source_category="training") == "TRAIN"
+
+    def test_competitive_from_source_category(self) -> None:
+        assert get_type_code(source_category="competitive") == "COMP"
+
+    def test_architecture_from_doc_type(self) -> None:
+        assert get_type_code(doc_type="architecture") == "ARCH"
+
+    def test_presentation_from_doc_type(self) -> None:
+        assert get_type_code(doc_type="presentation") == "PRES"
+
+    def test_unknown_gets_misc(self) -> None:
+        assert get_type_code() == "MISC"
+
+    def test_unknown_file_gets_misc(self) -> None:
+        assert get_type_code(filename="random_file.txt") == "MISC"
+
+    def test_security_from_filename(self) -> None:
+        assert get_type_code(filename="SOC_2_Report.pdf") == "SEC"
+
+    def test_workshop_from_filename(self) -> None:
+        assert get_type_code(filename="Ahold_Workshop_Agenda.pptx") == "WORK"
+
+    def test_demo_from_doc_type(self) -> None:
+        assert get_type_code(doc_type="demo") == "DEMO"
+
+    def test_meeting_from_filename(self) -> None:
+        assert get_type_code(filename="Weekly_Standup_Notes.docx") == "MEET"
+
+
+class TestInferType:
+    def test_training_from_metadata(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        f = tmp_path / "Cognitive_Friday_S4.pptx"
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        assert _infer_type(c) == "TRAIN"
+
+    def test_rfp_from_metadata(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        f = tmp_path / "RFP_Database_WMS.xlsx"
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        assert _infer_type(c) == "RFP"
+
+    def test_competitive_from_metadata(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        f = tmp_path / "Competitive_Analysis.pptx"
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        assert _infer_type(c) == "COMP"
+
+    def test_misc_for_no_match(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        f = tmp_path / "random_file.txt"
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        assert _infer_type(c) == "MISC"
+
+
+# -- client alias --
+
+
+class TestGetClientAlias:
+    def test_jaguar_land_rover(self) -> None:
+        assert get_client_alias("Jaguar Land Rover") == "JLR"
+
+    def test_lenzing(self) -> None:
+        assert get_client_alias("Lenzing") == "LENZ"
+
+    def test_pepsico(self) -> None:
+        assert get_client_alias("PepsiCo") == "PEPSI"
+
+    def test_saint_gobain(self) -> None:
+        assert get_client_alias("Saint-Gobain") == "SGDBF"
+
+    def test_none_gets_fallback(self) -> None:
+        assert get_client_alias(None) == "GEN"
+
+    def test_unknown_client_auto_alias(self) -> None:
+        """Unknown clients get auto-generated 5-char alias."""
+        result = get_client_alias("Volkswagen Group")
+        assert result == "VOLKS"
+
+    def test_case_insensitive(self) -> None:
+        assert get_client_alias("lenzing") == "LENZ"
+        assert get_client_alias("MICHELIN") == "MICH"
+
+
+class TestInferClient:
+    def test_client_from_classification(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        f = tmp_path / "Lenzing_Discovery.docx"
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        assert _infer_client(c) == "LENZ"
+
+    def test_no_client_gets_fallback(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        f = tmp_path / "Cognitive_Friday_S4.pptx"
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        assert _infer_client(c) == "GEN"
+
+
+# -- description cleaning --
+
+
+class TestCleanDescription:
+    def test_strip_special_chars(self) -> None:
+        result = clean_description("Report (2024)")
+        assert result == "Report_2024"
+
+    def test_noise_words_removed(self) -> None:
+        result = clean_description("Copy of Final Draft v2")
+        # "Copy", "of", "Final", "Draft", "v2" are all noise words
+        assert "Copy" not in result
+        assert "of" not in result.split("_")
+
+    def test_truncation_at_word_boundary(self) -> None:
+        long_name = "_".join(["Word"] * 20)
+        result = clean_description(long_name)
+        assert len(result) <= 50
+
+    def test_empty_after_noise_removal(self) -> None:
+        result = clean_description("Copy of Draft v2")
+        # Should return "Untitled" if everything is noise
+        assert result  # Non-empty
+
+    def test_underscores_preserved(self) -> None:
+        result = clean_description("Blue_Yonder_Overview")
+        assert "Blue" in result
+        assert "Yonder" in result
+        assert "Overview" in result
+
+
+# -- full propose_name --
+
+
+class TestProposeName:
+    def test_full_rename_series(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        """Series file gets proper convention name."""
+        f = tmp_path / "Cognitive_Friday_S4E1_Tag_Changes.pptx"
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        result = propose_name(f, c)
+
+        assert result.original_name == "Cognitive_Friday_S4E1_Tag_Changes.pptx"
+        assert result.proposed_name.endswith(".pptx")
+        assert "TRAIN" in result.proposed_name
+        # Has YYYY-MM prefix
+        assert result.proposed_name[:4].isdigit()
+        assert result.proposed_name[4] == "-"
+
+    def test_rename_with_client(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        """Client file includes client alias in name."""
+        f = tmp_path / "Lenzing_Discovery_Workshop.docx"
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        result = propose_name(f, c)
+        assert "LENZ" in result.proposed_name
+
+    def test_rename_ignores_user_context(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        """Proposed name uses original filename, not user context."""
+        f = tmp_path / "slide_deck.pptx"
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        result = propose_name(f, c, user_context="WMS warehouse architecture overview")
+        # Context should NOT appear in the filename
+        assert "warehouse" not in result.proposed_name.lower()
+        assert "slide_deck" in result.proposed_name
+
+    def test_long_name_truncated(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        """Long filename truncated to max length."""
+        long_name = "A" * 200 + ".pptx"
+        f = tmp_path / long_name
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        result = propose_name(f, c)
+        assert len(result.proposed_name) <= 125  # 120 stem + 5 ext
+
+    def test_preserves_extension(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        """Original extension preserved in rename."""
+        f = tmp_path / "test.xlsx"
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        result = propose_name(f, c)
+        assert result.proposed_name.endswith(".xlsx")
+
+    def test_components_populated(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        """RenameProposal components dict is populated."""
+        f = tmp_path / "Cognitive_Friday_S4.pptx"
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        result = propose_name(f, c)
+        assert "date" in result.components
+        assert "type" in result.components
+        assert "client" in result.components
+        assert result.components["type"] == "TRAIN"
+
+    def test_no_topic_in_pattern(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        """Decision #14 removes TOPIC from pattern (was GEN in 80% of cases)."""
+        f = tmp_path / "random_file.txt"
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        result = propose_name(f, c)
+        # Pattern is now DATE_TYPE_CLIENT_DESC, no TOPIC segment
+        parts = result.proposed_name.split("_", 3)
+        assert parts[1] == "MISC"  # type code
+        assert parts[2] == "GEN"  # client (not topic)
+
+    def test_filename_hint_overrides_source_category(
+        self, tmp_path: Path, registry: ContentRegistry
+    ) -> None:
+        """Filename hint takes priority over source_category for type code."""
+        f = tmp_path / "RFI_Security_Assessment.pdf"
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        result = propose_name(f, c)
+        # "RFI" in filename should give RFI type code
+        assert "_RFI_" in result.proposed_name
+
+
+class TestExtensionTypeCode:
+    """get_type_code() extension fallback for binary/media files."""
+
+    def test_jpg_gets_img(self) -> None:
+        assert get_type_code(filename="photo.jpg") == "IMG"
+
+    def test_jpeg_gets_img(self) -> None:
+        assert get_type_code(filename="scan.jpeg") == "IMG"
+
+    def test_png_gets_img(self) -> None:
+        assert get_type_code(filename="logo.png") == "IMG"
+
+    def test_mp4_gets_vid(self) -> None:
+        assert get_type_code(filename="demo.mp4") == "VID"
+
+    def test_mov_gets_vid(self) -> None:
+        assert get_type_code(filename="recording.mov") == "VID"
+
+    def test_zip_gets_arcv(self) -> None:
+        assert get_type_code(filename="backup.zip") == "ARCV"
+
+    def test_7z_gets_arcv(self) -> None:
+        assert get_type_code(filename="archive.7z") == "ARCV"
+
+    def test_tar_gz_gets_arcv(self) -> None:
+        assert get_type_code(filename="source.tar.gz") == "ARCV"
+
+    def test_xlsm_not_arch(self) -> None:
+        """xlsm should not be caught by extension map — falls through to MISC."""
+        result = get_type_code(filename="report.xlsm")
+        assert result == "MISC"
+
+    def test_filename_hint_beats_extension(self) -> None:
+        """A filename_hint match wins over extension fallback."""
+        # SOC_2.png — SEC hint in filename beats IMG extension
+        assert get_type_code(filename="SOC_2_certificate.png") == "SEC"
+
+
+class TestAlreadyCompliant:
+    """propose_name() skips files already matching YYYY-MM_TYPE_CLIENT_ pattern."""
+
+    def test_compliant_file_unchanged(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        fname = "2026-03_WORK_JLR_Workshop_Part_2.pptx"
+        f = tmp_path / fname
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        result = propose_name(f, c)
+        assert result.proposed_name == fname
+
+    def test_compliant_file_has_empty_components(
+        self, tmp_path: Path, registry: ContentRegistry
+    ) -> None:
+        fname = "2025-11_RFP_ALFAL_Localhost_Questions.xlsx"
+        f = tmp_path / fname
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        result = propose_name(f, c)
+        assert result.components["type"] == ""
+        assert result.components["date"] == ""
+
+    def test_non_compliant_still_renamed(self, tmp_path: Path, registry: ContentRegistry) -> None:
+        fname = "random_file.docx"
+        f = tmp_path / fname
+        f.write_bytes(b"x" * 100)
+        c = classify(f, registry)
+        result = propose_name(f, c)
+        assert result.proposed_name != fname
+        assert result.proposed_name[:4].isdigit()
+
+
+class TestProposeFolderName:
+    def test_project_folder_no_date(self, tmp_path: Path) -> None:
+        """Folder with files spanning >30 days gets no date prefix."""
+        folder = tmp_path / "Jaguar_Land_Rover_TMS"
+        folder.mkdir()
+        import time
+
+        old_file = folder / "old.docx"
+        old_file.write_bytes(b"x")
+        # Set mtime 60 days ago
+        old_ts = time.time() - 60 * 86400
+        import os
+
+        os.utime(old_file, (old_ts, old_ts))
+        new_file = folder / "new.docx"
+        new_file.write_bytes(b"x")
+
+        result = propose_folder_name(folder)
+        assert not result.is_event
+        assert not result.proposed_name[:4].isdigit()
+        assert result.type_code == "PROJECT"
+
+    def test_event_folder_has_date(self, tmp_path: Path) -> None:
+        """Subfolder (depth=2) with files all within 7 days gets a date prefix."""
+        folder = tmp_path / "Clicks_Workshop"
+        folder.mkdir()
+        (folder / "agenda.pptx").write_bytes(b"x")
+        (folder / "notes.docx").write_bytes(b"x")
+        (folder / "recording.txt").write_bytes(b"x")
+
+        result = propose_folder_name(folder, depth=2)
+        assert result.is_event
+        assert result.proposed_name[:4].isdigit()
+
+    def test_empty_folder(self, tmp_path: Path) -> None:
+        folder = tmp_path / "Empty_Project"
+        folder.mkdir()
+        result = propose_folder_name(folder)
+        assert result.file_count == 0
+        assert result.proposed_name == "Empty_Project"
+
+    def test_unchanged_flag_true_when_same(self, tmp_path: Path) -> None:
+        folder = tmp_path / "CLICK_Retail"
+        folder.mkdir()
+        result = propose_folder_name(folder)
+        assert isinstance(result.unchanged, bool)
+
+    def test_proposed_within_max_length(self, tmp_path: Path) -> None:
+        folder = tmp_path / "Jaguar Land Rover Very Long Project Name With Lots Of Words"
+        folder.mkdir()
+        # Needs >2 files to skip the consolidate path
+        for i in range(3):
+            (folder / f"file{i}.docx").write_bytes(b"x")
+        result = propose_folder_name(folder)
+        assert len(result.proposed_name) <= 40
+
+    def test_tiny_folder_consolidate_flag(self, tmp_path: Path) -> None:
+        """Folders with ≤2 files get consolidate=True and no rename proposed."""
+        folder = tmp_path / "Solo_Project"
+        folder.mkdir()
+        (folder / "only.docx").write_bytes(b"x")
+        result = propose_folder_name(folder)
+        assert result.consolidate is True
+        assert result.proposed_name == "Solo_Project"
+        assert result.unchanged is True
+
+    def test_batch_copy_treated_as_project(self, tmp_path: Path) -> None:
+        """span≈0 with >5 files = batch copy → PROJECT, not EVENT."""
+        folder = tmp_path / "NEOM_WMS"
+        folder.mkdir()
+        for i in range(7):
+            (folder / f"file{i}.docx").write_bytes(b"x")
+        result = propose_folder_name(folder)
+        assert result.is_event is False
+        assert result.type_code == "PROJECT"
+
+    def test_clean_project_name_kept_unchanged(self, tmp_path: Path) -> None:
+        """Already-clean PROJECT folder names are not renamed."""
+        folder = tmp_path / "Clicks_Retail"
+        folder.mkdir()
+        import os
+        import time
+        for i in range(3):
+            f = folder / f"file{i}.docx"
+            f.write_bytes(b"x")
+            ts = time.time() - (i * 40 * 86400)
+            os.utime(f, (ts, ts))
+        result = propose_folder_name(folder)
+        assert result.proposed_name == "Clicks_Retail"
+        assert result.unchanged is True
+
+    def test_dominant_type_threshold_met(self, tmp_path: Path) -> None:
+        """EVENT subfolder where ≥60% files share a type → that type used, not MISC."""
+        folder = tmp_path / "JLR_Workshop"
+        folder.mkdir()
+        # 4 workshop-triggering files out of 4 (100%) → should get WORK type
+        for name in ["workshop_agenda.pptx", "workshop_notes.docx",
+                     "workshop_prep.xlsx", "workshop_summary.pdf"]:
+            (folder / name).write_bytes(b"x")
+        result = propose_folder_name(folder, depth=2)
+        assert result.is_event
+        assert result.type_code != "MISC"
+
+    def test_dominant_type_threshold_not_met(self, tmp_path: Path) -> None:
+        """EVENT subfolder with mixed types below threshold → MISC."""
+        folder = tmp_path / "Mixed_Project"
+        folder.mkdir()
+        # 1 RFP out of 5 files (20%) → below 60%, should be MISC
+        (folder / "rfp_response.docx").write_bytes(b"x")
+        (folder / "data.csv").write_bytes(b"x")
+        (folder / "data2.csv").write_bytes(b"x")
+        (folder / "data3.csv").write_bytes(b"x")
+        (folder / "readme.txt").write_bytes(b"x")
+        result = propose_folder_name(folder, depth=2)
+        assert result.is_event
+        assert result.type_code == "MISC"
+
+
+class TestGetClientVariants:
+    def test_alias_expands_to_full_names(self) -> None:
+        """'JLR' returns all Jaguar Land Rover variants."""
+        variants = get_client_variants("JLR")
+        assert "Jaguar Land Rover" in variants
+        assert "JLR" in variants
+
+    def test_full_name_expands_to_alias(self) -> None:
+        """'Jaguar Land Rover' returns the same group including 'JLR'."""
+        variants = get_client_variants("Jaguar Land Rover")
+        assert "JLR" in variants
+        assert "Jaguar Land Rover" in variants
+
+    def test_unknown_client_returns_itself(self) -> None:
+        """Unknown client falls back to [client_name]."""
+        variants = get_client_variants("SomeUnknownCorp")
+        assert variants == ["SomeUnknownCorp"]
+
+    def test_case_insensitive_lookup(self) -> None:
+        """Lookup is case-insensitive."""
+        variants = get_client_variants("jaguar land rover")
+        assert "Jaguar Land Rover" in variants

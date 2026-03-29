@@ -1,6 +1,6 @@
 """Sandbox near-duplicate detection — no DB, in-memory only.
 
-Uses corp_by_os.ingest.dedup.compute_minhash (word 3-grams, 128 perms)
+Uses corp.ingest.dedup.compute_minhash (word 3-grams, 128 perms)
 to find near-duplicate pairs in the sandbox sample.
 
 Writes dedup_preview.json to .sandbox/cleanup_pilot/.
@@ -20,8 +20,8 @@ def main() -> None:
     if not input_dir.exists():
         raise SystemExit("Sandbox not found — run create_cleanup_sample.py first")
 
-    from corp_by_os.ingest.dedup import compute_minhash
-    from corp_by_os.ingest.light_scan import light_scan
+    from corp.ingest.dedup import compute_minhash
+    from corp.ingest.light_scan import light_scan
 
     # Build content index
     index: dict[str, tuple[str, object]] = {}  # path → (filename, minhash)

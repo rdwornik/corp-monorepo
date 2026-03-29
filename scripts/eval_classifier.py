@@ -20,10 +20,10 @@ from sklearn.metrics import accuracy_score, classification_report
 MONOREPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(MONOREPO / "packages/corp-knowledge-extractor/src"))
 
-from corp_knowledge_extractor.doc_type_classifier import (  # noqa: E402
+from corp.extractor.doc_type_classifier import (  # noqa: E402
     classify_from_filename,
 )
-from corp_knowledge_extractor.hybrid_loader import (  # noqa: E402
+from corp.extractor.hybrid_loader import (  # noqa: E402
     load_hybrid_classifier,
     predict_hybrid,
 )

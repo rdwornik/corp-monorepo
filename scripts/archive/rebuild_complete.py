@@ -173,7 +173,7 @@ def main() -> None:
     # ── Step 12c: Git commit ────────────────────────────────────────────────
     print("\n[Step 12c] Committing...")
     subprocess.run(["git", "add",
-        "packages/corp-by-os/src/corp_by_os/retrieve/engine.py",
+        "src/corp/retrieve/engine.py",
         ".ecosystem/archive/2026-03-27_VAULT_REBUILD_REPORT.md",
         "JOURNAL.md",
         "scripts/rebuild_complete.py",

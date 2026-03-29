@@ -1,0 +1,157 @@
+{
+	"folders": [
+		{
+			"name": "📋 corp-monorepo (root)",
+			"path": "."
+		},
+		{
+			"name": "📋 corp-os-meta",
+			"path": "packages\\corp-os-meta"
+		},
+		{
+			"name": "📋 corp-knowledge-extractor",
+			"path": "packages\\corp-knowledge-extractor"
+		},
+		{
+			"name": "📋 corp-by-os",
+			"path": "packages\\corp-by-os"
+		},
+		{
+			"name": "📋 corp-project-extractor",
+			"path": "packages\\corp-project-extractor"
+		},
+		{
+			"name": "📋 corp-rfp-agent",
+			"path": "packages\\corp-rfp-agent"
+		},
+		{
+			"name": "📋 corp-opportunity-manager",
+			"path": "packages\\corp-opportunity-manager"
+		},
+		{
+			"name": "🤖 ai-council",
+			"path": "..\\ai-council"
+		},
+		{
+			"name": "⚙️ corp-ops",
+			"path": "..\\corp-ops"
+		},
+		{
+			"name": "⏰ corp-sca-time-automation",
+			"path": "..\\corp-sca-time-automation"
+		},
+		{
+			"name": "📓 .dev-knowledge",
+			"path": "..\\.dev-knowledge"
+		}
+	],
+	"settings": {
+
+		// ── Python ──────────────────────────────────────────
+		"python.defaultInterpreterPath": "python",
+		"python.analysis.typeCheckingMode": "basic",
+		"python.analysis.autoImportCompletions": true,
+		"python.analysis.inlayHints.functionReturnTypes": true,
+		"python.analysis.inlayHints.variableTypes": false,
+
+		// ── Testing ─────────────────────────────────────────
+		"python.testing.pytestEnabled": true,
+		"python.testing.unittestEnabled": false,
+		"python.testing.pytestArgs": [
+			"--tb=short",
+			"-q"
+		],
+		"python.testing.autoTestDiscoverOnSaveEnabled": true,
+
+		// ── Ruff (replaces flake8, isort, black) ────────────
+		"ruff.enable": true,
+		"ruff.fixAll": true,
+		"ruff.organizeImports": true,
+		"ruff.lint.run": "onSave",
+
+		// ── Editor ──────────────────────────────────────────
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "charliermarsh.ruff",
+		"[python]": {
+			"editor.defaultFormatter": "charliermarsh.ruff",
+			"editor.formatOnSave": true,
+			"editor.codeActionsOnSave": {
+				"source.fixAll.ruff": "explicit",
+				"source.organizeImports.ruff": "explicit"
+			}
+		},
+		"editor.rulers": [120],
+		"editor.bracketPairColorization.enabled": true,
+		"editor.guides.bracketPairs": true,
+		"editor.stickyScroll.enabled": true,
+		"editor.minimap.enabled": false,
+
+		// ── Files ───────────────────────────────────────────
+		"files.exclude": {
+			"**/__pycache__": true,
+			"**/*.pyc": true,
+			"**/.pytest_cache": true,
+			"**/*.egg-info": true,
+			"**/dist": true,
+			"**/build": true,
+			"**/.ruff_cache": true,
+			"**/_outputs": true,
+			"**/.sandbox": true,
+			"**/output": true,
+			"**/.venv": true
+		},
+		"files.watcherExclude": {
+			"**/__pycache__/**": true,
+			"**/.git/objects/**": true,
+			"**/_outputs/**": true,
+			"**/output/**": true,
+			"**/.sandbox/**": true,
+			"**/.venv/**": true
+		},
+		"search.exclude": {
+			"**/_outputs": true,
+			"**/output": true,
+			"**/.sandbox": true,
+			"**/rebuild_staging": true,
+			"**/*.egg-info": true
+		},
+
+		// ── Git ─────────────────────────────────────────────
+		"git.enableSmartCommit": true,
+		"git.confirmSync": false,
+		"git.autofetch": true,
+
+		// ── Terminal ────────────────────────────────────────
+		"terminal.integrated.defaultProfile.windows": "PowerShell",
+
+		// ── Error Lens ──────────────────────────────────────
+		"errorLens.enabledDiagnosticLevels": ["error", "warning"],
+		"errorLens.delay": 500,
+
+		// ── Explorer ────────────────────────────────────────
+		"explorer.sortOrder": "type",
+		"explorer.compactFolders": false,
+
+		// ── Markdown ────────────────────────────────────────
+		"markdown.preview.fontSize": 14,
+
+		// ── Misc ────────────────────────────────────────────
+		"workbench.editor.highlightModifiedTabs": true,
+		"workbench.startupEditor": "none",
+		"breadcrumbs.enabled": true
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-python.python",
+			"ms-python.vscode-pylance",
+			"charliermarsh.ruff",
+			"usernamehw.errorlens",
+			"eamodio.gitlens",
+			"gruntfuggly.todo-tree",
+			"yzhang.markdown-all-in-one",
+			"mechatroner.rainbow-csv",
+			"redhat.vscode-yaml",
+			"tamasfe.even-better-toml"
+		]
+	}
+}
