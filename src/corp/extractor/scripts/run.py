@@ -55,6 +55,7 @@ from corp.extractor.transcript import (  # noqa: E402
     TranscriptResult,
     generate_transcript,
 )
+from corp.schema.folder_names import ARCHIVE  # noqa: E402
 
 logging.basicConfig(
     level=logging.INFO,
@@ -842,7 +843,7 @@ def info(package_path: str):
 @click.option(
     "--exclude",
     multiple=True,
-    default=["80_Archive", ".corp", "_knowledge", ".venv", "__pycache__", ".git"],
+    default=[ARCHIVE, ".corp", "_knowledge", ".venv", "__pycache__", ".git"],
     help="Folders to skip",
 )
 def scan(path: str, recursive: bool, output: str | None, exclude: tuple[str, ...]):
