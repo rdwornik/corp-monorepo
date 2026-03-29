@@ -30,7 +30,8 @@ def _get_client_variants(client: str) -> list[str]:
         from corp.ingest.naming_config import get_client_variants
 
         return get_client_variants(client)
-    except Exception:
+    except ImportError as e:
+        logger.debug("Client alias lookup unavailable: %s", e)
         return [client]
 
 

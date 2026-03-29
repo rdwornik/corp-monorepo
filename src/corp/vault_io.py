@@ -202,7 +202,8 @@ def _read_project_info_from_path(info_file: Path, project_id: str) -> ProjectInf
     try:
         with open(info_file, encoding="utf-8") as f:
             data = yaml.safe_load(f)
-    except Exception:
+    except (OSError, yaml.YAMLError) as e:
+        logger.warning("Failed to read project info from %s: %s", info_file, e)
         return None
 
     if not data or not isinstance(data, dict):
@@ -449,7 +450,7 @@ def _validate_project_info(path: Path, report: ValidationReport) -> None:
     try:
         with open(path, encoding="utf-8") as f:
             data = yaml.safe_load(f)
-    except Exception as e:
+    except (yaml.YAMLError, OSError) as e:
         report.issues.append(
             ValidationIssue(
                 path=path,
@@ -524,7 +525,7 @@ def _validate_note_frontmatter(path: Path, report: ValidationReport) -> None:
     except ImportError:
         # corp-os-meta not available — skip frontmatter validation
         report.notes_valid += 1
-    except Exception as e:
+    except (OSError, yaml.YAMLError, ValueError) as e:
         report.issues.append(
             ValidationIssue(
                 path=path,

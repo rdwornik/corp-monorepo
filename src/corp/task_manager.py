@@ -272,7 +272,8 @@ def _parse_task_file(path: Path) -> Task | None:
     """Parse a task markdown file into a Task object."""
     try:
         content = path.read_text(encoding="utf-8")
-    except Exception:
+    except OSError as e:
+        logger.warning("Failed to read task file %s: %s", path, e)
         return None
 
     if not content.startswith("---"):

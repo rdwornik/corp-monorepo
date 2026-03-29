@@ -413,7 +413,7 @@ def _enrich_from_onedrive(info: dict, folder: Path) -> None:
         if isinstance(opp, dict):
             info["region"] = opp.get("region", info.get("region"))
             info["industry"] = opp.get("industry", info.get("industry"))
-    except Exception as e:
+    except (yaml.YAMLError, OSError, KeyError) as e:
         logger.debug("Failed to read OneDrive project-info: %s", e)
 
 
@@ -438,7 +438,7 @@ def _enrich_from_vault(info: dict, folder: Path) -> None:
         info["files_processed"] = data.get("files_processed", info["files_processed"])
         info["facts_count"] = data.get("facts_count", 0)
         info["last_extracted"] = data.get("last_extracted", info.get("last_extracted"))
-    except Exception as e:
+    except (yaml.YAMLError, OSError) as e:
         logger.debug("Failed to read vault project-info: %s", e)
 
 
@@ -498,7 +498,7 @@ def _load_and_insert_facts(
         try:
             with open(facts_path, encoding="utf-8") as f:
                 data = yaml.safe_load(f)
-        except Exception as e:
+        except (yaml.YAMLError, OSError) as e:
             logger.debug("Failed to load facts from %s: %s", facts_path, e)
             continue
 
@@ -551,7 +551,8 @@ def _parse_frontmatter(filepath: Path) -> dict | None:
     """Extract YAML frontmatter from a markdown file."""
     try:
         text = filepath.read_text(encoding="utf-8", errors="replace")
-    except Exception:
+    except OSError as e:
+        logger.debug("Failed to read %s: %s", filepath, e)
         return None
     if not text.startswith("---"):
         return None
@@ -560,7 +561,8 @@ def _parse_frontmatter(filepath: Path) -> dict | None:
         return None
     try:
         return yaml.safe_load(text[3:end])
-    except Exception:
+    except yaml.YAMLError as e:
+        logger.debug("Failed to parse frontmatter from %s: %s", filepath, e)
         return None
 
 
