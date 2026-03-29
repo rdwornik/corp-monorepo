@@ -13,7 +13,7 @@ from corp.extraction.manifest_emitter import (
 )
 from corp.extraction.routing import RouteInfo
 from corp.extraction.scanner import ScanResult, scan_folder
-from corp.schema.folder_names import TEMPLATES
+from corp.schema.folder_names import REF_RFP_LIBRARY, REFERENCE, WORKFLOWS
 
 
 @pytest.fixture()
@@ -39,7 +39,7 @@ def policy():
 
 def test_build_manifest_structure(mywork_tree, route_info, policy):
     """Generated manifest matches CKE expected format."""
-    decks = mywork_tree / TEMPLATES / "01_Presentation_Decks"
+    decks = mywork_tree / WORKFLOWS / "01_Presentation_Decks"
     scans = scan_folder(decks, allow_extensions=[".pptx"])
     output = mywork_tree / "output"
 
@@ -59,7 +59,7 @@ def test_build_manifest_structure(mywork_tree, route_info, policy):
 
 def test_build_manifest_v21_fields(mywork_tree, route_info, policy):
     """All v2.1 provenance fields present in each entry."""
-    decks = mywork_tree / TEMPLATES / "01_Presentation_Decks"
+    decks = mywork_tree / WORKFLOWS / "01_Presentation_Decks"
     scans = scan_folder(decks, allow_extensions=[".pptx"])
     output = mywork_tree / "output"
 
@@ -76,7 +76,7 @@ def test_build_manifest_v21_fields(mywork_tree, route_info, policy):
 def test_build_manifest_config_section(mywork_tree, route_info, policy):
     """Manifest config contains provenance and policy metadata."""
     scans = scan_folder(
-        mywork_tree / TEMPLATES / "01_Presentation_Decks",
+        mywork_tree / WORKFLOWS / "01_Presentation_Decks",
         allow_extensions=[".pptx"],
     )
     manifest = build_manifest(scans, route_info, policy, mywork_tree / "out")

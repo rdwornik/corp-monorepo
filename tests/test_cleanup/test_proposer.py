@@ -8,7 +8,7 @@ import yaml
 from corp.cleanup.classifier import Classification
 from corp.cleanup.proposer import generate_proposals
 from corp.cleanup.scanner import FileInfo
-from corp.schema.folder_names import INBOX, TEMPLATES
+from corp.schema.folder_names import INBOX, WORKFLOWS
 
 
 def _make_classification(name: str, action: str, dest: str, confidence: float) -> Classification:
@@ -33,7 +33,7 @@ def _make_classification(name: str, action: str, dest: str, confidence: float) -
 def test_generate_proposals_yaml(tmp_path):
     """Proposals written as valid YAML with required fields."""
     classifications = [
-        _make_classification("a.pptx", "move", f"{TEMPLATES}/01_Presentation_Decks", 0.9),
+        _make_classification("a.pptx", "move", f"{WORKFLOWS}/01_Presentation_Decks", 0.9),
         _make_classification("b.log", "delete", "DELETE", 0.8),
         _make_classification("c.txt", "keep", INBOX, 0.5),
     ]

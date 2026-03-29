@@ -17,11 +17,13 @@ from corp.ops.database import OpsDB
 from corp.ops.registry import ContentRegistry
 from corp.schema.folder_names import (
     ADMIN,
+    CORP_INFRA,
     INBOX,
     PROJECTS,
-    RFP,
-    SOURCE_LIBRARY,
+    REF_RFP_LIBRARY,
+    REFERENCE,
     UNMATCHED,
+    WORKFLOWS,
 )
 
 
@@ -32,7 +34,7 @@ def registry(tmp_path: Path) -> ContentRegistry:
         "series": {
             "cognitive_friday": {
                 "display_name": "Cognitive Friday",
-                "destination": f"{SOURCE_LIBRARY}/02_Training_Enablement/Cognitive_Friday",
+                "destination": f"{REFERENCE}/02_Training_Enablement/Cognitive_Friday",
                 "naming_patterns": ["Cognitive_Friday*"],
             },
         },
@@ -40,7 +42,7 @@ def registry(tmp_path: Path) -> ContentRegistry:
             {
                 "name": "RFP databases",
                 "match": {"filename_contains": ["RFP_Database"]},
-                "destination": f"{RFP}/_databases",
+                "destination": f"{REFERENCE}/{REF_RFP_LIBRARY}/_databases",
             },
         ],
         "client_patterns": [],
@@ -71,10 +73,11 @@ class TestParseLlmJson:
 
     def test_code_fence_json(self) -> None:
         """Parses JSON inside markdown code fence."""
-        raw = f'```json\n{{"destination": "{RFP}", "confidence": 0.7}}\n```'
+        dest = f"{REFERENCE}/{REF_RFP_LIBRARY}"
+        raw = f'```json\n{{"destination": "{dest}", "confidence": 0.7}}\n```'
         result = _parse_llm_json(raw)
         assert result is not None
-        assert result["destination"] == RFP
+        assert result["destination"] == dest
 
     def test_json_with_prose(self) -> None:
         """Extracts JSON from surrounding prose."""
@@ -96,7 +99,7 @@ class TestClassifyFileLlm:
     def test_parses_valid_response(self) -> None:
         """classify_file_llm parses valid JSON from mocked Gemini."""
         mock_response = MagicMock()
-        destination = f"{SOURCE_LIBRARY}/01_Product_Docs"
+        destination = f"{REFERENCE}/01_Product_Docs"
         mock_response.text = (  # noqa: E501
             f'{{"destination": "{destination}", '
             '"series_id": null, "topics": ["WMS"], '
@@ -116,10 +119,10 @@ class TestClassifyFileLlm:
                 2.5,
                 INBOX,
                 None,
-                [f"{SOURCE_LIBRARY}/01_Product_Docs"],
+                [f"{REFERENCE}/01_Product_Docs"],
             )
 
-        assert result.destination == f"{SOURCE_LIBRARY}/01_Product_Docs"
+        assert result.destination == f"{REFERENCE}/01_Product_Docs"
         assert result.source_category == "product_doc"
         assert result.confidence == 0.75
 
@@ -266,7 +269,7 @@ class TestClassifyQuarantinedBatch:
         (unmatched / "test.pdf").write_bytes(b"content")
 
         mock_response = MagicMock()
-        destination = f"{SOURCE_LIBRARY}/01_Product_Docs"
+        destination = f"{REFERENCE}/01_Product_Docs"
         mock_response.text = (  # noqa: E501
             f'{{"destination": "{destination}", '
             f'"confidence": 0.7, "reasoning": "looks like product doc"}}'
@@ -314,9 +317,9 @@ class TestGetAllDestinations:
         """All valid destinations extracted from registry + standard folders."""
         dests = _get_all_destinations(registry)
         # From series
-        assert f"{SOURCE_LIBRARY}/02_Training_Enablement/Cognitive_Friday" in dests
+        assert f"{REFERENCE}/02_Training_Enablement/Cognitive_Friday" in dests
         # From rules
-        assert f"{RFP}/_databases" in dests
+        assert f"{REFERENCE}/{REF_RFP_LIBRARY}/_databases" in dests
         # Standard
         assert PROJECTS in dests
         assert ADMIN in dests

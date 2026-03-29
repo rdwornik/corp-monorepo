@@ -18,13 +18,15 @@ from corp.integrity import (
 )
 from corp.schema.folder_names import (
     ADMIN,
+    ARCHIVE,
+    COMPLIANCE,
+    CORP_INFRA,
     INBOX,
     PROJECTS,
-    RFP,
-    SOURCE_LIBRARY,
-    SYSTEM,
-    TEMPLATES,
+    REF_RFP_LIBRARY,
+    REFERENCE,
     UNMATCHED,
+    WORKFLOWS,
 )
 
 
@@ -39,12 +41,11 @@ def _make_mywork(tmp_path: Path) -> Path:
     for folder in [
         INBOX,
         PROJECTS,
-        "20_Extra_Initiatives",
-        TEMPLATES,
-        RFP,
-        SOURCE_LIBRARY,
+        WORKFLOWS,
+        REFERENCE,
         ADMIN,
-        SYSTEM,
+        COMPLIANCE,
+        ARCHIVE,
     ]:
         (mywork / folder).mkdir(parents=True, exist_ok=True)
     return mywork
@@ -148,12 +149,12 @@ class TestCheckRegistryPaths:
         """All registry destinations exist -> passed."""
         mywork = _make_mywork(tmp_path)
         registry = tmp_path / "registry.yaml"
-        (mywork / SOURCE_LIBRARY / "Training").mkdir(parents=True)
+        (mywork / REFERENCE / "Training").mkdir(parents=True)
         _write_yaml(
             registry,
             {
                 "series": {
-                    "test_series": {"destination": "60_Source_Library/Training"},
+                    "test_series": {"destination": f"{REFERENCE}/Training"},
                 },
             },
         )
@@ -314,7 +315,7 @@ class TestCheckMyworkStructure:
         mywork = _make_mywork(tmp_path)
         report = IntegrityReport()
         _check_mywork_structure(report, mywork)
-        assert report.checks_passed == 8
+        assert report.checks_passed == 7
         assert report.checks_failed == 0
 
     def test_missing_folder(self, tmp_path: Path) -> None:
@@ -395,7 +396,7 @@ class TestCheckAll:
 
         registry = tmp_path / "registry.yaml"
         _write_yaml(registry, {"series": {}})
-        routing = mywork / SYSTEM / "routing_map.yaml"
+        routing = mywork / CORP_INFRA / "routing_map.yaml"
         _write_yaml(routing, {"folders": {}})
 
         index_db = tmp_path / "index.db"

@@ -8,14 +8,20 @@ import pytest
 from corp.cli.overnight import _execute_reshape_actions
 from corp.overnight.classifier import ClassificationResult, classify_batch
 from corp.overnight.dedup import deduplicate
-from corp.schema.folder_names import INBOX, PROJECTS, RFP, SOURCE_LIBRARY, TEMPLATES
+from corp.schema.folder_names import (
+    INBOX,
+    PROJECTS,
+    REF_RFP_LIBRARY,
+    REFERENCE,
+    WORKFLOWS,
+)
 
 
 def _make_files(n: int, prefix: str = "file") -> list[dict]:
     """Generate n scan result dicts."""
     return [
         {
-            "path": f"{SOURCE_LIBRARY}/{prefix}_{i}.pptx",
+            "path": f"{REFERENCE}/{prefix}_{i}.pptx",
             "filename": f"{prefix}_{i}.pptx",
             "extension": ".pptx",
             "size_bytes": 1000 + i * 100,
@@ -41,7 +47,7 @@ class TestFullReshapeDryRun:
         files.append(
             {
                 **files[0],
-                "path": f"{TEMPLATES}/file_0_copy.pptx",
+                "path": f"{WORKFLOWS}/file_0_copy.pptx",
                 "filename": "file_0_copy.pptx",
             }
         )
@@ -136,7 +142,7 @@ class TestExecuteReshapeActions:
         action = ClassificationResult(
             current_path=f"{INBOX}/training_doc.pptx",
             proposed_name=None,
-            proposed_folder=f"{SOURCE_LIBRARY}/02_Training_Enablement",
+            proposed_folder=f"{REFERENCE}/02_Training_Enablement",
             confidence=0.95,
             reasoning="move",
         )
@@ -144,7 +150,7 @@ class TestExecuteReshapeActions:
         _execute_reshape_actions([action], mywork)
 
         assert not test_file.exists(), "Source should be moved"
-        dest = mywork / SOURCE_LIBRARY / "02_Training_Enablement" / "training_doc.pptx"
+        dest = mywork / REFERENCE / "02_Training_Enablement" / "training_doc.pptx"
         assert dest.exists(), "File should be at destination"
 
     def test_rename_and_move_combined(self, tmp_path: Path) -> None:
@@ -158,7 +164,7 @@ class TestExecuteReshapeActions:
         action = ClassificationResult(
             current_path=f"{INBOX}/Copy of Budget.xlsx",
             proposed_name="Budget.xlsx",
-            proposed_folder=RFP,
+            proposed_folder=f"{REFERENCE}/{REF_RFP_LIBRARY}",
             confidence=0.92,
             reasoning="remove_copy, move",
         )
@@ -167,7 +173,7 @@ class TestExecuteReshapeActions:
 
         assert not test_file.exists()
         assert not (inbox / "Budget.xlsx").exists(), "Renamed file should also be moved"
-        assert (mywork / RFP / "Budget.xlsx").exists()
+        assert (mywork / REFERENCE / REF_RFP_LIBRARY / "Budget.xlsx").exists()
 
     def test_relative_path_alone_does_not_resolve(self, tmp_path: Path) -> None:
         """Verify that relative paths alone can't accidentally find files."""

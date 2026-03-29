@@ -9,8 +9,8 @@ from corp.ops.database import OpsDB
 from corp.schema.folder_names import (
     INBOX,
     PROJECTS,
-    SOURCE_LIBRARY,
-    TEMPLATES,
+    REFERENCE,
+    WORKFLOWS,
 )
 
 
@@ -106,7 +106,7 @@ class TestAssets:
             f"{PROJECTS}/a.pdf", "a.pdf", ".pdf", 10, "2026-01-01T00:00:00", PROJECTS
         )
         db.upsert_asset(
-            f"{TEMPLATES}/b.pptx", "b.pptx", ".pptx", 20, "2026-01-01T00:00:00", TEMPLATES
+            f"{WORKFLOWS}/b.pptx", "b.pptx", ".pptx", 20, "2026-01-01T00:00:00", WORKFLOWS
         )
         projects = db.get_assets_by_folder(PROJECTS)
         assert len(projects) == 1
@@ -116,11 +116,11 @@ class TestAssets:
 class TestStatusChangeLogsEvent:
     def test_asset_status_change_logs_event(self, db: OpsDB) -> None:
         """Changing asset status always creates an ingest_event."""
-        db.upsert_asset("x.pptx", "x.pptx", ".pptx", 100, "2026-01-01T00:00:00", TEMPLATES)
+        db.upsert_asset("x.pptx", "x.pptx", ".pptx", 100, "2026-01-01T00:00:00", WORKFLOWS)
         db.update_asset_status(
             "x.pptx",
             "routed",
-            routed_to=f"{SOURCE_LIBRARY}/01_Product_Docs",
+            routed_to=f"{REFERENCE}/01_Product_Docs",
             routed_method="heuristic",
             routed_confidence=0.9,
             reasoning="Matched product doc pattern",
@@ -129,7 +129,7 @@ class TestStatusChangeLogsEvent:
         asset = db.get_asset("x.pptx")
         assert asset is not None
         assert asset["status"] == "routed"
-        assert asset["routed_to"] == f"{SOURCE_LIBRARY}/01_Product_Docs"
+        assert asset["routed_to"] == f"{REFERENCE}/01_Product_Docs"
         assert asset["routed_method"] == "heuristic"
 
         events = db.get_events_for_asset(asset["id"])
@@ -149,7 +149,7 @@ class TestUpdateAssetPath:
         """Regression: update_asset_path changes the canonical path so
         subsequent lookups by new path succeed."""
         old = f"{INBOX}/report.pdf"
-        new = f"{SOURCE_LIBRARY}/01_Product_Docs/report.pdf"
+        new = f"{REFERENCE}/01_Product_Docs/report.pdf"
         db.upsert_asset(old, "report.pdf", ".pdf", 100, "2026-01-01T00:00:00", INBOX)
 
         ok = db.update_asset_path(old, new)
@@ -165,7 +165,7 @@ class TestUpdateAssetPath:
     def test_update_path_then_status(self, db: OpsDB) -> None:
         """Regression: update_asset_status works after path is updated."""
         old = f"{INBOX}/deck.pptx"
-        new = f"{SOURCE_LIBRARY}/02_Training/deck.pptx"
+        new = f"{REFERENCE}/02_Training/deck.pptx"
         db.upsert_asset(old, "deck.pptx", ".pptx", 500, "2026-01-01T00:00:00", INBOX)
 
         db.update_asset_path(old, new)
@@ -236,7 +236,7 @@ class TestPackages:
         """Package creation with file count and size."""
         pid = db.create_package(
             folder_name="Cognitive_Friday_S12",
-            source_path=f"{SOURCE_LIBRARY}/Cognitive_Friday_S12",
+            source_path=f"{REFERENCE}/Cognitive_Friday_S12",
             file_count=5,
             total_size=1024000,
             inferred_topic="Cognitive Planning",
@@ -305,7 +305,7 @@ class TestSuggestions:
         sid = db.add_suggestion(
             pattern="Cognitive_Friday*",
             proposed_series="cognitive_friday",
-            proposed_destination=f"{SOURCE_LIBRARY}/02_Training/CF",
+            proposed_destination=f"{REFERENCE}/02_Training/CF",
             evidence='{"files": ["CF_S12.mp4", "CF_S13.mp4"], "count": 2}',
         )
         assert isinstance(sid, int)

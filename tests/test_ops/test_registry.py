@@ -10,8 +10,8 @@ from corp.ops.registry import ContentRegistry
 from corp.schema.folder_names import (
     INBOX,
     PROJECTS,
-    RFP,
-    SOURCE_LIBRARY,
+    REF_RFP_LIBRARY,
+    REFERENCE,
     UNMATCHED,
 )
 
@@ -24,7 +24,7 @@ def registry_path(tmp_path: Path) -> Path:
         "series": {
             "cognitive_friday": {
                 "display_name": "Cognitive Friday",
-                "destination": f"{SOURCE_LIBRARY}/02_Training_Enablement/Cognitive_Friday",
+                "destination": f"{REFERENCE}/02_Training_Enablement/Cognitive_Friday",
                 "naming_patterns": [
                     "Cognitive_Friday*",
                     "Cognitive_Fridays*",
@@ -38,7 +38,7 @@ def registry_path(tmp_path: Path) -> Path:
             },
             "lighthouse_program": {
                 "display_name": "Lighthouse Program",
-                "destination": f"{SOURCE_LIBRARY}/02_Training_Enablement/Lighthouse",
+                "destination": f"{REFERENCE}/02_Training_Enablement/Lighthouse",
                 "naming_patterns": ["Lighthouse*"],
                 "default_metadata": {
                     "source_category": "training",
@@ -52,7 +52,7 @@ def registry_path(tmp_path: Path) -> Path:
                     "filename_contains": ["RFP_Database"],
                     "extensions": [".xlsx", ".csv"],
                 },
-                "destination": f"{RFP}/_databases",
+                "destination": f"{REFERENCE}/{REF_RFP_LIBRARY}/_databases",
                 "metadata": {"source_category": "rfp"},
             },
             {
@@ -61,7 +61,7 @@ def registry_path(tmp_path: Path) -> Path:
                     "filename_contains": ["ISO_27001", "SOC_2"],
                     "extensions": [".pdf"],
                 },
-                "destination": f"{RFP}/Certificate",
+                "destination": f"{REFERENCE}/{REF_RFP_LIBRARY}/Certificate",
                 "metadata": {"source_category": "security_compliance"},
             },
             {
@@ -71,7 +71,7 @@ def registry_path(tmp_path: Path) -> Path:
                     "extensions": [".pdf", ".pptx"],
                     "folder_hint": "01_Product_Docs",
                 },
-                "destination": f"{SOURCE_LIBRARY}/01_Product_Docs",
+                "destination": f"{REFERENCE}/01_Product_Docs",
                 "metadata": {"source_category": "product_doc"},
             },
         ],
@@ -104,7 +104,7 @@ class TestSeriesMatch:
         assert result.series_id == "cognitive_friday"
         assert result.confidence >= 0.9
         assert result.method == "series"
-        assert result.destination == f"{SOURCE_LIBRARY}/02_Training_Enablement/Cognitive_Friday"
+        assert result.destination == f"{REFERENCE}/02_Training_Enablement/Cognitive_Friday"
 
     def test_match_cognitive_friday_space(self, registry: ContentRegistry) -> None:
         """Filename with spaces matches underscore pattern."""
@@ -137,7 +137,7 @@ class TestRuleMatch:
         result = registry.match_file("WMS_RFP_Database_v3.xlsx", ".xlsx")
         assert result.matched is True
         assert result.rule_name == "RFP databases"
-        assert result.destination == f"{RFP}/_databases"
+        assert result.destination == f"{REFERENCE}/{REF_RFP_LIBRARY}/_databases"
         assert result.method == "rule"
 
     def test_match_security_doc(self, registry: ContentRegistry) -> None:

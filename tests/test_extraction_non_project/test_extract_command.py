@@ -8,7 +8,14 @@ from unittest.mock import MagicMock, patch
 import yaml
 from click.testing import CliRunner
 from corp.cli import cli
-from corp.schema.folder_names import INBOX, PROJECTS, SYSTEM, TEMPLATES
+from corp.schema.folder_names import (
+    CORP_INFRA,
+    INBOX,
+    PROJECTS,
+    REF_RFP_LIBRARY,
+    REFERENCE,
+    WORKFLOWS,
+)
 
 
 def _mock_config(mywork_root: Path) -> MagicMock:
@@ -22,14 +29,14 @@ def _mock_config(mywork_root: Path) -> MagicMock:
 
 
 def _write_routing_map(mywork_root: Path, routes: dict | None = None) -> None:
-    """Write routing_map.yaml into SYSTEM/."""
-    system_dir = mywork_root / SYSTEM
+    """Write routing_map.yaml into CORP_INFRA/."""
+    system_dir = mywork_root / CORP_INFRA
     system_dir.mkdir(parents=True, exist_ok=True)
     data = {
         "version": "1.0",
         "routes": routes
         or {
-            TEMPLATES: {
+            WORKFLOWS: {
                 "vault_target": "04_evergreen/_generated/template",
                 "provenance": "template",
                 "subfolders": {
@@ -62,7 +69,7 @@ def test_extract_dry_run_no_cke_call(mock_config, mywork_tree):
         cli,
         [
             "extract",
-            str(mywork_tree / TEMPLATES / "01_Presentation_Decks"),
+            str(mywork_tree / WORKFLOWS / "01_Presentation_Decks"),
             "--dry-run",
         ],
     )

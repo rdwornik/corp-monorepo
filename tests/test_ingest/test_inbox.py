@@ -20,7 +20,15 @@ from corp.ingest.inbox import (
 from corp.ops.database import OpsDB
 from corp.ops.file_registry import FileRegistry
 from corp.ops.registry import ContentRegistry
-from corp.schema.folder_names import INBOX, PROJECTS, RFP, SOURCE_LIBRARY, UNMATCHED
+from corp.schema.folder_names import (
+    CORP_INFRA,
+    INBOX,
+    PROJECTS,
+    REF_RFP_LIBRARY,
+    REFERENCE,
+    UNMATCHED,
+    WORKFLOWS,
+)
 
 
 @pytest.fixture()
@@ -31,7 +39,7 @@ def registry_path(tmp_path: Path) -> Path:
         "series": {
             "cognitive_friday": {
                 "display_name": "Cognitive Friday",
-                "destination": f"{SOURCE_LIBRARY}/02_Training_Enablement/Cognitive_Friday",
+                "destination": f"{REFERENCE}/02_Training_Enablement/Cognitive_Friday",
                 "naming_patterns": ["Cognitive_Friday*", "CF_S[0-9]*"],
                 "expected_extensions": [".mp4", ".pptx"],
                 "default_metadata": {
@@ -47,7 +55,7 @@ def registry_path(tmp_path: Path) -> Path:
                     "filename_contains": ["RFP_Database"],
                     "extensions": [".xlsx"],
                 },
-                "destination": f"{RFP}/_databases",
+                "destination": f"{REFERENCE}/{REF_RFP_LIBRARY}/_databases",
                 "metadata": {"source_category": "rfp"},
             },
         ],
@@ -144,7 +152,7 @@ class TestMoveFile:
         f = inbox / "test.pptx"
         f.write_bytes(b"x" * 100)
 
-        dest = _move_file(f, f"{SOURCE_LIBRARY}/Training", "renamed.pptx", mywork)
+        dest = _move_file(f, f"{REFERENCE}/Training", "renamed.pptx", mywork)
         assert dest.exists()
         assert dest.name == "renamed.pptx"
         assert not f.exists()
@@ -154,7 +162,7 @@ class TestMoveFile:
         f = inbox / "test.pptx"
         f.write_bytes(b"x" * 100)
 
-        dest = _move_file(f, f"{SOURCE_LIBRARY}/New_Folder", "test.pptx", mywork)
+        dest = _move_file(f, f"{REFERENCE}/New_Folder", "test.pptx", mywork)
         assert dest.parent.exists()
 
     def test_handles_collision(self, mywork: Path) -> None:
@@ -163,11 +171,11 @@ class TestMoveFile:
         f.write_bytes(b"x" * 100)
 
         # Pre-create collision
-        dest_dir = mywork / SOURCE_LIBRARY
+        dest_dir = mywork / REFERENCE
         dest_dir.mkdir(parents=True)
         (dest_dir / "test.pptx").write_bytes(b"y" * 100)
 
-        dest = _move_file(f, SOURCE_LIBRARY, "test.pptx", mywork)
+        dest = _move_file(f, REFERENCE, "test.pptx", mywork)
         assert dest.exists()
         assert dest.name == "test_1.pptx"
 
@@ -183,7 +191,7 @@ class TestLogIngestEvent:
         classification = classify(f, registry)
 
         # Move file first (log needs dest_file)
-        dest_dir = mywork / SOURCE_LIBRARY / "Training"
+        dest_dir = mywork / REFERENCE / "Training"
         dest_dir.mkdir(parents=True)
         dest_file = dest_dir / "renamed.pptx"
         import shutil
@@ -413,7 +421,7 @@ class TestUserContext:
             from corp.ingest.inbox import _trigger_extraction
 
             # Route the file first so it has a destination
-            dest_dir = mywork / SOURCE_LIBRARY / "Training"
+            dest_dir = mywork / REFERENCE / "Training"
             dest_dir.mkdir(parents=True)
             import shutil
 
@@ -459,7 +467,7 @@ class TestUserContext:
         ):
             from corp.ingest.inbox import _trigger_extraction
 
-            dest_dir = mywork / SOURCE_LIBRARY
+            dest_dir = mywork / REFERENCE
             dest_dir.mkdir(parents=True)
             import shutil
 
@@ -1076,7 +1084,7 @@ class TestDefaultDestination:
         f.write_bytes(b"unique_override_test")
 
         (mywork / PROJECTS / "JLR").mkdir(parents=True)
-        (mywork / RFP).mkdir(parents=True)
+        (mywork / REFERENCE / REF_RFP_LIBRARY).mkdir(parents=True)
 
         call_count = [0]
 
@@ -1087,7 +1095,7 @@ class TestDefaultDestination:
             return "a"
 
         with patch("corp.ingest.inbox._prompt_action", side_effect=mock_prompt):
-            with patch("corp.ingest.inbox._get_custom_destination", return_value=RFP):
+            with patch("corp.ingest.inbox._get_custom_destination", return_value=f"{REFERENCE}/{REF_RFP_LIBRARY}"):
                 action = process_file(
                     f,
                     mywork,
@@ -1100,7 +1108,7 @@ class TestDefaultDestination:
         assert action == "routed"
         events = ops.get_recent_events(5)
         route = [e for e in events if e["action"] == "ingest_inbox_route"]
-        assert RFP in route[0]["destination_path"]
+        assert f"{REFERENCE}/{REF_RFP_LIBRARY}" in route[0]["destination_path"]
 
     def test_destination_overrides_classifier(
         self, mywork: Path, registry: ContentRegistry, ops: OpsDB

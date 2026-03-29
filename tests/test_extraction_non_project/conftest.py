@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import pytest
-from corp.schema.folder_names import INBOX, SOURCE_LIBRARY, TEMPLATES
+from corp.schema.folder_names import INBOX, REFERENCE, WORKFLOWS
 
 
 @pytest.fixture()
@@ -12,8 +12,8 @@ def routing_map() -> dict:
     return {
         "version": "1.0",
         "routes": {
-            TEMPLATES: {
-                "description": "Templates",
+            WORKFLOWS: {
+                "description": "Workflows",
                 "vault_target": "04_evergreen/_generated/template",
                 "provenance": "template",
                 "subfolders": {
@@ -22,8 +22,8 @@ def routing_map() -> dict:
                     "03_Discovery_Tools": {"content_type": "discovery"},
                 },
             },
-            SOURCE_LIBRARY: {
-                "description": "Source library",
+            REFERENCE: {
+                "description": "Reference",
                 "vault_target": "04_evergreen/_generated/evergreen",
                 "provenance": "evergreen",
                 "subfolders": {
@@ -52,8 +52,8 @@ def mywork_tree(tmp_path):
     """Create a minimal MyWork-like directory structure with test files."""
     mywork = tmp_path / "MyWork"
 
-    # TEMPLATES with subfolders
-    templates = mywork / TEMPLATES
+    # WORKFLOWS with subfolders
+    templates = mywork / WORKFLOWS
     decks = templates / "01_Presentation_Decks"
     demos = templates / "02_Demo_Scripts"
     decks.mkdir(parents=True)
@@ -71,9 +71,9 @@ def mywork_tree(tmp_path):
     # Hidden file (should be skipped)
     (decks / ".hidden").write_text("hidden", encoding="utf-8")
 
-    # folder_manifest.yaml for templates
+    # folder_manifest.yaml for workflows
     (templates / "folder_manifest.yaml").write_text(
-        "purpose: Templates\n"
+        "purpose: Workflows\n"
         "extraction:\n"
         "  enabled: true\n"
         "  scope: template\n"
@@ -99,8 +99,8 @@ def mywork_tree(tmp_path):
         encoding="utf-8",
     )
 
-    # SOURCE_LIBRARY
-    source_lib = mywork / SOURCE_LIBRARY
+    # REFERENCE
+    source_lib = mywork / REFERENCE
     prod_docs = source_lib / "01_Product_Docs"
     prod_docs.mkdir(parents=True)
     (prod_docs / "platform_spec.pdf").write_bytes(b"fake-pdf")
