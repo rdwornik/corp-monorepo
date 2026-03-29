@@ -17,22 +17,33 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from corp.schema.folder_names import (
+    ADMIN,
+    INBOX,
+    PROJECTS,
+    RFP,
+    SCAN_SKIP_FOLDERS,
+    SOURCE_LIBRARY,
+    SYSTEM,
+    TEMPLATES,
+)
+
 logger = logging.getLogger(__name__)
 
 # Folders to skip entirely during scan
-SKIP_FOLDERS: set[str] = {"80_Archive", ".corp", "__pycache__", ".git", ".venv", "node_modules"}
+SKIP_FOLDERS: set[str] = set(SCAN_SKIP_FOLDERS)
 
 # L1 folders that get individual Gemini analysis
 ANALYSIS_FOLDERS: list[str] = [
-    "00_Inbox",
-    "10_Projects",
+    INBOX,
+    PROJECTS,
     "20_Extra_Initiatives",
-    "30_Templates",
+    TEMPLATES,
     "40_Assets_Recordings",
-    "50_RFP",
-    "60_Source_Library",
-    "70_Admin",
-    "90_System",
+    RFP,
+    SOURCE_LIBRARY,
+    ADMIN,
+    SYSTEM,
 ]
 
 _FOLDER_ANALYSIS_PROMPT = """\
@@ -275,7 +286,7 @@ def analyze_folder(
     """
     from google import genai as genai_module  # type: ignore[import-untyped]
 
-    if folder_name == "10_Projects":
+    if folder_name == PROJECTS:
         listing = _build_project_listing(files)
         prompt = _PROJECT_ANALYSIS_PROMPT.format(project_listing=listing)
     else:
@@ -288,7 +299,7 @@ def analyze_folder(
     logger.info("Analyzing %s (%d files)...", folder_name, len(files))
 
     # 10_Projects needs more tokens (33 project analyses)
-    max_tokens = 16384 if folder_name == "10_Projects" else 8192
+    max_tokens = 16384 if folder_name == PROJECTS else 8192
 
     raw_text = None
     try:
