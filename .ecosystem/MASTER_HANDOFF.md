@@ -1,5 +1,5 @@
 ---
-Last updated: 2026-03-29
+Last updated: 2026-03-29T01:13:07Z
 ---
 
 > **Paste this file into new Claude.ai chats for context. This is the ONLY document a new chat needs.**
@@ -14,12 +14,12 @@ Update at end of each session: `python scripts/update_handoff.py`
 
 | Metric | Value | Date |
 |--------|-------|------|
-| Tests passing | 992 (6 pre-existing Jinja2 failures excluded) | 2026-03-27 |
-| Vault notes (indexed) | 488 active in 01_Knowledge/ | 2026-03-28 |
-| Hybrid classifier accuracy | 93.7% (TF-IDF tier) | 2026-03-26 |
-| Tag coverage (mean) | 79.7% | 2026-03-26 |
+| Tests passing | 992   | 2026-03-27 |
+| Vault notes (indexed) | 488   | 2026-03-28 |
+| Hybrid classifier accuracy | 93.7%   | 2026-03-26 |
+| Tag coverage (mean) | 79.7%   | 2026-03-26 |
 | Product Jaccard | 1.000 (idempotent) | 2026-03-26 |
-| People NER F1 | 92.7% | 2026-03-26 |
+| People NER F1 | 92.7%   | 2026-03-26 |
 | Council decisions | 23 | 2026-03-29 |
 | ADRs | 23 | 2026-03-29 |
 | Gotchas | 37 | 2026-03-28 |

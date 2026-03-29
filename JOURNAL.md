@@ -6,6 +6,21 @@ Claude Code: read last 5 entries before starting work.
 ---
 
 
+## 2026-03-29 session 3 — Phase 2 subprocess boundary fix (ADR-23 Q1)
+- **Did:** Rewrote `overnight/cke_client.py` (180 → 280 lines) to use subprocess instead of direct CKE imports. Enforces architecture rule: corp-by-os → CKE must use process boundary. `is_available()` uses `shutil.which("cke")`; `extract_batch`/`extract_sync` run `cke process-manifest` with `capture_output=True, encoding="utf-8", errors="replace"` and regex-parse stdout summary ("Done: N", "Errors: N", etc.); `scan_local` uses `cke scan -o <tmp.json>`; `load_cke_config()` reads settings.yaml directly; `estimate_cost()` → NotImplementedError (dead function, no callers). 1015 tests pass, 1 skip. Branch: `feat/phase2-subprocess-boundary`, commits `663a05d` + `775a7d3`. Zero remaining `corp_knowledge_extractor` runtime imports in corp-by-os.
+- **Failed:** Ruff E402 (`import os as _os` after constant) — moved `os` import to top-level block.
+- **Next:** Merge `feat/phase2-subprocess-boundary` to main. Phase 3 (ADR-23 Q2 remaining) or ADR-22 (RFP federation).
+
+## 2026-03-29 session 2 — Phase 1 CLI modularization (ADR-23 Q2)
+- **Did:** Split `cli.py` (3,574 lines, 71 commands) into `cli/` package with `__init__.py` + `_common.py` + 16 domain modules (project, vault, template, index, rfp, task, system, workflow, query, analytics, misc, retrieve, extract, cleanup, ingest, overnight). `__init__.py` thinned to 131 lines (imports + group def + 33 add_command calls). Updated 4 test files (patch targets for get_config; overnight private helper imports). 1014 tests passing. CLI snapshot captured to `eval/cli_snapshot_phase1/` — only invocation name differs vs baseline. Merged via feat/phase1-cli-modularization (commits f7d94ab → 06eb571).
+- **Failed:** Ruff pre-commit hook auto-fixed files on first attempt (import sorting, blank lines) — required re-stage and re-commit. Pattern documented.
+- **Next:** Phase 2 (further CLI refactoring per ADR-23) or other ADR-23 Q2 work.
+
+## 2026-03-29 session 1 — Council #23 Phase 0 prerequisites
+- **Did:** Completed all Phase 0 gates for ADR-23: CKE call volume (3/run, no batching needed), cli.py shared state audit (71 commands, 14-module split plan), CLI help snapshot (55 files in `eval/cli_snapshot_2026-03-28/`), dead code verification (4 corp-rfp-agent files confirmed dead; `kb_to_markdown.py` needs coordinated test update on deletion). MASTER_HANDOFF.md updated (Council 22→23, ADR-23 entry, Open Decisions phases 1–4). Merged `chore/council23-phase0-prerequisites` to main.
+- **Failed:** Pre-existing ruff E501 (`query_engine.py:389,423`) and integration test (`IMG` type code) — not introduced, not fixed.
+- **Next:** Phase 1 (CLI split): create `cli/` directory with 14 domain modules + `_common.py`; use `eval/cli_snapshot_2026-03-28/` as regression baseline.
+
 ## 2026-03-28 session 4 — archive naming cleanup
 - **Did:** Enforced `{YYYY-MM-DD}_{TYPE}_{description}.ext` naming on all `.ecosystem/archive/` files. Renamed 13 non-compliant files (date-at-end and undated variants). All 22 archive files now comply. Merged `chore/archive-naming-cleanup` to main.
 - **Failed:** -
