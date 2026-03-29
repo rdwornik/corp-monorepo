@@ -6,6 +6,11 @@ Claude Code: read last 5 entries before starting work.
 ---
 
 
+## 2026-03-29 session 5 — Package consolidation (6 → 1 unified src/corp/)
+- **Did:** Completed `feat/consolidate-packages` branch: 4 prior commits moved all 6 packages to `src/corp/`, unified `pyproject.toml`, updated all imports to `corp.*` namespace, removed old `packages/` directory. This session: fixed 6 remaining test failures (RFP CLI smoke cwd resolution 2→3 levels, naming_config test missing `extension_hint` check, `light_scan` `time.time()`→`time.perf_counter()` for Windows precision). Updated CLAUDE.md, `config/agents.yaml`, `.ecosystem/MASTER_HANDOFF.md` for new layout. Verified zero old import references (`corp_os_meta|corp_knowledge_extractor|corp_by_os` etc = 0 matches). All 4 CLIs working (`corp`, `cke`, `cpe`, `com`). **2,404 tests passing, 0 failed.** Merged to main.
+- **Failed:** Ruff pre-commit auto-fixed `batch_api.py` on first commit attempt — re-staged and committed successfully.
+- **Next:** Corp-rfp-agent Click CLI migration. 30-day skill eval (due 2026-04-25). MinHash wiring. Ontology Q4. RFP Federation (ADR-22).
+
 ## 2026-03-29 session 4 — Council #23 Phase 3+4 (ADR-23 Q3/Q4/Q5)
 - **Did:** Flattened 3 sub-packages: `doctor/integrity.py` → `integrity.py`, `freshness/scanner.py` → `freshness_scanner.py`, `extraction/non_project/` (5 files) → `extraction/`. Max path depth 6→3 (relative to src). Centralized `parse_llm_json` + `normalize_string_list` in corp-os-meta: added `log.error` before raise; moved `normalize_string_list` from CKE utils to corp-os-meta; deleted CKE `utils.py` entirely (8 import sites updated). Deleted 4 confirmed dead files in corp-rfp-agent: `clean_kb.py`, `scan_kb.py`, `kb_to_markdown.py`, `_paths.py` (test_cli_smoke.py updated). corp-os-meta: 133 pass; CKE: 863 pass; rfp-agent: 179 pass; corp-by-os: 990 pass.
 - **Failed:** Pre-commit ruff caught `UP038` (`isinstance(x, (int, float))` → `int | float`) in `contract.py` — fixed manually. Cherry-pick workflow needed to align doctor/freshness commits across phase2/phase3 branches due to background task switching branches accidentally.

@@ -14,7 +14,7 @@ Update at end of each session: `python scripts/update_handoff.py`
 
 | Metric | Value | Date |
 |--------|-------|------|
-| Tests passing | 992   | 2026-03-27 |
+| Tests passing | 2,404 | 2026-03-29 |
 | Vault notes (indexed) | 488   | 2026-03-28 |
 | Hybrid classifier accuracy | 93.7%   | 2026-03-26 |
 | Tag coverage (mean) | 79.7%   | 2026-03-26 |
@@ -30,17 +30,18 @@ Update at end of each session: `python scripts/update_handoff.py`
 
 **Corporate OS** is a private knowledge management system for a consulting firm (Blue Yonder presales ecosystem). Monorepo at `C:\Users\1028120\Documents\Dev\corp-monorepo`.
 
-| Package | CLI | Version | Tests | Purpose |
-|---------|-----|---------|-------|---------|
-| corp-os-meta | `corp-meta` | 1.0.0 | 118 | Schema, taxonomy, naming conventions, `schema.yaml` contract |
-| corp-knowledge-extractor | `cke` | 0.8.0 | 838 | Pure extraction engine — reads docs, writes JSON, no vault writes |
-| corp-by-os | `corp` | 0.3.0 | 926 | Vault writer, ingest pipeline, retrieval, SQL index, analytics |
-| corp-project-extractor | `cpe` | 0.1.0 | 45 | Project scope/role classifier |
-| corp-rfp-agent | scripts | 0.3.0 | 155 | RFP response generation |
-| corp-opportunity-manager | `com` | 0.2.0 | 62 | Opportunity tracking |
-| Integration | — | — | 9 | Cross-package E2E tests |
+**Consolidated layout** (2026-03-29): all 6 former packages unified under `src/corp/`. Single `pyproject.toml`, single `pip install -e .`.
 
-**Total: 2,153+ tests**
+| Module (src/corp/) | CLI | Purpose |
+|---------------------|-----|---------|
+| `schema/` | `corp-meta` | Schema, taxonomy, naming conventions, `schema.yaml` contract |
+| `extractor/` | `cke` | Pure extraction engine — reads docs, writes JSON, no vault writes |
+| `cli/`, `ingest/`, `retrieve/` | `corp` | Vault writer, ingest pipeline, retrieval, SQL index, analytics |
+| `project/` | `cpe` | Project scope/role classifier |
+| `rfp/` | scripts | RFP response generation |
+| `opportunity/` | `com` | Opportunity tracking |
+
+**Total: 2,404 tests (0 failed)**
 
 ---
 
@@ -201,11 +202,11 @@ ADR summaries: `decisions/ADR-NN-*.md` (ADR-01 through ADR-23)
 | `hybrid_classifier.json` | `models/hybrid_classifier.json` (also in CKE data/) | Dual TF-IDF + LogisticRegression, JSON only (no pickle), LRU-cached loader |
 | `ops.db` | `%LOCALAPPDATA%/corp-by-os/ops.db` | File registry, routing decisions, MinHash `content_signatures`, ingest events (2,673+ rows) |
 | `index.db` | `%LOCALAPPDATA%/corp-by-os/index.db` | FTS5 index: 488 notes + 25 projects + people |
-| `schema.yaml` | `packages/corp-os-meta/corp_os_meta/data/schema.yaml` | Frontmatter contract: 4 required, 56 optional, cardinality caps |
-| `naming_config.yaml` | `packages/corp-by-os/config/naming_config.yaml` | 19 type codes, 15 client aliases |
-| `taxonomy.yaml` | `packages/corp-os-meta/corp_os_meta/data/taxonomy.yaml` | Authoritative tag vocabulary |
-| `client_aliases.yaml` | `packages/corp-knowledge-extractor/.../client_aliases.yaml` | 48 client alias entries |
-| `product_aliases.yaml` | `packages/corp-os-meta/corp_os_meta/data/product_aliases.yaml` | Product normalization |
+| `schema.yaml` | `src/corp/schema/data/schema.yaml` | Frontmatter contract: 4 required, 56 optional, cardinality caps |
+| `naming_config.yaml` | `config/naming_config.yaml` | 19 type codes, 15 client aliases |
+| `taxonomy.yaml` | `src/corp/schema/taxonomy.yaml` | Authoritative tag vocabulary |
+| `client_aliases.yaml` | `src/corp/extractor/data/client_aliases.yaml` | 48 client alias entries |
+| `product_aliases.yaml` | `src/corp/extractor/data/product_aliases.yaml` | Product normalization |
 | `paths.toml` | `config/paths.toml` | Centralized path config (vault, mywork, DBs) |
 | `eval_history.jsonl` | `eval/eval_history.jsonl` | 21 eval snapshots tracking classifier/tag/product/people metrics |
 | `gotchas.md` | `~/.claude/skills/gotchas/gotchas.md` | 37 cross-repo gotchas — CHECK BEFORE MODIFYING ANY PACKAGE |
@@ -337,16 +338,15 @@ All repos at `C:\Users\1028120\Documents\Dev\`
 
 ## Architecture Rules (non-negotiable)
 
-1. `corp-by-os` is SOLE vault writer — no other package writes to ObsidianVault
-2. `CKE` is PURE extraction engine — reads docs, writes JSON, never touches vault
-3. Subprocess boundaries between packages — no Python cross-imports
+1. `ingest/` is SOLE vault writer — no other module writes to ObsidianVault
+2. `extractor/` is PURE extraction engine — reads docs, writes JSON, never touches vault
+3. Unified `src/corp/` namespace — single `pyproject.toml` at repo root
 4. Forward slashes everywhere in databases and path strings
-5. Each package has its own `pyproject.toml` and `tests/`
-6. No new dependencies without explicit user confirmation
-7. `GEMINI_API_KEY` is the standard (not `GOOGLE_API_KEY`)
-8. API keys in env vars only — never in config files, never committed
-9. NEVER let any operation touch `OneDrive - Blue Yonder` paths
-10. Feature branches only — never commit directly to main
+5. No new dependencies without explicit user confirmation
+6. `GEMINI_API_KEY` is the standard (not `GOOGLE_API_KEY`)
+7. API keys in env vars only — never in config files, never committed
+8. NEVER let any operation touch `OneDrive - Blue Yonder` paths
+9. Feature branches only — never commit directly to main
 
 ---
 
@@ -397,26 +397,28 @@ Monorepo layout:
   scripts/dev-check.ps1                      pre-merge quality gate
   scripts/update_handoff.py                  regenerates this file
 
-Package paths:
-  packages/corp-os-meta/corp_os_meta/data/schema.yaml
-  packages/corp-os-meta/corp_os_meta/data/taxonomy.yaml
-  packages/corp-os-meta/corp_os_meta/data/product_aliases.yaml
-  packages/corp-knowledge-extractor/.../client_aliases.yaml
-  packages/corp-by-os/config/naming_config.yaml
-  packages/corp-by-os/src/corp_by_os/ingest/dedup.py      MinHash
-  packages/corp-by-os/src/corp_by_os/ingest/inbox.py      ← MinHash NOT YET WIRED HERE
-  packages/corp-by-os/src/corp_by_os/light_scan.py        (actually in CKE)
+Source paths (src/corp/):
+  schema/data/schema.yaml                    frontmatter contract
+  schema/taxonomy.yaml                       tag vocabulary
+  extractor/data/client_aliases.yaml         48 client aliases
+  extractor/data/product_aliases.yaml        product normalization
+  config/naming_config.yaml                  19 type codes, 15 client aliases
+  ingest/dedup.py                            MinHash
+  ingest/inbox.py                            ← MinHash NOT YET WIRED HERE
+  ingest/light_scan.py                       7-format scanner
 ```
 
 ---
 
 ## Open Decisions (what's next)
 
-### ADR-23 Implementation (in order)
-1. **Phase 1** — CLI split: `cli/` directory, 14 domain modules, `_common.py`. Gate: shared-state audit (complete). Snapshot baseline in `eval/cli_snapshot_2026-03-28/`.
-2. **Phase 2** — Subprocess boundary: refactor `overnight/cke_client.py` to subprocess. Gate: call volume = 3/run (no batching needed). Reference: `corp-project-extractor/cke_invoker.py` pattern.
-3. **Phase 3** — Flatten nesting: merge `doctor/` (2 files), `freshness/` (2 files) into root-level modules; flatten `extraction/non_project/` (3 files) into `extraction/`. Gate: Phase 1 complete.
-4. **Phase 4** — Centralize utils + dead code: port `parse_llm_json` to `corp-os-meta`; delete 4 dead corp-rfp-agent files (+ update `test_cli_smoke.py` for `kb_to_markdown.py`). Gate: Phase 3 complete.
+### ADR-23 Implementation — COMPLETE (2026-03-29)
+All 4 phases done. Final step: 6-package consolidation into unified `src/corp/` namespace.
+- Phase 1: CLI split (14 modules) ✓
+- Phase 2: Subprocess boundary ✓
+- Phase 3: Flatten nesting ✓
+- Phase 4: Centralize utils + dead code ✓
+- Phase 5: Consolidate 6 packages → `src/corp/` ✓ (2,404 tests passing)
 
 ### Other open decisions
 5. **Ontology Q4** — canonical product map; unblocks 4 remaining benchmark SQL queries
@@ -433,8 +435,8 @@ Package paths:
 1. **MinHash not wired** — `check_near_duplicate()` exists in `dedup.py` but not called from `inbox.py` `process_file()` after `light_scan()`
 2. **2 Cognitive Friday YAML errors** — `session_id: "cognitive-friday-season-2` unquoted hyphen truncates string; notes skip on ingest
 3. **2 low-quality JLR notes** — score 28–29 (threshold 25), need re-extraction with deeper prompt
-4. **6 Jinja2 test failures** — `TemplateNotFound: meta.yaml.j2` pre-existing, not caused by recent work
-5. **1 flaky timer test** — light_scan timing test occasionally fails on slow CI
+4. ~~**6 Jinja2 test failures**~~ — resolved during consolidation (template paths updated)
+5. ~~**1 flaky timer test**~~ — fixed: switched to `time.perf_counter()` for sub-ms precision
 
 ---
 
