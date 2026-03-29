@@ -7,7 +7,6 @@ from unittest.mock import MagicMock, patch
 
 import yaml
 from click.testing import CliRunner
-
 from corp_by_os.cli import cli
 
 
@@ -47,7 +46,7 @@ def _write_routing_map(mywork_root: Path, routes: dict | None = None) -> None:
     )
 
 
-@patch("corp_by_os.cli.get_config")
+@patch("corp_by_os.cli.extract.get_config")
 def test_extract_dry_run_no_cke_call(mock_config, mywork_tree):
     """Dry run generates manifest but doesn't call CKE."""
     cfg = _mock_config(mywork_tree)
@@ -72,7 +71,7 @@ def test_extract_dry_run_no_cke_call(mock_config, mywork_tree):
     assert "manifest" in result.output.lower()
 
 
-@patch("corp_by_os.cli.get_config")
+@patch("corp_by_os.cli.extract.get_config")
 def test_extract_disabled_folder(mock_config, mywork_tree):
     """Folder with extraction disabled prints warning."""
     cfg = _mock_config(mywork_tree)
@@ -97,7 +96,7 @@ def test_extract_disabled_folder(mock_config, mywork_tree):
     assert "disabled" in result.output.lower()
 
 
-@patch("corp_by_os.cli.get_config")
+@patch("corp_by_os.cli.extract.get_config")
 def test_extract_not_a_directory(mock_config, tmp_path):
     """Non-directory path is rejected by Click's file_okay=False."""
     cfg = _mock_config(tmp_path)
