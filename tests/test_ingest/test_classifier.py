@@ -12,6 +12,12 @@ from corp.ingest.classifier import (
     detect_file_info,
 )
 from corp.ops.registry import ContentRegistry
+from corp.schema.folder_names import (
+    INBOX,
+    REF_RFP_LIBRARY,
+    REFERENCE,
+    UNMATCHED,
+)
 
 
 @pytest.fixture()
@@ -22,7 +28,7 @@ def registry_path(tmp_path: Path) -> Path:
         "series": {
             "cognitive_friday": {
                 "display_name": "Cognitive Friday",
-                "destination": "60_Source_Library/02_Training_Enablement/Cognitive_Friday",
+                "destination": f"{REFERENCE}/02_Training_Enablement/Cognitive_Friday",
                 "naming_patterns": [
                     "Cognitive_Friday*",
                     "Cognitive_Fridays*",
@@ -36,7 +42,7 @@ def registry_path(tmp_path: Path) -> Path:
             },
             "lighthouse_program": {
                 "display_name": "Lighthouse Program",
-                "destination": "60_Source_Library/02_Training_Enablement/Lighthouse",
+                "destination": f"{REFERENCE}/02_Training_Enablement/Lighthouse",
                 "naming_patterns": ["Lighthouse*"],
                 "default_metadata": {
                     "source_category": "training",
@@ -50,7 +56,7 @@ def registry_path(tmp_path: Path) -> Path:
                     "filename_contains": ["RFP_Database"],
                     "extensions": [".xlsx", ".csv"],
                 },
-                "destination": "50_RFP/_databases",
+                "destination": f"{REFERENCE}/{REF_RFP_LIBRARY}/_databases",
                 "metadata": {"source_category": "rfp"},
             },
             {
@@ -59,7 +65,7 @@ def registry_path(tmp_path: Path) -> Path:
                     "filename_contains": ["ISO_27001", "SOC_2"],
                     "extensions": [".pdf"],
                 },
-                "destination": "50_RFP/Certificate",
+                "destination": f"{REFERENCE}/{REF_RFP_LIBRARY}/Certificate",
                 "metadata": {"source_category": "security_compliance"},
             },
         ],
@@ -68,7 +74,7 @@ def registry_path(tmp_path: Path) -> Path:
             {"pattern": "SGDBF|Saint.Gobain", "project": "SGDBF_Retail"},
         ],
         "fallback": {
-            "unknown_destination": "00_Inbox/_Unmatched",
+            "unknown_destination": f"{INBOX}/{UNMATCHED}",
             "confidence_threshold": 0.75,
             "llm_escalation_threshold": 0.50,
         },
@@ -136,7 +142,7 @@ class TestClassify:
         result = classify(f, registry)
         assert result.best_match is not None
         assert result.best_match.destination == (
-            "60_Source_Library/02_Training_Enablement/Lighthouse"
+            f"{REFERENCE}/02_Training_Enablement/Lighthouse"
         )
 
     def test_client_detected(self, tmp_path: Path, registry: ContentRegistry) -> None:
@@ -165,7 +171,7 @@ class TestClassify:
         result = classify(f, registry)
         assert result.best_match is not None
         assert result.best_match.rule_name == "RFP databases"
-        assert result.best_match.destination == "50_RFP/_databases"
+        assert result.best_match.destination == f"{REFERENCE}/{REF_RFP_LIBRARY}/_databases"
 
     def test_no_match_needs_human(self, tmp_path: Path, registry: ContentRegistry) -> None:
         """Unknown file needs human review."""

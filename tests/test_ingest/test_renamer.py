@@ -24,6 +24,12 @@ from corp.ingest.renamer import (
     propose_name,
 )
 from corp.ops.registry import ContentRegistry
+from corp.schema.folder_names import (
+    INBOX,
+    REF_RFP_LIBRARY,
+    REFERENCE,
+    UNMATCHED,
+)
 
 
 @pytest.fixture()
@@ -34,7 +40,7 @@ def registry_path(tmp_path: Path) -> Path:
         "series": {
             "cognitive_friday": {
                 "display_name": "Cognitive Friday",
-                "destination": "60_Source_Library/02_Training_Enablement/Cognitive_Friday",
+                "destination": f"{REFERENCE}/02_Training_Enablement/Cognitive_Friday",
                 "naming_patterns": ["Cognitive_Friday*", "CF_S[0-9]*"],
                 "expected_extensions": [".mp4", ".pptx"],
                 "default_metadata": {
@@ -51,7 +57,7 @@ def registry_path(tmp_path: Path) -> Path:
                     "filename_contains": ["RFP_Database"],
                     "extensions": [".xlsx"],
                 },
-                "destination": "50_RFP/_databases",
+                "destination": f"{REFERENCE}/{REF_RFP_LIBRARY}/_databases",
                 "metadata": {"source_category": "rfp"},
             },
             {
@@ -60,7 +66,7 @@ def registry_path(tmp_path: Path) -> Path:
                     "filename_contains": ["Differentiation", "Competitive"],
                     "extensions": [".pdf", ".pptx"],
                 },
-                "destination": "60_Source_Library/03_Competitive",
+                "destination": f"{REFERENCE}/03_Competitive",
                 "metadata": {"source_category": "competitive"},
             },
         ],
@@ -69,7 +75,7 @@ def registry_path(tmp_path: Path) -> Path:
             {"pattern": "SGDBF|Saint.Gobain", "project": "SGDBF_Retail"},
         ],
         "fallback": {
-            "unknown_destination": "00_Inbox/_Unmatched",
+            "unknown_destination": f"{INBOX}/{UNMATCHED}",
             "confidence_threshold": 0.75,
         },
     }
