@@ -22,11 +22,8 @@ from pathlib import Path
 # Paths
 # ---------------------------------------------------------------------------
 
-REPO_ROOT = Path(__file__).parent.parent.parent.parent  # corp-monorepo/
-FIXTURE_PATH = (
-    REPO_ROOT
-    / "packages/corp-knowledge-extractor/tests/fixtures/classifier_training.json"
-)
+REPO_ROOT = Path(__file__).resolve().parents[1]  # corp-monorepo/
+FIXTURE_PATH = REPO_ROOT / "tests/extractor/fixtures/classifier_training.json"
 OUTPUT_PATH = FIXTURE_PATH.parent / "classifier_training_enriched.json"
 
 # Candidate roots to search for actual files (safe paths only)
@@ -69,11 +66,6 @@ def _find_file(filename: str) -> Path | None:
 
 
 def main() -> None:
-    # Import here so the script works from any CWD
-    sys.path.insert(
-        0,
-        str(REPO_ROOT / "packages/corp-by-os/src"),
-    )
     from corp.ingest.light_scan import ScanResult, light_scan  # noqa: PLC0415
 
     with FIXTURE_PATH.open(encoding="utf-8") as f:

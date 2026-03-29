@@ -26,24 +26,25 @@ API_KEYS = {
     "Llama (Together)": "TOGETHER_API_KEY",
 }
 
-print("=" * 50)
-print("API Keys Status")
-print("=" * 50)
+if __name__ == "__main__":
+    print("=" * 50)
+    print("API Keys Status")
+    print("=" * 50)
 
-configured = 0
-for name, env_var in API_KEYS.items():
-    key = os.getenv(env_var)
-    if key:
-        # Show only first/last 4 chars
-        masked = f"{key[:8]}...{key[-4:]}"
-        print(f"[OK] {name}: {masked}")
-        configured += 1
-    else:
-        print(f"[--] {name}: Not configured")
+    configured = 0
+    for name, env_var in API_KEYS.items():
+        key = os.getenv(env_var)
+        if key:
+            # Show only first/last 4 chars
+            masked = f"{key[:8]}...{key[-4:]}"
+            print(f"[OK] {name}: {masked}")
+            configured += 1
+        else:
+            print(f"[--] {name}: Not configured")
 
-print("=" * 50)
-print(f"Total: {configured}/{len(API_KEYS)} configured")
+    print("=" * 50)
+    print(f"Total: {configured}/{len(API_KEYS)} configured")
 
-if configured == 0:
-    print("\n[WARNING] No API keys found!")
-    print("Copy .env.example to .env and add your keys.")
+    if configured == 0:
+        print("\n[WARNING] No API keys found!")
+        print("Copy .env.example to .env and add your keys.")

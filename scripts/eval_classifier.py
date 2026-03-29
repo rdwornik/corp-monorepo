@@ -12,13 +12,11 @@ Metrics:
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
 
 from sklearn.metrics import accuracy_score, classification_report
 
 MONOREPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(MONOREPO / "packages/corp-knowledge-extractor/src"))
 
 from corp.extractor.doc_type_classifier import (  # noqa: E402
     classify_from_filename,

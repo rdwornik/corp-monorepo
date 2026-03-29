@@ -99,7 +99,7 @@ def _check_config_files(
             with open(routing_map_path, encoding="utf-8") as f:
                 yaml.safe_load(f)
             report.checks_passed += 1
-        except Exception as exc:
+        except (yaml.YAMLError, OSError) as exc:
             report.issues.append(
                 IntegrityIssue(
                     category="config",
@@ -138,7 +138,7 @@ def _check_config_files(
                 report.checks_warned += 1
             else:
                 report.checks_passed += 1
-        except Exception as exc:
+        except (yaml.YAMLError, OSError) as exc:
             report.issues.append(
                 IntegrityIssue(
                     category="config",
@@ -164,7 +164,8 @@ def _check_registry_paths(
     try:
         with open(registry_path, encoding="utf-8") as f:
             registry = yaml.safe_load(f)
-    except Exception:
+    except (yaml.YAMLError, OSError) as e:
+        logger.debug("Failed to read registry at %s: %s", registry_path, e)
         return
 
     if not isinstance(registry, dict):
@@ -287,7 +288,7 @@ def _check_ops_db(
             )
 
         conn.close()
-    except Exception as exc:
+    except (sqlite3.Error, OSError) as exc:
         report.issues.append(
             IntegrityIssue(
                 category="ops_db",
@@ -361,7 +362,7 @@ def _check_vault_index(
             report.checks_passed += 1
 
         conn.close()
-    except Exception as exc:
+    except (sqlite3.Error, OSError) as exc:
         report.issues.append(
             IntegrityIssue(
                 category="index",
