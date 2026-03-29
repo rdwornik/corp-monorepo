@@ -5,16 +5,16 @@ from corp.schema.folder_names import (
     ADMIN,
     ALL_MYWORK_FOLDERS,
     ARCHIVE,
+    COMPLIANCE,
     INBOX,
     PROJECTS,
     QUARANTINE,
-    RFP,
+    REF_RFP_LIBRARY,
+    REFERENCE,
     SCAN_SKIP_FOLDERS,
-    SOURCE_LIBRARY,
     STAGING,
-    SYSTEM,
-    TEMPLATES,
     UNMATCHED,
+    WORKFLOWS,
 )
 
 
@@ -22,12 +22,11 @@ def test_folder_name_values():
     """Each constant has the expected string value."""
     assert INBOX == "00_Inbox"
     assert PROJECTS == "10_Projects"
-    assert TEMPLATES == "30_Templates"
-    assert RFP == "50_RFP"
-    assert SOURCE_LIBRARY == "60_Source_Library"
+    assert WORKFLOWS == "20_Workflows"
+    assert REFERENCE == "30_Reference"
     assert ADMIN == "70_Admin"
-    assert ARCHIVE == "80_Archive"
-    assert SYSTEM == "90_System"
+    assert COMPLIANCE == "80_Compliance"
+    assert ARCHIVE == "90_Archive"
 
 
 def test_internal_folder_name_values():
@@ -41,12 +40,11 @@ def test_all_mywork_folders_ordered():
     assert ALL_MYWORK_FOLDERS == (
         INBOX,
         PROJECTS,
-        TEMPLATES,
-        RFP,
-        SOURCE_LIBRARY,
+        WORKFLOWS,
+        REFERENCE,
         ADMIN,
+        COMPLIANCE,
         ARCHIVE,
-        SYSTEM,
     )
 
 
@@ -54,14 +52,14 @@ def test_all_mywork_folders_no_duplicates():
     assert len(ALL_MYWORK_FOLDERS) == len(set(ALL_MYWORK_FOLDERS))
 
 
-def test_scan_skip_contains_archive_and_system():
+def test_scan_skip_contains_archive_compliance():
     assert ARCHIVE in SCAN_SKIP_FOLDERS
-    assert SYSTEM in SCAN_SKIP_FOLDERS
+    assert COMPLIANCE in SCAN_SKIP_FOLDERS
 
 
 def test_scan_skip_does_not_contain_ingestible_folders():
     """Inbox, Projects, etc. must NOT be in SCAN_SKIP — they contain real content."""
-    ingestible = {INBOX, PROJECTS, TEMPLATES, RFP, SOURCE_LIBRARY, ADMIN}
+    ingestible = {INBOX, PROJECTS, WORKFLOWS, REFERENCE}
     assert ingestible.isdisjoint(SCAN_SKIP_FOLDERS)
 
 

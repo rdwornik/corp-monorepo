@@ -13,14 +13,14 @@ from corp.overnight.classifier import (
 from corp.schema.folder_names import (
     INBOX,
     PROJECTS,
-    RFP,
-    SOURCE_LIBRARY,
-    TEMPLATES,
+    REF_RFP_LIBRARY,
+    REFERENCE,
+    WORKFLOWS,
 )
 
 
 def _make_scan_result(
-    path: str = f"{SOURCE_LIBRARY}/doc.pptx",
+    path: str = f"{REFERENCE}/doc.pptx",
     extension: str = ".pptx",
     title: str | None = "Platform Architecture Overview",
     text_preview: str = "Blue Yonder platform services architecture",
@@ -50,8 +50,8 @@ def _make_scan_result(
 
 ROUTING_MAP: dict = {
     "folders": {
-        TEMPLATES: {"vault_target": "05_templates"},
-        SOURCE_LIBRARY: {"vault_target": "04_evergreen"},
+        WORKFLOWS: {"vault_target": "05_templates"},
+        REFERENCE: {"vault_target": "04_evergreen"},
     },
 }
 
@@ -66,7 +66,7 @@ class TestProposeRename:
             "Budget Report Q2",
             ".xlsx",
             {},
-            f"{SOURCE_LIBRARY}/Budget Report Q2.xlsx",
+            f"{REFERENCE}/Budget Report Q2.xlsx",
         )
         assert action == "space_cleanup"
         assert name == "Budget_Report_Q2.xlsx"
@@ -127,7 +127,7 @@ class TestProposeRename:
             "WMS_Best_Practices",
             ".pptx",
             {},
-            f"{SOURCE_LIBRARY}/WMS_Best_Practices.pptx",
+            f"{REFERENCE}/WMS_Best_Practices.pptx",
         )
         assert action == "skip"
         assert name is None
@@ -152,7 +152,7 @@ class TestProposeRename:
             "WMS_Architecture_Deck",
             ".pptx",
             {"title": "Something Completely Different"},
-            f"{SOURCE_LIBRARY}/WMS_Architecture_Deck.pptx",
+            f"{REFERENCE}/WMS_Architecture_Deck.pptx",
         )
         assert action == "skip"
         assert name is None
@@ -193,12 +193,12 @@ class TestFolderRules:
             text_preview="rfp request for proposal response template",
         )
         result = classify_from_metadata(sr, ROUTING_MAP)
-        assert result.proposed_folder == RFP
+        assert result.proposed_folder == f"{REFERENCE}/{REF_RFP_LIBRARY}"
 
     def test_non_inbox_non_pinned_no_move(self) -> None:
-        """Files in SOURCE_LIBRARY etc. shouldn't be moved either."""
+        """Files in REFERENCE etc. shouldn't be moved either."""
         sr = _make_scan_result(
-            path=f"{SOURCE_LIBRARY}/doc.pptx",
+            path=f"{REFERENCE}/doc.pptx",
             text_preview="training exercise lab hands-on workshop",
         )
         result = classify_from_metadata(sr, ROUTING_MAP)
@@ -212,9 +212,9 @@ class TestClassifyBatch:
     def test_batch_only_returns_actionable(self) -> None:
         """classify_batch should only return files that need action."""
         files = [
-            _make_scan_result(path=f"{SOURCE_LIBRARY}/Good_Name.pptx"),
-            _make_scan_result(path=f"{SOURCE_LIBRARY}/Also Fine.pptx"),
-            _make_scan_result(path=f"{SOURCE_LIBRARY}/Another_Clean.pptx"),
+            _make_scan_result(path=f"{REFERENCE}/Good_Name.pptx"),
+            _make_scan_result(path=f"{REFERENCE}/Also Fine.pptx"),
+            _make_scan_result(path=f"{REFERENCE}/Another_Clean.pptx"),
         ]
         results = classify_batch(files, ROUTING_MAP)
         # "Also Fine.pptx" has a space → space_cleanup action
@@ -224,8 +224,8 @@ class TestClassifyBatch:
 
     def test_batch_empty_for_clean_files(self) -> None:
         files = [
-            _make_scan_result(path=f"{SOURCE_LIBRARY}/Clean_Name.pptx"),
-            _make_scan_result(path=f"{SOURCE_LIBRARY}/Another_Clean.pptx"),
+            _make_scan_result(path=f"{REFERENCE}/Clean_Name.pptx"),
+            _make_scan_result(path=f"{REFERENCE}/Another_Clean.pptx"),
         ]
         results = classify_batch(files, ROUTING_MAP)
         assert len(results) == 0

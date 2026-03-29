@@ -15,7 +15,7 @@ import yaml
 
 from corp.config import get_config
 from corp.models import TemplateInfo
-from corp.schema.folder_names import SYSTEM
+from corp.schema.folder_names import CORP_INFRA
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +70,7 @@ _AUTO_TAGS: list[tuple[str, list[str], list[str]]] = [
 def _registry_path() -> Path:
     """Get the default registry file path."""
     cfg = get_config()
-    system_dir = cfg.vault_path / SYSTEM
+    system_dir = cfg.vault_path / CORP_INFRA
     system_dir.mkdir(parents=True, exist_ok=True)
     return system_dir / "template_registry.yaml"
 

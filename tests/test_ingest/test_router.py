@@ -18,12 +18,14 @@ from corp.ingest.router import (
 from corp.ops.database import OpsDB
 from corp.ops.registry import ContentRegistry
 from corp.schema.folder_names import (
+    CORP_INFRA,
     INBOX,
     PROJECTS,
-    RFP,
-    SOURCE_LIBRARY,
+    REF_RFP_LIBRARY,
+    REFERENCE,
     STAGING,
     UNMATCHED,
+    WORKFLOWS,
 )
 
 
@@ -33,10 +35,10 @@ def mywork(tmp_path: Path) -> Path:
     inbox = tmp_path / INBOX
     inbox.mkdir()
     (tmp_path / PROJECTS).mkdir()
-    (tmp_path / SOURCE_LIBRARY / "02_Training_Enablement" / "Cognitive_Friday").mkdir(
+    (tmp_path / REFERENCE / "02_Training_Enablement" / "Cognitive_Friday").mkdir(
         parents=True
     )
-    (tmp_path / RFP / "_databases").mkdir(parents=True)
+    (tmp_path / REFERENCE / REF_RFP_LIBRARY / "_databases").mkdir(parents=True)
     return tmp_path
 
 
@@ -48,7 +50,7 @@ def registry_path(tmp_path: Path) -> Path:
         "series": {
             "cognitive_friday": {
                 "display_name": "Cognitive Friday",
-                "destination": f"{SOURCE_LIBRARY}/02_Training_Enablement/Cognitive_Friday",
+                "destination": f"{REFERENCE}/02_Training_Enablement/Cognitive_Friday",
                 "naming_patterns": [
                     "Cognitive_Friday*",
                     "CF_S[0-9]*",
@@ -67,7 +69,7 @@ def registry_path(tmp_path: Path) -> Path:
                     "filename_contains": ["RFP_Database"],
                     "extensions": [".xlsx", ".csv"],
                 },
-                "destination": f"{RFP}/_databases",
+                "destination": f"{REFERENCE}/{REF_RFP_LIBRARY}/_databases",
                 "metadata": {"source_category": "rfp"},
             },
         ],
@@ -274,7 +276,7 @@ class TestIngestFile:
         assert result.match_series == "cognitive_friday"
         assert result.confidence >= 0.9
         assert (
-            result.destination_path == f"{SOURCE_LIBRARY}/02_Training_Enablement/Cognitive_Friday"
+            result.destination_path == f"{REFERENCE}/02_Training_Enablement/Cognitive_Friday"
         )
         # File should have been moved
         assert not inbox_file.exists()
@@ -395,7 +397,7 @@ class TestIngestFile:
 
         old_path = f"{INBOX}/Cognitive_Friday_S25.pptx"
         new_path = (
-            f"{SOURCE_LIBRARY}/02_Training_Enablement/Cognitive_Friday/Cognitive_Friday_S25.pptx"
+            f"{REFERENCE}/02_Training_Enablement/Cognitive_Friday/Cognitive_Friday_S25.pptx"
         )
 
         # Old path should no longer exist in ops.db
@@ -751,18 +753,18 @@ class TestIngestFolder:
 class TestStagingAndFinalize:
     def test_get_staged_files(self, mywork: Path) -> None:
         """get_staged_files finds files in _Staging directories."""
-        staging = mywork / SOURCE_LIBRARY / "02_Training_Enablement" / STAGING
+        staging = mywork / REFERENCE / "02_Training_Enablement" / STAGING
         staging.mkdir(parents=True)
         (staging / "review_me.pptx").write_bytes(b"staged content")
 
         staged = get_staged_files(mywork)
         assert len(staged) == 1
         assert staged[0]["filename"] == "review_me.pptx"
-        assert f"{SOURCE_LIBRARY}/02_Training_Enablement" in staged[0]["parent_destination"]
+        assert f"{REFERENCE}/02_Training_Enablement" in staged[0]["parent_destination"]
 
     def test_finalize_moves_to_parent(self, mywork: Path, ops: OpsDB) -> None:
         """finalize_file moves file from _Staging to parent."""
-        dest = mywork / RFP / "_databases"
+        dest = mywork / REFERENCE / REF_RFP_LIBRARY / "_databases"
         staging = dest / STAGING
         staging.mkdir(parents=True)
         staged_file = staging / "data.xlsx"

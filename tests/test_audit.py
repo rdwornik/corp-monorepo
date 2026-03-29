@@ -17,11 +17,11 @@ from corp.audit import (
 )
 from corp.schema.folder_names import (
     ARCHIVE,
+    CORP_INFRA,
     INBOX,
     PROJECTS,
-    SOURCE_LIBRARY,
-    SYSTEM,
-    TEMPLATES,
+    REFERENCE,
+    WORKFLOWS,
 )
 
 
@@ -46,13 +46,13 @@ def mywork_tree(tmp_path: Path) -> Path:
     proj2.mkdir(parents=True)
     (proj2 / "demo.mp4").write_bytes(b"\x00" * 1024)
 
-    # TEMPLATES
-    templates = mywork / TEMPLATES / "01_Presentations"
+    # WORKFLOWS
+    templates = mywork / WORKFLOWS / "01_Presentations"
     templates.mkdir(parents=True)
     (templates / "Platform Overview.pptx").write_bytes(b"PK\x03\x04tmpl")
 
-    # SOURCE_LIBRARY
-    source = mywork / SOURCE_LIBRARY
+    # REFERENCE
+    source = mywork / REFERENCE
     source.mkdir(parents=True)
     (source / "product_docs.pdf").write_bytes(b"%PDF-1.4fake")
 
@@ -61,8 +61,8 @@ def mywork_tree(tmp_path: Path) -> Path:
     archive.mkdir(parents=True)
     (archive / "old_stuff.pdf").write_bytes(b"archived")
 
-    # SYSTEM
-    system = mywork / SYSTEM
+    # CORP_INFRA
+    system = mywork / CORP_INFRA
     system.mkdir(parents=True)
 
     return mywork
@@ -170,7 +170,7 @@ class TestBuildReport:
 
     def test_duplicate_detection(self, mywork_tree: Path, vault_tree: Path) -> None:
         # Add a duplicate filename
-        dup = mywork_tree / SOURCE_LIBRARY / "notes.txt"
+        dup = mywork_tree / REFERENCE / "notes.txt"
         dup.write_text("Duplicate", encoding="utf-8")
 
         files = scan_mywork(mywork_tree)

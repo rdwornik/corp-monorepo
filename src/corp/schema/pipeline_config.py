@@ -14,7 +14,7 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from corp.schema.folder_names import ARCHIVE, INBOX, PROJECTS, TEMPLATES
+from corp.schema.folder_names import ARCHIVE, INBOX, PROJECTS, WORKFLOWS
 
 
 @dataclass(frozen=True)
@@ -81,7 +81,7 @@ class PipelineConfig:
             vault_path=vault,
             mywork_root=mywork,
             projects_root=_env_or("PROJECTS_ROOT", mywork / PROJECTS),
-            templates_root=_env_or("TEMPLATES_ROOT", mywork / TEMPLATES),
+            templates_root=_env_or("TEMPLATES_ROOT", mywork / WORKFLOWS),
             archive_root=_env_or("ARCHIVE_ROOT", mywork / ARCHIVE),
             app_data_path=_env_or("APP_DATA_PATH", local_appdata / "corp-by-os"),
             index_extra_roots=extra_roots,
@@ -98,7 +98,7 @@ class PipelineConfig:
             vault_path=tmp_root / "vault",
             mywork_root=mywork,
             projects_root=mywork / PROJECTS,
-            templates_root=mywork / TEMPLATES,
+            templates_root=mywork / WORKFLOWS,
             archive_root=mywork / ARCHIVE,
             app_data_path=tmp_root / "appdata",
         )

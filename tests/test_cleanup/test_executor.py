@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 from corp.cleanup.executor import _guard_onedrive, execute_moves
-from corp.schema.folder_names import ADMIN, INBOX, RFP, SOURCE_LIBRARY
+from corp.schema.folder_names import ADMIN, INBOX, REF_RFP_LIBRARY, REFERENCE
 
 
 def _write_moves(path, entries):
@@ -39,7 +39,7 @@ def test_execute_approved_only(mywork_cleanup, tmp_path):
             {
                 "source": f"{INBOX}/RFP_Response_Final.txt",
                 "action": "move",
-                "destination": RFP,
+                "destination": f"{REFERENCE}/{REF_RFP_LIBRARY}",
                 "proposed_name": "RFP_Response_Final.txt",
                 "approved": None,
             },
@@ -111,7 +111,7 @@ def test_execute_delete_action(mywork_cleanup, tmp_path):
         moves_file,
         [
             {
-                "source": f"{SOURCE_LIBRARY}/02_Training_Enablement/bookmark.url",
+                "source": f"{REFERENCE}/02_Training_Enablement/bookmark.url",
                 "action": "delete",
                 "destination": "DELETE",
                 "proposed_name": "bookmark.url",
@@ -124,7 +124,7 @@ def test_execute_delete_action(mywork_cleanup, tmp_path):
 
     assert result.deleted == 1
     assert not (
-        mywork_cleanup / SOURCE_LIBRARY / "02_Training_Enablement" / "bookmark.url"
+        mywork_cleanup / REFERENCE / "02_Training_Enablement" / "bookmark.url"
     ).exists()
 
 

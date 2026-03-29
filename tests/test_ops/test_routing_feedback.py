@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 from corp.ops.database import OpsDB
-from corp.schema.folder_names import PROJECTS, RFP
+from corp.schema.folder_names import PROJECTS, REF_RFP_LIBRARY, REFERENCE
 
 
 @pytest.fixture()
@@ -23,9 +23,9 @@ def _log(db: OpsDB, **kwargs) -> None:
         "filename": "test.pdf",
         "extension": ".pdf",
         "file_size_bytes": 1024,
-        "classifier_destination": RFP,
+        "classifier_destination": f"{REFERENCE}/{REF_RFP_LIBRARY}",
         "classifier_confidence": 0.85,
-        "final_destination": RFP,
+        "final_destination": f"{REFERENCE}/{REF_RFP_LIBRARY}",
         "was_overridden": False,
         "routing_method": "classifier_auto",
         "user_context": None,
@@ -56,7 +56,7 @@ class TestLogRoutingDecision:
             file_size_bytes=1024,
             classifier_destination=None,
             classifier_confidence=None,
-            final_destination=RFP,
+            final_destination=f"{REFERENCE}/{REF_RFP_LIBRARY}",
             was_overridden=False,
             routing_method="classifier_auto",
         )
@@ -145,14 +145,14 @@ class TestRoutingStats:
         _log(
             db,
             filename="a.pdf",
-            final_destination=RFP,
+            final_destination=f"{REFERENCE}/{REF_RFP_LIBRARY}",
             routing_method="manual_override",
             was_overridden=True,
         )
         _log(
             db,
             filename="b.pdf",
-            final_destination=RFP,
+            final_destination=f"{REFERENCE}/{REF_RFP_LIBRARY}",
             routing_method="manual_override",
             was_overridden=True,
         )

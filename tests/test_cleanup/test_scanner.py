@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from corp.cleanup.scanner import scan_problematic_files
-from corp.schema.folder_names import INBOX, RFP, SOURCE_LIBRARY
+from corp.schema.folder_names import INBOX, REF_RFP_LIBRARY, REFERENCE
 
 
 def test_scan_finds_inbox_files(mywork_cleanup):
@@ -26,7 +26,7 @@ def test_scan_skips_triage_files(mywork_cleanup):
 
 
 def test_scan_finds_url_files(mywork_cleanup):
-    """Scanner finds .url files in SOURCE_LIBRARY."""
+    """Scanner finds .url files in REFERENCE."""
     results = scan_problematic_files(mywork_cleanup)
     url_files = [f for f in results if f.extension == ".url"]
     assert len(url_files) == 1
@@ -34,16 +34,16 @@ def test_scan_finds_url_files(mywork_cleanup):
 
 
 def test_scan_finds_log_files(mywork_cleanup):
-    """Scanner finds .log files in SOURCE_LIBRARY."""
+    """Scanner finds .log files in REFERENCE."""
     results = scan_problematic_files(mywork_cleanup)
     log_files = [f for f in results if f.extension == ".log"]
     assert len(log_files) == 1
 
 
 def test_scan_finds_rfp_loose_files(mywork_cleanup):
-    """Scanner finds loose files at RFP root but not subfolder contents."""
+    """Scanner finds loose files at RFP_Library root but not subfolder contents."""
     results = scan_problematic_files(mywork_cleanup)
-    rfp_files = [f for f in results if f.current_folder == RFP]
+    rfp_files = [f for f in results if f.current_folder == f"{REFERENCE}/{REF_RFP_LIBRARY}"]
     names = {f.name for f in rfp_files}
     assert "RFP_Database_Master.xlsx" in names
     assert "RFP_Database_Planning.xlsx" in names

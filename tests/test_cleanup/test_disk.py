@@ -14,7 +14,7 @@ from corp.cleanup.disk import (
     find_onedrive_overlap,
     find_staging_artifacts,
 )
-from corp.schema.folder_names import SYSTEM
+from corp.schema.folder_names import CORP_INFRA
 
 # === OneDrive overlap ===
 
@@ -177,7 +177,7 @@ class TestFindDuplicates:
 class TestFindArtifacts:
     def test_finds_extraction_artifacts(self, tmp_path: Path) -> None:
         """Finds files in .corp/run/ directory."""
-        run_dir = tmp_path / SYSTEM / ".corp" / "run" / "batch_001" / "output"
+        run_dir = tmp_path / CORP_INFRA / "run" / "batch_001" / "output"
         run_dir.mkdir(parents=True)
         (run_dir / "result.json").write_bytes(b"result")
         (run_dir / "source.pdf").write_bytes(b"x" * 5000)

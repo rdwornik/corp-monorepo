@@ -11,14 +11,13 @@ import click
 from corp.cli._common import console, logger
 from corp.cli.extract import EXTRACT_EXTENSIONS
 from corp.config import get_config
-from corp.schema.folder_names import RFP, SOURCE_LIBRARY, SYSTEM, TEMPLATES
+from corp.schema.folder_names import CORP_INFRA, REFERENCE, WORKFLOWS
 from corp.schema.pipeline_config import PipelineConfig
 
 OVERNIGHT_SCOPES: dict[str, list[str]] = {
-    "all-non-project": [TEMPLATES, RFP, SOURCE_LIBRARY],
-    "source-library": [SOURCE_LIBRARY],
-    "rfp": [RFP],
-    "templates": [TEMPLATES],
+    "all-non-project": [WORKFLOWS, REFERENCE],
+    "reference": [REFERENCE],
+    "workflows": [WORKFLOWS],
     "full-reshape": [],  # Special: uses CKE scan, not folder-based extraction
 }
 
@@ -169,7 +168,7 @@ def _run_folder_extraction(
     from corp.extraction.vault_writer import move_to_vault
     from corp.overnight.cke_client import extract_batch, extract_sync
 
-    routing_map_path = mywork_root / SYSTEM / "routing_map.yaml"
+    routing_map_path = mywork_root / CORP_INFRA / "routing_map.yaml"
     with open(routing_map_path, encoding="utf-8") as f:
         routing_map = yaml.safe_load(f)
 
@@ -377,7 +376,7 @@ def _run_full_reshape(
 
         from corp.overnight.classifier import classify_batch as reshape_classify
 
-        routing_map_path = mywork_root / SYSTEM / "routing_map.yaml"
+        routing_map_path = mywork_root / CORP_INFRA / "routing_map.yaml"
         if routing_map_path.exists():
             with open(routing_map_path, encoding="utf-8") as f:
                 routing_map = yaml.safe_load(f)
@@ -476,7 +475,7 @@ def _run_freshness_phase(cfg: AppConfig) -> None:  # noqa: F821
         console.print(f"  [yellow]Errors: {summary.errors}[/yellow]")
 
     # Save report
-    report_dir = cfg.mywork_root / SYSTEM
+    report_dir = cfg.mywork_root / CORP_INFRA
     report_dir.mkdir(parents=True, exist_ok=True)
     report_path = report_dir / "freshness_report.json"
 

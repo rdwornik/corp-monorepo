@@ -18,11 +18,16 @@ from corp.schema.folder_names import (
     ADMIN,
     INBOX,
     PROJECTS,
-    RFP,
-    SOURCE_LIBRARY,
+    REF_COMPETITION,
+    REF_PRODUCTS,
+    REF_RFP_LIBRARY,
+    REFERENCE,
     STAGING,
-    TEMPLATES,
     UNMATCHED,
+    WF_DEMO_SCRIPTS,
+    WF_MASTER_DECK,
+    WF_WORKSHOP_KITS,
+    WORKFLOWS,
 )
 
 logger = logging.getLogger(__name__)
@@ -304,16 +309,14 @@ def _get_all_destinations(registry: ContentRegistry) -> list[str]:  # noqa: F821
     dests.update(
         [
             PROJECTS,
-            "20_Extra_Initiatives",
-            f"{TEMPLATES}/01_Presentation_Decks",
-            f"{TEMPLATES}/02_Demo_Scripts",
-            f"{TEMPLATES}/03_Discovery_Tools",
-            f"{TEMPLATES}/90_Reference_Baselines",
-            RFP,
-            f"{RFP}/_databases",
-            f"{SOURCE_LIBRARY}/01_Product_Docs",
-            f"{SOURCE_LIBRARY}/02_Training_Enablement",
-            f"{SOURCE_LIBRARY}/03_Competitive",
+            WORKFLOWS,
+            f"{WORKFLOWS}/{WF_MASTER_DECK}",
+            f"{WORKFLOWS}/{WF_DEMO_SCRIPTS}",
+            f"{WORKFLOWS}/{WF_WORKSHOP_KITS}",
+            f"{REFERENCE}/{REF_RFP_LIBRARY}",
+            f"{REFERENCE}/{REF_PRODUCTS}",
+            f"{REFERENCE}/Training",
+            f"{REFERENCE}/{REF_COMPETITION}",
             ADMIN,
         ]
     )

@@ -18,14 +18,11 @@ from pathlib import Path
 from typing import Any
 
 from corp.schema.folder_names import (
-    ADMIN,
     INBOX,
     PROJECTS,
-    RFP,
+    REFERENCE,
     SCAN_SKIP_FOLDERS,
-    SOURCE_LIBRARY,
-    SYSTEM,
-    TEMPLATES,
+    WORKFLOWS,
 )
 
 logger = logging.getLogger(__name__)
@@ -37,13 +34,8 @@ SKIP_FOLDERS: set[str] = set(SCAN_SKIP_FOLDERS)
 ANALYSIS_FOLDERS: list[str] = [
     INBOX,
     PROJECTS,
-    "20_Extra_Initiatives",
-    TEMPLATES,
-    "40_Assets_Recordings",
-    RFP,
-    SOURCE_LIBRARY,
-    ADMIN,
-    SYSTEM,
+    WORKFLOWS,
+    REFERENCE,
 ]
 
 _FOLDER_ANALYSIS_PROMPT = """\

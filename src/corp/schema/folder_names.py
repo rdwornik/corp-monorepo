@@ -1,37 +1,49 @@
 """Canonical MyWork folder names — single source of truth.
 
+Council #24 binding decision (2026-03-29).
+Access-frequency principle: daily=1 click, weekly=2, monthly=deeper.
+Folders = access state. Tags = knowledge dimensions.
+
 Zero imports — safe to use from any module without circular import risk.
-Renaming a folder means changing one constant here; all usages follow.
 """
 
-# Top-level MyWork folders
+# === Top-level MyWork folders (ordered by number prefix) ===
 INBOX = "00_Inbox"
 PROJECTS = "10_Projects"
-TEMPLATES = "30_Templates"
-RFP = "50_RFP"
-SOURCE_LIBRARY = "60_Source_Library"
+WORKFLOWS = "20_Workflows"
+REFERENCE = "30_Reference"
 ADMIN = "70_Admin"
-ARCHIVE = "80_Archive"
-SYSTEM = "90_System"
+COMPLIANCE = "80_Compliance"
+ARCHIVE = "90_Archive"
 
-# Internal sub-folder names (appear inside any top-level folder)
+# === Hidden pipeline infrastructure ===
+CORP_INFRA = ".corp"
+
+# === Inbox sub-locations ===
 STAGING = "_Staging"
 UNMATCHED = "_Unmatched"
 QUARANTINE = "_quarantine"
 
-# All top-level MyWork folders in canonical order
+# === All canonical top-level folders ===
 ALL_MYWORK_FOLDERS: tuple[str, ...] = (
-    INBOX,
-    PROJECTS,
-    TEMPLATES,
-    RFP,
-    SOURCE_LIBRARY,
-    ADMIN,
-    ARCHIVE,
-    SYSTEM,
+    INBOX, PROJECTS, WORKFLOWS, REFERENCE, ADMIN, COMPLIANCE, ARCHIVE
 )
 
-# Folders the overnight scanner and audit skip (they are not ingestible content)
+# === Folders the scanner skips (non-ingestible) ===
 SCAN_SKIP_FOLDERS: frozenset[str] = frozenset(
-    {ARCHIVE, SYSTEM, ".corp", "__pycache__", ".git", ".venv", "node_modules"}
+    {ARCHIVE, ADMIN, COMPLIANCE, CORP_INFRA,
+     "__pycache__", ".git", ".venv", "node_modules", ".claude"}
 )
+
+# === Reference subfolders ===
+REF_PRODUCTS = "Products"
+REF_ARCHITECTURE = "Architecture"
+REF_COMPETITION = "Competition"
+REF_BRANDING = "Branding"
+REF_RFP_LIBRARY = "RFP_Library"
+
+# === Workflow subfolders ===
+WF_MASTER_DECK = "Master_Deck"
+WF_TECH_PRESENTATIONS = "Technical_Presentations"
+WF_DEMO_SCRIPTS = "Demo_Scripts"
+WF_WORKSHOP_KITS = "Workshop_Kits"

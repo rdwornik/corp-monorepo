@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import pytest
-from corp.schema.folder_names import INBOX, RFP, SOURCE_LIBRARY
+from corp.schema.folder_names import INBOX, REF_RFP_LIBRARY, REFERENCE
 
 
 @pytest.fixture()
@@ -22,23 +22,23 @@ def mywork_cleanup(tmp_path):
     (inbox / "_triage_log.jsonl").write_text("", encoding="utf-8")
     (inbox / "_triage_schema.yaml").write_text("fields: {}", encoding="utf-8")
 
-    # SOURCE_LIBRARY with junk files
-    source_lib = mywork / SOURCE_LIBRARY / "02_Training_Enablement"
-    source_lib.mkdir(parents=True)
-    (source_lib / "training.pptx").write_bytes(b"pptx")
-    (source_lib / "bookmark.url").write_text(
+    # REFERENCE with junk files
+    ref_training = mywork / REFERENCE / "02_Training_Enablement"
+    ref_training.mkdir(parents=True)
+    (ref_training / "training.pptx").write_bytes(b"pptx")
+    (ref_training / "bookmark.url").write_text(
         "[InternetShortcut]\nURL=https://example.com", encoding="utf-8"
     )
-    (source_lib / "debug.log").write_text("log line", encoding="utf-8")
+    (ref_training / "debug.log").write_text("log line", encoding="utf-8")
 
-    # RFP with loose files
-    rfp = mywork / RFP
-    rfp.mkdir(parents=True)
-    (rfp / "RFP_Database_Master.xlsx").write_bytes(b"xlsx")
-    (rfp / "RFP_Database_Planning.xlsx").write_bytes(b"xlsx")
-    (rfp / "folder_manifest.yaml").write_text("purpose: RFP", encoding="utf-8")
+    # RFP_Library with loose files
+    rfp_lib = mywork / REFERENCE / REF_RFP_LIBRARY
+    rfp_lib.mkdir(parents=True)
+    (rfp_lib / "RFP_Database_Master.xlsx").write_bytes(b"xlsx")
+    (rfp_lib / "RFP_Database_Planning.xlsx").write_bytes(b"xlsx")
+    (rfp_lib / "folder_manifest.yaml").write_text("purpose: RFP_Library", encoding="utf-8")
     # Subfolder (should not be scanned as loose)
-    (rfp / "Certificate").mkdir()
-    (rfp / "Certificate" / "cert.pdf").write_bytes(b"pdf")
+    (rfp_lib / "Certificate").mkdir()
+    (rfp_lib / "Certificate" / "cert.pdf").write_bytes(b"pdf")
 
     return mywork
