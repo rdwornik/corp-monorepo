@@ -6,7 +6,7 @@ from pathlib import Path
 
 def test_cke_output_has_required_fields():
     """CKE extraction JSON has expected classifier training structure."""
-    fixture_dir = Path("packages/corp-knowledge-extractor/tests/fixtures")
+    fixture_dir = Path("tests/extractor/fixtures")
     training = json.loads((fixture_dir / "classifier_training.json").read_text())
     assert len(training) > 0
     for entry in training[:5]:
@@ -16,7 +16,7 @@ def test_cke_output_has_required_fields():
 
 def test_cke_sample_output_has_expected_structure():
     """CKE sample_output.json has deep extraction structure (qa_pairs or slide_breakdown)."""
-    fixture_dir = Path("packages/corp-knowledge-extractor/tests/fixtures")
+    fixture_dir = Path("tests/extractor/fixtures")
     sample_path = fixture_dir / "sample_output.json"
     if not sample_path.exists():
         import pytest

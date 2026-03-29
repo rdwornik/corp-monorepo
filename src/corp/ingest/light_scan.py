@@ -100,7 +100,7 @@ def light_scan(file_path: Path) -> ScanResult:
     """
     import time
 
-    start = time.time()
+    start = time.perf_counter()
 
     result = ScanResult(
         filename=file_path.name,
@@ -133,7 +133,7 @@ def light_scan(file_path: Path) -> ScanResult:
         result.errors.append(str(e))
         result.scan_tier = "degraded" if result.title else "filename_only"
 
-    result.scan_time_ms = (time.time() - start) * 1000
+    result.scan_time_ms = (time.perf_counter() - start) * 1000
     return result
 
 

@@ -231,14 +231,14 @@ class TestUserContextInPrompt:
 class TestUserContextCLIFlag:
     def test_context_option_exists(self):
         """The process command accepts --context."""
-        from scripts.run import process
+        from corp.extractor.scripts.run import process
 
         param_names = [p.name for p in process.params]
         assert "context" in param_names
 
     def test_context_option_default_empty(self):
         """--context defaults to empty string."""
-        from scripts.run import process
+        from corp.extractor.scripts.run import process
 
         ctx_param = next(p for p in process.params if p.name == "context")
         assert ctx_param.default == ""

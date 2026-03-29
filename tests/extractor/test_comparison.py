@@ -15,7 +15,7 @@ import pytest
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
-from scripts.compare_reports import (
+from corp.extractor.scripts.compare_reports import (
     compare_frames,
     compare_qa_pairs,
     compare_reports,

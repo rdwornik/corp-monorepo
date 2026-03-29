@@ -28,10 +28,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
-# Add project root to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add repo root to path so tests/ is importable
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from tests.test_quality import QualityChecker
+from tests.extractor.test_quality import QualityChecker
 
 
 def load_report_data(report_dir: str) -> dict:

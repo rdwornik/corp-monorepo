@@ -187,7 +187,7 @@ class BatchProcessor:
         Tier,
     ) -> int:
         """Process a single manifest entry through the full pipeline. Returns tier used."""
-        from scripts.run import keep_slide_frames
+        from corp.extractor.scripts.run import keep_slide_frames
 
         # Build SourceFile from manifest entry
         ft_name = _DOC_TYPE_MAP.get(entry.doc_type.lower(), "DOCUMENT")

@@ -29,5 +29,5 @@ def test_naming_config_type_codes_have_doc_types_or_hints():
     for code, spec in config["type_codes"].items():
         if code == "MISC":
             continue  # MISC is explicitly the catch-all with no doc_type
-        has_anchor = spec.get("doc_type") or spec.get("filename_hint")
-        assert has_anchor, f"Type code {code} has neither doc_type nor filename_hint"
+        has_anchor = spec.get("doc_type") or spec.get("filename_hint") or spec.get("extension_hint")
+        assert has_anchor, f"Type code {code} has neither doc_type, filename_hint, nor extension_hint"

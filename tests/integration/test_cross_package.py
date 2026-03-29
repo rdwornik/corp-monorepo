@@ -25,13 +25,13 @@ def test_cke_namespace():
 
 
 def test_cke_paths_resolve():
-    """CKE _paths.py resolves to package root, not monorepo root."""
+    """CKE _paths.py resolves to repo root with config/extractor/ for configs."""
     from corp.extractor._paths import CONFIG_DIR, REPO_ROOT
 
     assert (REPO_ROOT / "pyproject.toml").exists()
     assert CONFIG_DIR.exists()
-    # Should NOT be the monorepo root
-    assert REPO_ROOT.name == "corp-knowledge-extractor"
+    assert REPO_ROOT.name == "corp-monorepo"
+    assert CONFIG_DIR.name == "extractor"
 
 
 def test_all_clis_importable():
@@ -55,12 +55,11 @@ def test_rfp_agent_importable():
     assert LLMRouter is not None
 
 
-def test_rfp_agent_paths_resolve():
-    """RFP agent _paths.py resolves to package root."""
-    from corp.rfp._paths import REPO_ROOT
+def test_rfp_agent_importable_deep():
+    """RFP agent submodules are importable."""
+    import corp.rfp.answer_selector
 
-    assert (REPO_ROOT / "pyproject.toml").exists()
-    assert REPO_ROOT.name == "corp-rfp-agent"
+    assert hasattr(corp.rfp.answer_selector, "NumpyEncoder")
 
 
 def test_com_importable():

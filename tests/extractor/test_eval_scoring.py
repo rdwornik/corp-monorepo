@@ -1,8 +1,12 @@
 """Tests for doc-type-aware eval scoring and low_content flag."""
 
+import sys
 from pathlib import Path
 
 import yaml
+
+# eval_extraction.py lives in scripts/
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
 from eval_extraction import evaluate_package
 
 

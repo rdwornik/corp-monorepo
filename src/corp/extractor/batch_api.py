@@ -341,8 +341,8 @@ class BatchJobRunner:
         from corp.extractor.extract import extract_knowledge, extract_local
         from corp.extractor.frames.sampler import sample_frames
         from corp.extractor.manifest import load_status
+        from corp.extractor.scripts.run import keep_slide_frames
         from corp.extractor.synthesize import build_package
-        from scripts.run import keep_slide_frames
 
         output_dir = self.manifest.output_dir
         output_dir.mkdir(parents=True, exist_ok=True)

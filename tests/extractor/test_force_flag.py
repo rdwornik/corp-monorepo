@@ -82,13 +82,13 @@ class TestBatchJobRunnerForce:
 
 class TestProcessManifestCLI:
     def test_force_flag_exists(self):
-        from scripts.run import process_manifest
+        from corp.extractor.scripts.run import process_manifest
 
         param_names = [p.name for p in process_manifest.params]
         assert "force" in param_names
 
     def test_force_is_flag(self):
-        from scripts.run import process_manifest
+        from corp.extractor.scripts.run import process_manifest
 
         force_param = next(p for p in process_manifest.params if p.name == "force")
         assert force_param.is_flag is True
