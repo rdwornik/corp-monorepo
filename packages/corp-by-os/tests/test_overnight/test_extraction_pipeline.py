@@ -13,7 +13,6 @@ from pathlib import Path
 
 import pytest
 import yaml
-
 from corp_by_os.overnight.monitor import OvernightMonitor
 from corp_by_os.overnight.state import OvernightState
 
@@ -91,7 +90,7 @@ class TestExtractionPipeline:
         state_db: Path,
     ) -> None:
         """After extraction, files must move from pending → done."""
-        from corp_by_os.cli import _update_folder_file_statuses
+        from corp_by_os.cli.overnight import _update_folder_file_statuses
 
         state = OvernightState(db_path=state_db)
         run_id = "test-run-002"
@@ -129,7 +128,7 @@ class TestExtractionPipeline:
         state_db: Path,
     ) -> None:
         """On extraction failure, files must be marked as error."""
-        from corp_by_os.cli import _update_folder_file_statuses
+        from corp_by_os.cli.overnight import _update_folder_file_statuses
 
         state = OvernightState(db_path=state_db)
         run_id = "test-run-003"
@@ -209,7 +208,7 @@ class TestExtractionPipeline:
         state_db: Path,
     ) -> None:
         """_update_folder_file_statuses must only update files in the target folder."""
-        from corp_by_os.cli import _update_folder_file_statuses
+        from corp_by_os.cli.overnight import _update_folder_file_statuses
 
         state = OvernightState(db_path=state_db)
         run_id = "test-run-prefix"

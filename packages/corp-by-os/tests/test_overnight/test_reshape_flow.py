@@ -5,8 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
-from corp_by_os.cli import _execute_reshape_actions
+from corp_by_os.cli.overnight import _execute_reshape_actions
 from corp_by_os.overnight.classifier import ClassificationResult, classify_batch
 from corp_by_os.overnight.dedup import deduplicate
 

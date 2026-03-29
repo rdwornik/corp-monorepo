@@ -8,7 +8,6 @@ from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
-
 from corp_by_os.cli import cli
 
 _TEST_SCHEMA = """\
@@ -93,7 +92,7 @@ def json_db(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 
     # Patch get_index_path and get_config
     monkeypatch.setattr(
-        "corp_by_os.cli.get_config",
+        "corp_by_os.cli.retrieve.get_config",
         lambda: type("Cfg", (), {"vault_path": vault, "mywork_root": tmp_path})(),
     )
 
