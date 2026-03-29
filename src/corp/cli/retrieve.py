@@ -8,6 +8,7 @@ from rich.table import Table
 
 from corp.cli._common import DASH, console
 from corp.config import get_config
+from corp.schema.folder_names import PROJECTS, SYSTEM
 
 
 @click.command("retrieve")
@@ -183,7 +184,7 @@ def prep_cmd(client: str, model: str, output: str | None) -> None:
     if output:
         output_dir = Path(output)
     else:
-        projects_dir = cfg.mywork_root / "10_Projects"
+        projects_dir = cfg.mywork_root / PROJECTS
         matching = (
             [
                 d
@@ -196,7 +197,7 @@ def prep_cmd(client: str, model: str, output: str | None) -> None:
         if matching:
             output_dir = matching[0] / "_corp_prep"
         else:
-            output_dir = cfg.mywork_root / "90_System" / "_corp_prep"
+            output_dir = cfg.mywork_root / SYSTEM / "_corp_prep"
 
     console.print(f"[bold]Preparing briefing for: {client}[/bold]")
     console.print("Retrieving knowledge...")

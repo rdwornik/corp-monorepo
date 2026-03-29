@@ -24,6 +24,7 @@ from corp.ingest.renamer import RenameProposal, propose_name
 from corp.ingest.router import _SKIP_EXTENSIONS, _SKIP_NAMES, compute_file_hash
 from corp.ops.database import OpsDB
 from corp.ops.registry import ContentRegistry
+from corp.schema.folder_names import INBOX
 
 logger = logging.getLogger(__name__)
 console = Console()
@@ -239,7 +240,7 @@ def _log_ingest_event(
     # Upsert asset — use dest_file for stat since source may already be moved
     mtime = datetime.fromtimestamp(dest_file.stat().st_mtime).isoformat(timespec="seconds")
     dest_parts = dest_rel.split("/")
-    folder_l1 = dest_parts[0] if dest_parts else "00_Inbox"
+    folder_l1 = dest_parts[0] if dest_parts else INBOX
     folder_l2 = dest_parts[1] if len(dest_parts) > 1 else None
 
     asset_id = ops.upsert_asset(
@@ -661,7 +662,7 @@ def _undo_event(
 
     # Resolve to absolute paths
     dest_abs = mywork_root / dest_path.replace("/", "\\")
-    inbox = mywork_root / "00_Inbox"
+    inbox = mywork_root / INBOX
 
     if not dest_abs.exists():
         console.print(f"[red]File not found at destination: {dest_path}[/red]")
@@ -1073,7 +1074,7 @@ def ingest_inbox(
     if path:
         files = [Path(path).resolve()]
     else:
-        inbox = cfg.mywork_root / "00_Inbox"
+        inbox = cfg.mywork_root / INBOX
         files = _scan_inbox_files(inbox)
 
     if not files:

@@ -7,6 +7,7 @@ import click
 from rich.table import Table
 
 from corp.cli._common import console, logger
+from corp.schema.folder_names import PROJECTS
 
 
 @click.command("query")
@@ -101,7 +102,7 @@ def folder_review_command(path: str | None) -> None:
         _paths_toml = Path(__file__).parents[4] / "config" / "paths.toml"
         with _paths_toml.open("rb") as fh:
             _cfg = tomllib.load(fh)
-        root = Path(_cfg["paths"]["mywork"]) / "10_Projects"
+        root = Path(_cfg["paths"]["mywork"]) / PROJECTS
 
     if not root.exists():
         console.print(f"[red]Path not found: {root}[/red]")

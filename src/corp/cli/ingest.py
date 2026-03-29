@@ -7,6 +7,7 @@ from rich.table import Table
 
 from corp.cli._common import CHECK, DASH, console
 from corp.config import get_config
+from corp.schema.folder_names import INBOX, UNMATCHED
 from corp.schema.pipeline_config import PipelineConfig
 
 
@@ -263,7 +264,7 @@ def ingest_inbox_command(
     if path:
         files = [Path(path).resolve()]
     else:
-        inbox = cfg.mywork_root / "00_Inbox"
+        inbox = cfg.mywork_root / INBOX
         files = _scan_inbox_files(inbox)
 
     if not files:
@@ -433,7 +434,7 @@ def classify_command(obj: dict, model: str, budget: float, dry_run: bool) -> Non
 
     console.print(table)
 
-    staged = sum(1 for r in results if r["classification"].destination != "00_Inbox/_Unmatched")
+    staged = sum(1 for r in results if r["classification"].destination != f"{INBOX}/{UNMATCHED}")
     unmatched = len(results) - staged
     console.print(
         f"\n[bold]Classified: {len(results)} | "

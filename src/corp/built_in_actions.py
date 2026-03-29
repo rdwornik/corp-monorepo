@@ -16,6 +16,7 @@ import yaml
 
 from corp.config import get_config
 from corp.models import StepResult, VaultZone
+from corp.schema.folder_names import INBOX
 
 logger = logging.getLogger(__name__)
 
@@ -319,7 +320,7 @@ def generate_attention_dashboard(params: dict[str, str]) -> StepResult:
 def scan_inbox(params: dict[str, str]) -> StepResult:
     """List files in 00_Inbox/, classify by extension/name."""
     cfg = get_config()
-    inbox_path = cfg.projects_root.parent / "00_Inbox"
+    inbox_path = cfg.projects_root.parent / INBOX
 
     if not inbox_path.exists():
         return StepResult(

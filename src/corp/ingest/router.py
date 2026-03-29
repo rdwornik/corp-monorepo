@@ -17,6 +17,7 @@ from pathlib import Path
 
 from corp.ops.database import OpsDB
 from corp.ops.registry import ContentRegistry
+from corp.schema.folder_names import INBOX, STAGING, UNMATCHED
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +37,7 @@ _SKIP_NAMES = {
 }
 
 # Directories in Inbox that are infrastructure, not packages
-_SKIP_DIRS = {"_Unmatched", "_Staging", ".corp", "_knowledge", "__pycache__"}
+_SKIP_DIRS = {UNMATCHED, STAGING, ".corp", "_knowledge", "__pycache__"}
 
 _SKIP_EXTENSIONS = {".tmp", ".crdownload", ".partial"}
 
@@ -107,7 +108,7 @@ def scan_inbox(mywork_root: Path) -> list[InboxItem]:
     Loose files (directly in Inbox root, not in a subfolder) are
     returned as individual InboxItems with is_folder=False.
     """
-    inbox = mywork_root / "00_Inbox"
+    inbox = mywork_root / INBOX
     if not inbox.exists():
         logger.warning("Inbox not found: %s", inbox)
         return []
@@ -206,7 +207,7 @@ def ingest_file(
 
     if not match.matched:
         # No match — quarantine to _Unmatched
-        dest_rel = match.destination or "00_Inbox/_Unmatched"
+        dest_rel = match.destination or f"{INBOX}/{UNMATCHED}"
         result.action = "quarantined"
     elif match.confidence >= confidence_threshold:
         # High confidence — route directly
@@ -214,14 +215,14 @@ def ingest_file(
         result.action = "routed"
     else:
         # Low confidence — stage for review
-        dest_rel = f"{match.destination}/_Staging" if match.destination else "00_Inbox/_Staging"
+        dest_rel = f"{match.destination}/{STAGING}" if match.destination else f"{INBOX}/{STAGING}"
         result.action = "staged"
 
     result.destination_path = dest_rel
 
     # Derive folder levels from destination
     dest_parts = dest_rel.replace("\\", "/").split("/") if dest_rel else []
-    folder_l1 = dest_parts[0] if dest_parts else "00_Inbox"
+    folder_l1 = dest_parts[0] if dest_parts else INBOX
     folder_l2 = dest_parts[1] if len(dest_parts) > 1 else None
 
     # Step 4: Record in ops.db (before moving, so we have the record even if move fails)
@@ -450,13 +451,13 @@ def ingest_folder(
 
     if not match.matched:
         action = "quarantined"
-        dest_folder = fallback.get("unknown_destination", "00_Inbox/_Unmatched")
+        dest_folder = fallback.get("unknown_destination", f"{INBOX}/{UNMATCHED}")
     elif match.confidence >= confidence_threshold:
         action = "routed"
         dest_folder = match.destination
     else:
         action = "staged"
-        dest_folder = f"{match.destination}/_Staging" if match.destination else "00_Inbox/_Staging"
+        dest_folder = f"{match.destination}/{STAGING}" if match.destination else f"{INBOX}/{STAGING}"
 
     # --- Step 5: Normalize folder name ---
     normalized_name = folder_path.name.replace(" ", "_")
@@ -772,7 +773,7 @@ def get_staged_files(mywork_root: Path) -> list[dict]:
     Returns list of dicts with path, filename, staging_parent info.
     """
     staged: list[dict] = []
-    for staging_dir in sorted(mywork_root.rglob("_Staging")):
+    for staging_dir in sorted(mywork_root.rglob(STAGING)):
         if not staging_dir.is_dir():
             continue
         parent_dest = str(staging_dir.parent.relative_to(mywork_root.resolve())).replace("\\", "/")
@@ -809,7 +810,7 @@ def finalize_file(
 
     # _Staging is always one level below the destination
     staging_dir = staged_path.parent
-    if staging_dir.name != "_Staging":
+    if staging_dir.name != STAGING:
         logger.warning("File is not in a _Staging directory: %s", staged_path)
         return False
 
