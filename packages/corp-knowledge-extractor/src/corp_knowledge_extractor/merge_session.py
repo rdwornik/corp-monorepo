@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 
 from corp_knowledge_extractor.fact_validation import extract_numbers_from_text, _numbers_match
-from corp_knowledge_extractor.utils import normalize_string_list
+from corp_os_meta.utils import normalize_string_list
 
 logger = logging.getLogger(__name__)
 

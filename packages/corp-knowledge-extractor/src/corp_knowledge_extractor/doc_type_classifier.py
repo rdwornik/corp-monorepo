@@ -59,7 +59,10 @@ FILENAME_DOC_TYPE_PATTERNS = [
     # Master data / catalogs (standard depth — no deep extraction)
     (r"(?i)(product.catalog|hierarchy|master.data|item.master|price.list)", "master_data"),
     # Product documentation / technical specs
-    (r"(?i)(datasheet|user.guide|user.manual|admin.guide|config.guide|release.notes?|changelog|api.reference|technical.reference|spec.sheet|sizing.guide|brand.guide|mapping.matrix|reference.material)", "product_doc"),
+    (
+        r"(?i)(datasheet|user.guide|user.manual|admin.guide|config.guide|release.notes?|changelog|api.reference|technical.reference|spec.sheet|sizing.guide|brand.guide|mapping.matrix|reference.material)",
+        "product_doc",
+    ),
     # Cognitive content — must precede architecture (Cognitive Shorts/Friday meeting recordings)
     (r"(?i)(cognitive.shorts|cognitive.friday|cognitive.demand)", "training"),
     # Demo-to-Win training packets — must precede demo→presentation rule
@@ -67,17 +70,26 @@ FILENAME_DOC_TYPE_PATTERNS = [
     # Security — extended certs/whitepaper (must precede architecture)
     (r"(?i)(iso.?22\d{3}|cyber.?security|security.whitepaper)", "security"),
     # Architecture / technical
-    (r"(?i)(architecture|technical.overview|system.design|integration.pattern|data.flow|deployment|infrastructure|topology)", "architecture"),
+    (
+        r"(?i)(architecture|technical.overview|system.design|integration.pattern|data.flow|deployment|infrastructure|topology)",
+        "architecture",
+    ),
     # Competitive
     (r"(?i)(competitive|battlecard|comparison|vs\.)", "competitive"),
     # Training / enablement (expanded)
-    (r"(?i)(training|enablement|curriculum|course|certification|academy|learning|onboarding|meeting.recording|cognitive.shorts|how.to|guide.for|tutorial|hands.on|lab.exercise|exam\b|quiz\b)", "training"),
+    (
+        r"(?i)(training|enablement|curriculum|course|certification|academy|learning|onboarding|meeting.recording|cognitive.shorts|how.to|guide.for|tutorial|hands.on|lab.exercise|exam\b|quiz\b)",
+        "training",
+    ),
     # Workshop → meeting (workshops are a type of facilitated meeting)
     (r"(?i)(workshop|lab\b)", "meeting"),
     # Demo / showcase → presentation
     (r"(?i)(demo|demonstration|showcase)", "presentation"),
     # Meeting / debrief (expanded)
-    (r"(?i)(meeting.notes|minutes|recap|debrief|agenda|standup|interview|briefing|timetable|working.session)", "meeting"),
+    (
+        r"(?i)(meeting.notes|minutes|recap|debrief|agenda|standup|interview|briefing|timetable|working.session)",
+        "meeting",
+    ),
     # Commercial / pricing
     (r"(?i)(commercial\b|pricing|quote\b|subscription\b|saas.fee)", "commercial"),
     # Discovery (keep last — "requirements" moved to requirements_spec)
@@ -134,10 +146,17 @@ def classify_doc_type_hybrid(
     # --- Extension-based type (binary files — no text content to classify) ---
     ext = Path(filename).suffix.lower()
     _EXTENSION_TYPES: dict[str, str] = {
-        ".jpg": "image", ".jpeg": "image", ".png": "image",
-        ".gif": "image", ".svg": "image",
-        ".mp4": "video", ".avi": "video", ".mov": "video",
-        ".zip": "archive", ".7z": "archive", ".rar": "archive",
+        ".jpg": "image",
+        ".jpeg": "image",
+        ".png": "image",
+        ".gif": "image",
+        ".svg": "image",
+        ".mp4": "video",
+        ".avi": "video",
+        ".mov": "video",
+        ".zip": "archive",
+        ".7z": "archive",
+        ".rar": "archive",
     }
     if ext in _EXTENSION_TYPES:
         return _EXTENSION_TYPES[ext], 0.9, "extension"

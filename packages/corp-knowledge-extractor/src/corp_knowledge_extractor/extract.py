@@ -28,7 +28,7 @@ from pathlib import Path
 from corp_knowledge_extractor.inventory import SourceFile, FileType
 from corp_knowledge_extractor.frames.sampler import SampledFrame
 from corp_knowledge_extractor.text_extract import TextExtractionResult, extract_source_date
-from corp_knowledge_extractor.utils import parse_llm_json, normalize_string_list
+from corp_os_meta.utils import normalize_string_list, parse_llm_json
 from corp_knowledge_extractor.post_process import post_process_extraction
 from corp_knowledge_extractor.taxonomy_prompt import get_taxonomy_for_prompt
 
@@ -132,7 +132,7 @@ def _estimate_gemini_cost(model: str, total_tokens: int) -> float:
     Uses a blended rate (input-heavy assumption: ~80% input, ~20% output).
     """
     rates = {
-        "gemini-3.1-flash-lite": 0.25,   # blended $/1M tokens
+        "gemini-3.1-flash-lite": 0.25,  # blended $/1M tokens
         "gemini-3.1-flash": 0.50,
         "gemini-3-flash-preview": 1.00,  # kept for backward compat
         "gemini-3.1-pro-preview": 4.00,
@@ -387,9 +387,9 @@ def _build_sampled_frame_contents(
     parts.append(
         types.Part.from_text(
             text=(
-                    f"[{len(selected)} sampled frame(s) provided above, "
-                    f"sample_0000 through sample_{len(selected) - 1:04d}.]\n\n{prompt}"
-                )
+                f"[{len(selected)} sampled frame(s) provided above, "
+                f"sample_0000 through sample_{len(selected) - 1:04d}.]\n\n{prompt}"
+            )
         )
     )
 
@@ -550,9 +550,9 @@ def extract_knowledge(
             contents.append(
                 types.Part.from_text(
                     text=(
-                    f"[{len(selected)} sampled frame(s) provided above, "
-                    f"sample_0000 through sample_{len(selected) - 1:04d}.]\n\n{unified_prompt}"
-                )
+                        f"[{len(selected)} sampled frame(s) provided above, "
+                        f"sample_0000 through sample_{len(selected) - 1:04d}.]\n\n{unified_prompt}"
+                    )
                 )
             )
         else:
@@ -1417,9 +1417,9 @@ def extract_pptx_multimodal(
     parts.append(
         types.Part.from_text(
             text=(
-                    f"[{len(rendered_slides)} slide image(s) provided above, "
-                    f"slides 1 through {len(rendered_slides)}.]\n\n{prompt}"
-                )
+                f"[{len(rendered_slides)} slide image(s) provided above, "
+                f"slides 1 through {len(rendered_slides)}.]\n\n{prompt}"
+            )
         )
     )
 
