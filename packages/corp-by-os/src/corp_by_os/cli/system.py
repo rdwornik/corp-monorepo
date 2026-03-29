@@ -58,8 +58,8 @@ def doctor() -> None:
     console.print(table)
 
     # --- System Integrity Checks ---
-    from corp_by_os.doctor.integrity import check_all
     from corp_by_os.index_builder import get_index_path
+    from corp_by_os.integrity import check_all
     from corp_by_os.ops.database import get_ops_db_path
 
     console.print("\n[bold]System Integrity[/bold]")

@@ -448,7 +448,7 @@ def _run_freshness_phase(cfg: AppConfig) -> None:  # noqa: F821
     """
     import json as _json
 
-    from corp_by_os.freshness.scanner import scan_vault_freshness
+    from corp_by_os.freshness_scanner import scan_vault_freshness
 
     console.print("\n[bold]Freshness scan...[/bold]")
     try:
