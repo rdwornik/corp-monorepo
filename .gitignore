@@ -39,8 +39,8 @@ data/_outputs/
 # Test output
 output/
 
-# Rebuild staging (large, regenerable)
-.ecosystem/rebuild_staging/
+# docs/staging (working space, never commit)
+docs/staging/
 
 # Sandbox (copied source files — never commit)
 .sandbox/
