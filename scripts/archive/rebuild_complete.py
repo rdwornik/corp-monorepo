@@ -16,7 +16,7 @@ from pathlib import Path
 MONOREPO = Path(__file__).parent.parent
 STATUS_FILE = MONOREPO / ".ecosystem/rebuild_staging/source_library/rebuild/status.json"
 STAGING_DIR = MONOREPO / ".ecosystem/rebuild_staging"
-REPORT_PATH = MONOREPO / ".ecosystem/archive/2026-03-27_VAULT_REBUILD_REPORT.md"
+REPORT_PATH = MONOREPO / "docs/archive/2026-03-27_VAULT_REBUILD_REPORT.md"
 JOURNAL_PATH = MONOREPO / "JOURNAL.md"
 TOTAL_FILES = 257
 POLL_INTERVAL_SECONDS = 60
@@ -174,7 +174,7 @@ def main() -> None:
     print("\n[Step 12c] Committing...")
     subprocess.run(["git", "add",
         "src/corp/retrieve/engine.py",
-        ".ecosystem/archive/2026-03-27_VAULT_REBUILD_REPORT.md",
+        "docs/archive/2026-03-27_VAULT_REBUILD_REPORT.md",
         "JOURNAL.md",
         "scripts/rebuild_complete.py",
         "scripts/build_pilot_batch.py",
@@ -186,7 +186,7 @@ def main() -> None:
         "- Re-extracted 257 vault notes via CKE batch (gemini-3.1-pro-preview)\n"
         "- Added include_deprecated filter to retrieve/engine.py (all query paths)\n"
         "- Added Compliance MOC to 02_Navigate/\n"
-        "- Report: .ecosystem/archive/2026-03-27_VAULT_REBUILD_REPORT.md\n\n"
+        "- Report: docs/archive/2026-03-27_VAULT_REBUILD_REPORT.md\n\n"
         "Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
     )
     result = subprocess.run(

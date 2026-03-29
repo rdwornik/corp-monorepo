@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent
-HANDOFF_PATH = REPO_ROOT / ".ecosystem" / "MASTER_HANDOFF.md"
+HANDOFF_PATH = REPO_ROOT / "docs" / "HANDOFF.md"
 EVAL_HISTORY = REPO_ROOT / "eval" / "eval_history.jsonl"
 JOURNAL_PATH = REPO_ROOT / "JOURNAL.md"
 INDEX_DB = Path(os.environ.get("LOCALAPPDATA", "")) / "corp-by-os" / "index.db"
@@ -81,7 +81,7 @@ def update_last_updated(content: str, ts: str) -> str:
 def main() -> None:
     if not HANDOFF_PATH.exists():
         print(f"ERROR: {HANDOFF_PATH} not found.")
-        print("Create .ecosystem/MASTER_HANDOFF.md first.")
+        print("Create docs/HANDOFF.md first.")
         raise SystemExit(1)
 
     content = HANDOFF_PATH.read_text(encoding="utf-8")

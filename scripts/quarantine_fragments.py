@@ -16,7 +16,7 @@ from pathlib import Path
 
 _MONOREPO_ROOT = Path(__file__).resolve().parents[1]
 
-MANIFEST_PATH = _MONOREPO_ROOT / ".ecosystem/archive/2026-03-26_VAULT_MANIFEST.json"
+MANIFEST_PATH = _MONOREPO_ROOT / "docs/archive/2026-03-26_VAULT_MANIFEST.json"
 VAULT_ROOT = Path(os.environ["USERPROFILE"]) / "Documents" / "ObsidianVault"
 KNOWLEDGE_DIR = VAULT_ROOT / "01_Knowledge"
 QUARANTINE_DIR = VAULT_ROOT / "_quarantine"

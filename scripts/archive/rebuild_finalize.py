@@ -1,7 +1,7 @@
 """
 Vault Rebuild Finalization — Step 12
 Reads rebuild_complete_output.log and produces:
-  - .ecosystem/archive/2026-03-27_VAULT_REBUILD_REPORT.md
+  - docs/archive/2026-03-27_VAULT_REBUILD_REPORT.md
   - JOURNAL.md entry
   - git commit of all rebuild changes
 
@@ -17,7 +17,7 @@ from pathlib import Path
 MONOREPO = Path(__file__).parent.parent
 STATUS_FILE = MONOREPO / ".ecosystem/rebuild_staging/source_library/rebuild/status.json"
 OUTPUT_LOG = MONOREPO / ".ecosystem/rebuild_complete_output.log"
-REPORT_PATH = MONOREPO / ".ecosystem/archive/2026-03-27_VAULT_REBUILD_REPORT.md"
+REPORT_PATH = MONOREPO / "docs/archive/2026-03-27_VAULT_REBUILD_REPORT.md"
 JOURNAL_PATH = MONOREPO / "JOURNAL.md"
 TOTAL_FILES = 257
 
@@ -145,7 +145,7 @@ def main() -> None:
     print("\nStaging files...")
     files_to_add = [
         "src/corp/retrieve/engine.py",
-        ".ecosystem/archive/2026-03-27_VAULT_REBUILD_REPORT.md",
+        "docs/archive/2026-03-27_VAULT_REBUILD_REPORT.md",
         "JOURNAL.md",
         "scripts/rebuild_complete.py",
         "scripts/rebuild_finalize.py",
@@ -160,7 +160,7 @@ def main() -> None:
         "- retrieve/engine.py: add include_deprecated filter to RetrievalFilter\n"
         "  Deprecated notes excluded from FTS5, supplement, and fallback queries\n"
         "- 02_Navigate/Compliance/Compliance.md: new MOC file\n"
-        "- Report: .ecosystem/archive/2026-03-27_VAULT_REBUILD_REPORT.md\n\n"
+        "- Report: docs/archive/2026-03-27_VAULT_REBUILD_REPORT.md\n\n"
         "Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
     )
     result = subprocess.run(

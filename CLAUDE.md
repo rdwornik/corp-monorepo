@@ -51,7 +51,7 @@ src/corp/
 - Training data: `scripts/extract_training_data.py` → `tests/fixtures/`
 - Environment variables override config
 
-## Council Decisions: 23 (ADR summaries in `decisions/`, full transcripts in `.ecosystem/council_transcripts/`)
+## Council Decisions: 24 (ADR summaries in `docs/decisions/`, full transcripts in `docs/decisions/transcripts/`)
 - #14: Naming convention v2 — `{YYYY-MM}_{TYPE}_{CLIENT}_{Description}.{ext}`
 - #23: Monorepo internal architecture — flatten, centralize, delete dead code
 
@@ -68,10 +68,10 @@ src/corp/
 
 ## Session Handoff
 When starting a new Claude.ai chat session, paste:
-1. `.ecosystem/MASTER_HANDOFF.md` (living doc, updated after each session)
+1. `docs/HANDOFF.md` (living doc, updated after each session)
 2. Latest Council debate output (if pending)
 
-`MASTER_HANDOFF.md` replaces per-session handoffs.
+`docs/HANDOFF.md` replaces per-session handoffs.
 Update it at end of every major session:
 ```
 python scripts/update_handoff.py

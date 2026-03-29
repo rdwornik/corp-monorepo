@@ -26,7 +26,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 OUTPUTS_DIR = REPO_ROOT / "packages" / "corp-knowledge-extractor" / "_outputs"
 CKE_FIXTURES = REPO_ROOT / "packages" / "corp-knowledge-extractor" / "tests" / "fixtures"
 BOS_FIXTURES = REPO_ROOT / "packages" / "corp-by-os" / "tests" / "fixtures"
-REPORT_DIR = REPO_ROOT / ".ecosystem" / "archive"
+REPORT_DIR = REPO_ROOT / "docs" / "archive"
 
 # ---------- frontmatter parser ----------
 
@@ -310,7 +310,7 @@ def analyze(
     lines = [
         "# Training Data Extraction Report",
         "",
-        f"**Date:** 2026-03-25",
+        "**Date:** 2026-03-25",
         f"**Source:** {len(notes)} extraction notes from _outputs/",
         "",
         "## Generated Fixtures",

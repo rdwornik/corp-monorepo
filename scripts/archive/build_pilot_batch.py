@@ -2,7 +2,7 @@
 Step 5a: Build CKE pilot manifest — 25 diverse files.
 
 Selects 25 files from the full rebuild batch covering all doc_types.
-Writes to .ecosystem/archive/rebuild_pilot_manifest.json.
+Writes to docs/archive/rebuild_pilot_manifest.json.
 """
 
 from __future__ import annotations
@@ -13,8 +13,8 @@ from pathlib import Path
 
 _MONOREPO_ROOT = Path(__file__).resolve().parents[1]
 
-FULL_MANIFEST_PATH = _MONOREPO_ROOT / ".ecosystem/archive/rebuild_batch_manifest.json"
-PILOT_MANIFEST_PATH = _MONOREPO_ROOT / ".ecosystem/archive/rebuild_pilot_manifest.json"
+FULL_MANIFEST_PATH = _MONOREPO_ROOT / "docs/archive/rebuild_batch_manifest.json"
+PILOT_MANIFEST_PATH = _MONOREPO_ROOT / "docs/archive/rebuild_pilot_manifest.json"
 STAGING_ROOT = _MONOREPO_ROOT / ".ecosystem/rebuild_staging"
 PILOT_OUTPUT_DIR = str(STAGING_ROOT / "source_library" / "rebuild_pilot")
 
@@ -67,7 +67,7 @@ def main() -> None:
     print(f"Pilot manifest: {PILOT_MANIFEST_PATH}")
     print(f"Output dir: {PILOT_OUTPUT_DIR}")
     print("\nEstimated cost: ~$0.50–1.00 (Gemini Flash)")
-    print("Run: cke process-manifest .ecosystem/archive/rebuild_pilot_manifest.json")
+    print("Run: cke process-manifest docs/archive/rebuild_pilot_manifest.json")
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@
 Step 4: Build CKE manifest for vault rebuild.
 
 Generates a CKE-format manifest (schema_version: 1) for the 257 accessible
-source files. Output saved to .ecosystem/archive/rebuild_batch_manifest.json.
+source files. Output saved to docs/archive/rebuild_batch_manifest.json.
 
 CKE manifest schema:
 {
@@ -33,8 +33,8 @@ from typing import Any
 
 _MONOREPO_ROOT = Path(__file__).resolve().parents[1]
 
-MANIFEST_PATH = _MONOREPO_ROOT / ".ecosystem/archive/2026-03-26_VAULT_MANIFEST.json"
-OUTPUT_PATH = _MONOREPO_ROOT / ".ecosystem/archive/rebuild_batch_manifest.json"
+MANIFEST_PATH = _MONOREPO_ROOT / "docs/archive/2026-03-26_VAULT_MANIFEST.json"
+OUTPUT_PATH = _MONOREPO_ROOT / "docs/archive/rebuild_batch_manifest.json"
 
 # CKE output dir — temp staging area for re-extracted notes
 # Structure: scope/series/pkg/extract/*.md

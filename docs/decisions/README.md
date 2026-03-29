@@ -1,6 +1,6 @@
 # Architecture Decision Records
 
-Distilled from AI Council debates. Full transcripts in `.ecosystem/council_transcripts/`.
+Distilled from AI Council debates. Full transcripts in `docs/decisions/transcripts/`.
 Max 20 lines each. Format: Context / Decision / Consequences.
 
 | ADR | Title | Status |
