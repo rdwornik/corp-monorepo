@@ -161,7 +161,7 @@ C:/Users/1028120/Documents/MyWork/10_Projects/
 
 ---
 
-## All 22 Council Decisions
+## All 23 Council Decisions
 
 | # | Title | Key Decision |
 |---|-------|-------------|
@@ -443,7 +443,7 @@ All 4 phases done. Final step: 6-package consolidation into unified `src/corp/` 
 ## Session Protocol
 
 1. Read last 5 entries from `JOURNAL.md` before starting
-2. Check `~/.claude/skills/gotchas/gotchas.md` before modifying any package (37 gotchas)
+2. Check `~/.claude/skills/gotchas/gotchas.md` before modifying any package (41 gotchas)
 3. After implementation: self-review — error handling, edge cases, gotchas
 4. Before merging: `./scripts/dev-check.ps1`
 5. Append 3-line summary to `JOURNAL.md` (Did / Failed / Next)
