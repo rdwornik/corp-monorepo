@@ -3,6 +3,9 @@
 ## [1.0.0] - 2026-03-28
 
 ### Changed
+- Project meta-files restructured per Playbook: `.ecosystem/` eliminated, content moved to `docs/` and `docs/decisions/transcripts/`; root `decisions/` moved to `docs/decisions/`; `MASTER_HANDOFF.md` renamed to `docs/HANDOFF.md`
+
+### Changed (prior)
 - **Consolidated 6 packages into unified `src/corp/` namespace** (ADR-23)
   - `corp-os-meta` → `src/corp/schema/`
   - `corp-knowledge-extractor` → `src/corp/extractor/`

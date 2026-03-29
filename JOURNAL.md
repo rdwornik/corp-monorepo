@@ -188,3 +188,9 @@ Claude Code: read last 5 entries before starting work.
 - **Did:** Implemented Council #24 binding decisions. Rewrote `folder_names.py` (7 canonical folders + `.corp`). Removed TEMPLATES/SOURCE_LIBRARY/RFP/SYSTEM constants; added WORKFLOWS/REFERENCE/COMPLIANCE/CORP_INFRA + subfolder constants. Updated 17 source files (classifier routing, overnight scopes, integrity checks, path flattening SYSTEM/.corp/X → .corp/X). Updated all test files. Added 16 missing client aliases. Restructured MyWork on disk: created 90_Archive + .corp, moved 9 stale projects to archive, migrated pipeline infra from 90_System to .corp, deleted empty 40_Media and 90_System, merged legacy subdirs in 20_Workflows and 30_Reference.
 - **Tests:** 2412 passed, 6 skipped (no regressions across all steps).
 - **Next:** Verify magistrala pipeline end-to-end with new paths. Measure MISC rate at day 7. Monitor 20_Workflows file count (<75 threshold).
+
+## 2026-03-30 — refactor/align-with-playbook
+
+- **Did:** Eliminated `.ecosystem/`. Moved: `MASTER_HANDOFF.md` → `docs/HANDOFF.md`, `archive/` (32 files) → `docs/archive/`, `council_transcripts/` (25 files) → `docs/decisions/transcripts/`, root `decisions/` (25 ADRs + README) → `docs/decisions/`. Updated all active references in `CLAUDE.md`, `update_handoff.py`, `extract_training_data.py`, `quarantine_fragments.py`, `tag_legacy_notes.py`, `docs/decisions/README.md`, `scripts/archive/*.py`. Updated `.gitignore` (`.ecosystem/rebuild_staging/` → `docs/staging/`). One convention, universally applied.
+- **Failed:** Nothing.
+- **Next:** Verify magistrala pipeline end-to-end with new paths. Measure MISC rate at day 7. Monitor 20_Workflows file count (<75 threshold).
