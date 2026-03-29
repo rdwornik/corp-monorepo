@@ -11,6 +11,8 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
+from corp.schema.folder_names import INBOX, RFP, SOURCE_LIBRARY
+
 log = logging.getLogger(__name__)
 
 # Files to always skip (infrastructure)
@@ -51,7 +53,7 @@ def _is_infrastructure(name: str) -> bool:
 
 def _scan_inbox(mywork_root: Path) -> list[FileInfo]:
     """Scan 00_Inbox for all non-infrastructure files."""
-    inbox = mywork_root / "00_Inbox"
+    inbox = mywork_root / INBOX
     if not inbox.is_dir():
         return []
 
@@ -68,7 +70,7 @@ def _scan_inbox(mywork_root: Path) -> list[FileInfo]:
                 name=entry.name,
                 extension=entry.suffix.lower(),
                 size_bytes=entry.stat().st_size,
-                current_folder="00_Inbox",
+                current_folder=INBOX,
                 relative_path=rel,
             )
         )
@@ -77,7 +79,7 @@ def _scan_inbox(mywork_root: Path) -> list[FileInfo]:
 
 def _scan_source_library_junk(mywork_root: Path) -> list[FileInfo]:
     """Scan 60_Source_Library for .url, .log, and other junk files."""
-    source_lib = mywork_root / "60_Source_Library"
+    source_lib = mywork_root / SOURCE_LIBRARY
     if not source_lib.is_dir():
         return []
 
@@ -103,7 +105,7 @@ def _scan_source_library_junk(mywork_root: Path) -> list[FileInfo]:
                     name=fname,
                     extension=ext,
                     size_bytes=size,
-                    current_folder="60_Source_Library",
+                    current_folder=SOURCE_LIBRARY,
                     relative_path=rel,
                 )
             )
@@ -112,7 +114,7 @@ def _scan_source_library_junk(mywork_root: Path) -> list[FileInfo]:
 
 def _scan_rfp_loose_files(mywork_root: Path) -> list[FileInfo]:
     """Scan 50_RFP root for loose files (not in subfolders)."""
-    rfp = mywork_root / "50_RFP"
+    rfp = mywork_root / RFP
     if not rfp.is_dir():
         return []
 
@@ -129,7 +131,7 @@ def _scan_rfp_loose_files(mywork_root: Path) -> list[FileInfo]:
                 name=entry.name,
                 extension=entry.suffix.lower(),
                 size_bytes=entry.stat().st_size,
-                current_folder="50_RFP",
+                current_folder=RFP,
                 relative_path=rel,
             )
         )

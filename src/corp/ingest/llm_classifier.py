@@ -14,6 +14,16 @@ import shutil
 from dataclasses import dataclass
 from pathlib import Path
 
+from corp.schema.folder_names import (
+    ADMIN,
+    INBOX,
+    PROJECTS,
+    RFP,
+    SOURCE_LIBRARY,
+    TEMPLATES,
+    UNMATCHED,
+)
+
 logger = logging.getLogger(__name__)
 
 try:
@@ -98,7 +108,7 @@ def _parse_llm_json(raw_text: str) -> dict | None:
 def _no_match_classification(reason: str) -> LLMClassification:
     """Return a zero-confidence classification for error cases."""
     return LLMClassification(
-        destination="00_Inbox/_Unmatched",
+        destination=f"{INBOX}/{UNMATCHED}",
         series_id=None,
         topics=[],
         source_category="unknown",
@@ -155,7 +165,7 @@ def classify_file_llm(
         return _no_match_classification("LLM response could not be parsed")
 
     return LLMClassification(
-        destination=parsed.get("destination", "00_Inbox/_Unmatched"),
+        destination=parsed.get("destination", f"{INBOX}/{UNMATCHED}"),
         series_id=parsed.get("series_id"),
         topics=parsed.get("topics", []),
         source_category=parsed.get("source_category", "unknown"),
@@ -221,7 +231,7 @@ def classify_quarantined_batch(
             }
         )
 
-        if not dry_run and classification.destination != "00_Inbox/_Unmatched":
+        if not dry_run and classification.destination != f"{INBOX}/{UNMATCHED}":
             _move_to_staging(
                 asset,
                 classification,
@@ -292,18 +302,18 @@ def _get_all_destinations(registry: ContentRegistry) -> list[str]:  # noqa: F821
     # Standard folders
     dests.update(
         [
-            "10_Projects",
+            PROJECTS,
             "20_Extra_Initiatives",
-            "30_Templates/01_Presentation_Decks",
-            "30_Templates/02_Demo_Scripts",
-            "30_Templates/03_Discovery_Tools",
-            "30_Templates/90_Reference_Baselines",
-            "50_RFP",
-            "50_RFP/_databases",
-            "60_Source_Library/01_Product_Docs",
-            "60_Source_Library/02_Training_Enablement",
-            "60_Source_Library/03_Competitive",
-            "70_Admin",
+            f"{TEMPLATES}/01_Presentation_Decks",
+            f"{TEMPLATES}/02_Demo_Scripts",
+            f"{TEMPLATES}/03_Discovery_Tools",
+            f"{TEMPLATES}/90_Reference_Baselines",
+            RFP,
+            f"{RFP}/_databases",
+            f"{SOURCE_LIBRARY}/01_Product_Docs",
+            f"{SOURCE_LIBRARY}/02_Training_Enablement",
+            f"{SOURCE_LIBRARY}/03_Competitive",
+            ADMIN,
         ]
     )
     return sorted(dests)

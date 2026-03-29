@@ -11,17 +11,19 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from corp.schema.folder_names import INBOX, PROJECTS, RFP, SOURCE_LIBRARY, TEMPLATES
+
 logger = logging.getLogger(__name__)
 
 # Folders whose files must NEVER be moved elsewhere
 _PINNED_FOLDERS: set[str] = {
-    "10_Projects",
+    PROJECTS,
     "20_Extra_Initiatives",
 }
 
 # Folders whose files MAY be moved (inbox = misplaced files)
 _MOVABLE_FOLDERS: set[str] = {
-    "00_Inbox",
+    INBOX,
 }
 
 # Generic filenames that should be enriched with client/context
@@ -55,17 +57,17 @@ _NEEDS_SPACE_CLEANUP = re.compile(r"[ ]")
 
 # Map extracted content type keywords to routing folders
 _TYPE_TO_FOLDER: dict[str, str] = {
-    "training": "60_Source_Library/02_Training_Enablement",
-    "enablement": "60_Source_Library/02_Training_Enablement",
-    "product_docs": "60_Source_Library/01_Product_Docs",
-    "documentation": "60_Source_Library/01_Product_Docs",
-    "industry": "60_Source_Library/03_Industry_Knowledge",
-    "demo": "30_Templates/02_Demo_Scripts",
-    "demo_script": "30_Templates/02_Demo_Scripts",
-    "questionnaire": "30_Templates/03_Discovery_Tools",
-    "discovery": "30_Templates/03_Discovery_Tools",
-    "template": "30_Templates/01_Presentation_Decks",
-    "rfp": "50_RFP",
+    "training": f"{SOURCE_LIBRARY}/02_Training_Enablement",
+    "enablement": f"{SOURCE_LIBRARY}/02_Training_Enablement",
+    "product_docs": f"{SOURCE_LIBRARY}/01_Product_Docs",
+    "documentation": f"{SOURCE_LIBRARY}/01_Product_Docs",
+    "industry": f"{SOURCE_LIBRARY}/03_Industry_Knowledge",
+    "demo": f"{TEMPLATES}/02_Demo_Scripts",
+    "demo_script": f"{TEMPLATES}/02_Demo_Scripts",
+    "questionnaire": f"{TEMPLATES}/03_Discovery_Tools",
+    "discovery": f"{TEMPLATES}/03_Discovery_Tools",
+    "template": f"{TEMPLATES}/01_Presentation_Decks",
+    "rfp": RFP,
 }
 
 
@@ -282,13 +284,13 @@ def _determine_folder(
     combined = f"{heading_text} {text_preview}".lower()
 
     if any(kw in combined for kw in ("rfp", "request for proposal", "response template")):
-        return "50_RFP"
+        return RFP
     if any(kw in combined for kw in ("training", "hands-on", "exercise", "lab", "workshop")):
-        return "60_Source_Library/02_Training_Enablement"
+        return f"{SOURCE_LIBRARY}/02_Training_Enablement"
     if any(kw in combined for kw in ("demo script", "demo scenario", "click path")):
-        return "30_Templates/02_Demo_Scripts"
+        return f"{TEMPLATES}/02_Demo_Scripts"
     if any(kw in combined for kw in ("discovery", "questionnaire", "assessment")):
-        return "30_Templates/03_Discovery_Tools"
+        return f"{TEMPLATES}/03_Discovery_Tools"
 
     return None
 
