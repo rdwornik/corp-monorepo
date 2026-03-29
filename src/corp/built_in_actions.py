@@ -389,8 +389,8 @@ def generate_project_brief(params: dict[str, str]) -> StepResult:
                 facts_data = yaml.safe_load(f)
             if isinstance(facts_data, list):
                 facts = facts_data[:20]  # top 20 facts for brief
-        except Exception:
-            pass
+        except (yaml.YAMLError, OSError) as e:
+            logger.warning("Failed to parse facts.yaml for %s: %s", project_id, e)
 
     # Build brief
     lines = [
@@ -918,8 +918,8 @@ def _resolve_project_id(project: str, params: dict[str, str]) -> str:
         resolved = resolve_project(project)
         if resolved:
             return resolved.project_id
-    except Exception:
-        pass
+    except (ImportError, ValueError, KeyError, OSError) as e:
+        logger.debug("Project resolution fallback to slug: %s", e)
 
     return _slugify(project)
 
@@ -941,8 +941,8 @@ def _resolve_project_path(project: str, params: dict[str, str]) -> Path | None:
         resolved = resolve_project(project)
         if resolved and resolved.onedrive_path:
             return resolved.onedrive_path
-    except Exception:
-        pass
+    except (ImportError, OSError) as e:
+        logger.debug("OneDrive path not resolvable for %s: %s", project, e)
 
     # Try direct path
     cfg = get_config()

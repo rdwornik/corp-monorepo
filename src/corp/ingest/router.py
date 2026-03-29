@@ -304,7 +304,7 @@ def ingest_file(
             result.extracted = vault_note is not None
             result.extraction_cost = cost
             result.vault_note_path = vault_note
-        except Exception as exc:
+        except (OSError, ValueError, RuntimeError) as exc:
             logger.error("Extraction failed for %s: %s", filename, exc)
             result.error = f"Extraction failed: {exc}"
             # Don't change action — the file is already routed/staged
@@ -564,7 +564,7 @@ def ingest_folder(
                 "extracted",
                 destination_path=dest_rel,
             )
-        except Exception as exc:
+        except (OSError, ValueError, RuntimeError) as exc:
             logger.warning(
                 "Package extraction failed for %s: %s",
                 folder_path.name,
