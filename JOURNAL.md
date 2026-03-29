@@ -6,6 +6,11 @@ Claude Code: read last 5 entries before starting work.
 ---
 
 
+## 2026-03-30 — P0+P1 error handling + scripts fix (Code Quality Audit)
+- **Did:** Fixed all 15 error-handling items from audit: 5 critical `except Exception: pass` → specific types + logging (`built_in_actions.py` × 3, `ingest/router.py` × 2); 9 high-severity broad catches narrowed (`integrity.py` × 5, `vault_io.py` × 3, `task_manager.py`, `index_builder.py` × 5, `retrieve/engine.py`). Fixed 4 broken scripts (`packages/` → `tests/extractor/fixtures/`; stale `sys.path` inserts removed; REPO_ROOT depth fixed). Archived 6 one-time migration scripts to `scripts/archive/`. Added `__main__` guards to 3 scripts. Removed hardcoded username from `project/cli.py`. `llm_router.py:212` kept broad — google-genai raises unknown exception hierarchy, already logs. Work landed on `feat/project-scoped-gotchas` (pre-commit stash cycle switched branches after 2nd commit). **2412 tests passing, 0 failed.**
+- **Failed:** `llm_router.py` narrowed exception broke `test_api_failure` (mock raises bare `Exception`); reverted. Pre-commit stash/restore switched active branch mid-session — all commits on `feat/project-scoped-gotchas` instead of `fix/p0-p1-error-handling-scripts`.
+- **Next:** Merge `feat/project-scoped-gotchas` to main. P2: refactor `extract_knowledge()` (235 lines), `process_file()` (218 lines), `ingest_folder()` (216 lines). Standardize config access pattern.
+
 ## 2026-03-29 session 5 — Package consolidation (6 → 1 unified src/corp/)
 - **Did:** Completed `feat/consolidate-packages` branch: 4 prior commits moved all 6 packages to `src/corp/`, unified `pyproject.toml`, updated all imports to `corp.*` namespace, removed old `packages/` directory. This session: fixed 6 remaining test failures (RFP CLI smoke cwd resolution 2→3 levels, naming_config test missing `extension_hint` check, `light_scan` `time.time()`→`time.perf_counter()` for Windows precision). Updated CLAUDE.md, `config/agents.yaml`, `.ecosystem/MASTER_HANDOFF.md` for new layout. Verified zero old import references (`corp_os_meta|corp_knowledge_extractor|corp_by_os` etc = 0 matches). All 4 CLIs working (`corp`, `cke`, `cpe`, `com`). **2,404 tests passing, 0 failed.** Merged to main.
 - **Failed:** Ruff pre-commit auto-fixed `batch_api.py` on first commit attempt — re-staged and committed successfully.
