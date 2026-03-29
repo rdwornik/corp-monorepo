@@ -1,3 +1,3 @@
-"""Corp-by-os — Root orchestrator for the corp agent ecosystem."""
+"""Corporate OS — knowledge management for Blue Yonder presales."""
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
