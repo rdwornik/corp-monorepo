@@ -2,18 +2,20 @@
 
 Unified knowledge management ecosystem for pre-sales engineering.
 
-## Packages
+## Modules
 
-| Package | Version | Tests | CLI | Role |
-|---------|---------|-------|-----|------|
-| corp-os-meta | 1.0.0 | 118 | `corp-meta` | Shared schema & taxonomy |
-| corp-knowledge-extractor | 0.8.0 | 838 | `cke` | Tiered AI extraction engine |
-| corp-by-os | 0.3.0 | 926 | `corp` | Root orchestrator, sole vault writer |
-| corp-project-extractor | 0.1.0 | 45 | `cpe` | Project folder classifier |
-| corp-rfp-agent | 0.3.0 | 155 | scripts | AI-powered RFP answering engine |
-| corp-opportunity-manager | 0.2.0 | 62 | `com` | Opportunity lifecycle management |
-| Integration | — | 9 | — | Cross-package integration tests |
-| **Total** | | **2,153** | | |
+All code lives in `src/corp/` under a single `pyproject.toml`.
+
+| Module | CLI | Tests | Role |
+|--------|-----|-------|------|
+| `corp/schema/` | `corp-meta` | 118 | Shared schema & taxonomy |
+| `corp/extractor/` | `cke` | 838 | Tiered AI extraction engine |
+| `corp/ingest/` `corp/retrieve/` `corp/cli/` | `corp` | 926 | Root orchestrator, sole vault writer |
+| `corp/project/` | `cpe` | 45 | Project folder classifier |
+| `corp/rfp/` | — | 155 | AI-powered RFP answering engine |
+| `corp/opportunity/` | `com` | 62 | Opportunity lifecycle management |
+| Integration | — | 9 | Cross-module integration tests |
+| **Total** | | **2,412** | |
 
 ## Setup
 
@@ -22,13 +24,8 @@ Unified knowledge management ecosystem for pre-sales engineering.
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 
-# Install all packages in dev mode
-pip install -e packages/corp-os-meta
-pip install -e packages/corp-knowledge-extractor
-pip install -e "packages/corp-by-os[dev,llm]"
-pip install -e packages/corp-project-extractor
-pip install -e "packages/corp-rfp-agent[dev]"
-pip install -e packages/corp-opportunity-manager
+# Install in dev mode (single command)
+pip install -e ".[dev,llm]"
 
 # Run all tests
 ./scripts/run-all-tests.ps1
@@ -37,5 +34,5 @@ pip install -e packages/corp-opportunity-manager
 ## Architecture
 
 See `config/paths.toml` for centralized path configuration.
-Each package maintains its own `pyproject.toml` and test suite.
+See `CLAUDE.md` for architectural invariants and dependency rules.
 CLI entry points: `corp`, `cke`, `cpe`, `corp-meta`, `com`.

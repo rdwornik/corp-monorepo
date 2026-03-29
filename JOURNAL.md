@@ -175,3 +175,10 @@ Claude Code: read last 5 entries before starting work.
 - **Gotcha:** Ruff pre-commit hook reformats import blocks in-place, causing "unstaged files" conflicts. Fix: always re-stage (git add) the modified file after a ruff-failed commit, then recommit. Happened 4× during this session.
 - **Tests:** 2412 passed, 6 skipped throughout all batches (no regressions).
 - **Next:** Step 5 (YAML config annotation), Step 6 (test assertion literals), merge to main.
+
+## 2026-03-29 — fix/stale-docs-post-consolidation
+
+- **Did:** Cleaned up all stale references from the 6-package → unified `src/corp/` consolidation. Tier 1: fixed `run-all-tests.ps1` (6-package loop → single `pytest tests/`) and `dev-check.ps1` (`packages/` → `src/`). Tier 2: rewrote README.md for unified layout, updated MASTER_HANDOFF.md (council count 22→23, gotcha count 37→41), fixed ADR-14 config path, updated 20 verify: paths in `~/.claude/skills/gotchas/gotchas.md`. Tier 3: fixed `.env.example` (stale CKE_PATH comment), fixed `.gitignore` (`packages/cke/_outputs/` → `data/_outputs/`), moved 3 phase reports from `docs/` to `.ecosystem/archive/`, removed empty `docs/`, created `CHANGELOG.md` with 1.0.0 consolidation summary.
+- **Commits:** `453a0e3` (Tier 1), `39b95cb` (Tier 2), `7350265` (Tier 3), merged to main.
+- **Failed:** -
+- **Next:** Step 5 (YAML config annotation), Step 6 (test assertion literals), merge `refactor/centralize-hardcoded-paths` to main.

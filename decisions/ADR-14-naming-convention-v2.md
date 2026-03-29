@@ -11,7 +11,7 @@ sort order and made date-based chronological browsing impossible.
 
 New format: `{YYYY-MM}_{TYPE}_{CLIENT}_{Description}.{ext}`. 19 type codes
 (RFP, DECK, CERT, QA, PROP, etc.) and 15 client aliases defined in
-`packages/corp-by-os/config/naming_config.yaml`. Date-first enables natural
+`config/naming_config.yaml`. Date-first enables natural
 chronological sort. Supersedes the type-first convention from ADR-10.
 
 ## Consequences
