@@ -43,10 +43,12 @@ from corp_knowledge_extractor.extract import (  # noqa: E402
 )
 from corp_knowledge_extractor.correlate import correlate_files  # noqa: E402
 from corp_knowledge_extractor.synthesize import (  # noqa: E402
-    build_package, write_transcript_note
+    build_package,
+    write_transcript_note,
 )
 from corp_knowledge_extractor.transcript import (  # noqa: E402
-    generate_transcript, TranscriptResult
+    generate_transcript,
+    TranscriptResult,
 )
 from corp_knowledge_extractor.reextract import reextract_package  # noqa: E402
 from corp_knowledge_extractor.frames.sampler import SampledFrame  # noqa: E402

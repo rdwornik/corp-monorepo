@@ -20,7 +20,7 @@ from corp_os_meta import (
 from corp_os_meta.validate import validate_against_schema
 from corp_os_meta.models import NoteFrontmatter
 from corp_os_meta.normalize import load_taxonomy
-from corp_knowledge_extractor.utils import normalize_string_list
+from corp_os_meta.utils import normalize_string_list
 
 logger = logging.getLogger(__name__)
 
@@ -435,7 +435,7 @@ def filter_product_tags(tags: list[str]) -> list[str]:
     filtered = []
     for tag in tags:
         if tag.startswith("product/"):
-            product_slug = tag[len("product/"):]
+            product_slug = tag[len("product/") :]
             if any(exc in product_slug for exc in excluded_slugs):
                 logger.debug("Filtered non-BY product tag: %s", tag)
                 continue

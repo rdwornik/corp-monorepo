@@ -10,7 +10,6 @@ COMMANDS = [
     [sys.executable, "src/corp_rfp_agent/rfp_excel_agent.py", "--help"],
     [sys.executable, "src/corp_rfp_agent/rfp_feedback.py", "--help"],
     [sys.executable, "src/corp_rfp_agent/validate_profiles.py", "--help"],
-    [sys.executable, "src/corp_rfp_agent/kb_to_markdown.py", "--help"],
 ]
 
 

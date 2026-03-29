@@ -36,10 +36,9 @@ from corp_knowledge_extractor.correlate import FileGroup
 from corp_knowledge_extractor.extract import ExtractionResult
 from corp_knowledge_extractor.inventory import FileType, SourceFile
 from corp_knowledge_extractor.post_process import generate_tags, validate_tags
-from corp_knowledge_extractor.utils import parse_llm_json
+from corp_os_meta.utils import normalize_string_list, parse_llm_json
 
 from corp_knowledge_extractor.transcript import TranscriptResult
-from corp_knowledge_extractor.utils import normalize_string_list
 
 log = logging.getLogger(__name__)
 

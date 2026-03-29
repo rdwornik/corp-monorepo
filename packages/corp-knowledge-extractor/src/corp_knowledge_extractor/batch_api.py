@@ -36,7 +36,7 @@ from corp_knowledge_extractor.extract import (
 from corp_knowledge_extractor.inventory import SourceFile, FileType
 from corp_knowledge_extractor.tier_router import route_tier, Tier, TierDecision, TIER_COSTS
 from corp_knowledge_extractor.post_process import post_process_extraction
-from corp_knowledge_extractor.utils import parse_llm_json
+from corp_os_meta.utils import parse_llm_json
 
 logger = logging.getLogger(__name__)
 
