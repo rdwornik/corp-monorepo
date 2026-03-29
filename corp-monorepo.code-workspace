@@ -1,0 +1,151 @@
+{
+    "folders": [
+        {
+            "path": ".",
+            "name": "corp-monorepo"
+        }
+    ],
+    "settings": {
+        // === Python Environment ===
+        "python.defaultInterpreterPath": ".venv/Scripts/python.exe",
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": ["tests", "-x", "--tb=short"],
+        "python.analysis.extraPaths": ["./src"],
+        "python.analysis.typeCheckingMode": "basic",
+
+        // === Ruff (replaces Black, Flake8, isort — one tool) ===
+        "[python]": {
+            "editor.formatOnSave": true,
+            "editor.defaultFormatter": "charliermarsh.ruff",
+            "editor.codeActionsOnSave": {
+                "source.fixAll": "explicit",
+                "source.organizeImports": "explicit"
+            }
+        },
+
+        // === Hide noise from file explorer ===
+        "files.exclude": {
+            "**/__pycache__": true,
+            "**/*.egg-info": true,
+            "**/.pytest_cache": true,
+            "**/.ruff_cache": true,
+            "**/.hypothesis": true,
+            "**/Thumbs.db": true,
+            "**/desktop.ini": true,
+            "data/_outputs": true,
+            ".git": true
+        },
+
+        // === Editor ===
+        "editor.rulers": [120],
+        "editor.minimap.enabled": false,
+        "editor.stickyScroll.enabled": true,
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+        "files.autoSave": "onFocusChange",
+
+        // === Search — skip irrelevant dirs ===
+        "search.exclude": {
+            "data/_outputs": true,
+            "**/node_modules": true,
+            "**/.git": true,
+            "eval/cli_snapshot_*": true,
+            ".ecosystem/archive": true
+        },
+
+        // === Terminal ===
+        "terminal.integrated.defaultProfile.windows": "PowerShell",
+        "terminal.integrated.cwd": "${workspaceFolder}",
+
+        // === Git ===
+        "git.enableSmartCommit": true,
+        "git.autofetch": true
+    },
+    "extensions": {
+        "recommendations": [
+            // Core Python (must have)
+            "ms-python.python",
+            "ms-python.vscode-pylance",
+            "charliermarsh.ruff",
+            "ms-python.debugpy",
+
+            // Testing
+            "ms-python.pytest-vscode",
+
+            // Git
+            "eamodio.gitlens",
+
+            // Productivity
+            "oderwat.indent-rainbow",
+            "usernamehw.errorlens",
+            "gruntfuggly.todo-tree",
+
+            // Markdown (for CLAUDE.md, JOURNAL.md, ADRs)
+            "yzhang.markdown-all-in-one",
+
+            // YAML (for config files)
+            "redhat.vscode-yaml"
+        ],
+        "unwantedRecommendations": [
+            // Don't need these — Ruff covers linting+formatting
+            "ms-python.black-formatter",
+            "ms-python.flake8",
+            "ms-python.isort",
+            "ms-python.autopep8",
+            "ms-python.pylint"
+        ]
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "Python: Current File",
+                "type": "debugpy",
+                "request": "launch",
+                "program": "${file}",
+                "cwd": "${workspaceFolder}",
+                "env": { "PYTHONPATH": "${workspaceFolder}/src" }
+            },
+            {
+                "name": "pytest: Current File",
+                "type": "debugpy",
+                "request": "launch",
+                "module": "pytest",
+                "args": ["${file}", "-x", "--tb=short"],
+                "cwd": "${workspaceFolder}"
+            },
+            {
+                "name": "corp CLI",
+                "type": "debugpy",
+                "request": "launch",
+                "module": "corp.cli",
+                "args": ["--help"],
+                "cwd": "${workspaceFolder}"
+            }
+        ]
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "Run All Tests",
+                "type": "shell",
+                "command": "pytest tests/ -x --tb=short",
+                "group": { "kind": "test", "isDefault": true },
+                "problemMatcher": "$pytest"
+            },
+            {
+                "label": "Ruff Check",
+                "type": "shell",
+                "command": "ruff check src/ tests/ --fix",
+                "group": "build"
+            },
+            {
+                "label": "Corp Doctor",
+                "type": "shell",
+                "command": "corp doctor",
+                "group": "none"
+            }
+        ]
+    }
+}
