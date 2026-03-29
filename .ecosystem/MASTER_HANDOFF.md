@@ -14,14 +14,14 @@ Update at end of each session: `python scripts/update_handoff.py`
 
 | Metric | Value | Date |
 |--------|-------|------|
-| Tests passing | 2,404 | 2026-03-29 |
+| Tests passing | 2,412 | 2026-03-29 |
 | Vault notes (indexed) | 488   | 2026-03-28 |
 | Hybrid classifier accuracy | 93.7%   | 2026-03-26 |
 | Tag coverage (mean) | 79.7%   | 2026-03-26 |
 | Product Jaccard | 1.000 (idempotent) | 2026-03-26 |
 | People NER F1 | 92.7%   | 2026-03-26 |
-| Council decisions | 23 | 2026-03-29 |
-| ADRs | 23 | 2026-03-29 |
+| Council decisions | 24 | 2026-03-29 |
+| ADRs | 24 | 2026-03-29 |
 | Gotchas | 37 | 2026-03-28 |
 
 ---
@@ -161,7 +161,7 @@ C:/Users/1028120/Documents/MyWork/10_Projects/
 
 ---
 
-## All 23 Council Decisions
+## All 24 Council Decisions
 
 | # | Title | Key Decision |
 |---|-------|-------------|
@@ -189,6 +189,7 @@ C:/Users/1028120/Documents/MyWork/10_Projects/
 | #21 | Ontology Approach | `taxonomy.yaml` as single authoritative tag vocab; `product_aliases.yaml` + `client_aliases.yaml` normalize variants |
 | #22 | RFP Federation | How to federate RFP KB (1,325 entries) with vault search (487 notes) — same `index.db`, separate `rfp_entries` FTS5 table, grouped output, default `--source all` |
 | #23 | Monorepo Internal Architecture | Split cli.py monolith (3,573 lines → 14 modules); eliminate cke_client.py boundary violation via subprocess; flatten doctor/freshness/extraction/non_project; centralize parse_llm_json in corp-os-meta; delete 4 dead corp-rfp-agent files |
+| #24 | MyWork Knowledge Architecture | 7 canonical folders (00_Inbox, 10_Projects, 20_Workflows, 30_Reference, 70_Admin, 80_Compliance, 90_Archive) + hidden .corp for pipeline infra. Removed 30_Templates, 50_RFP, 60_Source_Library. Access-frequency principle. |
 
 Full transcripts: `.ecosystem/council_transcripts/DECISION_NN_*.md`
 ADR summaries: `decisions/ADR-NN-*.md` (ADR-01 through ADR-23)

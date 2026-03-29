@@ -182,3 +182,9 @@ Claude Code: read last 5 entries before starting work.
 - **Commits:** `453a0e3` (Tier 1), `39b95cb` (Tier 2), `7350265` (Tier 3), merged to main.
 - **Failed:** -
 - **Next:** Step 5 (YAML config annotation), Step 6 (test assertion literals), merge `refactor/centralize-hardcoded-paths` to main.
+
+## 2026-03-29 — Council #24: MyWork Knowledge Architecture
+
+- **Did:** Implemented Council #24 binding decisions. Rewrote `folder_names.py` (7 canonical folders + `.corp`). Removed TEMPLATES/SOURCE_LIBRARY/RFP/SYSTEM constants; added WORKFLOWS/REFERENCE/COMPLIANCE/CORP_INFRA + subfolder constants. Updated 17 source files (classifier routing, overnight scopes, integrity checks, path flattening SYSTEM/.corp/X → .corp/X). Updated all test files. Added 16 missing client aliases. Restructured MyWork on disk: created 90_Archive + .corp, moved 9 stale projects to archive, migrated pipeline infra from 90_System to .corp, deleted empty 40_Media and 90_System, merged legacy subdirs in 20_Workflows and 30_Reference.
+- **Tests:** 2412 passed, 6 skipped (no regressions across all steps).
+- **Next:** Verify magistrala pipeline end-to-end with new paths. Measure MISC rate at day 7. Monitor 20_Workflows file count (<75 threshold).
