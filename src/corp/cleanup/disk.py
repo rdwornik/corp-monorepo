@@ -15,6 +15,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
+from corp.schema.folder_names import SYSTEM
+
 logger = logging.getLogger(__name__)
 
 # OneDrive MyWork path (redundant copy of local MyWork after migration)
@@ -216,7 +218,7 @@ def find_extraction_artifacts(mywork_root: Path) -> CleanupPlan:
     """
     plan = CleanupPlan()
 
-    run_dir = mywork_root / "90_System" / ".corp" / "run"
+    run_dir = mywork_root / SYSTEM / ".corp" / "run"
     if not run_dir.exists():
         logger.info("No .corp/run/ directory found")
         return plan

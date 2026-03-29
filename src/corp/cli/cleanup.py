@@ -11,6 +11,7 @@ from rich.table import Table
 
 from corp.cli._common import console
 from corp.config import get_config
+from corp.schema.folder_names import SYSTEM
 
 
 @click.command("cleanup-scan")
@@ -44,7 +45,7 @@ def cleanup_scan_command(output: str | None) -> None:
     classifications = cleanup_classify(files)
 
     # Generate proposals
-    output_path = Path(output) if output else mywork_root / "90_System" / ".corp" / "moves.yaml"
+    output_path = Path(output) if output else mywork_root / SYSTEM / ".corp" / "moves.yaml"
     generate_proposals(classifications, output_path)
 
     # Summary
@@ -77,7 +78,7 @@ def apply_moves_command(moves_file: str | None, dry_run: bool) -> None:
     if moves_file:
         moves_path = Path(moves_file)
     else:
-        moves_path = mywork_root / "90_System" / ".corp" / "moves.yaml"
+        moves_path = mywork_root / SYSTEM / ".corp" / "moves.yaml"
 
     if not moves_path.exists():
         console.print(f"[red]Moves file not found: {moves_path}[/red]")
@@ -199,7 +200,7 @@ def cleanup_cmd(scope: str, execute: bool) -> None:
 
     if execute:
         console.print("\n[yellow]Executing cleanup...[/yellow]")
-        log_path = cfg.mywork_root / "90_System" / "cleanup_log.jsonl"
+        log_path = cfg.mywork_root / SYSTEM / "cleanup_log.jsonl"
         total_deleted = 0
         total_failed = 0
 
@@ -256,7 +257,7 @@ def audit_command(skip_gemini: bool, budget: float, model: str) -> None:
 
     cfg = get_config()
     mywork_root = cfg.mywork_root
-    system_dir = mywork_root / "90_System"
+    system_dir = mywork_root / SYSTEM
     system_dir.mkdir(parents=True, exist_ok=True)
 
     # --- Step 1: Scan ---

@@ -22,6 +22,7 @@ from pathlib import Path
 
 import yaml
 
+from corp.schema.folder_names import QUARANTINE
 from corp.vault_io import read_frontmatter, write_note
 
 logger = logging.getLogger(__name__)
@@ -184,7 +185,7 @@ def _quarantine_note(
     vault_root: Path,
 ) -> None:
     """Write failed note to _quarantine/ with reason in frontmatter."""
-    quarantine_dir = vault_root / "_quarantine"
+    quarantine_dir = vault_root / QUARANTINE
     quarantine_dir.mkdir(parents=True, exist_ok=True)
     note_fm["quarantine_reason"] = reason
     note_fm.setdefault("trust_level", "draft")

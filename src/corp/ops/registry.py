@@ -14,6 +14,8 @@ from pathlib import Path
 
 import yaml
 
+from corp.schema.folder_names import SYSTEM
+
 logger = logging.getLogger(__name__)
 
 
@@ -21,7 +23,7 @@ def get_content_registry_path() -> Path:
     """Default content_registry.yaml path from config."""
     from corp.config import get_config
 
-    return get_config().mywork_root / "90_System" / "content_registry.yaml"
+    return get_config().mywork_root / SYSTEM / "content_registry.yaml"
 
 
 @dataclass(frozen=True)

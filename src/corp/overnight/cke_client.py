@@ -18,6 +18,8 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from corp.schema.folder_names import ARCHIVE
+
 logger = logging.getLogger(__name__)
 
 # Resolve CKE package directory — same env-var pattern as CPE's cke_invoker.py
@@ -267,7 +269,7 @@ def scan_local(
     path: Path,
     recursive: bool = True,
     exclude: tuple[str, ...] = (
-        "80_Archive",
+        ARCHIVE,
         ".corp",
         "_knowledge",
         ".venv",

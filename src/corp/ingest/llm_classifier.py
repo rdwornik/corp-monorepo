@@ -20,6 +20,7 @@ from corp.schema.folder_names import (
     PROJECTS,
     RFP,
     SOURCE_LIBRARY,
+    STAGING,
     TEMPLATES,
     UNMATCHED,
 )
@@ -256,7 +257,7 @@ def _move_to_staging(
         logger.warning("Source file not found for staging: %s", asset["path"])
         return
 
-    staging_dest = mywork_root / classification.destination.replace("/", "\\") / "_Staging"
+    staging_dest = mywork_root / classification.destination.replace("/", "\\") / STAGING
     staging_dest.mkdir(parents=True, exist_ok=True)
     dest_file = staging_dest / src_path.name
 

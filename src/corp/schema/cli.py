@@ -31,6 +31,7 @@ from corp.schema import (  # noqa: E402
     normalize_frontmatter,
     validate_frontmatter,
 )
+from corp.schema.folder_names import QUARANTINE  # noqa: E402
 
 console = Console()
 
@@ -66,7 +67,7 @@ def validate(path: str, recursive: bool, strict: bool):
     stats = {"valid": 0, "warnings": 0, "quarantine": 0, "no_frontmatter": 0}
 
     for f in files:
-        if "_quarantine" in str(f):
+        if QUARANTINE in str(f):
             continue
         text = f.read_text(encoding="utf-8")
         data, _ = extract_yaml_frontmatter(text)
@@ -123,8 +124,8 @@ def report(vault_path: str):
     vault = Path(vault_path)
     files = list(vault.rglob("*.md"))
 
-    quarantine_count = sum(1 for f in files if "_quarantine" in str(f))
-    note_files = [f for f in files if "_quarantine" not in str(f)]
+    quarantine_count = sum(1 for f in files if QUARANTINE in str(f))
+    note_files = [f for f in files if QUARANTINE not in str(f)]
 
     all_topics: dict[str, int] = {}
     all_unknown: list[str] = []

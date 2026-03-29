@@ -12,6 +12,7 @@ from datetime import datetime
 from pathlib import Path
 
 from corp.overnight.state import OvernightState
+from corp.schema.folder_names import SYSTEM
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +21,7 @@ def _get_monitor_dir() -> Path:
     """Resolve monitor directory from config."""
     from corp.config import get_config
 
-    return get_config().mywork_root / "90_System" / ".corp"
+    return get_config().mywork_root / SYSTEM / ".corp"
 
 
 class OvernightMonitor:

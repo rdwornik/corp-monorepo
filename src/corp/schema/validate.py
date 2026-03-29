@@ -11,6 +11,8 @@ from typing import Any
 import yaml
 from pydantic import ValidationError
 
+from corp.schema.folder_names import QUARANTINE
+
 from .models import Confidentiality, NoteFrontmatter
 
 logger = logging.getLogger(__name__)
@@ -115,7 +117,7 @@ def get_output_path(
 ) -> Path:
     """Determine where to write the note based on validation result."""
     if validation_result == ValidationResult.QUARANTINE:
-        return base_vault_dir / "_quarantine" / note_filename
+        return base_vault_dir / QUARANTINE / note_filename
     return base_vault_dir / note_filename
 
 

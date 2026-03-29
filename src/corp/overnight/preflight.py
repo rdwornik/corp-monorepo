@@ -12,6 +12,8 @@ from pathlib import Path
 
 import yaml
 
+from corp.schema.folder_names import SYSTEM
+
 logger = logging.getLogger(__name__)
 
 
@@ -50,7 +52,7 @@ def run_preflight(
         errors.append(f"MyWork root does not exist: {mywork_root}")
 
     # 4. Routing map
-    routing_map_path = mywork_root / "90_System" / "routing_map.yaml"
+    routing_map_path = mywork_root / SYSTEM / "routing_map.yaml"
     if not routing_map_path.exists():
         errors.append(f"routing_map.yaml not found: {routing_map_path}")
     else:
