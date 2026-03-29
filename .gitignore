@@ -30,8 +30,8 @@ Thumbs.db
 *.db
 _outputs/
 
-# Package-specific (each package may have its own .gitignore too)
-packages/corp-knowledge-extractor/_outputs/
+# Extraction outputs (data/ is the canonical output root)
+data/_outputs/
 
 # Hypothesis
 .hypothesis/
