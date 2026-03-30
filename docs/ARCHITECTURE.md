@@ -5,46 +5,15 @@
 
 ## System Overview
 
+> **Visual diagrams** live in `docs/diagrams/`. Open the `.svg` files directly in VS Code for rendered architecture views (system context, module map, pipeline flow).
+
 Corporate OS is a knowledge management system for Blue Yonder presales. It ingests
 files from a MyWork folder hierarchy, extracts structured knowledge via LLM (Gemini/Claude),
 stores results as Obsidian vault notes with YAML frontmatter, and serves queries
 through a full-text search index. Five CLIs (`corp`, `corp-meta`, `cke`, `cpe`, `com`)
 expose all operations.
 
-```mermaid
-flowchart TD
-    Rob["Rob\n(presales engineer)"]
-
-    subgraph corp["Corporate OS"]
-        CLIs["5 CLIs\ncorp · corp-meta · cke · cpe · com"]
-        Ingest["ingest/\n(sole vault writer)"]
-        CKE["extractor/ CKE\n(pure extraction)"]
-        Retrieve["retrieve/\nFTS5 queries"]
-        OpsDB[("ops.db\nassets · events")]
-        IndexDB[("index.db\nFTS5 notes")]
-        OvernightDB[("overnight_state.db\nbatch runs")]
-    end
-
-    GeminiAPI["Gemini API\n(primary LLM)"]
-    ClaudeAPI["Claude API\n(Anthropic provider)"]
-    Vault["Obsidian Vault\n.md notes + YAML"]
-    MyWork["MyWork\nfolder hierarchy"]
-    OneDrive["OneDrive\n(read-only source)"]
-
-    Rob -->|"CLI commands"| CLIs
-    CLIs --> Ingest
-    CLIs --> CKE
-    CLIs --> Retrieve
-    CKE -->|"extract knowledge"| GeminiAPI
-    CKE -->|"enrich / classify"| ClaudeAPI
-    Ingest -->|"write notes"| Vault
-    Ingest -->|"route files"| MyWork
-    Ingest -->|"log events"| OpsDB
-    CKE -->|"track state"| OvernightDB
-    Retrieve -->|"FTS5 search"| IndexDB
-    Vault -->|"rebuild index"| IndexDB
-    OneDrive -.->|"copy source files"| MyWork
-```
+→ System context diagram: `docs/diagrams/system-context.svg`
 
 ## Source Layout
 
@@ -256,40 +225,7 @@ a chat session executes a task-management workflow.
 **No import cycle violations.** Former `llm_router` ↔ `intent_router`
 cycle was resolved by extracting `Intent` to `routing_types.py`.
 
-```mermaid
-flowchart TD
-    subgraph L0["Layer 0 — Foundation"]
-        schema["schema/\ntaxonomy · models · config"]
-        extraction_pkg["extraction/\nscan · route · manifest"]
-        extractor_pkg["extractor/\nCKE engine · strategies · providers"]
-        models_rt["models.py · routing_types.py"]
-        ingest_base["ingest base · ops base · cli._common"]
-    end
-
-    subgraph L1["Layer 1 — Core Services"]
-        config_mod["config.py · vault_io.py\naudit · integrity"]
-        ingest_router["ingest.router\nclassifier · renamer · dedup"]
-        ext_subs["extractor submodules\nbatch · tier_router · post_process"]
-        overnight_base["overnight base\nproject.* · opportunity.*"]
-        intent_rt["intent_router · llm_router"]
-    end
-
-    subgraph L2["Layer 2 — Index & State"]
-        index_b["index_builder · ops.database"]
-        proj_res["project_resolver · template_manager\ntask_manager · workflow_engine"]
-        overnight_sm["overnight.state/monitor"]
-    end
-
-    subgraph L3["Layer 3 — Interactive"]
-        query_e["query_engine · sandbox"]
-        inbox["ingest.inbox"]
-        actions_pkg["actions/ · built_in_actions"]
-        chat_mod["chat.py · test_pipeline"]
-        cli_all["cli/ (18 command files)"]
-    end
-
-    L0 --> L1 --> L2 --> L3
-```
+→ Module map diagram: `docs/diagrams/container-module.svg`
 
 ## Database Schemas
 
@@ -426,40 +362,7 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
        |  FTS5 BM25 ranking + metadata filters + vault content loading
 ```
 
-```mermaid
-sequenceDiagram
-    participant Rob
-    participant Inbox as MyWork/00_Inbox
-    participant Scan as light_scan()
-    participant Registry as ContentRegistry
-    participant Rename as renamer
-    participant OpsDB as ops.db
-    participant Router as ingest.router
-    participant TierRouter as tier_router
-    participant Gemini as Gemini API
-    participant VaultWriter as vault_writer
-    participant Vault as Obsidian Vault
-    participant IndexDB as index.db
-
-    Rob->>Inbox: Drop file
-    Inbox->>Scan: Read file metadata
-    Scan-->>Inbox: size · mtime · extension
-    Inbox->>Registry: match_file() — pattern routing
-    Registry-->>Inbox: destination + confidence (0.75–0.95)
-    Inbox->>Rename: Apply naming convention
-    Rename-->>Inbox: {YYYY-MM}_{TYPE}_{CLIENT}_{Desc}.{ext}
-    Inbox->>OpsDB: Log asset + ingest_event (BEFORE move)
-    Inbox->>Router: Move file to destination
-    Router->>TierRouter: Select tier (LOCAL / TEXT_AI / MULTIMODAL)
-    TierRouter->>Gemini: Extract knowledge
-    Gemini-->>TierRouter: JSON response
-    TierRouter->>TierRouter: post_process → normalize
-    TierRouter-->>Router: ExtractionResult
-    Router->>VaultWriter: Write .md note + YAML frontmatter
-    VaultWriter->>Vault: Save note (source_hash tracked)
-    Note over Vault,IndexDB: FTS5 triggers auto-sync notes_fts
-    Vault->>IndexDB: notes_fts updated
-```
+→ Pipeline diagram: `docs/diagrams/magistrala-pipeline.svg`
 
 ## Design Patterns
 
