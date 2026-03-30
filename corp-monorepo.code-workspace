@@ -59,7 +59,25 @@
 
         // === Git ===
         "git.enableSmartCommit": true,
-        "git.autofetch": true
+        "git.autofetch": true,
+
+        // === TODO Tree — show only actionable items in source code ===
+        "todo-tree.general.tags": ["TODO", "FIXME", "HACK", "XXX", "BUG"],
+        "todo-tree.highlights.defaultHighlight": {
+            "type": "text"
+        },
+        "todo-tree.filtering.excludeGlobs": [
+            "**/docs/archive/**",
+            "**/docs/decisions/**",
+            "**/*.json",
+            "**/JOURNAL.md",
+            "**/CHANGELOG.md",
+            "**/.venv/**",
+            "**/__pycache__/**",
+            "**/models/**",
+            "**/data/**",
+            "**/eval/**"
+        ]
     },
     "extensions": {
         "recommendations": [
