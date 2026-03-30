@@ -16,25 +16,25 @@ One `pyproject.toml` at repo root. One `pip install -e .`.
 
 ```
 src/corp/
-  schema/          corp-os-meta (taxonomy, models, schema.yaml)
-  extractor/       corp-knowledge-extractor (CKE)
-  ingest/          corp-by-os ingest pipeline
-  retrieve/        corp-by-os retrieval
-  cli/             corp-by-os CLI modules
-  project/         corp-project-extractor (CPE)
-  rfp/             corp-rfp-agent
-  opportunity/     corp-opportunity-manager (COM)
+  schema/          taxonomy, models, schema.yaml
+  extractor/       CKE — knowledge extraction engine
+  ingest/          ingest pipeline (sole vault writer)
+  retrieve/        retrieval engine
+  cli/             CLI modules
+  project/         CPE — project extractor
+  rfp/             RFP agent
+  opportunity/     COM — opportunity manager
 ```
 
 ### CLIs (2,404 tests)
 
-| CLI | Entry point | Former package |
-|-----|-------------|----------------|
-| `corp` | `corp.cli:cli` | corp-by-os |
-| `corp-meta` | `corp.schema.cli:main` | corp-os-meta |
-| `cke` | `corp.extractor.scripts.run:cli` | corp-knowledge-extractor |
-| `cpe` | `corp.project.cli:cli` | corp-project-extractor |
-| `com` | `corp.opportunity.cli:cli` | corp-opportunity-manager |
+| CLI | Entry point | Module |
+|-----|-------------|--------|
+| `corp` | `corp.cli:cli` | ingest, retrieve, cli |
+| `corp-meta` | `corp.schema.cli:main` | schema |
+| `cke` | `corp.extractor.scripts.run:cli` | extractor |
+| `cpe` | `corp.project.cli:cli` | project |
+| `com` | `corp.opportunity.cli:cli` | opportunity |
 
 ## Development
 - Feature branches: `feat/`, `fix/`, `refactor/`, `chore/`
@@ -68,7 +68,7 @@ src/corp/
 - CKE output must be staged in `scope/client/package/` hierarchy BEFORE running `corp ingest-extractions`. Flat dirs → 0 notes ingested.
   verify: Grep("ingest-extractions", path="corp-monorepo/") → check any docs/scripts for flat-dir usage
 - status.json concurrent reads must use try/except with 2-3 retries — CKE writes while polling reads cause JSONDecodeError.
-  verify: Grep("json.loads", path="corp-monorepo/packages/corp-by-os/src/") → confirm retry wrapper exists
+  verify: Grep("json.loads", path="corp-monorepo/src/corp/") → confirm retry wrapper exists
 
 ## Session Protocol
 1. Read last 5 entries from JOURNAL.md before starting work
