@@ -147,6 +147,7 @@ def retrieve(
                 topics=filters.topics,
                 source_type=filters.source_type,
                 type=filters.type,
+                rfp_only=filters.rfp_only,
                 include_deprecated=filters.include_deprecated,
             )
         except ImportError:
