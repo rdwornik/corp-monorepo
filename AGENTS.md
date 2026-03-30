@@ -8,7 +8,7 @@
 **Codex MUST NOT:**
 - Modify any file
 - Create branches or commits
-- Run any command that writes, deletes, or modifies state
+- Run any command that writes, deletes, or modifies state. Read-only commands (git diff, git log, cat, type) are explicitly allowed.
 - Suggest applying fixes directly — only report findings
 
 **Codex MUST:**
@@ -16,7 +16,6 @@
 - Reference specific file:line locations
 - Prioritize findings (critical / high / medium / low)
 - Be concise — no lengthy explanations, just finding + why + suggested fix direction
-- May run read-only commands: git diff, git log, cat, type
 
 ## Architecture Context
 
@@ -70,9 +69,18 @@ Dependencies flow DOWN layers only. Layer N may import from Layer 0..N-1, never 
 
 ## Review Checklist
 
+### Review Modes
+
+**Diff review (default):** When reviewing a branch diff, check Critical + High only. Skip Medium and Low — they add noise to focused reviews.
+
+**Full audit (explicit):** When asked for a full repo scan, check all severity levels. Use this monthly or after major refactors.
+
+Codex assumes diff review mode unless the prompt explicitly says "full audit."
+
 When reviewing code changes, check ALL of the following:
 
 ### Critical (block merge)
+> CRITICAL = blocks merge. Runtime bugs, data loss risk, security issues, architectural invariant violations.
 - [ ] **Import direction** — no upward layer violations (e.g., schema importing from ingest)
 - [ ] **OneDrive safety** — no code modifies/deletes files under `OneDrive - Blue Yonder`
 - [ ] **API keys** — no secrets hardcoded in code or config files
@@ -81,15 +89,16 @@ When reviewing code changes, check ALL of the following:
 - [ ] **Vault writer invariant** — only `ingest/` and `extraction/vault_writer.py` write to vault
 
 ### High (should fix before merge)
+> HIGH = issues that change runtime behavior or silently degrade data. Convention violations belong in MEDIUM or LOW.
 - [ ] **Missing error handling** — file I/O, API calls, subprocess without try/except
 - [ ] **Hardcoded paths** — Windows paths, usernames, absolute paths in code (use PipelineConfig)
-- [ ] **Type hints missing** — public functions without return type annotations
 - [ ] **Broad exceptions** — `except Exception:` where specific types are known
 - [ ] **Race conditions** — concurrent file access, SQLite from multiple processes
 - [ ] **Test coverage** — new public functions without corresponding test
 
 ### Medium (note for follow-up)
-- [ ] **Stale references** — old package names (corp_by_os, corp_os_meta, corp_knowledge_extractor)
+- [ ] **Type hints missing** — public functions without return type annotations
+- [ ] **Stale references** — old package names (corp_by_os, corp_os_meta, corp_knowledge_extractor) — no runtime impact
 - [ ] **print() in library** — should be `logging` in non-CLI modules, `console.print()` in CLI only
 - [ ] **os.path.join** — should be `pathlib.Path` for filesystem operations
 - [ ] **Magic numbers** — unnamed constants (use `folder_names.py` or config)
