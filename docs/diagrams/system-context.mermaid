@@ -1,0 +1,32 @@
+flowchart TD
+    Rob["Rob\n(presales engineer)"]
+
+    subgraph corp["Corporate OS"]
+        CLIs["5 CLIs\ncorp · corp-meta · cke · cpe · com"]
+        Ingest["ingest/\n(sole vault writer)"]
+        CKE["extractor/ CKE\n(pure extraction)"]
+        Retrieve["retrieve/\nFTS5 queries"]
+        OpsDB[("ops.db\nassets · events")]
+        IndexDB[("index.db\nFTS5 notes")]
+        OvernightDB[("overnight_state.db\nbatch runs")]
+    end
+
+    GeminiAPI["Gemini API\n(primary LLM)"]
+    ClaudeAPI["Claude API\n(Anthropic provider)"]
+    Vault["Obsidian Vault\n.md notes + YAML"]
+    MyWork["MyWork\nfolder hierarchy"]
+    OneDrive["OneDrive\n(read-only source)"]
+
+    Rob -->|"CLI commands"| CLIs
+    CLIs --> Ingest
+    CLIs --> CKE
+    CLIs --> Retrieve
+    CKE -->|"extract knowledge"| GeminiAPI
+    CKE -->|"enrich / classify"| ClaudeAPI
+    Ingest -->|"write notes"| Vault
+    Ingest -->|"route files"| MyWork
+    Ingest -->|"log events"| OpsDB
+    CKE -->|"track state"| OvernightDB
+    Retrieve -->|"FTS5 search"| IndexDB
+    Vault -->|"rebuild index"| IndexDB
+    OneDrive -.->|"copy source files"| MyWork

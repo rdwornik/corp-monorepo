@@ -1,0 +1,41 @@
+flowchart TD
+    subgraph L0["Layer 0 — Foundation"]
+        schema["schema/\ntaxonomy · models · config"]
+        extraction_pkg["extraction/\nscan · route · manifest"]
+        extractor_pkg["extractor/\nCKE engine · strategies · providers"]
+        models_rt["models.py · routing_types.py"]
+        ingest_base["ingest base · ops base · cli._common"]
+    end
+
+    subgraph L1["Layer 1 — Core Services"]
+        config_mod["config.py · vault_io.py\naudit · integrity"]
+        ingest_router["ingest.router\nclassifier · renamer · dedup"]
+        ext_subs["extractor submodules\nbatch · tier_router · post_process"]
+        overnight_base["overnight base\nproject.* · opportunity.*"]
+        intent_rt["intent_router · llm_router"]
+    end
+
+    subgraph L2["Layer 2 — Index & State"]
+        index_b["index_builder · ops.database"]
+        proj_res["project_resolver · template_manager\ntask_manager · workflow_engine"]
+        overnight_sm["overnight.state/monitor"]
+    end
+
+    subgraph L3["Layer 3 — Interactive"]
+        query_e["query_engine · sandbox"]
+        inbox["ingest.inbox"]
+        actions_pkg["actions/ · built_in_actions"]
+        chat_mod["chat.py · test_pipeline"]
+        cli_all["cli/ (18 command files)"]
+    end
+
+    subgraph DBs["Databases"]
+        opsdb[("ops.db\n8 tables")]
+        indexdb[("index.db\n6 tables + FTS5")]
+        overnightdb[("overnight_state.db\n3 tables")]
+    end
+
+    L0 --> L1 --> L2 --> L3
+    index_b --> indexdb
+    ingest_base --> opsdb
+    overnight_sm --> overnightdb

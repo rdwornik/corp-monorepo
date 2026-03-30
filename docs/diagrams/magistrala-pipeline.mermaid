@@ -1,0 +1,32 @@
+sequenceDiagram
+    participant Rob
+    participant Inbox as MyWork/00_Inbox
+    participant Scan as light_scan()
+    participant Registry as ContentRegistry
+    participant Rename as renamer
+    participant OpsDB as ops.db
+    participant Router as ingest.router
+    participant TierRouter as tier_router
+    participant Gemini as Gemini API
+    participant VaultWriter as vault_writer
+    participant Vault as Obsidian Vault
+    participant IndexDB as index.db
+
+    Rob->>Inbox: Drop file
+    Inbox->>Scan: Read file metadata
+    Scan-->>Inbox: size · mtime · extension
+    Inbox->>Registry: match_file() — pattern routing
+    Registry-->>Inbox: destination + confidence (0.75–0.95)
+    Inbox->>Rename: Apply naming convention
+    Rename-->>Inbox: {YYYY-MM}_{TYPE}_{CLIENT}_{Desc}.{ext}
+    Inbox->>OpsDB: Log asset + ingest_event (BEFORE move)
+    Inbox->>Router: Move file to destination
+    Router->>TierRouter: Select tier (LOCAL / TEXT_AI / MULTIMODAL)
+    TierRouter->>Gemini: Extract knowledge
+    Gemini-->>TierRouter: JSON response
+    TierRouter->>TierRouter: post_process → normalize
+    TierRouter-->>Router: ExtractionResult
+    Router->>VaultWriter: Write .md note + YAML frontmatter
+    VaultWriter->>Vault: Save note (source_hash tracked)
+    Note over Vault,IndexDB: FTS5 triggers auto-sync notes_fts
+    Vault->>IndexDB: notes_fts updated
