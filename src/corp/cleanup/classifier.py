@@ -124,7 +124,7 @@ def classify_file(
             ),
         )
         parsed = _parse_response(response.text)
-    except Exception as exc:
+    except (ConnectionError, TimeoutError, ValueError, KeyError) as exc:
         log.warning("Classification failed for %s: %s", file_info.name, exc)
         return Classification(
             file_info=file_info,

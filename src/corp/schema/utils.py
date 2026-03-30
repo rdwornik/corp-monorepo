@@ -61,7 +61,7 @@ def parse_llm_json(text: str) -> dict:
         if isinstance(repaired, dict) and repaired:
             log.debug("json-repair recovered malformed JSON")
             return repaired
-    except Exception:
+    except (ImportError, ValueError):
         pass
 
     log.error("Cannot parse LLM JSON. Full response (%d chars):\n%s", len(text), text[:5000])

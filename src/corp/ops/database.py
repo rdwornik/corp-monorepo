@@ -195,7 +195,7 @@ class OpsDB:
         # Migrate: add vault_note_path if missing (pre-existing DBs)
         try:
             self.conn.execute("SELECT vault_note_path FROM ingest_events LIMIT 0")
-        except Exception:
+        except sqlite3.OperationalError:
             self.conn.execute("ALTER TABLE ingest_events ADD COLUMN vault_note_path TEXT")
             self.conn.commit()
 
@@ -641,7 +641,7 @@ class OpsDB:
                 ),
             )
             self.conn.commit()
-        except Exception as e:
+        except sqlite3.Error as e:
             logger.warning("Failed to log routing decision: %s", e)
 
     def check_review_trigger(self) -> str | None:
@@ -656,7 +656,7 @@ class OpsDB:
             ).fetchone()
             if row and row[1] and row[1] >= 15:
                 return f"You have {row[1]} unreviewed routing overrides. Run: corp routing-review"
-        except Exception:
+        except sqlite3.Error:
             pass
         return None
 
@@ -674,7 +674,7 @@ class OpsDB:
                 (limit,),
             ).fetchall()
             return [dict(row) for row in rows]
-        except Exception:
+        except sqlite3.Error:
             return []
 
     def get_routing_stats(self) -> dict:
@@ -695,7 +695,7 @@ class OpsDB:
                 "manual": row[2] or 0,
                 "batch": row[3] or 0,
             }
-        except Exception:
+        except sqlite3.Error:
             return {"total": 0, "auto": 0, "manual": 0, "batch": 0}
 
     def mark_routing_reviewed(self) -> int:

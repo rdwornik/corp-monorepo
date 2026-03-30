@@ -158,7 +158,7 @@ def route(
             from corp.llm_router import classify_intent
 
             return classify_intent(user_input, workflows, context)
-        except Exception as e:
+        except (ImportError, ConnectionError, TimeoutError, ValueError) as e:
             logger.warning("LLM routing failed: %s", e)
 
     return Intent(
@@ -316,7 +316,7 @@ def _extract_client(normalized: str, raw: str) -> str | None:
             client_slug = proj.split("_")[0].lower()
             if client_slug in normalized:
                 return proj.split("_")[0]
-    except Exception:
+    except (ImportError, OSError):
         pass
 
     # Fallback: look for capitalized words that aren't common Polish/English words
@@ -375,7 +375,7 @@ def _extract_project_ref(normalized: str) -> str | None:
                 resolved = resolve_project(client_slug)
                 if resolved:
                     return resolved.project_id
-    except Exception:
+    except (ImportError, OSError):
         pass
     return None
 

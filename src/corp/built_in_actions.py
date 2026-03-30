@@ -504,7 +504,7 @@ def archive_project(params: dict[str, str]) -> StepResult:
                 yaml.dump(data, default_flow_style=False, allow_unicode=True),
                 encoding="utf-8",
             )
-        except Exception as e:
+        except (OSError, yaml.YAMLError) as e:
             logger.warning("Failed to update project-info.yaml: %s", e)
 
     return StepResult(
@@ -541,7 +541,7 @@ def update_archive_metadata(params: dict[str, str]) -> StepResult:
             yaml.dump(data, default_flow_style=False, allow_unicode=True),
             encoding="utf-8",
         )
-    except Exception as e:
+    except (OSError, yaml.YAMLError) as e:
         return StepResult(
             step_index=0,
             description="Update archive metadata",

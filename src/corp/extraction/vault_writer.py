@@ -25,7 +25,7 @@ def _read_trust_level(path: Path) -> str | None:
     """
     try:
         text = path.read_text(encoding="utf-8")
-    except Exception as e:
+    except OSError as e:
         log.warning(
             "Cannot read trust_level from %s: %s. Defaulting to 'verified' (safe).", path.name, e
         )
@@ -38,7 +38,7 @@ def _read_trust_level(path: Path) -> str | None:
     try:
         fm = yaml.safe_load(text[3:end])
         return fm.get("trust_level") if isinstance(fm, dict) else None
-    except Exception as e:
+    except yaml.YAMLError as e:
         log.warning(
             "Cannot parse frontmatter in %s: %s. Defaulting to 'verified' (safe).", path.name, e
         )

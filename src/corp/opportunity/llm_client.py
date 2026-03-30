@@ -170,7 +170,7 @@ def parse_intent(
             needs_confirmation=False,
             confidence=0.0,
         )
-    except Exception as e:
+    except (ConnectionError, TimeoutError, ValueError, OSError, RuntimeError) as e:
         logger.error("Gemini API error: %s", e)
         return IntentResult(
             intent="clarify",
