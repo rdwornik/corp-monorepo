@@ -23,7 +23,7 @@ def test_retrieval_result_has_notes_field():
 
 def test_naming_config_type_codes_have_doc_types_or_hints():
     """Every type code (except MISC) has either a doc_type or filename_hint."""
-    from corp.ingest.naming_config import load_naming_config
+    from corp.schema.naming_config import load_naming_config
 
     config = load_naming_config()
     for code, spec in config["type_codes"].items():

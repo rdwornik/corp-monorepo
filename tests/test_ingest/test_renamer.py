@@ -10,12 +10,6 @@ from pathlib import Path
 import pytest
 import yaml
 from corp.ingest.classifier import classify
-from corp.ingest.naming_config import (
-    clean_description,
-    get_client_alias,
-    get_client_variants,
-    get_type_code,
-)
 from corp.ingest.renamer import (
     _infer_client,
     _infer_type,
@@ -29,6 +23,12 @@ from corp.schema.folder_names import (
     REF_RFP_LIBRARY,
     REFERENCE,
     UNMATCHED,
+)
+from corp.schema.naming_config import (
+    clean_description,
+    get_client_alias,
+    get_client_variants,
+    get_type_code,
 )
 
 

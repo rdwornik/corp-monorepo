@@ -385,8 +385,8 @@ def naming_stats_command(obj: dict) -> None:
     """Show naming convention type code distribution from routing feedback."""
     from collections import Counter
 
-    from corp.ingest.naming_config import get_type_code, load_naming_config
     from corp.ops.database import OpsDB
+    from corp.schema.naming_config import get_type_code, load_naming_config
 
     pipeline_config = (obj or {}).get("config") or PipelineConfig.production()
     ops = OpsDB(config=pipeline_config)

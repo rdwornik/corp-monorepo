@@ -80,7 +80,7 @@ def test_cpe_classify_file_always_returns_valid_classification(filename, ext):
 @settings(max_examples=300)
 def test_clean_description_never_crashes_and_never_returns_empty(stem):
     """clean_description must return a non-empty string for any input."""
-    from corp.ingest.naming_config import clean_description, load_naming_config
+    from corp.schema.naming_config import clean_description, load_naming_config
 
     load_naming_config.cache_clear()
     result = clean_description(stem)

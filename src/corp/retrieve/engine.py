@@ -27,7 +27,7 @@ def _get_client_variants(client: str) -> list[str]:
     and vice versa. Falls back to [client] if config is unavailable.
     """
     try:
-        from corp.ingest.naming_config import get_client_variants
+        from corp.schema.naming_config import get_client_variants
 
         return get_client_variants(client)
     except ImportError as e:

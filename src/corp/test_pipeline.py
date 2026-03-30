@@ -252,7 +252,7 @@ def _test_classify_and_rename(
     _record_state: dict | None = None,
 ) -> str:
     """Verify type code and client alias resolution against naming_config.yaml."""
-    from corp.ingest.naming_config import get_client_alias, get_type_code
+    from corp.schema.naming_config import get_client_alias, get_type_code
 
     checks = [
         # (label, actual, expected)
