@@ -23,8 +23,7 @@ Thumbs.db
 # Environment
 .env
 
-# Claude
-.claude/
+# Claude — project .claude/ is config (tracked). Runtime data lives in ~/.claude/ not here.
 
 # Data
 *.db
