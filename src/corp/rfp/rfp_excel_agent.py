@@ -25,6 +25,7 @@ import json
 import os
 import sys
 import time
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -56,7 +57,9 @@ from corp.rfp.anonymization import AnonymizationMiddleware  # noqa: E402
 from corp.rfp.llm_router import LLMRouter  # noqa: E402
 
 
-def call_llm_with_retry(llm_func, *args, max_retries=3, **kwargs):
+def call_llm_with_retry(
+    llm_func: Callable[..., str], *args: Any, max_retries: int = 3, **kwargs: Any
+) -> str:
     """Wrapper for LLM calls with exponential backoff retry for rate limits."""
     for attempt in range(max_retries):
         try:
