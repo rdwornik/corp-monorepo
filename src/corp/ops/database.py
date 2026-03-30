@@ -4,6 +4,13 @@ ops.db is the system's memory of what files exist, where they went,
 and why. Every state change is logged as an ingest_event for undo support.
 
 DB location: {app_data_path}/ops.db (alongside index.db, NOT in OneDrive).
+
+OpsDB is a facade that delegates to per-entity repositories:
+- AssetRepository (asset_repo.py)
+- PackageRepository (package_repo.py)
+- EventRepository (event_repo.py)
+- RoutingRepository (routing_repo.py)
+- SuggestionRepository (suggestion_repo.py)
 """
 
 from __future__ import annotations
@@ -12,6 +19,12 @@ import logging
 import sqlite3
 from datetime import datetime
 from pathlib import Path
+
+from corp.ops.asset_repo import AssetRepository
+from corp.ops.event_repo import EventRepository
+from corp.ops.package_repo import PackageRepository
+from corp.ops.routing_repo import RoutingRepository
+from corp.ops.suggestion_repo import SuggestionRepository
 
 logger = logging.getLogger(__name__)
 
@@ -165,10 +178,13 @@ def get_ops_db_path() -> Path:
 
 
 class OpsDB:
-    """Operational database for asset tracking and ingest audit trail.
+    """Operational database facade — delegates to per-entity repositories.
 
     This is the system's memory of what files exist, where they went,
     and why. Every action is logged as an ingest_event for undo support.
+
+    Repositories: AssetRepository, PackageRepository, EventRepository,
+    RoutingRepository, SuggestionRepository (created lazily on first conn access).
     """
 
     def __init__(self, db_path: Path | None = None, config=None) -> None:
@@ -177,6 +193,12 @@ class OpsDB:
             db_path = config.ops_db_path
         self.db_path = db_path or get_ops_db_path()
         self._conn: sqlite3.Connection | None = None
+        # Repositories — created lazily when conn is first accessed
+        self._asset_repo: AssetRepository | None = None
+        self._package_repo: PackageRepository | None = None
+        self._event_repo: EventRepository | None = None
+        self._routing_repo: RoutingRepository | None = None
+        self._suggestion_repo: SuggestionRepository | None = None
 
     @property
     def conn(self) -> sqlite3.Connection:
@@ -187,6 +209,12 @@ class OpsDB:
             self._conn.execute("PRAGMA journal_mode=WAL")
             self._conn.execute("PRAGMA foreign_keys=ON")
             self._init_schema()
+            # Initialize repositories
+            self._asset_repo = AssetRepository(self._conn)
+            self._package_repo = PackageRepository(self._conn)
+            self._event_repo = EventRepository(self._conn)
+            self._routing_repo = RoutingRepository(self._conn)
+            self._suggestion_repo = SuggestionRepository(self._conn)
         return self._conn
 
     def _init_schema(self) -> None:
@@ -203,6 +231,11 @@ class OpsDB:
         if self._conn is not None:
             self._conn.close()
             self._conn = None
+            self._asset_repo = None
+            self._package_repo = None
+            self._event_repo = None
+            self._routing_repo = None
+            self._suggestion_repo = None
 
     # === Timestamp helper ===
 
@@ -210,7 +243,7 @@ class OpsDB:
     def _now() -> str:
         return datetime.now().isoformat(timespec="seconds")
 
-    # === Asset operations ===
+    # === Asset operations (delegated to AssetRepository) ===
 
     def upsert_asset(
         self,
@@ -222,87 +255,31 @@ class OpsDB:
         folder_l1: str,
         folder_l2: str | None = None,
     ) -> int:
-        """Insert or update an asset record. Returns asset ID.
-
-        Path must use forward slashes, relative to mywork_root.
-        """
-        # Normalize path to forward slashes
-        path = path.replace("\\", "/")
-        now = self._now()
-
-        existing = self.conn.execute(
-            "SELECT id FROM assets WHERE path = ?",
-            (path,),
-        ).fetchone()
-
-        if existing:
-            self.conn.execute(
-                """UPDATE assets SET
-                     filename = ?, extension = ?, size_bytes = ?,
-                     mtime = ?, folder_l1 = ?, folder_l2 = ?,
-                     last_scanned = ?
-                   WHERE path = ?""",
-                (filename, extension, size_bytes, mtime, folder_l1, folder_l2, now, path),
-            )
-            self.conn.commit()
-            return existing["id"]
-
-        cur = self.conn.execute(
-            """INSERT INTO assets
-               (path, filename, extension, size_bytes, mtime,
-                folder_l1, folder_l2, first_seen, last_scanned)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (path, filename, extension, size_bytes, mtime, folder_l1, folder_l2, now, now),
+        """Insert or update an asset record. Returns asset ID."""
+        _ = self.conn  # ensure repos initialized
+        return self._asset_repo.upsert_asset(
+            path, filename, extension, size_bytes, mtime, folder_l1, folder_l2,
         )
-        self.conn.commit()
-        return cur.lastrowid  # type: ignore[return-value]
 
     def get_asset(self, path: str) -> dict | None:
         """Get asset by relative path."""
-        path = path.replace("\\", "/")
-        row = self.conn.execute(
-            "SELECT * FROM assets WHERE path = ?",
-            (path,),
-        ).fetchone()
-        return dict(row) if row else None
+        _ = self.conn
+        return self._asset_repo.get_asset(path)
 
     def get_assets_by_status(self, status: str) -> list[dict]:
         """Get all assets with given status."""
-        rows = self.conn.execute(
-            "SELECT * FROM assets WHERE status = ?",
-            (status,),
-        ).fetchall()
-        return [dict(r) for r in rows]
+        _ = self.conn
+        return self._asset_repo.get_assets_by_status(status)
 
     def get_assets_by_folder(self, folder_l1: str) -> list[dict]:
         """Get all assets in a given L1 folder."""
-        rows = self.conn.execute(
-            "SELECT * FROM assets WHERE folder_l1 = ?",
-            (folder_l1,),
-        ).fetchall()
-        return [dict(r) for r in rows]
+        _ = self.conn
+        return self._asset_repo.get_assets_by_folder(folder_l1)
 
     def update_asset_path(self, old_path: str, new_path: str) -> bool:
-        """Update the canonical path of an asset after a file move.
-
-        Must be called BEFORE update_asset_status when the lookup path
-        needs to reflect the file's new location. Returns True if a row
-        was updated.
-        """
-        old_path = old_path.replace("\\", "/")
-        new_path = new_path.replace("\\", "/")
-        cur = self.conn.execute(
-            "UPDATE assets SET path = ? WHERE path = ?",
-            (new_path, old_path),
-        )
-        self.conn.commit()
-        if cur.rowcount == 0:
-            logger.warning(
-                "update_asset_path: no asset found at old path: %s",
-                old_path,
-            )
-            return False
-        return True
+        """Update the canonical path of an asset after a file move."""
+        _ = self.conn
+        return self._asset_repo.update_asset_path(old_path, new_path)
 
     def update_asset_status(
         self,
@@ -321,6 +298,7 @@ class OpsDB:
         """Update asset status and optional fields. Logs an ingest_event.
 
         Every state change goes through here to maintain the audit trail.
+        This method stays on OpsDB because it coordinates asset + event repos.
         """
         path = path.replace("\\", "/")
         asset = self.get_asset(path)
@@ -368,7 +346,7 @@ class OpsDB:
 
         self.conn.commit()
 
-    # === Package operations ===
+    # === Package operations (delegated to PackageRepository) ===
 
     def create_package(
         self,
@@ -382,33 +360,17 @@ class OpsDB:
         inferred_domains: str | None = None,
     ) -> int:
         """Create a new package record. Returns package ID."""
-        source_path = source_path.replace("\\", "/")
-        cur = self.conn.execute(
-            """INSERT INTO packages
-               (folder_name, source_path, file_count, total_size_bytes,
-                inferred_topic, inferred_products, inferred_domains, created_at)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-            (
-                folder_name,
-                source_path,
-                file_count,
-                total_size,
-                inferred_topic,
-                inferred_products,
-                inferred_domains,
-                self._now(),
-            ),
+        _ = self.conn
+        return self._package_repo.create_package(
+            folder_name, source_path, file_count, total_size,
+            inferred_topic=inferred_topic, inferred_products=inferred_products,
+            inferred_domains=inferred_domains,
         )
-        self.conn.commit()
-        return cur.lastrowid  # type: ignore[return-value]
 
     def get_package(self, package_id: int) -> dict | None:
         """Get package by ID."""
-        row = self.conn.execute(
-            "SELECT * FROM packages WHERE id = ?",
-            (package_id,),
-        ).fetchone()
-        return dict(row) if row else None
+        _ = self.conn
+        return self._package_repo.get_package(package_id)
 
     def update_package_status(
         self,
@@ -418,22 +380,12 @@ class OpsDB:
         destination_path: str | None = None,
     ) -> None:
         """Update package status."""
-        parts = ["status = ?"]
-        params: list = [status]
+        _ = self.conn
+        self._package_repo.update_package_status(
+            package_id, status, destination_path=destination_path,
+        )
 
-        if destination_path is not None:
-            parts.append("destination_path = ?")
-            params.append(destination_path.replace("\\", "/"))
-        if status in ("extracted", "archived"):
-            parts.append("completed_at = ?")
-            params.append(self._now())
-
-        params.append(package_id)
-        sql = f"UPDATE packages SET {', '.join(parts)} WHERE id = ?"
-        self.conn.execute(sql, params)
-        self.conn.commit()
-
-    # === Ingest event operations ===
+    # === Ingest event operations (delegated to EventRepository) ===
 
     def log_event(
         self,
@@ -450,85 +402,32 @@ class OpsDB:
         reversible: bool = True,
         vault_note_path: str | None = None,
     ) -> int:
-        """Log an ingest event. Returns event ID.
-
-        EVERY state change must go through this method to maintain
-        the audit trail and enable undo.
-        """
-        if source_path:
-            source_path = source_path.replace("\\", "/")
-        if destination_path:
-            destination_path = destination_path.replace("\\", "/")
-        if vault_note_path:
-            vault_note_path = vault_note_path.replace("\\", "/")
-
-        cur = self.conn.execute(
-            """INSERT INTO ingest_events
-               (asset_id, package_id, action, source_path, destination_path,
-                method, confidence, reasoning, cost, timestamp, reversible,
-                vault_note_path)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (
-                asset_id,
-                package_id,
-                action,
-                source_path,
-                destination_path,
-                method,
-                confidence,
-                reasoning,
-                cost,
-                self._now(),
-                1 if reversible else 0,
-                vault_note_path,
-            ),
+        """Log an ingest event. Returns event ID."""
+        _ = self.conn
+        return self._event_repo.log_event(
+            action,
+            asset_id=asset_id, package_id=package_id,
+            source_path=source_path, destination_path=destination_path,
+            method=method, confidence=confidence, reasoning=reasoning,
+            cost=cost, reversible=reversible, vault_note_path=vault_note_path,
         )
-        self.conn.commit()
-        return cur.lastrowid  # type: ignore[return-value]
 
     def revert_event(self, event_id: int) -> bool:
-        """Mark an event as reverted.
-
-        Does NOT undo the filesystem change — that's the caller's
-        responsibility. This just marks the record.
-        """
-        row = self.conn.execute(
-            "SELECT reversible, reverted FROM ingest_events WHERE id = ?",
-            (event_id,),
-        ).fetchone()
-        if row is None:
-            return False
-        if not row["reversible"]:
-            logger.warning("Event %d is not reversible", event_id)
-            return False
-        if row["reverted"]:
-            logger.warning("Event %d already reverted", event_id)
-            return False
-
-        self.conn.execute(
-            "UPDATE ingest_events SET reverted = 1 WHERE id = ?",
-            (event_id,),
-        )
-        self.conn.commit()
-        return True
+        """Mark an event as reverted."""
+        _ = self.conn
+        return self._event_repo.revert_event(event_id)
 
     def get_events_for_asset(self, asset_id: int) -> list[dict]:
         """Get full history for an asset, ordered chronologically."""
-        rows = self.conn.execute(
-            "SELECT * FROM ingest_events WHERE asset_id = ? ORDER BY timestamp",
-            (asset_id,),
-        ).fetchall()
-        return [dict(r) for r in rows]
+        _ = self.conn
+        return self._event_repo.get_events_for_asset(asset_id)
 
     def get_recent_events(self, limit: int = 50) -> list[dict]:
         """Get most recent ingest events."""
-        rows = self.conn.execute(
-            "SELECT * FROM ingest_events ORDER BY timestamp DESC LIMIT ?",
-            (limit,),
-        ).fetchall()
-        return [dict(r) for r in rows]
+        _ = self.conn
+        return self._event_repo.get_recent_events(limit)
 
-    # === Registry suggestion operations ===
+    # === Registry suggestion operations (delegated to SuggestionRepository) ===
 
     def add_suggestion(
         self,
@@ -538,21 +437,15 @@ class OpsDB:
         evidence: str,
     ) -> int:
         """Add a registry suggestion from auto-discovery."""
-        cur = self.conn.execute(
-            """INSERT INTO registry_suggestions
-               (pattern, proposed_series, proposed_destination, evidence, created_at)
-               VALUES (?, ?, ?, ?, ?)""",
-            (pattern, proposed_series, proposed_destination, evidence, self._now()),
+        _ = self.conn
+        return self._suggestion_repo.add_suggestion(
+            pattern, proposed_series, proposed_destination, evidence,
         )
-        self.conn.commit()
-        return cur.lastrowid  # type: ignore[return-value]
 
     def get_pending_suggestions(self) -> list[dict]:
         """Get suggestions awaiting review."""
-        rows = self.conn.execute(
-            "SELECT * FROM registry_suggestions WHERE status = 'pending' ORDER BY created_at",
-        ).fetchall()
-        return [dict(r) for r in rows]
+        _ = self.conn
+        return self._suggestion_repo.get_pending_suggestions()
 
     def update_suggestion_status(
         self,
@@ -560,13 +453,10 @@ class OpsDB:
         status: str,
     ) -> None:
         """Approve, reject, or expire a suggestion."""
-        self.conn.execute(
-            "UPDATE registry_suggestions SET status = ?, reviewed_at = ? WHERE id = ?",
-            (status, self._now(), suggestion_id),
-        )
-        self.conn.commit()
+        _ = self.conn
+        self._suggestion_repo.update_suggestion_status(suggestion_id, status)
 
-    # === Stats ===
+    # === Stats (cross-table — stays on OpsDB) ===
 
     def get_stats(self) -> dict:
         """Summary stats for corp status command."""
@@ -603,7 +493,7 @@ class OpsDB:
             "pending_suggestions": pending_suggestions,
         }
 
-    # --- Routing feedback ---
+    # === Routing feedback (delegated to RoutingRepository) ===
 
     def log_routing_decision(
         self,
@@ -620,86 +510,33 @@ class OpsDB:
         client: str | None = None,
     ) -> None:
         """Log a routing decision. Fail-open — never blocks routing."""
-        try:
-            self.conn.execute(
-                """INSERT INTO routing_feedback
-                   (filename, extension, file_size_bytes, classifier_destination,
-                    classifier_confidence, final_destination, was_overridden,
-                    routing_method, user_context, client)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    filename,
-                    extension,
-                    file_size_bytes,
-                    classifier_destination,
-                    classifier_confidence,
-                    final_destination,
-                    was_overridden,
-                    routing_method,
-                    user_context,
-                    client,
-                ),
-            )
-            self.conn.commit()
-        except sqlite3.Error as e:
-            logger.warning("Failed to log routing decision: %s", e)
+        _ = self.conn
+        self._routing_repo.log_routing_decision(
+            filename=filename, extension=extension,
+            file_size_bytes=file_size_bytes,
+            classifier_destination=classifier_destination,
+            classifier_confidence=classifier_confidence,
+            final_destination=final_destination,
+            was_overridden=was_overridden, routing_method=routing_method,
+            user_context=user_context, client=client,
+        )
 
     def check_review_trigger(self) -> str | None:
         """Check if routing review is needed. Returns message or None."""
-        try:
-            row = self.conn.execute(
-                """SELECT COUNT(*) as total,
-                          SUM(CASE WHEN was_overridden AND routing_method = 'manual_override'
-                              THEN 1 ELSE 0 END) as overrides
-                   FROM routing_feedback
-                   WHERE reviewed = 0 AND routing_method != 'batch_flag'""",
-            ).fetchone()
-            if row and row[1] and row[1] >= 15:
-                return f"You have {row[1]} unreviewed routing overrides. Run: corp routing-review"
-        except sqlite3.Error:
-            pass
-        return None
+        _ = self.conn
+        return self._routing_repo.check_review_trigger()
 
     def get_routing_overrides(self, limit: int = 20) -> list[dict]:
         """Get unreviewed routing override patterns grouped by destination."""
-        try:
-            rows = self.conn.execute(
-                """SELECT final_destination, COUNT(*) as cnt,
-                          GROUP_CONCAT(DISTINCT filename) as examples
-                   FROM routing_feedback
-                   WHERE was_overridden = 1 AND reviewed = 0
-                   GROUP BY final_destination
-                   ORDER BY cnt DESC
-                   LIMIT ?""",
-                (limit,),
-            ).fetchall()
-            return [dict(row) for row in rows]
-        except sqlite3.Error:
-            return []
+        _ = self.conn
+        return self._routing_repo.get_routing_overrides(limit)
 
     def get_routing_stats(self) -> dict:
         """Get routing feedback stats for unreviewed entries."""
-        try:
-            row = self.conn.execute(
-                """SELECT COUNT(*) as total,
-                          SUM(CASE WHEN routing_method = 'classifier_auto'
-                              THEN 1 ELSE 0 END) as auto,
-                          SUM(CASE WHEN routing_method = 'manual_override'
-                              THEN 1 ELSE 0 END) as manual,
-                          SUM(CASE WHEN routing_method = 'batch_flag' THEN 1 ELSE 0 END) as batch
-                   FROM routing_feedback WHERE reviewed = 0""",
-            ).fetchone()
-            return {
-                "total": row[0] or 0,
-                "auto": row[1] or 0,
-                "manual": row[2] or 0,
-                "batch": row[3] or 0,
-            }
-        except sqlite3.Error:
-            return {"total": 0, "auto": 0, "manual": 0, "batch": 0}
+        _ = self.conn
+        return self._routing_repo.get_routing_stats()
 
     def mark_routing_reviewed(self) -> int:
         """Mark all unreviewed routing feedback as reviewed. Returns count."""
-        cur = self.conn.execute("UPDATE routing_feedback SET reviewed = 1 WHERE reviewed = 0")
-        self.conn.commit()
-        return cur.rowcount
+        _ = self.conn
+        return self._routing_repo.mark_routing_reviewed()
