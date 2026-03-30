@@ -30,6 +30,12 @@ def render_project(project_path: Path) -> dict:
     Returns:
         Summary dict with stats
     """
+    if "onedrive" in str(project_path).lower():
+        raise ValueError(
+            f"Cannot write to OneDrive path: {project_path}. "
+            "Copy project to a local path first."
+        )
+
     settings = get_settings()
     knowledge_dir = project_path / settings.knowledge_dir
     cke_output = knowledge_dir / "_cke_output"
