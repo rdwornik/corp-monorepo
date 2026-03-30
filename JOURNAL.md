@@ -210,3 +210,9 @@ Claude Code: read last 5 entries before starting work.
 - **Did:** Purged all stale old-package name references following the 6→1 consolidation. 4 commits: (1) fixed 3 broken runtime paths in `cke_client.py`, `cke_invoker.py`, `extract_training_data.py`; (2) renamed agent keys in `agents.yaml`/`workflows.yaml` to CLI names (com, cpe, rfp); (3) updated `CLAUDE.md` source layout and CLI table; (4) updated docstrings in ~25 src/ files. Preserved intentionally: `%LOCALAPPDATA%/corp-by-os/` paths, `source_tool`/`generated_by` DB values, 3 excluded files. 20 remaining grep hits all confirmed intentional.
 - **Failed:** Nothing — 2495 tests passed.
 - **Next:** Merge fix/stale-package-references → main.
+
+## 2026-03-30 — chore/todo-audit-cleanup
+
+- **Did:** Full TODO/FIXME/HACK audit across all repo files. Found zero actual comment markers anywhere in the codebase. All 10 hits were false positives: (1) `TaskStatus.TODO` enum values in `models.py`/`task_manager.py`/tests — legitimate code; (2) English noun "hacks" (e.g., "sys.path hacks") in frozen `docs/archive/` and `docs/decisions/transcripts/` — accurate technical prose; (3) "XXXX" substring in a template filename embedded in JSON data/fixture files. No docs needed editing. Added `todo-tree.filtering.excludeGlobs` to `corp-monorepo.code-workspace` — excludes `docs/archive/`, `docs/decisions/`, `*.json`, `JOURNAL.md`, `CHANGELOG.md`, `.venv`, `__pycache__`, `models/`, `data/`, `eval/`. Also added `todo-tree.general.tags` and `defaultHighlight` for explicit tag config. Merged to main.
+- **Failed:** Nothing.
+- **Next:** Verify magistrala pipeline end-to-end with new paths. Measure MISC rate at day 7. Monitor 20_Workflows file count (<75 threshold).
