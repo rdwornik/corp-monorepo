@@ -2,7 +2,7 @@
 # Requires: npm install -g @mermaid-js/mermaid-cli
 # Usage: powershell scripts/render-diagrams.ps1
 
-$diagramDir = Join-Path $PSScriptRoot ".." "docs" "diagrams"
+$diagramDir = Join-Path (Join-Path $PSScriptRoot "..") "docs\diagrams"
 
 # Check mmdc is available
 if (-not (Get-Command mmdc -ErrorAction SilentlyContinue)) {
