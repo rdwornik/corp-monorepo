@@ -308,7 +308,7 @@ def scan_local(
         data = json.loads(tmp_path.read_text(encoding="utf-8"))
         return data.get("results", [])
 
-    except Exception as exc:
+    except (FileNotFoundError, json.JSONDecodeError, subprocess.SubprocessError) as exc:
         logger.error("scan_local failed: %s", exc)
         return []
     finally:

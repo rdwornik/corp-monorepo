@@ -1,5 +1,6 @@
 """System / doctor CLI commands."""
 
+import sqlite3
 import subprocess
 
 import click
@@ -54,7 +55,7 @@ def doctor() -> None:
             table.add_row(name, cli_cmd, "[red]NOT FOUND[/red]", "Not on PATH")
         except subprocess.TimeoutExpired:
             table.add_row(name, cli_cmd, "[yellow]TIMEOUT[/yellow]", "Took >10s")
-        except Exception as e:
+        except (subprocess.SubprocessError, OSError) as e:
             table.add_row(name, cli_cmd, "[red]ERROR[/red]", str(e)[:50])
 
     console.print(table)
@@ -140,7 +141,7 @@ def trust_status() -> None:
                     level = fm.get("trust_level", "none") if isinstance(fm, dict) else "none"
                     counts[level] = counts.get(level, 0) + 1
                     continue
-        except Exception:
+        except (OSError, ValueError):
             pass
         counts["none"] = counts.get("none", 0) + 1
 
@@ -181,7 +182,7 @@ def routing_review(obj: dict) -> None:
     config = (obj or {}).get("config") or PipelineConfig.production()
     try:
         ops = OpsDB(config=config)
-    except Exception as e:
+    except (sqlite3.Error, OSError) as e:
         console.print(f"[red]Cannot open ops.db: {e}[/red]")
         return
 
@@ -231,7 +232,7 @@ def routing_mark_reviewed(obj: dict) -> None:
     config = (obj or {}).get("config") or PipelineConfig.production()
     try:
         ops = OpsDB(config=config)
-    except Exception as e:
+    except (sqlite3.Error, OSError) as e:
         console.print(f"[red]Cannot open ops.db: {e}[/red]")
         return
 

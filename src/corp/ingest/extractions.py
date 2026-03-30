@@ -62,7 +62,7 @@ def _read_meta(pkg_dir: Path) -> dict:
     try:
         with open(meta_path, encoding="utf-8") as f:
             return yaml.safe_load(f) or {}
-    except Exception:
+    except (OSError, yaml.YAMLError):
         return {}
 
 
