@@ -6,6 +6,11 @@ Claude Code: read last 5 entries before starting work.
 ---
 
 
+## 2026-03-30 — Diagrams v4 Pipeline
+- **Did:** Audited per-module READMEs: 12 existed, 1 generated (actions/). Created docs/diagrams/conventions.yaml (style guide, 31 lines). Generated 3 C4 diagrams from ARCHITECTURE.md: system-context (4 internal + 7 external nodes, 11 edges), container-module (4 layers, 14 nodes, 13 edges, vertical layout), magistrala-pipeline (4 phases, 15 nodes, side-channel DBs). All diagrams use 13px font, dark mode themeVariables, classDef colors per layer. Rendered SVGs via mmdc 11.12.0. Removed orphaned README.md from docs/diagrams/. Process: ARCHITECTURE.md + conventions.yaml -> .mermaid -> .svg (Council #25). **2495 tests passing, 0 failed.** 7 commits, merged to main (fast-forward).
+- **Failed:** render-diagrams.ps1 Join-Path fix (step 8) was already applied in prior commit 9db4302 — no-op.
+- **Next:** Magistrala verification. MISC rate measurement.
+
 ## 2026-03-30 (Codex audit fixes)
 - **Did:** Fixed 6 findings from first Codex audit: (1) rfp_only filter dropped during product expansion in retrieve() — 1-line bug fix; (2) naming_config.py moved from ingest/ to schema/ — fix layer violation, shim left in ingest/ for compat, all 8 import sites updated; (3) schema normalize --in-place deprecated — now reports instead of writing vault files directly; (4) OneDrive safety guard added to project/renderer.py; (5) note paths in retrieve engine now resolved against vault_root, silent OSError catches now log at DEBUG; (6) CKE manifest paths switched to .as_posix() — forward slashes per invariant. **2495 tests passing, 0 failed.** Merged to main.
 - **Failed:** Nothing.
