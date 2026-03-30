@@ -156,7 +156,7 @@ class TestGenerateCkeManifest:
         manifest = _make_manifest(entries)
         custom_out = tmp_path / "my_output"
         data = _load_cke_manifest(generate_cke_manifest(manifest, tmp_path, output_dir=custom_out))
-        assert str(custom_out.resolve()) in data["output_dir"]
+        assert custom_out.resolve().as_posix() in data["output_dir"]
 
     def test_file_paths_are_absolute(self, tmp_path: Path):
         entries = [_make_entry(tmp_path, "test.pdf")]

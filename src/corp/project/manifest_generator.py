@@ -144,7 +144,7 @@ def generate_cke_manifest(
         files.append(
             {
                 "id": file_id,
-                "path": str(file_path.resolve()),
+                "path": file_path.resolve().as_posix(),
                 "doc_type": doc_type,
                 "name": entry.filename,
                 "client": client_name,
@@ -155,7 +155,7 @@ def generate_cke_manifest(
     cke_manifest = {
         "schema_version": 1,
         "project": manifest.project_id,
-        "output_dir": str(output_dir.resolve()),
+        "output_dir": output_dir.resolve().as_posix(),
         "generated_at": datetime.now().isoformat(),
         "generated_by": "corp-project-extractor",
         "files": files,
