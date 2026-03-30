@@ -937,12 +937,7 @@ def _try_pdf_multimodal(
     text_result: TextExtractionResult,
     user_context: str = "",
 ) -> ExtractionResult | None:
-    """Upload PDF directly to Gemini Pro for native multimodal extraction.
-
-    Delegates to PDFMultimodalStrategy. This wrapper is kept for backward
-    compatibility and will be removed when extract_from_text() is rewritten
-    as a strategy dispatcher.
-    """
+    """Backward-compat shim — delegates to PDFMultimodalStrategy."""
     from corp.extractor.strategies.pdf_multimodal import PDFMultimodalStrategy
 
     return PDFMultimodalStrategy().extract(file, config, text_result, user_context=user_context)
@@ -954,12 +949,7 @@ def _try_pptx_pdf_multimodal(
     text_result: TextExtractionResult,
     user_context: str = "",
 ) -> ExtractionResult | None:
-    """Attempt PPTX→PDF conversion and Gemini multimodal extraction.
-
-    Delegates to PPTXPdfMultimodalStrategy. This wrapper is kept for backward
-    compatibility and will be removed when extract_from_text() is rewritten
-    as a strategy dispatcher.
-    """
+    """Backward-compat shim — delegates to PPTXPdfMultimodalStrategy."""
     from corp.extractor.strategies.pptx_pdf_multimodal import PPTXPdfMultimodalStrategy
 
     return PPTXPdfMultimodalStrategy().extract(file, config, text_result, user_context=user_context)
@@ -975,199 +965,40 @@ def extract_from_text(
     """
     Tier 2: Send pre-extracted text to AI provider (Claude Haiku or Gemini).
 
-    For PPTX files: attempts PDF conversion first for Gemini multimodal.
-    If PDF conversion succeeds, sends PDF to Gemini with deep_multimodal prompt
-    and text grounding. Falls back to text-only on failure.
+    Routes through a chain of extraction strategies in order:
+    1. PDF multimodal (Gemini Pro with native file upload)
+    2. PPTX→PDF multimodal (Gemini Pro after PDF conversion)
+    3. Text provider fallback (Claude Haiku or Gemini via provider abstraction)
 
-    Routes through the provider abstraction layer. For deep-eligible doc types,
-    uses the deep extraction prompt with overlay fields. Falls back to standard
-    prompt for general documents. Validates response and escalates to Sonnet
-    on malformed JSON.
+    Each strategy checks applicability via can_handle(), attempts extraction,
+    and falls through to the next on failure or None result.
 
     Args:
         file: SourceFile metadata
         config: Unified config dict
         text_result: Pre-extracted text from local extraction (Tier 1)
-        custom_prompt: Optional custom prompt override (bypasses deep routing)
+        custom_prompt: Optional custom prompt override (bypasses multimodal strategies)
 
     Returns:
         ExtractionResult with AI-structured knowledge
     """
-    from corp.extractor.deep_prompt import build_deep_prompt
-    from corp.extractor.doc_type_classifier import (
-        classify_doc_type_hybrid,
-        should_extract_deep,
-    )
-    from corp.extractor.freshness import compute_freshness_fields
-    from corp.extractor.providers.base import ExtractionRequest
-    from corp.extractor.providers.router import (
-        DEFAULT_LARGE_CONTEXT_MODEL,
-        get_provider,
-        has_anthropic_key,
-        route_model,
-    )
-    from corp.extractor.providers.validator import validate_and_retry
+    from corp.extractor.strategies import STRATEGIES
 
-    # For PDF: attempt native multimodal extraction via Gemini Pro
-    if file.path.suffix.lower() == ".pdf" and custom_prompt is None:
-        try:
-            result = _try_pdf_multimodal(file, config, text_result, user_context=user_context)
-            if result is not None:
-                return result
-        except Exception as exc:
-            log.warning("PDF multimodal failed for %s: %s — falling back to text-only", file.path.name, exc)
+    for strategy in STRATEGIES:
+        if strategy.can_handle(file, config, text_result, custom_prompt):
+            try:
+                result = strategy.extract(file, config, text_result, custom_prompt, user_context)
+                if result is not None:
+                    return result
+            except Exception as exc:
+                log.warning(
+                    "%s failed for %s: %s — trying next strategy",
+                    strategy.name,
+                    file.path.name,
+                    exc,
+                )
 
-    # For PPTX: attempt PDF conversion for multimodal extraction
-    if file.path.suffix.lower() == ".pptx" and custom_prompt is None:
-        try:
-            result = _try_pptx_pdf_multimodal(file, config, text_result, user_context=user_context)
-            if result is not None:
-                return result
-        except Exception as exc:
-            log.warning("PPTX PDF multimodal failed for %s: %s — falling back to text-only", file.path.name, exc)
-
-    # Truncate very long text to stay within token limits
-    text_content = text_result.text[:80000]
-
-    # --- Classify doc type and decide extraction depth ---
-    # Use hybrid classifier (TF-IDF + regex); fall back to LLM guidance when neither fires
-    _doc_type, _conf, _method = classify_doc_type_hybrid(file.path.name, content=text_content)
-    doc_type = _doc_type or "general"
-    use_deep = should_extract_deep(doc_type) and custom_prompt is None
-
-    # --- Route to correct model ---
-    model_override = config.get("model_override")
-    batch_mode = config.get("batch_mode", False)
-    model = route_model(
-        tier=2,
-        text_length=len(text_content),
-        model_override=model_override,
-        batch_mode=batch_mode,
-    )
-
-    log.info(
-        "Extracting %s via provider (%d chars, model=%s, doc_type=%s, deep=%s)...",
-        file.path.name,
-        len(text_content),
-        model,
-        doc_type,
-        use_deep,
-    )
-
-    # --- Build prompt ---
-    if custom_prompt:
-        system_prompt = ""
-        user_prompt = _prepend_user_context(
-            f"{custom_prompt}\n\n--- FILE CONTENT ({text_result.extractor}) ---\n{text_content}",
-            user_context,
-        )
-    elif use_deep:
-        deep_prompt = build_deep_prompt(doc_type)
-        taxonomy = get_taxonomy_for_prompt()
-        system_prompt = "You are a structured knowledge extraction engine for a pre-sales knowledge base."
-        user_prompt = _prepend_user_context(
-            f"{deep_prompt}\n\n{taxonomy}\n\n--- FILE CONTENT ({text_result.extractor}) ---\n{text_content}",
-            user_context,
-        )
-    else:
-        prompt = _get_prompt(config, "extract")
-        system_prompt = ""
-        user_prompt = _prepend_user_context(
-            f"{prompt}\n\n--- FILE CONTENT ({text_result.extractor}) ---\n{text_content}",
-            user_context,
-        )
-
-    # --- Compute dynamic token budget ---
-    slide_count = text_result.slide_count or 0
-    token_budget = compute_token_budget(
-        depth="deep" if use_deep else "standard",
-        config=config,
-        slide_count=slide_count,
-    )
-
-    # --- Call provider ---
-    request = ExtractionRequest(
-        system_prompt=system_prompt,
-        user_prompt=user_prompt,
-        model=model,
-        max_tokens=token_budget,
-        temperature=0.2,
-        response_format="json",
-    )
-
-    provider = get_provider(model)
-    response = provider.extract(request)
-
-    # --- Validate and optionally escalate to Sonnet ---
-    response, was_escalated = validate_and_retry(response, request)
-    if was_escalated:
-        log.warning("Extraction for %s was escalated to Sonnet after validation failure", file.path.name)
-
-    tokens = response.input_tokens + response.output_tokens
-
-    # --- Parse response ---
-    data = _parse_response(response.text, file)
-
-    # --- Handle deep extraction base/overlay split ---
-    overlay_data = {}
-    if use_deep and "base" in data:
-        overlay_data = data.get("overlay", {})
-        data = data["base"]
-
-    # Preserve raw output before post-processing mutates it
-    # Always preserve raw_json so key_facts/entities flow to output for all depths
-    raw_data = copy.deepcopy(data)
-
-    # Post-process via corp-os-meta
-    pp = post_process_extraction(
-        raw_result=data,
-        source_tool="knowledge-extractor",
-        source_file=str(file.path),
-    )
-
-    result = _result_from_json(pp.data, file, tokens)
-    result.links_line = pp.links_line
-    result.validation_result = pp.validation_result.value
-    result.raw_json = raw_data
-
-    # Deep extraction metadata
-    result.doc_type = doc_type
-    result.depth = "deep" if use_deep else "standard"
-    result.extraction_version = 2 if use_deep else 1
-    result.overlay = overlay_data
-
-    # RFP agent enrichment: source_date, locator, polarity
-    result.source_date = extract_source_date(file.path)
-    result.facts = _enrich_facts(data, file, result.source_date, text_result)
-
-    # Freshness tracking
-    result.freshness = compute_freshness_fields(file.path)
-
-    # Provenance metadata — response.model reflects escalation if it happened
-    result.model_used = response.model
-    if model_override:
-        result.routing_reason = "manual_override"
-    elif batch_mode:
-        result.routing_reason = "batch_discount"
-    elif model == DEFAULT_LARGE_CONTEXT_MODEL and not has_anthropic_key():
-        result.routing_reason = "anthropic_key_missing"
-    else:
-        result.routing_reason = "text_default"
-    result.prompt_version = "deep_v2" if use_deep else "standard_v1"
-    result.extraction_cost_usd = response.cost_estimate
-    result.user_context = user_context
-
-    log.info(
-        "Tier 2 extracted: '%s' | model=%s | deep=%s | doc_type=%s | topics=%s | tokens=%d | cost=$%.6f",
-        result.title,
-        model,
-        use_deep,
-        doc_type,
-        result.topics[:3],
-        tokens,
-        response.cost_estimate,
-    )
-    return result
+    raise ExtractionError(f"All extraction strategies exhausted for {file.path.name}")
 
 
 def extract_pptx_multimodal(

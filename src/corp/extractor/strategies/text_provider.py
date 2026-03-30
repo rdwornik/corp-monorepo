@@ -4,21 +4,15 @@ from __future__ import annotations
 
 import copy
 import logging
+from typing import TYPE_CHECKING
 
-from corp.extractor.extract import (
-    ExtractionResult,
-    _enrich_facts,
-    _get_prompt,
-    _parse_response,
-    _prepend_user_context,
-    _result_from_json,
-    compute_token_budget,
-)
 from corp.extractor.inventory import SourceFile
 from corp.extractor.post_process import post_process_extraction
 from corp.extractor.strategies.base import ExtractionStrategy
-from corp.extractor.taxonomy_prompt import get_taxonomy_for_prompt
 from corp.extractor.text_extract import TextExtractionResult, extract_source_date
+
+if TYPE_CHECKING:
+    from corp.extractor.extract import ExtractionResult
 
 log = logging.getLogger(__name__)
 
@@ -60,6 +54,14 @@ class TextProviderStrategy(ExtractionStrategy):
             classify_doc_type_hybrid,
             should_extract_deep,
         )
+        from corp.extractor.extract import (
+            _enrich_facts,
+            _get_prompt,
+            _parse_response,
+            _prepend_user_context,
+            _result_from_json,
+            compute_token_budget,
+        )
         from corp.extractor.freshness import compute_freshness_fields
         from corp.extractor.providers.base import ExtractionRequest
         from corp.extractor.providers.router import (
@@ -69,6 +71,7 @@ class TextProviderStrategy(ExtractionStrategy):
             route_model,
         )
         from corp.extractor.providers.validator import validate_and_retry
+        from corp.extractor.taxonomy_prompt import get_taxonomy_for_prompt
 
         # Truncate very long text to stay within token limits
         text_content = text_result.text[:80000]

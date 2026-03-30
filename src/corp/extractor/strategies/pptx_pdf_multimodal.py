@@ -4,25 +4,14 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from corp.extractor.extract import (
-    ExtractionResult,
-    _assemble_extraction_result,
-    _enrich_facts,
-    _get_client,
-    _get_prompt,
-    _parse_response,
-    _prepend_user_context,
-    _render_pdf_to_slides,
-    _run_haiku_enrichment,
-    _select_extraction_model,
-    _upload_and_wait,
-    compute_token_budget,
-)
 from corp.extractor.inventory import SourceFile
 from corp.extractor.strategies.base import ExtractionStrategy
-from corp.extractor.taxonomy_prompt import get_taxonomy_for_prompt
 from corp.extractor.text_extract import TextExtractionResult
+
+if TYPE_CHECKING:
+    from corp.extractor.extract import ExtractionResult
 
 log = logging.getLogger(__name__)
 
@@ -62,6 +51,20 @@ class PPTXPdfMultimodalStrategy(ExtractionStrategy):
         from corp.extractor.doc_type_classifier import (
             classify_doc_type_hybrid,
             should_extract_deep,
+        )
+        from corp.extractor.extract import (
+            _assemble_extraction_result,
+            _enrich_facts,
+            _get_client,
+            _get_prompt,
+            _parse_response,
+            _prepend_user_context,
+            _render_pdf_to_slides,
+            _run_haiku_enrichment,
+            _select_extraction_model,
+            _upload_and_wait,
+            compute_token_budget,
+            get_taxonomy_for_prompt,
         )
         from corp.extractor.slides.pdf_converter import convert_pptx_to_pdf
 

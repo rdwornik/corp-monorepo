@@ -125,7 +125,7 @@ class TestPptxMultimodalRouting:
     """Test that extract_from_text routes PPTX through PDF multimodal."""
 
     def test_pptx_routes_multimodal_with_pdf(self, tmp_path):
-        """PDF available → Tier 3 multimodal extraction used."""
+        """PDF available → PPTX PDF multimodal strategy used."""
         from unittest.mock import patch
 
         from corp.extractor.extract import ExtractionResult
@@ -142,7 +142,10 @@ class TestPptxMultimodalRouting:
         fake_result = MagicMock(spec=ExtractionResult)
         fake_result.title = "Test Deck"
 
-        with patch("corp.extractor.extract._try_pptx_pdf_multimodal", return_value=fake_result) as mock_multi:
+        with patch(
+            "corp.extractor.strategies.pptx_pdf_multimodal.PPTXPdfMultimodalStrategy.extract",
+            return_value=fake_result,
+        ) as mock_multi:
             from corp.extractor.extract import extract_from_text
 
             result = extract_from_text(sf, {"gemini": {"model": "test"}}, text_result)
@@ -162,9 +165,12 @@ class TestPptxMultimodalRouting:
         sf = SourceFile(path=pptx, name="deck.pptx", type=FileType.SLIDES, size_bytes=1000)
         text_result = TextExtractionResult(text="Slide content", char_count=13, extractor="python-pptx", slide_count=5)
 
-        # Make PDF multimodal return None (conversion failed)
+        # Make PPTX PDF multimodal strategy return None (conversion failed)
         with (
-            patch("corp.extractor.extract._try_pptx_pdf_multimodal", return_value=None),
+            patch(
+                "corp.extractor.strategies.pptx_pdf_multimodal.PPTXPdfMultimodalStrategy.extract",
+                return_value=None,
+            ),
             patch("corp.extractor.providers.router.route_model", return_value="gemini-3-flash-preview"),
             patch("corp.extractor.providers.router.get_provider") as mock_provider_fn,
             patch("corp.extractor.providers.validator.validate_and_retry") as mock_validate,
