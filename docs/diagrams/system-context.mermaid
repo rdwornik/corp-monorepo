@@ -1,32 +1,48 @@
-flowchart TD
-    Rob["Rob\n(presales engineer)"]
-
-    subgraph corp["Corporate OS"]
-        CLIs["5 CLIs\ncorp · corp-meta · cke · cpe · com"]
-        Ingest["ingest/\n(sole vault writer)"]
-        CKE["extractor/ CKE\n(pure extraction)"]
-        Retrieve["retrieve/\nFTS5 queries"]
-        OpsDB[("ops.db\nassets · events")]
-        IndexDB[("index.db\nFTS5 notes")]
-        OvernightDB[("overnight_state.db\nbatch runs")]
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'fontSize': '13px',
+    'fontFamily': 'Segoe UI, sans-serif',
+    'lineColor': '#718096',
+    'primaryTextColor': '#2d3748'
+  }
+}}%%
+flowchart TB
+    subgraph corp["Corporate OS — src/corp/"]
+        cli["cli/<br/>5 CLIs, 40+ commands"]
+        ingest["ingest/ + ops/<br/>Route files, write vault<br/>ContentRegistry, OpsDB facade"]
+        cke["extractor/ CKE<br/>LOCAL | TEXT_AI | MULTIMODAL<br/>Strategies, post_process"]
+        retrieve["retrieve/ + query_engine<br/>FTS5 BM25, client prep<br/>search_facts()"]
     end
 
-    GeminiAPI["Gemini API\n(primary LLM)"]
-    ClaudeAPI["Claude API\n(Anthropic provider)"]
-    Vault["Obsidian Vault\n.md notes + YAML"]
-    MyWork["MyWork\nfolder hierarchy"]
-    OneDrive["OneDrive\n(read-only source)"]
+    gemini(["Gemini API<br/>Flash classify, Pro extract"])
+    claude(["Claude API<br/>Haiku, Sonnet"])
+    vault[("Obsidian Vault<br/>.md + YAML frontmatter")]
+    mywork[/"MyWork<br/>7 folders + .corp/"/]
+    onedrive["<em>OneDrive</em><br/>Read-only source"]
+    opsdb[("ops.db")]
+    indexdb[("index.db")]
 
-    Rob -->|"CLI commands"| CLIs
-    CLIs --> Ingest
-    CLIs --> CKE
-    CLIs --> Retrieve
-    CKE -->|"extract knowledge"| GeminiAPI
-    CKE -->|"enrich / classify"| ClaudeAPI
-    Ingest -->|"write notes"| Vault
-    Ingest -->|"route files"| MyWork
-    Ingest -->|"log events"| OpsDB
-    CKE -->|"track state"| OvernightDB
-    Retrieve -->|"FTS5 search"| IndexDB
-    Vault -->|"rebuild index"| IndexDB
-    OneDrive -.->|"copy source files"| MyWork
+    cli --> ingest
+    cli --> cke
+    cli --> retrieve
+    ingest --> mywork
+    ingest --> vault
+    ingest --> opsdb
+    cke --> gemini
+    cke --> claude
+    vault --> indexdb
+    retrieve --- indexdb
+    onedrive -.-> mywork
+
+    classDef internal fill:#3182ce,stroke:#2b6cb0,color:#fff
+    classDef ext fill:#dd6b20,stroke:#c05621,color:#fff
+    classDef store fill:#805ad5,stroke:#6b46c1,color:#fff
+    classDef db fill:#2d3748,stroke:#1a202c,color:#fff
+    classDef cliStyle fill:#e53e3e,stroke:#c53030,color:#fff
+
+    class cli cliStyle
+    class ingest,cke,retrieve internal
+    class gemini,claude,onedrive ext
+    class vault,mywork store
+    class opsdb,indexdb db
