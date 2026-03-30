@@ -824,6 +824,105 @@ def _check_near_dup(
     return choice == "s"
 
 
+def _auto_route(
+    file_path: Path,
+    dest: str,
+    proposed_name: str,
+    mywork_root: Path,
+    ops: OpsDB,
+    classification: Classification,
+    *,
+    skip_extract: bool,
+    override_dest: bool,
+    default_destination: str | None,
+) -> None:
+    """Execute auto-mode routing: move, register, log, extract."""
+    final_path = _move_file(file_path, dest, proposed_name, mywork_root)
+    _register_file(final_path, ops)
+    event_id = _log_ingest_event(
+        ops,
+        file_path,
+        final_path,
+        mywork_root,
+        classification,
+        file_path.name,
+        proposed_name,
+        None,
+        not skip_extract,
+    )
+    _log_routing_feedback(
+        ops,
+        file_path,
+        classification,
+        final_destination=dest,
+        was_overridden=override_dest,
+        routing_method="batch_flag" if default_destination else "classifier_auto",
+    )
+    console.print(f"[green]AUTO:[/green] {file_path.name} → {dest}/{proposed_name}")
+    if not skip_extract:
+        _trigger_extraction(final_path, mywork_root, ops, None, event_id=event_id)
+
+
+def _accept_and_route(
+    file_path: Path,
+    current_dest: str,
+    current_name: str,
+    mywork_root: Path,
+    ops: OpsDB,
+    classification: Classification,
+    *,
+    skip_extract: bool,
+    dest_was_set: bool,
+    default_destination: str | None,
+    user_context: str | None,
+) -> str | None:
+    """Execute interactive accept: move, register, log, extract.
+
+    Returns 'routed' on success, None if move failed (caller should continue loop).
+    """
+    try:
+        final_path = _move_file(file_path, current_dest, current_name, mywork_root)
+    except OSError as exc:
+        console.print(f"[red]Move failed: {exc}[/red]")
+        return None
+
+    _register_file(final_path, ops)
+
+    event_id = _log_ingest_event(
+        ops,
+        file_path,
+        final_path,
+        mywork_root,
+        classification,
+        file_path.name,
+        current_name,
+        user_context,
+        not skip_extract,
+    )
+
+    _log_routing_feedback(
+        ops,
+        file_path,
+        classification,
+        final_destination=current_dest,
+        was_overridden=dest_was_set,
+        routing_method="manual_override"
+        if dest_was_set
+        else ("batch_flag" if default_destination else "classifier_auto"),
+        user_context=user_context,
+    )
+
+    console.print(
+        f"[green]Routed:[/green] {current_dest}/{final_path.name}"
+        f"  [dim](event #{event_id})[/dim]"
+    )
+
+    if not skip_extract:
+        _trigger_extraction(final_path, mywork_root, ops, user_context, event_id=event_id)
+
+    return "routed"
+
+
 def process_file(
     file_path: Path,
     mywork_root: Path,
@@ -877,31 +976,11 @@ def process_file(
             )
             return "routed"
 
-        dest = auto_dest
-        final_path = _move_file(file_path, dest, rename.proposed_name, mywork_root)
-        _register_file(final_path, ops)
-        event_id = _log_ingest_event(
-            ops,
-            file_path,
-            final_path,
-            mywork_root,
-            classification,
-            file_path.name,
-            rename.proposed_name,
-            None,
-            not skip_extract,
+        _auto_route(
+            file_path, auto_dest, rename.proposed_name, mywork_root, ops,
+            classification, skip_extract=skip_extract,
+            override_dest=bool(override_dest), default_destination=default_destination,
         )
-        _log_routing_feedback(
-            ops,
-            file_path,
-            classification,
-            final_destination=dest,
-            was_overridden=bool(override_dest),
-            routing_method="batch_flag" if default_destination else "classifier_auto",
-        )
-        console.print(f"[green]AUTO:[/green] {file_path.name} → {dest}/{rename.proposed_name}")
-        if not skip_extract:
-            _trigger_extraction(final_path, mywork_root, ops, None, event_id=event_id)
         return "routed"
 
     # Step 4: Present to user
@@ -974,48 +1053,14 @@ def process_file(
                 )
                 return "routed"
 
-            # Execute: move + register + log + extract
-            try:
-                final_path = _move_file(file_path, current_dest, current_name, mywork_root)
-            except OSError as exc:
-                console.print(f"[red]Move failed: {exc}[/red]")
-                continue
-
-            _register_file(final_path, ops)
-
-            event_id = _log_ingest_event(
-                ops,
-                file_path,
-                final_path,
-                mywork_root,
-                classification,
-                file_path.name,
-                current_name,
-                user_context,
-                not skip_extract,
-            )
-
-            _log_routing_feedback(
-                ops,
-                file_path,
-                classification,
-                final_destination=current_dest,
-                was_overridden=dest_was_set,
-                routing_method="manual_override"
-                if dest_was_set
-                else ("batch_flag" if default_destination else "classifier_auto"),
+            result = _accept_and_route(
+                file_path, current_dest, current_name, mywork_root, ops,
+                classification, skip_extract=skip_extract,
+                dest_was_set=dest_was_set, default_destination=default_destination,
                 user_context=user_context,
             )
-
-            console.print(
-                f"[green]Routed:[/green] {current_dest}/{final_path.name}"
-                f"  [dim](event #{event_id})[/dim]"
-            )
-
-            if not skip_extract:
-                _trigger_extraction(final_path, mywork_root, ops, user_context, event_id=event_id)
-
-            return "routed"
+            if result:
+                return result
 
 
 @click.command("ingest-inbox")
