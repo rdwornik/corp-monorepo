@@ -842,6 +842,95 @@ def _render_pdf_to_slides(pdf_path: Path, temp_dir: Path) -> list[Path]:
     return paths
 
 
+def _truncate_large_pdf(
+    file_path: Path,
+    size_bytes: int,
+    max_pages: int = 50,
+) -> tuple[Path, bool, int, Path | None]:
+    """Truncate large PDFs for multimodal upload.
+
+    Returns:
+        (pdf_path, was_truncated, page_count, temp_dir_to_clean)
+    """
+    import tempfile
+
+    try:
+        import fitz
+
+        doc = fitz.open(str(file_path))
+        page_count = len(doc)
+        doc.close()
+    except Exception:
+        return file_path, False, 0, None
+
+    if page_count <= max_pages and size_bytes <= 30 * 1024 * 1024:
+        return file_path, False, page_count, None
+
+    log.info(
+        "Large PDF: %d pages, %.1f MB — truncating to %d pages for multimodal",
+        page_count,
+        size_bytes / (1024 * 1024),
+        max_pages,
+    )
+    try:
+        import fitz
+
+        temp_dir = Path(tempfile.mkdtemp(prefix="cke_pdf_trunc_"))
+        doc = fitz.open(str(file_path))
+        truncated = fitz.open()
+        truncated.insert_pdf(doc, to_page=min(max_pages - 1, len(doc) - 1))
+        truncated_path = temp_dir / f"truncated_{file_path.name}"
+        truncated.save(str(truncated_path))
+        truncated.close()
+        doc.close()
+        return truncated_path, True, page_count, temp_dir
+    except Exception as exc:
+        log.warning("PDF truncation failed: %s — uploading full PDF", exc)
+        return file_path, False, page_count, None
+
+
+def _render_cover_page(file_path: Path) -> list[Path]:
+    """Render first page of PDF as cover PNG. Returns list of image paths."""
+    import tempfile
+
+    try:
+        import fitz
+
+        cover_dir = Path(tempfile.mkdtemp(prefix="cke_pdf_cover_"))
+        doc = fitz.open(str(file_path))
+        mat = fitz.Matrix(2, 2)  # 2x zoom for quality
+        pix = doc[0].get_pixmap(matrix=mat)
+        cover_path = cover_dir / "cover_001.png"
+        pix.save(str(cover_path))
+        doc.close()
+        log.info("Rendered cover page PNG for %s", file_path.name)
+        return [cover_path]
+    except Exception as exc:
+        log.warning("Failed to render cover page PNG: %s", exc)
+        return []
+
+
+def _run_haiku_enrichment(
+    result: ExtractionResult,
+    data: dict,
+    file: SourceFile,
+    text_result: TextExtractionResult,
+) -> None:
+    """Run Haiku enrichment pass and update result in-place."""
+    enrichment_facts = _haiku_enrichment(
+        existing_facts=[f.get("fact", "") for f in result.facts],
+        source_text=text_result.text or "",
+        source_file=file,
+        source_date=result.source_date,
+        text_result=text_result,
+    )
+    if enrichment_facts:
+        result.facts.extend(enrichment_facts)
+        existing_kf = result.raw_json.get("key_facts") or []
+        result.raw_json["key_facts"] = existing_kf + [f["fact"] for f in enrichment_facts]
+        log.info("Haiku enrichment added %d facts for %s", len(enrichment_facts), file.path.name)
+
+
 def _try_pdf_multimodal(
     file: SourceFile,
     config: dict,
@@ -855,9 +944,6 @@ def _try_pdf_multimodal(
 
     Returns ExtractionResult on success, None on failure.
     """
-    import copy
-    import tempfile
-
     from google.genai import types
 
     from corp.extractor.deep_prompt import build_deep_multimodal_prompt
@@ -865,58 +951,20 @@ def _try_pdf_multimodal(
         classify_doc_type_hybrid,
         should_extract_deep,
     )
-    from corp.extractor.freshness import compute_freshness_fields
-    from corp.extractor.providers.router import select_model
 
     client = _get_client(config)
-    model_override = config.get("model_override")
-    model, routing_reason = select_model(
-        file.path,
-        file.size_bytes,
-        model_override=model_override,
-    )
+    model, routing_reason = _select_extraction_model(file, config)
 
     _doc_type, _conf, _method = classify_doc_type_hybrid(file.path.name)
     doc_type = _doc_type or "general"
     use_deep = should_extract_deep(doc_type)
 
-    # --- Large PDF guard: truncate for upload if needed ---
-    pdf_path = file.path
-    multimodal_truncated = False
-    temp_dir = None
+    # Large PDF guard
+    pdf_path, multimodal_truncated, page_count, temp_dir = _truncate_large_pdf(
+        file.path, file.size_bytes
+    )
 
-    try:
-        import fitz
-
-        doc = fitz.open(str(file.path))
-        page_count = len(doc)
-        doc.close()
-    except Exception:
-        page_count = 0
-
-    if page_count > 50 or file.size_bytes > 30 * 1024 * 1024:
-        log.info(
-            "Large PDF: %d pages, %.1f MB — truncating to 50 pages for multimodal",
-            page_count,
-            file.size_bytes / (1024 * 1024),
-        )
-        try:
-            import fitz
-
-            temp_dir = Path(tempfile.mkdtemp(prefix="cke_pdf_trunc_"))
-            doc = fitz.open(str(file.path))
-            truncated = fitz.open()
-            truncated.insert_pdf(doc, to_page=min(49, len(doc) - 1))
-            truncated_path = temp_dir / f"truncated_{file.path.name}"
-            truncated.save(str(truncated_path))
-            truncated.close()
-            doc.close()
-            pdf_path = truncated_path
-            multimodal_truncated = True
-        except Exception as exc:
-            log.warning("PDF truncation failed: %s — uploading full PDF", exc)
-
-    # --- Build prompt ---
+    # Build prompt
     if use_deep:
         deep_prompt = build_deep_multimodal_prompt(doc_type)
         taxonomy = get_taxonomy_for_prompt()
@@ -924,12 +972,11 @@ def _try_pdf_multimodal(
     else:
         prompt = _prepend_user_context(_get_prompt(config, "extract"), user_context)
 
-    # Include text grounding from pdfplumber
     text_grounding = text_result.text[:30000] if text_result.text else ""
     if text_grounding:
         prompt += f"\n\n--- TEXT GROUNDING (from pdfplumber) ---\n{text_grounding}"
 
-    # --- Upload and extract ---
+    # Upload and extract
     uploaded = _upload_and_wait(client, pdf_path, config)
     contents = [
         types.Part.from_uri(file_uri=uploaded.uri, mime_type="application/pdf"),
@@ -958,64 +1005,19 @@ def _try_pdf_multimodal(
 
     data = _parse_response(response_text, file)
 
-    # Handle deep extraction overlay
-    overlay_data = {}
-    if use_deep:
-        overlay_key = f"{doc_type}_overlay"
-        if overlay_key in data:
-            overlay_data = data.pop(overlay_key) or {}
-
-    raw_data = copy.deepcopy(data)
-
-    pp = post_process_extraction(
-        raw_result=data,
-        source_tool="knowledge-extractor",
-        source_file=str(file.path),
+    # Assemble result
+    result = _assemble_extraction_result(
+        data, file, tokens, use_deep, doc_type,
+        model, routing_reason, user_context, None,
     )
-
-    result = _result_from_json(pp.data, file, tokens)
-    result.links_line = pp.links_line
-    result.validation_result = pp.validation_result.value
-    result.raw_json = raw_data
-
-    result.doc_type = doc_type
-    result.depth = "deep" if use_deep else "standard"
-    result.extraction_version = 2 if use_deep else 1
-    result.overlay = overlay_data
-
-    result.source_date = extract_source_date(file.path)
+    # PDF-specific: override facts with text_result enrichment
     result.facts = _enrich_facts(data, file, result.source_date, text_result)
-    result.freshness = compute_freshness_fields(file.path)
 
     # Haiku enrichment pass
-    enrichment_facts = _haiku_enrichment(
-        existing_facts=[f.get("fact", "") for f in result.facts],
-        source_text=text_result.text or "",
-        source_file=file,
-        source_date=result.source_date,
-        text_result=text_result,
-    )
-    if enrichment_facts:
-        result.facts.extend(enrichment_facts)
-        existing_kf = result.raw_json.get("key_facts") or []
-        result.raw_json["key_facts"] = existing_kf + [f["fact"] for f in enrichment_facts]
-        log.info("Haiku enrichment added %d facts for %s", len(enrichment_facts), file.path.name)
+    _run_haiku_enrichment(result, data, file, text_result)
 
-    # --- Render cover page PNG ---
-    try:
-        import fitz
-
-        cover_dir = Path(tempfile.mkdtemp(prefix="cke_pdf_cover_"))
-        doc = fitz.open(str(file.path))
-        mat = fitz.Matrix(2, 2)  # 2x zoom for quality
-        pix = doc[0].get_pixmap(matrix=mat)
-        cover_path = cover_dir / "cover_001.png"
-        pix.save(str(cover_path))
-        doc.close()
-        result.slide_image_paths = [cover_path]
-        log.info("Rendered cover page PNG for %s", file.path.name)
-    except Exception as exc:
-        log.warning("Failed to render cover page PNG: %s", exc)
+    # Render cover page PNG
+    result.slide_image_paths = _render_cover_page(file.path)
 
     # Cleanup temp truncated PDF
     if temp_dir:
@@ -1026,12 +1028,6 @@ def _try_pdf_multimodal(
         except OSError:
             pass
 
-    # Provenance metadata
-    result.model_used = model
-    result.routing_reason = routing_reason
-    result.prompt_version = "deep_v2" if use_deep else "standard_v1"
-    result.extraction_cost_usd = _estimate_gemini_cost(model, tokens)
-    result.user_context = user_context
     if multimodal_truncated:
         result.raw_json["multimodal_truncated"] = True
 
@@ -1058,7 +1054,6 @@ def _try_pptx_pdf_multimodal(
 
     Returns ExtractionResult on success, None if PDF conversion fails.
     """
-    import copy
 
     # Convert PPTX to PDF
     import tempfile
@@ -1070,8 +1065,6 @@ def _try_pptx_pdf_multimodal(
         classify_doc_type_hybrid,
         should_extract_deep,
     )
-    from corp.extractor.freshness import compute_freshness_fields
-    from corp.extractor.providers.router import select_model
     from corp.extractor.slides.pdf_converter import convert_pptx_to_pdf
 
     pdf_dir = Path(tempfile.mkdtemp(prefix="cke_pptx_pdf_"))
@@ -1083,13 +1076,7 @@ def _try_pptx_pdf_multimodal(
     log.info("PPTX→PDF conversion succeeded for %s, sending PDF to Gemini multimodal", file.path.name)
 
     client = _get_client(config)
-    model_override = config.get("model_override")
-    model, routing_reason = select_model(
-        file.path,
-        file.size_bytes,
-        has_images=True,
-        model_override=model_override,
-    )
+    model, routing_reason = _select_extraction_model(file, config)
 
     _doc_type, _conf, _method = classify_doc_type_hybrid(file.path.name)
     doc_type = _doc_type or "general"
@@ -1138,49 +1125,16 @@ def _try_pptx_pdf_multimodal(
 
     data = _parse_response(response_text, file)
 
-    # Handle deep extraction overlay
-    overlay_data = {}
-    if use_deep:
-        overlay_key = f"{doc_type}_overlay"
-        if overlay_key in data:
-            overlay_data = data.pop(overlay_key) or {}
-
-    raw_data = copy.deepcopy(data)
-
-    pp = post_process_extraction(
-        raw_result=data,
-        source_tool="knowledge-extractor",
-        source_file=str(file.path),
+    # Assemble result using shared helper
+    result = _assemble_extraction_result(
+        data, file, tokens, use_deep, doc_type,
+        model, routing_reason, user_context, None,
     )
-
-    result = _result_from_json(pp.data, file, tokens)
-    result.links_line = pp.links_line
-    result.validation_result = pp.validation_result.value
-    result.raw_json = raw_data
-
-    result.doc_type = doc_type
-    result.depth = "deep" if use_deep else "standard"
-    result.extraction_version = 2 if use_deep else 1
-    result.overlay = overlay_data
-
-    result.source_date = extract_source_date(file.path)
+    # Override facts with text_result enrichment
     result.facts = _enrich_facts(data, file, result.source_date, text_result)
-    result.freshness = compute_freshness_fields(file.path)
 
-    # Haiku enrichment pass: extract additional facts from raw text
-    enrichment_facts = _haiku_enrichment(
-        existing_facts=[f.get("fact", "") for f in result.facts],
-        source_text=text_result.text or "",
-        source_file=file,
-        source_date=result.source_date,
-        text_result=text_result,
-    )
-    if enrichment_facts:
-        result.facts.extend(enrichment_facts)
-        # Also update raw_json key_facts for frontmatter
-        existing_kf = result.raw_json.get("key_facts") or []
-        result.raw_json["key_facts"] = existing_kf + [f["fact"] for f in enrichment_facts]
-        log.info("Haiku enrichment added %d facts for %s", len(enrichment_facts), file.path.name)
+    # Haiku enrichment pass
+    _run_haiku_enrichment(result, data, file, text_result)
 
     # Render slide PNGs from PDF before cleanup
     try:
@@ -1195,13 +1149,6 @@ def _try_pptx_pdf_multimodal(
         pdf_path.unlink(missing_ok=True)
     except OSError:
         pass
-
-    # Provenance metadata
-    result.model_used = model
-    result.routing_reason = routing_reason
-    result.prompt_version = "deep_v2" if use_deep else "standard_v1"
-    result.extraction_cost_usd = _estimate_gemini_cost(model, tokens)
-    result.user_context = user_context
 
     log.info(
         "PPTX PDF multimodal extracted: '%s' | doc_type=%s | deep=%s | tokens=%d | model=%s",
