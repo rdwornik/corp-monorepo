@@ -111,10 +111,11 @@ def normalize(path: str, in_place: bool):
         console.print("[dim]Nothing to normalize[/]")
 
     if in_place and changes:
-        frontmatter_str = yaml.dump(normalized, default_flow_style=False, allow_unicode=True, sort_keys=False)
-        output = f"---\n{frontmatter_str}---\n{body}"
-        target.write_text(output, encoding="utf-8")
-        console.print(f"[green]Written:[/] {target}")
+        console.print(
+            "[yellow]--in-place is deprecated and no longer writes files.[/]\n"
+            "[yellow]Use 'corp vault normalize' to apply changes through the ingest layer.[/]"
+        )
+        console.print(f"[dim]Would update: {target}[/]")
 
 
 @main.command()
