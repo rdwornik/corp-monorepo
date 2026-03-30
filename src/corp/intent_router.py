@@ -12,23 +12,12 @@ from __future__ import annotations
 import logging
 import re
 import unicodedata
-from dataclasses import dataclass, field
 from datetime import date, timedelta
 
 from corp.models import Workflow
+from corp.routing_types import Intent  # noqa: F401 — re-exported for backward compat
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class Intent:
-    """Routing result from user input."""
-
-    workflow_id: str | None = None  # None = chitchat/unclear
-    parameters: dict = field(default_factory=dict)
-    confidence: float = 0.0
-    source: str = "none"  # "keyword" | "llm" | "none"
-    response_text: str | None = None  # for chitchat/clarification
 
 
 # --- Product aliases ---

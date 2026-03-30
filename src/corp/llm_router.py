@@ -14,8 +14,8 @@ import os
 from datetime import date
 from pathlib import Path
 
-from corp.intent_router import Intent
 from corp.models import Workflow
+from corp.routing_types import Intent
 
 logger = logging.getLogger(__name__)
 
