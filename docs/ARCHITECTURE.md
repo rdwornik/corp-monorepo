@@ -395,6 +395,14 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
 | ~~Mixed concerns~~ | ~~Low~~ | ~~ingest/inbox.py (1161 LOC)~~ | **RESOLVED** | Business logic extracted to inbox_ops.py |
 | **Deep CLI layers** | Low | cli.misc at Layer 9 | **ACCEPTED** | Runtime depth 9, static depth 3 — lazy imports already applied at every boundary; each layer has distinct responsibility |
 
+### Accepted Limitations
+
+| Item | Rationale |
+|------|-----------|
+| synthesize.py writes to _outputs/ staging | Staging ≠ vault. Invariant "extractor doesn't write vault" is preserved. |
+| rfp_feedback.py non-atomic ID | Single-threaded CLI. Race condition impossible in current usage. |
+| schema/cli.py missing -> None annotations | Cosmetic. Click commands return None by convention. |
+
 ### Key Invariants
 
 1. **corp (ingest/) is SOLE vault writer** -- CKE produces JSON, ingest writes .md
