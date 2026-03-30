@@ -6,6 +6,11 @@ Claude Code: read last 5 entries before starting work.
 ---
 
 
+## 2026-03-30 (Codex audit fixes)
+- **Did:** Fixed 6 findings from first Codex audit: (1) rfp_only filter dropped during product expansion in retrieve() — 1-line bug fix; (2) naming_config.py moved from ingest/ to schema/ — fix layer violation, shim left in ingest/ for compat, all 8 import sites updated; (3) schema normalize --in-place deprecated — now reports instead of writing vault files directly; (4) OneDrive safety guard added to project/renderer.py; (5) note paths in retrieve engine now resolved against vault_root, silent OSError catches now log at DEBUG; (6) CKE manifest paths switched to .as_posix() — forward slashes per invariant. **2495 tests passing, 0 failed.** Merged to main.
+- **Failed:** Nothing.
+- **Next:** Magistrala verification. MISC rate measurement.
+
 ## 2026-03-30 — P0+P1 error handling + scripts fix (Code Quality Audit)
 - **Did:** Fixed all 15 error-handling items from audit: 5 critical `except Exception: pass` → specific types + logging (`built_in_actions.py` × 3, `ingest/router.py` × 2); 9 high-severity broad catches narrowed (`integrity.py` × 5, `vault_io.py` × 3, `task_manager.py`, `index_builder.py` × 5, `retrieve/engine.py`). Fixed 4 broken scripts (`packages/` → `tests/extractor/fixtures/`; stale `sys.path` inserts removed; REPO_ROOT depth fixed). Archived 6 one-time migration scripts to `scripts/archive/`. Added `__main__` guards to 3 scripts. Removed hardcoded username from `project/cli.py`. `llm_router.py:212` kept broad — google-genai raises unknown exception hierarchy, already logs. Work landed on `feat/project-scoped-gotchas` (pre-commit stash cycle switched branches after 2nd commit). **2412 tests passing, 0 failed.**
 - **Failed:** `llm_router.py` narrowed exception broke `test_api_failure` (mock raises bare `Exception`); reverted. Pre-commit stash/restore switched active branch mid-session — all commits on `feat/project-scoped-gotchas` instead of `fix/p0-p1-error-handling-scripts`.
