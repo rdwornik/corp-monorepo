@@ -1,0 +1,31 @@
+# Diagram generation conventions — read by Claude Code, not by scripts
+# Last updated: 2026-03-30
+
+theme:
+  font_size: "13px"
+  font_family: "Segoe UI, sans-serif"
+  light:
+    line_color: "#718096"
+    text_color: "#2d3748"
+    cluster_bg: "#edf2f7"
+    cluster_border: "#cbd5e0"
+  dark:
+    line_color: "#a0aec0"
+    text_color: "#e2e8f0"
+    cluster_bg: "#2d374880"
+    cluster_border: "#4a556880"
+
+colors:
+  layer_0: { fill: "#38a169", stroke: "#276749", label: "Foundation" }
+  layer_1: { fill: "#3182ce", stroke: "#2b6cb0", label: "Core services" }
+  layer_2: { fill: "#805ad5", stroke: "#6b46c1", label: "Orchestration" }
+  layer_3: { fill: "#dd6b20", stroke: "#c05621", label: "Composition" }
+  cli:     { fill: "#e53e3e", stroke: "#c53030", label: "CLI entry point" }
+  db:      { fill: "#2d3748", stroke: "#1a202c", label: "Database" }
+  external: { fill: "#dd6b20", stroke: "#c05621", label: "External API" }
+  store:   { fill: "#805ad5", stroke: "#6b46c1", label: "Data store" }
+
+limits:
+  max_nodes_per_layer: 4
+  max_edges_per_diagram: 15
+  node_text_color: "#fff"
