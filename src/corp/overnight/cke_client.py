@@ -1,6 +1,6 @@
 """Subprocess wrapper around CKE CLI.
 
-Enforces the corp-by-os → CKE process boundary (Architecture Rule,
+Enforces the corp → CKE process boundary (Architecture Rule,
 ECOSYSTEM.md): no direct Python imports from corp.extractor.
 All operations invoke `cke` via subprocess.
 """
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 _CKE_DIR = Path(
     os.environ.get(
         "CKE_PATH",
-        str(Path(__file__).parents[4] / "corp-knowledge-extractor"),
+        str(Path(__file__).parents[3] / "src" / "corp" / "extractor"),
     )
 )
 
@@ -85,7 +85,7 @@ def load_cke_config() -> dict[str, Any]:
     if not settings_path.exists():
         return {}
     try:
-        import yaml  # already a dep via corp-os-meta
+        import yaml  # already a dep via corp.schema
 
         with open(settings_path, encoding="utf-8") as fh:
             return yaml.safe_load(fh) or {}

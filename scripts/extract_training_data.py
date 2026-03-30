@@ -23,9 +23,9 @@ from pathlib import Path
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-OUTPUTS_DIR = REPO_ROOT / "packages" / "corp-knowledge-extractor" / "_outputs"
-CKE_FIXTURES = REPO_ROOT / "packages" / "corp-knowledge-extractor" / "tests" / "fixtures"
-BOS_FIXTURES = REPO_ROOT / "packages" / "corp-by-os" / "tests" / "fixtures"
+OUTPUTS_DIR = REPO_ROOT / "data" / "_outputs"
+CKE_FIXTURES = REPO_ROOT / "tests" / "extractor" / "fixtures"
+BOS_FIXTURES = REPO_ROOT / "tests" / "fixtures"
 REPORT_DIR = REPO_ROOT / "docs" / "archive"
 
 # ---------- frontmatter parser ----------
@@ -322,7 +322,7 @@ def analyze(
         f"| Product normalization | {len(products)} products | CKE/tests/fixtures/product_normalization.json |",
         f"| People filter | {len(people)} entries | CKE/tests/fixtures/people_filter.json |",
         f"| Quality prediction | {len(quality)} entries | CKE/tests/fixtures/quality_prediction.json |",
-        f"| Routing patterns | {len(routing)} entries | corp-by-os/tests/fixtures/routing_patterns.json |",
+        f"| Routing patterns | {len(routing)} entries | tests/fixtures/routing_patterns.json |",
         "",
         "## Batch Distribution",
         "",

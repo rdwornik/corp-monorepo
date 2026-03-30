@@ -1,4 +1,4 @@
-"""Invoke corp-knowledge-extractor's batch CLI.
+"""Invoke the CKE batch CLI.
 
 Runs CKE as a subprocess -- maintains CLI boundary per orchestrator pattern.
 """
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 CKE_DIR = Path(
     os.environ.get(
         "CKE_PATH",
-        str(Path(__file__).parents[4] / "packages" / "corp-knowledge-extractor"),
+        str(Path(__file__).parents[3] / "src" / "corp" / "extractor"),
     )
 )
 
