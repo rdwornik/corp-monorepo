@@ -204,3 +204,9 @@ Claude Code: read last 5 entries before starting work.
 - **Did:** Eliminated `.ecosystem/`. Moved: `MASTER_HANDOFF.md` → `docs/HANDOFF.md`, `archive/` (32 files) → `docs/archive/`, `council_transcripts/` (25 files) → `docs/decisions/transcripts/`, root `decisions/` (25 ADRs + README) → `docs/decisions/`. Updated all active references in `CLAUDE.md`, `update_handoff.py`, `extract_training_data.py`, `quarantine_fragments.py`, `tag_legacy_notes.py`, `docs/decisions/README.md`, `scripts/archive/*.py`. Updated `.gitignore` (`.ecosystem/rebuild_staging/` → `docs/staging/`). One convention, universally applied.
 - **Failed:** Nothing.
 - **Next:** Verify magistrala pipeline end-to-end with new paths. Measure MISC rate at day 7. Monitor 20_Workflows file count (<75 threshold).
+
+## 2026-03-30 — fix/stale-package-references
+
+- **Did:** Purged all stale old-package name references following the 6→1 consolidation. 4 commits: (1) fixed 3 broken runtime paths in `cke_client.py`, `cke_invoker.py`, `extract_training_data.py`; (2) renamed agent keys in `agents.yaml`/`workflows.yaml` to CLI names (com, cpe, rfp); (3) updated `CLAUDE.md` source layout and CLI table; (4) updated docstrings in ~25 src/ files. Preserved intentionally: `%LOCALAPPDATA%/corp-by-os/` paths, `source_tool`/`generated_by` DB values, 3 excluded files. 20 remaining grep hits all confirmed intentional.
+- **Failed:** Nothing — 2495 tests passed.
+- **Next:** Merge fix/stale-package-references → main.
