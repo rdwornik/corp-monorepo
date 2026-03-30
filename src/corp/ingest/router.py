@@ -16,7 +16,7 @@ from datetime import datetime
 from pathlib import Path
 
 from corp.ops.database import OpsDB
-from corp.ops.registry import ContentRegistry
+from corp.ops.registry import ContentRegistry, RegistryMatch
 from corp.schema.folder_names import INBOX, STAGING, UNMATCHED
 
 logger = logging.getLogger(__name__)
@@ -371,6 +371,122 @@ def ingest_all(
     return file_results, package_results
 
 
+def _preflight_folder(
+    folder_path: Path,
+) -> tuple[list[Path], int, int, float, int]:
+    """Pre-flight checks: scan files, compute size, check depth.
+
+    Returns:
+        (file_list, file_count, total_size, total_size_mb, max_depth)
+    """
+    file_list = [f for f in folder_path.rglob("*") if f.is_file()]
+    file_count = len(file_list)
+    total_size = sum(f.stat().st_size for f in file_list)
+    total_size_mb = round(total_size / 1024 / 1024, 2)
+    max_depth = max(
+        (len(f.relative_to(folder_path).parts) for f in file_list),
+        default=0,
+    )
+
+    if max_depth > 3 or total_size > 500 * 1024 * 1024:
+        logger.warning(
+            "Large folder: %s (depth=%d, size=%.1fMB, files=%d). "
+            "Consider reviewing before ingesting.",
+            folder_path.name,
+            max_depth,
+            total_size_mb,
+            file_count,
+        )
+
+    return file_list, file_count, total_size, total_size_mb, max_depth
+
+
+def _determine_folder_route(
+    folder_path: Path,
+    registry: ContentRegistry,
+) -> tuple[str, str, str, RegistryMatch]:
+    """Match folder against registry and determine routing.
+
+    Returns:
+        (action, dest_folder, normalized_name, match)
+    """
+    match = registry.match_folder(folder_path.name)
+
+    fallback = registry.get_fallback_config()
+    confidence_threshold = fallback.get("confidence_threshold", 0.75)
+
+    if not match.matched:
+        action = "quarantined"
+        dest_folder = fallback.get("unknown_destination", f"{INBOX}/{UNMATCHED}")
+    elif match.confidence >= confidence_threshold:
+        action = "routed"
+        dest_folder = match.destination
+    else:
+        action = "staged"
+        dest_folder = f"{match.destination}/{STAGING}" if match.destination else f"{INBOX}/{STAGING}"
+
+    normalized_name = folder_path.name.replace(" ", "_")
+    while "__" in normalized_name:
+        normalized_name = normalized_name.replace("__", "_")
+
+    return action, dest_folder, normalized_name, match
+
+
+def _register_folder_assets(
+    destination: Path,
+    mywork_root: Path,
+    ops: OpsDB,
+    package_id: int | None,
+    action: str,
+    rel_str: str,
+    match: RegistryMatch,
+    file_count: int,
+) -> str:
+    """Register all files in moved folder as assets and log package event.
+
+    Returns:
+        dest_rel — relative path of destination.
+    """
+    dest_rel = str(destination.relative_to(mywork_root.resolve())).replace("\\", "/")
+
+    for f in destination.rglob("*"):
+        if not f.is_file():
+            continue
+        f_rel = str(f.relative_to(mywork_root.resolve())).replace("\\", "/")
+        f_stat = f.stat()
+        f_parts = f.relative_to(mywork_root.resolve()).parts
+        ops.upsert_asset(
+            path=f_rel,
+            filename=f.name,
+            extension=f.suffix.lower(),
+            size_bytes=f_stat.st_size,
+            mtime=datetime.fromtimestamp(f_stat.st_mtime).isoformat(
+                timespec="seconds",
+            ),
+            folder_l1=f_parts[0] if f_parts else "",
+            folder_l2=f_parts[1] if len(f_parts) > 1 else None,
+        )
+        ops.conn.execute(
+            "UPDATE assets SET package_id = ?, status = ? WHERE path = ?",
+            (package_id, action, f_rel),
+        )
+    ops.conn.commit()
+
+    ops.log_event(
+        action=action,
+        package_id=package_id,
+        source_path=rel_str,
+        destination_path=dest_rel,
+        method=match.method,
+        confidence=match.confidence,
+        reasoning=(
+            f"Folder package: series={match.series_id}, rule={match.rule_name}, {file_count} files"
+        ),
+    )
+
+    return dest_rel
+
+
 def ingest_folder(
     folder_path: Path,
     mywork_root: Path,
@@ -392,25 +508,8 @@ def ingest_folder(
     except ValueError:
         rel_str = folder_path.name
 
-    # --- Step 1: Pre-flight ---
-    file_list = [f for f in folder_path.rglob("*") if f.is_file()]
-    file_count = len(file_list)
-    total_size = sum(f.stat().st_size for f in file_list)
-    total_size_mb = round(total_size / 1024 / 1024, 2)
-    max_depth = max(
-        (len(f.relative_to(folder_path).parts) for f in file_list),
-        default=0,
-    )
-
-    if max_depth > 3 or total_size > 500 * 1024 * 1024:
-        logger.warning(
-            "Large folder: %s (depth=%d, size=%.1fMB, files=%d). "
-            "Consider reviewing before ingesting.",
-            folder_path.name,
-            max_depth,
-            total_size_mb,
-            file_count,
-        )
+    # --- Pre-flight ---
+    _file_list, file_count, total_size, total_size_mb, _max_depth = _preflight_folder(folder_path)
 
     def _error_result(error: str) -> PackageIngestResult:
         return PackageIngestResult(
@@ -431,7 +530,8 @@ def ingest_folder(
     if file_count == 0:
         return _error_result("Empty folder — no files to ingest")
 
-    # --- Step 2: Create Package record ---
+    # --- Create package record ---
+    package_id = None
     if not dry_run:
         package_id = ops.create_package(
             folder_name=folder_path.name,
@@ -439,31 +539,9 @@ def ingest_folder(
             file_count=file_count,
             total_size=total_size,
         )
-    else:
-        package_id = None
 
-    # --- Step 3: Match against registry ---
-    match = registry.match_folder(folder_path.name)
-
-    # --- Step 4: Determine routing ---
-    fallback = registry.get_fallback_config()
-    confidence_threshold = fallback.get("confidence_threshold", 0.75)
-
-    if not match.matched:
-        action = "quarantined"
-        dest_folder = fallback.get("unknown_destination", f"{INBOX}/{UNMATCHED}")
-    elif match.confidence >= confidence_threshold:
-        action = "routed"
-        dest_folder = match.destination
-    else:
-        action = "staged"
-        dest_folder = f"{match.destination}/{STAGING}" if match.destination else f"{INBOX}/{STAGING}"
-
-    # --- Step 5: Normalize folder name ---
-    normalized_name = folder_path.name.replace(" ", "_")
-    while "__" in normalized_name:
-        normalized_name = normalized_name.replace("__", "_")
-
+    # --- Match & route ---
+    action, dest_folder, normalized_name, match = _determine_folder_route(folder_path, registry)
     dest_full = f"{dest_folder}/{normalized_name}"
 
     if dry_run:
@@ -482,7 +560,7 @@ def ingest_folder(
             error=None,
         )
 
-    # --- Step 6: Move entire folder ---
+    # --- Move folder ---
     destination = mywork_root / dest_full.replace("/", "\\")
     try:
         destination.parent.mkdir(parents=True, exist_ok=True)
@@ -504,47 +582,12 @@ def ingest_folder(
         logger.error("Failed to move folder %s: %s", folder_path.name, exc)
         return _error_result(f"Move failed: {exc}")
 
-    # --- Step 7: Register all files as assets ---
-    dest_rel = str(destination.relative_to(mywork_root.resolve())).replace("\\", "/")
-
-    for f in destination.rglob("*"):
-        if not f.is_file():
-            continue
-        f_rel = str(f.relative_to(mywork_root.resolve())).replace("\\", "/")
-        f_stat = f.stat()
-        f_parts = f.relative_to(mywork_root.resolve()).parts
-        ops.upsert_asset(
-            path=f_rel,
-            filename=f.name,
-            extension=f.suffix.lower(),
-            size_bytes=f_stat.st_size,
-            mtime=datetime.fromtimestamp(f_stat.st_mtime).isoformat(
-                timespec="seconds",
-            ),
-            folder_l1=f_parts[0] if f_parts else "",
-            folder_l2=f_parts[1] if len(f_parts) > 1 else None,
-        )
-        # Link asset to package
-        ops.conn.execute(
-            "UPDATE assets SET package_id = ?, status = ? WHERE path = ?",
-            (package_id, action, f_rel),
-        )
-    ops.conn.commit()
-
-    # Log package event
-    ops.log_event(
-        action=action,
-        package_id=package_id,
-        source_path=rel_str,
-        destination_path=dest_rel,
-        method=match.method,
-        confidence=match.confidence,
-        reasoning=(
-            f"Folder package: series={match.series_id}, rule={match.rule_name}, {file_count} files"
-        ),
+    # --- Register assets & log event ---
+    dest_rel = _register_folder_assets(
+        destination, mywork_root, ops, package_id, action, rel_str, match, file_count
     )
 
-    # --- Step 8: Extract with shared context ---
+    # --- Extract ---
     extracted = False
     extraction_cost = 0.0
 
