@@ -457,48 +457,16 @@ def compute_token_budget(
 # ---------------------------------------------------------------------------
 
 
-def extract_knowledge(
-    file: SourceFile,
-    config: dict,
-    sampled_frames: list[SampledFrame] | None = None,
-    custom_prompt: str | None = None,
-    user_context: str = "",
-) -> ExtractionResult:
-    """
-    Send a file to Gemini and return structured extracted knowledge.
-
-    Strategy:
-    - VIDEO + sampled_frames → File API upload + inline frame images + extract_with_slides prompt
-      Gemini identifies unique slides, returns slides[] with frame_index references
-    - VIDEO / AUDIO (no frames) → File API upload + extract prompt
-    - DOCUMENT / SLIDES > 20MB → File API upload + extract prompt
-    - DOCUMENT / SLIDES ≤ 20MB → inline bytes + extract prompt
-    - NOTE / TRANSCRIPT / SPREADSHEET → text embedded in prompt
-
-    Args:
-        file: SourceFile to extract from
-        config: Unified config dict from load_config()
-        sampled_frames: Time-sampled frames from sampler.py (video only)
+def _select_extraction_model(
+    file: SourceFile, config: dict
+) -> tuple[str, str]:
+    """Select Gemini model based on file type and config overrides.
 
     Returns:
-        ExtractionResult with slides[] populated when sampled_frames given
-
-    Raises:
-        ExtractionError: Caller logs and skips
+        (model_name, routing_reason)
     """
-    from google.genai import types
-
-    from corp.extractor.deep_prompt import build_deep_multimodal_prompt
-    from corp.extractor.doc_type_classifier import (
-        classify_doc_type_hybrid,
-        should_extract_deep,
-    )
-    from corp.extractor.freshness import compute_freshness_fields
     from corp.extractor.providers.router import select_model
 
-    client = _get_client(config)
-
-    # Policy-based model selection (overridable via --model flag)
     model_override = config.get("model_override")
     has_images = file.type in (FileType.VIDEO, FileType.SLIDES)
     model, routing_reason = select_model(
@@ -511,22 +479,37 @@ def extract_knowledge(
     if model == "free":
         model = "gemini-3.1-flash-lite"
         routing_reason = "tier3_fallback"
+    return model, routing_reason
+
+
+def _build_extraction_contents(
+    client,
+    file: SourceFile,
+    config: dict,
+    sampled_frames: list[SampledFrame] | None,
+    custom_prompt: str | None,
+    user_context: str,
+    doc_type: str,
+    use_deep: bool,
+) -> tuple[list, str | None, int]:
+    """Build Gemini request content parts based on file type.
+
+    Returns:
+        (contents, gemini_file_uri, estimated_duration_min)
+    """
+    from google.genai import types
+
+    from corp.extractor.deep_prompt import build_deep_multimodal_prompt
 
     INLINE_SIZE_LIMIT = 20 * 1024 * 1024  # 20MB
-    _gemini_file_uri = None  # Track uploaded file URI for transcript reuse
+    gemini_file_uri = None
 
-    # --- Classify doc type BEFORE Gemini call ---
-    _doc_type, _conf, _method = classify_doc_type_hybrid(file.path.name)
-    doc_type = _doc_type or "general"
-    use_deep = should_extract_deep(doc_type) and custom_prompt is None
-
-    # --- Estimate duration from sampled frames for token budget ---
+    # Estimate duration from sampled frames for token budget
     estimated_duration_min = 0
     if sampled_frames:
         interval_sec = config.get("frame_sampling", {}).get("interval_sec", 10)
         estimated_duration_min = int(len(sampled_frames) * interval_sec / 60)
 
-    # --- Build content parts ---
     if file.type == FileType.VIDEO and sampled_frames:
         log.info(
             "Extracting %s with %d sampled frames (~%dmin, doc_type=%s, deep=%s)...",
@@ -537,14 +520,12 @@ def extract_knowledge(
             use_deep,
         )
         if use_deep:
-            # Unified deep multimodal prompt — single prompt with per-slide + structured output
             deep_prompt = build_deep_multimodal_prompt(doc_type)
             taxonomy = get_taxonomy_for_prompt()
             unified_prompt = _prepend_user_context(f"{deep_prompt}\n\n{taxonomy}", user_context)
 
-            # Upload video, add frames, append unified prompt (no system_instruction)
             uploaded = _upload_and_wait(client, file.path, config)
-            _gemini_file_uri = uploaded.uri
+            gemini_file_uri = uploaded.uri
             contents = [types.Part.from_uri(file_uri=uploaded.uri, mime_type=uploaded.mime_type)]
 
             selected = sampled_frames[:MAX_FRAMES_PER_REQUEST]
@@ -563,14 +544,13 @@ def extract_knowledge(
                 )
             )
         else:
-            # Standard extract_with_slides prompt
             contents = _build_sampled_frame_contents(client, file, sampled_frames, config, custom_prompt=custom_prompt)
 
     elif file.type in (FileType.VIDEO, FileType.AUDIO):
         log.info("Extracting %s (no frames)...", file.path.name)
         prompt = _prepend_user_context(_get_prompt(config, "extract", custom_prompt=custom_prompt), user_context)
         uploaded = _upload_and_wait(client, file.path, config)
-        _gemini_file_uri = uploaded.uri
+        gemini_file_uri = uploaded.uri
         contents = [
             types.Part.from_uri(file_uri=uploaded.uri, mime_type=uploaded.mime_type),
             types.Part.from_text(text=prompt),
@@ -604,31 +584,24 @@ def extract_knowledge(
     else:
         raise ExtractionError(f"Unsupported file type {file.type} for {file.path.name}")
 
-    # --- Compute dynamic token budget ---
-    multimodal_budget = compute_token_budget(
-        depth="multimodal",
-        config=config,
-        duration_min=estimated_duration_min,
-    )
+    return contents, gemini_file_uri, estimated_duration_min
 
-    # --- Call Gemini (no system_instruction — unified prompt in contents) ---
-    response = client.models.generate_content(
-        model=model,
-        contents=contents,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            max_output_tokens=multimodal_budget,
-        ),
-    )
 
-    response_text = response.text or ""
-    tokens = 0
-    if hasattr(response, "usage_metadata") and response.usage_metadata:
-        tokens = getattr(response.usage_metadata, "total_token_count", 0) or 0
+def _assemble_extraction_result(
+    data: dict,
+    file: SourceFile,
+    tokens: int,
+    use_deep: bool,
+    doc_type: str,
+    model: str,
+    routing_reason: str,
+    user_context: str,
+    gemini_file_uri: str | None,
+) -> ExtractionResult:
+    """Post-process extraction data and build ExtractionResult."""
+    from corp.extractor.freshness import compute_freshness_fields
 
-    data = _parse_response(response_text, file)
-
-    # --- Handle deep extraction: extract overlay from doc_type-specific key ---
+    # Handle deep extraction: extract overlay from doc_type-specific key
     overlay_data = {}
     if use_deep:
         overlay_key = f"{doc_type}_overlay"
@@ -666,7 +639,7 @@ def extract_knowledge(
     result.freshness = compute_freshness_fields(file.path)
 
     # Store Gemini file URI for transcript reuse
-    result.gemini_file_uri = _gemini_file_uri
+    result.gemini_file_uri = gemini_file_uri
 
     # Provenance metadata
     result.model_used = model
@@ -690,6 +663,83 @@ def extract_knowledge(
         routing_reason,
     )
     return result
+
+
+def extract_knowledge(
+    file: SourceFile,
+    config: dict,
+    sampled_frames: list[SampledFrame] | None = None,
+    custom_prompt: str | None = None,
+    user_context: str = "",
+) -> ExtractionResult:
+    """
+    Send a file to Gemini and return structured extracted knowledge.
+
+    Strategy:
+    - VIDEO + sampled_frames → File API upload + inline frame images + extract_with_slides prompt
+      Gemini identifies unique slides, returns slides[] with frame_index references
+    - VIDEO / AUDIO (no frames) → File API upload + extract prompt
+    - DOCUMENT / SLIDES > 20MB → File API upload + extract prompt
+    - DOCUMENT / SLIDES ≤ 20MB → inline bytes + extract prompt
+    - NOTE / TRANSCRIPT / SPREADSHEET → text embedded in prompt
+
+    Args:
+        file: SourceFile to extract from
+        config: Unified config dict from load_config()
+        sampled_frames: Time-sampled frames from sampler.py (video only)
+
+    Returns:
+        ExtractionResult with slides[] populated when sampled_frames given
+
+    Raises:
+        ExtractionError: Caller logs and skips
+    """
+    from google.genai import types
+
+    from corp.extractor.doc_type_classifier import (
+        classify_doc_type_hybrid,
+        should_extract_deep,
+    )
+
+    client = _get_client(config)
+    model, routing_reason = _select_extraction_model(file, config)
+
+    # Classify doc type BEFORE Gemini call
+    _doc_type, _conf, _method = classify_doc_type_hybrid(file.path.name)
+    doc_type = _doc_type or "general"
+    use_deep = should_extract_deep(doc_type) and custom_prompt is None
+
+    # Build content parts for the request
+    contents, gemini_file_uri, duration_min = _build_extraction_contents(
+        client, file, config, sampled_frames, custom_prompt, user_context, doc_type, use_deep
+    )
+
+    # Compute dynamic token budget and call Gemini
+    multimodal_budget = compute_token_budget(
+        depth="multimodal",
+        config=config,
+        duration_min=duration_min,
+    )
+    response = client.models.generate_content(
+        model=model,
+        contents=contents,
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            max_output_tokens=multimodal_budget,
+        ),
+    )
+
+    response_text = response.text or ""
+    tokens = 0
+    if hasattr(response, "usage_metadata") and response.usage_metadata:
+        tokens = getattr(response.usage_metadata, "total_token_count", 0) or 0
+
+    data = _parse_response(response_text, file)
+
+    return _assemble_extraction_result(
+        data, file, tokens, use_deep, doc_type,
+        model, routing_reason, user_context, gemini_file_uri,
+    )
 
 
 def _haiku_enrichment(
