@@ -1031,7 +1031,6 @@ def extract_pptx_multimodal(
         classify_doc_type_hybrid,
         should_extract_deep,
     )
-    from corp.extractor.freshness import compute_freshness_fields
     from corp.extractor.providers.router import select_model
 
     client = _get_client(config)
@@ -1105,49 +1104,11 @@ def extract_pptx_multimodal(
 
     data = _parse_response(response_text, file)
 
-    # --- Handle deep extraction: extract overlay from doc_type-specific key ---
-    overlay_data = {}
-    if use_deep:
-        overlay_key = f"{doc_type}_overlay"
-        if overlay_key in data:
-            overlay_data = data.pop(overlay_key) or {}
-
-    # Always preserve raw data so key_facts/entities flow to output
-    raw_data = copy.deepcopy(data)
-
-    # Post-process
-    pp = post_process_extraction(
-        raw_result=data,
-        source_tool="knowledge-extractor",
-        source_file=str(file.path),
+    # Use shared assembly helper (eliminates ~45 lines of duplication)
+    result = _assemble_extraction_result(
+        data, file, tokens, use_deep, doc_type,
+        model, routing_reason, user_context, None,
     )
-    if pp.changes:
-        log.debug("Normalized: %s", pp.changes)
-
-    result = _result_from_json(pp.data, file, tokens)
-    result.links_line = pp.links_line
-    result.validation_result = pp.validation_result.value
-    result.raw_json = raw_data
-
-    # Deep extraction v2 metadata
-    result.doc_type = doc_type
-    result.depth = "deep" if use_deep else "standard"
-    result.extraction_version = 2 if use_deep else 1
-    result.overlay = overlay_data
-
-    # RFP agent enrichment
-    result.source_date = extract_source_date(file.path)
-    result.facts = _enrich_facts(data, file, result.source_date, None)
-
-    # Freshness tracking
-    result.freshness = compute_freshness_fields(file.path)
-
-    # Provenance metadata
-    result.model_used = model
-    result.routing_reason = routing_reason
-    result.prompt_version = "deep_v2" if use_deep else "standard_v1"
-    result.extraction_cost_usd = _estimate_gemini_cost(model, tokens)
-    result.user_context = user_context
 
     log.info(
         "PPTX multimodal extracted: '%s' | %d slides | doc_type=%s | deep=%s"
@@ -1156,8 +1117,8 @@ def extract_pptx_multimodal(
         len(result.slides),
         doc_type,
         use_deep,
-        bool(overlay_data),
-        len(raw_data.get("key_facts") or []),
+        bool(result.overlay),
+        len(result.raw_json.get("key_facts") or []),
         result.topics[:3],
         tokens,
         model,
