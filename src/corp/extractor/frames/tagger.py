@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import sys
 from pathlib import Path
@@ -7,6 +8,8 @@ from dotenv import load_dotenv
 from google import genai
 
 from corp.extractor._paths import REPO_ROOT
+
+logger = logging.getLogger(__name__)
 
 _project_root = str(REPO_ROOT)
 if _project_root not in sys.path:
@@ -48,7 +51,7 @@ def tag_frames(frames: list[dict], batch_size: int = None) -> list[dict]:
         batch = frames[i : i + batch_size]
         batch_num = (i // batch_size) + 1
         total_batches = (len(frames) + batch_size - 1) // batch_size
-        print(f"    Tagging frames {batch_num}/{total_batches}...")
+        logger.info("Tagging frames %d/%d...", batch_num, total_batches)
 
         # Build prompt
         prompt = _build_tagging_prompt(batch, start_index=i)
