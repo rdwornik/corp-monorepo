@@ -275,6 +275,8 @@ def retrieve(
             seen_ids.add(rid)
 
             note_path = Path(row["note_path"])
+            if not note_path.is_absolute():
+                note_path = vault_root / note_path
             content = _load_note_content(note_path)
             meta = _load_note_metadata(note_path)
 
@@ -437,7 +439,8 @@ def _load_note_content(note_path: Path) -> str:
     """Load full markdown content, stripping YAML frontmatter."""
     try:
         text = note_path.read_text(encoding="utf-8", errors="replace")
-    except Exception:
+    except OSError as e:
+        logger.debug("Failed to load note content %s: %s", note_path, e)
         return ""
 
     if text.startswith("---"):
@@ -452,7 +455,8 @@ def _load_note_metadata(note_path: Path) -> dict:
     """Load frontmatter metadata including overlay data."""
     try:
         text = note_path.read_text(encoding="utf-8", errors="replace")
-    except Exception:
+    except OSError as e:
+        logger.debug("Failed to load note metadata %s: %s", note_path, e)
         return {}
 
     if not text.startswith("---"):
@@ -467,7 +471,8 @@ def _load_note_metadata(note_path: Path) -> dict:
         fm = yaml.safe_load(text[3:end])
         if not isinstance(fm, dict):
             return {}
-    except Exception:
+    except Exception as e:  # yaml.YAMLError and subclasses
+        logger.debug("Failed to parse frontmatter %s: %s", note_path, e)
         return {}
 
     overlay_data = {}
