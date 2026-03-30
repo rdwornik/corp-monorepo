@@ -78,7 +78,8 @@ src/corp/
 
 | Module | Responsibility |
 |--------|---------------|
-| `extract.py` | Core extraction: Gemini API calls, prompt building, JSON parsing (1588 LOC) |
+| `extract.py` | Core extraction: Gemini API calls, prompt building, JSON parsing (1184 LOC) |
+| `strategies/` | ExtractionStrategy ABC + PDF/PPTX/Text strategy classes for extract_from_text() |
 | `batch.py` | Manifest-driven sequential extraction with resume |
 | `batch_api.py` | Google Batch API integration for bulk extraction |
 | `tier_router.py` | Cost-optimized routing: LOCAL / TEXT_AI / MULTIMODAL tiers |
@@ -327,6 +328,7 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
 | Pattern | Where | Quality | Notes |
 |---------|-------|---------|-------|
 | **Strategy** | extractor/providers/ (ABC + Anthropic/Gemini) | Excellent | Clean interface, easy to add providers |
+| **Strategy** | extractor/strategies/ (ABC + PDF/PPTX/Text) | Excellent | extract_from_text() dispatches to 3 strategy classes |
 | **Strategy** | extractor/tier_router.py (LOCAL/TEXT_AI/MULTIMODAL) | Good | Cost-optimized routing per file type |
 | **Pipeline** | ingest/router.py (detect->match->route->record->move->extract) | Good | Linear stages, crash-safe recording |
 | **Facade** | ops/database.py (OpsDB delegates to 5 repos) | Excellent | Split into AssetRepo, PackageRepo, EventRepo, RoutingRepo, SuggestionRepo |
@@ -356,7 +358,7 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
 | ~~Circular import~~ | ~~Medium~~ | ~~llm_router <-> intent_router~~ | **RESOLVED** | Extracted Intent to routing_types.py |
 | ~~God class~~ | ~~Medium~~ | ~~ops/database.py (705 LOC)~~ | **RESOLVED** | Split into 5 per-entity repositories; OpsDB is facade |
 | ~~God module~~ | ~~Medium~~ | ~~built_in_actions.py (967 LOC)~~ | **RESOLVED** | Split into actions/ package with 12 domain modules |
-| **Long functions** | Medium | extractor/extract.py (203-line func) | Open | extract_from_text() should be strategy classes |
+| ~~Long functions~~ | ~~Medium~~ | ~~extractor/extract.py (203-line func)~~ | **RESOLVED** | extract_from_text() → strategy dispatcher (1589→1184 LOC) |
 | ~~Mixed concerns~~ | ~~Low~~ | ~~ingest/inbox.py (1161 LOC)~~ | **RESOLVED** | Business logic extracted to inbox_ops.py |
 | **Deep CLI layers** | Low | cli.misc at Layer 9 | Open | 9 dependency layers; could simplify |
 
