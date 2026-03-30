@@ -1,4 +1,4 @@
-# corp-project-extractor pipeline configuration
+# corp.project pipeline configuration
 
 paths:
   projects_root: "${PROJECTS_ROOT}"

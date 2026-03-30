@@ -1,4 +1,4 @@
-# Workflow Definitions — corp-by-os v0.2
+# Workflow Definitions — corp v0.2
 # Curated multi-step pipelines executed by the workflow engine.
 
 workflows:
@@ -12,7 +12,7 @@ workflows:
     steps:
       - type: agent
         description: "Create project folder + deck + metadata"
-        agent: corp-opportunity-manager
+        agent: com
         command: ["com", "new", "{client}", "-p", "{product}"]
         conditional_args:
           contact: ["-c", "{contact}"]
@@ -33,15 +33,15 @@ workflows:
     steps:
       - type: agent
         description: "Scan and classify files"
-        agent: corp-project-extractor
+        agent: cpe
         command: ["cpe", "scan", "{project_path}"]
       - type: agent
         description: "Extract knowledge via CKE"
-        agent: corp-project-extractor
+        agent: cpe
         command: ["cpe", "extract-cke", "{project_path}", "--max-rpm", "50"]
       - type: agent
         description: "Render index + facts"
-        agent: corp-project-extractor
+        agent: cpe
         command: ["cpe", "render", "{project_path}"]
       - type: python
         description: "Copy knowledge to Obsidian vault"
@@ -122,7 +122,7 @@ workflows:
     steps:
       - type: agent
         description: "Final render of project knowledge"
-        agent: corp-project-extractor
+        agent: cpe
         command: ["cpe", "render", "{project_path}"]
       - type: python
         description: "Move to 80_Archive/{year}/"

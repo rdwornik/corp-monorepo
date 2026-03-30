@@ -1,9 +1,9 @@
-# Agent Registry — corp-by-os
+# Agent Registry — corp
 # Each agent is invoked via CLI subprocess. NEVER import agent code directly.
 # `path` is informational only (not used at runtime); relative to monorepo root.
 
 agents:
-  corp-opportunity-manager:
+  com:
     cli: com
     path: "src/corp/opportunity"
     commands:
@@ -15,7 +15,7 @@ agents:
     cost: free
     confirmation: [new]  # commands requiring confirmation
 
-  corp-project-extractor:
+  cpe:
     cli: cpe
     path: "src/corp/project"
     commands:
@@ -25,7 +25,7 @@ agents:
     cost: "$0.20/project average"
     confirmation: [extract-cke]
 
-  corp-knowledge-extractor:
+  cke:
     cli: cke
     path: "src/corp/extractor"
     commands:
@@ -34,7 +34,7 @@ agents:
     cost: "$0.001-0.03/file (tiered)"
     confirmation: [process-manifest]
 
-  corp-os-meta:
+  schema:
     cli: corp-meta
     path: "src/corp/schema"
     commands:
@@ -52,7 +52,7 @@ agents:
     cost: "$0.50-2.00/debate"
     confirmation: [ask]
 
-  corp-rfp-agent:
+  rfp:
     cli: TBD
     path: "src/corp/rfp"
     commands:
