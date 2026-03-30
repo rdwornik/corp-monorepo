@@ -85,7 +85,7 @@ class BatchCompressor:
         videos = []
         for filename in os.listdir(self.input_dir):
             if filename.lower().endswith(video_extensions):
-                videos.append(os.path.join(self.input_dir, filename))
+                videos.append(str(Path(self.input_dir) / filename))
 
         return sorted(videos)
 
@@ -108,7 +108,7 @@ class BatchCompressor:
         else:
             output_filename = filename
 
-        return os.path.join(self.output_dir, output_filename)
+        return str(Path(self.output_dir) / output_filename)
 
     def should_skip(self, input_path: str, output_path: str) -> bool:
         """
@@ -291,7 +291,7 @@ class BatchCompressor:
         """
         if report_path is None:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            report_path = os.path.join(self.output_dir, f"compression_report_{timestamp}.json")
+            report_path = str(Path(self.output_dir) / f"compression_report_{timestamp}.json")
 
         # Convert datetime to string for JSON serialization
         stats_copy = stats.copy()

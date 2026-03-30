@@ -73,7 +73,7 @@ def remove_silence(
         >>> # Result: 45MB file with same content
     """
     if output_path is None:
-        output_path = os.path.join(tempfile.gettempdir(), f"silence_removed_{os.path.basename(input_path)}")
+        output_path = str(Path(tempfile.gettempdir()) / f"silence_removed_{Path(input_path).name}")
 
     original_size = get_file_size_mb(input_path)
     original_duration = get_audio_duration(input_path)
@@ -148,7 +148,7 @@ def optimize_audio(
         Path to optimized audio file
     """
     if output_path is None:
-        output_path = os.path.join(tempfile.gettempdir(), f"optimized_{Path(input_path).stem}.mp3")
+        output_path = str(Path(tempfile.gettempdir()) / f"optimized_{Path(input_path).stem}.mp3")
 
     original_size = get_file_size_mb(input_path)
 
@@ -217,7 +217,7 @@ def preprocess_for_transcription(
         print(f"Size: {stats['original_size_mb']:.1f}MB\n")
 
     # Step 1: Extract and optimize audio
-    temp_optimized = os.path.join(tempfile.gettempdir(), f"optimized_{Path(input_path).stem}.mp3")
+    temp_optimized = str(Path(tempfile.gettempdir()) / f"optimized_{Path(input_path).stem}.mp3")
 
     optimized_path = optimize_audio(input_path, temp_optimized, verbose=verbose)
     optimized_size = get_file_size_mb(optimized_path)
@@ -228,7 +228,7 @@ def preprocess_for_transcription(
 
     # Step 2: Remove silence if enabled
     if remove_silence_enabled:
-        temp_silence_removed = os.path.join(tempfile.gettempdir(), f"silence_removed_{Path(input_path).stem}.mp3")
+        temp_silence_removed = str(Path(tempfile.gettempdir()) / f"silence_removed_{Path(input_path).stem}.mp3")
 
         silence_removed_path = remove_silence(
             current_path,

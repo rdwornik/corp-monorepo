@@ -49,10 +49,10 @@ def load_report_data(report_dir: str) -> dict:
 
     data = {
         "report_dir": report_dir,
-        "markdown_path": os.path.join(report_dir, "report.md"),
-        "jsonl_path": os.path.join(report_dir, "knowledge.jsonl"),
-        "metadata_path": os.path.join(report_dir, "metadata.json"),
-        "frames_dir": os.path.join(report_dir, "frames"),
+        "markdown_path": str(Path(report_dir) / "report.md"),
+        "jsonl_path": str(Path(report_dir) / "knowledge.jsonl"),
+        "metadata_path": str(Path(report_dir) / "metadata.json"),
+        "frames_dir": str(Path(report_dir) / "frames"),
     }
 
     # Load markdown
@@ -461,8 +461,8 @@ def main():
         # Generate outputs
         os.makedirs(args.output, exist_ok=True)
 
-        md_path = os.path.join(args.output, "comparison_report.md")
-        json_path = os.path.join(args.output, "comparison_metrics.json")
+        md_path = str(Path(args.output) / "comparison_report.md")
+        json_path = str(Path(args.output) / "comparison_metrics.json")
 
         generate_markdown_report(comparison, md_path)
         generate_json_metrics(comparison, json_path)
