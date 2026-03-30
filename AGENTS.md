@@ -8,7 +8,7 @@
 **Codex MUST NOT:**
 - Modify any file
 - Create branches or commits
-- Run shell commands (pytest, ruff, git, pip, powershell)
+- Run any command that writes, deletes, or modifies state
 - Suggest applying fixes directly — only report findings
 
 **Codex MUST:**
@@ -16,6 +16,7 @@
 - Reference specific file:line locations
 - Prioritize findings (critical / high / medium / low)
 - Be concise — no lengthy explanations, just finding + why + suggested fix direction
+- May run read-only commands: git diff, git log, cat, type
 
 ## Architecture Context
 
