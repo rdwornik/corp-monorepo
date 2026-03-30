@@ -47,7 +47,9 @@ src/corp/
 | `llm_router.py` | Gemini Flash for intent classification fallback | classify_intent() |
 | `workflow_engine.py` | Executes workflow YAML definitions | load_workflows(), execute_workflow() |
 | `chat.py` | Interactive Rich terminal chat loop | chat_loop() |
-| `built_in_actions.py` | Python step handlers for workflows (25 actions) | ACTION_REGISTRY |
+| `built_in_actions.py` | Re-export shim for actions/ package | get_action (via corp.actions) |
+| `actions/` | Domain-split action handlers (12 modules) | register_action(), get_action(), ACTION_REGISTRY |
+| `routing_types.py` | Shared types for intent/LLM routing | Intent |
 | `project_resolver.py` | Fuzzy project name -> concrete paths | resolve_project() |
 | `task_manager.py` | Task CRUD via Obsidian vault notes | add_task(), list_tasks(), complete_task() |
 | `template_manager.py` | Template registry in 30_Templates/ | scan_templates(), select_template() |
@@ -327,7 +329,7 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
 | **Strategy** | extractor/providers/ (ABC + Anthropic/Gemini) | Excellent | Clean interface, easy to add providers |
 | **Strategy** | extractor/tier_router.py (LOCAL/TEXT_AI/MULTIMODAL) | Good | Cost-optimized routing per file type |
 | **Pipeline** | ingest/router.py (detect->match->route->record->move->extract) | Good | Linear stages, crash-safe recording |
-| **Facade** | ops/database.py (OpsDB wraps 8 tables) | Good structure | God class risk (705 LOC, 100+ methods) |
+| **Facade** | ops/database.py (OpsDB delegates to 5 repos) | Excellent | Split into AssetRepo, PackageRepo, EventRepo, RoutingRepo, SuggestionRepo |
 | **Facade** | ops/registry.py (ContentRegistry) | Excellent | Clean match_file()/match_folder() interface |
 | **Factory** | schema/pipeline_config.py (.production()/.sandbox()) | Good | Frozen config, test isolation |
 | **Repository** | ops/file_registry.py (content-hash identity) | Good | Focused, single entity |
@@ -349,14 +351,14 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
 
 ### Violations & Technical Debt
 
-| Issue | Severity | Location | Description |
-|-------|----------|----------|-------------|
-| **Circular import** | Medium | llm_router <-> intent_router | Mutual dependency; extract shared logic to L2 module |
-| **God class** | Medium | ops/database.py (705 LOC) | OpsDB handles 5 entity types; split into repositories |
-| **God module** | Medium | built_in_actions.py (967 LOC, 25 funcs) | 12+ domains in one module; split by domain |
-| **Long functions** | Medium | extractor/extract.py (203-line func) | extract_from_text() should be strategy classes |
-| **Mixed concerns** | Low | ingest/inbox.py (1161 LOC) | Rich UI interleaved with file operations |
-| **Deep CLI layers** | Low | cli.misc at Layer 9 | 9 dependency layers; could simplify |
+| Issue | Severity | Location | Status | Description |
+|-------|----------|----------|--------|-------------|
+| ~~Circular import~~ | ~~Medium~~ | ~~llm_router <-> intent_router~~ | **RESOLVED** | Extracted Intent to routing_types.py |
+| ~~God class~~ | ~~Medium~~ | ~~ops/database.py (705 LOC)~~ | **RESOLVED** | Split into 5 per-entity repositories; OpsDB is facade |
+| ~~God module~~ | ~~Medium~~ | ~~built_in_actions.py (967 LOC)~~ | **RESOLVED** | Split into actions/ package with 12 domain modules |
+| **Long functions** | Medium | extractor/extract.py (203-line func) | Open | extract_from_text() should be strategy classes |
+| ~~Mixed concerns~~ | ~~Low~~ | ~~ingest/inbox.py (1161 LOC)~~ | **RESOLVED** | Business logic extracted to inbox_ops.py |
+| **Deep CLI layers** | Low | cli.misc at Layer 9 | Open | 9 dependency layers; could simplify |
 
 ### Key Invariants
 
