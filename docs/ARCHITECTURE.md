@@ -1,7 +1,7 @@
 # Architecture Reference -- Corporate OS
 
 > Living document. Updated after structural changes.
-> Last updated: 2026-03-30
+> Last updated: 2026-03-30 (dependency layers clarified)
 
 ## System Overview
 
@@ -159,9 +159,37 @@ src/corp/
 
 ## Dependency Layers
 
+Two views: **static** (module-level imports, determines load-time cost) and
+**runtime** (maximum transitive depth when all code paths execute).
+
+### Static Layers (module-level imports only)
+
+```
+Layer 0  schema, models, routing_types, extraction/*, extractor/*,
+         ingest base, ops base, cli._common
+         (no corp.* imports or only same-package / L0 imports)
+
+Layer 1  config, vault_io, audit, integrity, extractor submodules,
+         ingest.router, cleanup.*, overnight base, project.*, opportunity.*,
+         intent_router, llm_router, cli.misc
+
+Layer 2  index_builder, ops.database, project_resolver, template_manager,
+         overnight.state/monitor, task_manager, workflow_engine,
+         cli.cleanup/extract/overnight/task/workflow
+
+Layer 3  query_engine, sandbox, ingest.inbox, actions/, built_in_actions,
+         chat, test_pipeline,
+         cli.ingest/project/retrieve/rfp/system/template/vault/query/analytics
+```
+
+Static depth peaks at **Layer 3**. Lazy imports throughout the chain keep
+module loading lightweight — heavy dependencies (LLM clients, vault I/O,
+task manager) are only loaded when their code paths execute.
+
+### Runtime Layers (transitive depth including lazy imports)
+
 ```
 Layer 0  schema, models, extraction/*, extractor/*, ingest base, ops base
-         (no corp.* imports or only same-package imports)
 
 Layer 1  config, vault_io, audit, integrity, extractor submodules,
          ingest.router, cleanup.*, overnight base, project.*, opportunity.*
@@ -185,8 +213,13 @@ Layer 8  chat, cli.workflow
 Layer 9  cli.misc
 ```
 
-**Violations found:** `llm_router` (L3) <-> `intent_router` (L4) mutual import cycle.
-All other dependencies flow downward cleanly.
+Runtime depth reaches Layer 9 via the chain:
+`cli.misc` → `chat` → `workflow_engine` → `built_in_actions` → `task_manager` → `intent_router`.
+Each arrow is a **lazy import** — the full chain only materializes when
+a chat session executes a task-management workflow.
+
+**No import cycle violations.** Former `llm_router` ↔ `intent_router`
+cycle was resolved by extracting `Intent` to `routing_types.py`.
 
 ## Database Schemas
 
@@ -360,7 +393,7 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
 | ~~God module~~ | ~~Medium~~ | ~~built_in_actions.py (967 LOC)~~ | **RESOLVED** | Split into actions/ package with 12 domain modules |
 | ~~Long functions~~ | ~~Medium~~ | ~~extractor/extract.py (203-line func)~~ | **RESOLVED** | extract_from_text() → strategy dispatcher (1589→1184 LOC) |
 | ~~Mixed concerns~~ | ~~Low~~ | ~~ingest/inbox.py (1161 LOC)~~ | **RESOLVED** | Business logic extracted to inbox_ops.py |
-| **Deep CLI layers** | Low | cli.misc at Layer 9 | Open | 9 dependency layers; could simplify |
+| **Deep CLI layers** | Low | cli.misc at Layer 9 | **ACCEPTED** | Runtime depth 9, static depth 3 — lazy imports already applied at every boundary; each layer has distinct responsibility |
 
 ### Key Invariants
 
