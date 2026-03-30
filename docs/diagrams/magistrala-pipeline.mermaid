@@ -1,32 +1,92 @@
-sequenceDiagram
-    participant Rob
-    participant Inbox as MyWork/00_Inbox
-    participant Scan as light_scan()
-    participant Registry as ContentRegistry
-    participant Rename as renamer
-    participant OpsDB as ops.db
-    participant Router as ingest.router
-    participant TierRouter as tier_router
-    participant Gemini as Gemini API
-    participant VaultWriter as vault_writer
-    participant Vault as Obsidian Vault
-    participant IndexDB as index.db
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'fontSize': '13px',
+    'fontFamily': 'Segoe UI, sans-serif',
+    'lineColor': '#718096',
+    'primaryTextColor': '#2d3748'
+  }
+}}%%
+flowchart TB
+    subgraph P1["Phase 1 — Intake & Classify"]
+        source["MyWork/00_Inbox<br/>or OneDrive copy"]
+        scan["light_scan()<br/>size, mtime, ext"]
+        match["ContentRegistry.match_file()<br/>series &rarr; client &rarr; rules<br/>confidence 0.75 &ndash; 0.95"]
+        quarantine["Quarantine<br/>llm_classifier.py<br/>Gemini re-classify"]
+    end
 
-    Rob->>Inbox: Drop file
-    Inbox->>Scan: Read file metadata
-    Scan-->>Inbox: size · mtime · extension
-    Inbox->>Registry: match_file() — pattern routing
-    Registry-->>Inbox: destination + confidence (0.75–0.95)
-    Inbox->>Rename: Apply naming convention
-    Rename-->>Inbox: {YYYY-MM}_{TYPE}_{CLIENT}_{Desc}.{ext}
-    Inbox->>OpsDB: Log asset + ingest_event (BEFORE move)
-    Inbox->>Router: Move file to destination
-    Router->>TierRouter: Select tier (LOCAL / TEXT_AI / MULTIMODAL)
-    TierRouter->>Gemini: Extract knowledge
-    Gemini-->>TierRouter: JSON response
-    TierRouter->>TierRouter: post_process → normalize
-    TierRouter-->>Router: ExtractionResult
-    Router->>VaultWriter: Write .md note + YAML frontmatter
-    VaultWriter->>Vault: Save note (source_hash tracked)
-    Note over Vault,IndexDB: FTS5 triggers auto-sync notes_fts
-    Vault->>IndexDB: notes_fts updated
+    subgraph P2["Phase 2 — Route & Record"]
+        rename["renamer.apply()<br/>YYYY-MM_TYPE_CLIENT_Desc.ext<br/>19 types, 15 aliases"]
+        record["OpsDB.log_ingest_event()<br/>record-before-move"]
+        move["router.move_file()<br/>src &rarr; MyWork/project/"]
+        dedup["MinHash dedup check<br/>content_signatures"]
+    end
+
+    subgraph P3["Phase 3 — Knowledge Extraction"]
+        direction LR
+        local["LOCAL<br/>text_extract.py<br/>PDF/DOCX/PPTX"]
+        text_ai["TEXT_AI<br/>Gemini Flash<br/>text &rarr; JSON"]
+        multimodal["MULTIMODAL<br/>Gemini Pro<br/>PDF upload, scenes"]
+    end
+
+    dispatch["extract_from_text() &rarr; strategy dispatcher<br/>post_process() &rarr; normalize"]
+
+    subgraph P4["Phase 4 — Store & Query"]
+        vault_write["vault_writer.write_note()<br/>.md + YAML frontmatter<br/>source_hash"]
+        rebuild["rebuild_index()<br/>notes_fts, facts_fts<br/>SQLite triggers"]
+        search["search_facts()<br/>+ search_projects()<br/>BM25 + metadata filters"]
+        retrieve_ctx["retrieve/<br/>client prep<br/>RFP context"]
+    end
+
+    %% Side-channel databases
+    opsdb[("ops.db")]
+    statedb[("overnight_state.db")]
+    indexdb[("index.db")]
+    overnight["overnight/<br/>batch extraction<br/>resume on crash"]
+
+    %% Phase 1 flow
+    source --> scan --> match
+    match -->|low confidence| quarantine
+    match --> rename
+    quarantine --> rename
+
+    %% Phase 2 flow
+    rename --> record --> move --> dedup
+
+    %% Phase 2 → Phase 3
+    dedup --> dispatch
+
+    %% Phase 3 dispatch
+    dispatch --> local
+    dispatch --> text_ai
+    dispatch --> multimodal
+
+    %% Phase 3 → Phase 4
+    local --> vault_write
+    text_ai --> vault_write
+    multimodal --> vault_write
+    vault_write --> rebuild --> search --> retrieve_ctx
+
+    %% Side-channel connections
+    record --- opsdb
+    match --- opsdb
+    overnight --> local
+    overnight --> text_ai
+    overnight --> multimodal
+    overnight --- statedb
+    search --- indexdb
+    rebuild --- indexdb
+
+    classDef phase1 fill:#3182ce,stroke:#2b6cb0,color:#fff
+    classDef phase2 fill:#805ad5,stroke:#6b46c1,color:#fff
+    classDef phase3 fill:#dd6b20,stroke:#c05621,color:#fff
+    classDef phase4 fill:#38a169,stroke:#276749,color:#fff
+    classDef db fill:#2d3748,stroke:#1a202c,color:#fff
+    classDef side fill:#718096,stroke:#4a5568,color:#fff
+
+    class source,scan,match,quarantine phase1
+    class rename,record,move,dedup phase2
+    class local,text_ai,multimodal,dispatch phase3
+    class vault_write,rebuild,search,retrieve_ctx phase4
+    class opsdb,statedb,indexdb db
+    class overnight side
