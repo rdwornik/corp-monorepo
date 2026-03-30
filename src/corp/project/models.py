@@ -1,4 +1,4 @@
-"""All dataclasses for corp-project-extractor. No raw dicts anywhere in the pipeline."""
+"""All dataclasses for corp.project. No raw dicts anywhere in the pipeline."""
 
 from __future__ import annotations
 

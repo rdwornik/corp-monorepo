@@ -1,6 +1,6 @@
 """Vault IO — the single writer to the Obsidian vault.
 
-All agents write to vault THROUGH this module (via corp-by-os workflows).
+All agents write to vault THROUGH this module (via corp workflows).
 Direct agent writes allowed for now but should migrate here.
 
 Key responsibilities:
@@ -381,7 +381,7 @@ def validate_vault(
 ) -> ValidationReport:
     """Validate vault structure and frontmatter.
 
-    Uses corp-os-meta's validate_frontmatter for .md files.
+    Uses corp.schema.validate_frontmatter for .md files.
     Checks project-info.yaml exists and has required fields.
     """
     if config is None:
@@ -429,7 +429,7 @@ def validate_vault(
         else:
             _validate_project_info(info_file, report)
 
-        # Validate .md frontmatter via corp-os-meta
+        # Validate .md frontmatter via corp.schema
         for md_file in folder.rglob("*.md"):
             report.notes_checked += 1
             _validate_note_frontmatter(md_file, report)
@@ -483,7 +483,7 @@ def _validate_project_info(path: Path, report: ValidationReport) -> None:
 
 
 def _validate_note_frontmatter(path: Path, report: ValidationReport) -> None:
-    """Validate a single .md note's frontmatter using corp-os-meta."""
+    """Validate a single .md note's frontmatter using corp.schema."""
     try:
         from corp.schema import ValidationResult as VR
         from corp.schema import validate_frontmatter
@@ -523,7 +523,7 @@ def _validate_note_frontmatter(path: Path, report: ValidationReport) -> None:
                     )
                 )
     except ImportError:
-        # corp-os-meta not available — skip frontmatter validation
+        # corp.schema not available — skip frontmatter validation
         report.notes_valid += 1
     except (OSError, yaml.YAMLError, ValueError) as e:
         report.issues.append(

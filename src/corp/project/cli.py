@@ -1,4 +1,4 @@
-"""Click CLI for corp-project-extractor. Entry point: cpe"""
+"""Click CLI for corp.project. Entry point: cpe"""
 
 from __future__ import annotations
 
@@ -180,7 +180,7 @@ def extract(ctx: click.Context, project_path: str, force: bool, skip_junk: bool)
 def extract_cke(
     ctx: click.Context, project_path: str, client: str | None, resume: bool, max_rpm: int, dry_run: bool
 ) -> None:
-    """Extract knowledge via corp-knowledge-extractor (CKE) batch processing.
+    """Extract knowledge via CKE batch processing.
 
     Reads scan results, generates a CKE manifest, and invokes CKE's
     process-manifest command for LLM-powered extraction via Gemini.

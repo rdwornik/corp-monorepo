@@ -1,1 +1,1 @@
-"""corp-project-extractor — scan, classify, extract, and render pre-sales project knowledge."""
+"""corp.project — scan, classify, extract, and render pre-sales project knowledge."""

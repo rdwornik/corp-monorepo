@@ -1,4 +1,4 @@
-"""PipelineConfig — portable path bundle for the corp-by-os pipeline.
+"""PipelineConfig — portable path bundle for the corp pipeline.
 
 Resolution order for production(): ENV_VAR > config/paths.toml > Path.home() defaults.
 For isolated testing: PipelineConfig.sandbox(tmp_root) puts everything under tmp_root.
@@ -19,7 +19,7 @@ from corp.schema.folder_names import ARCHIVE, INBOX, PROJECTS, WORKFLOWS
 
 @dataclass(frozen=True)
 class PipelineConfig:
-    """All filesystem paths needed by the corp-by-os pipeline.
+    """All filesystem paths needed by the corp pipeline.
 
     Frozen so callers can trust paths don't mutate. Derived paths (inbox,
     db files) are computed in __post_init__ from the six base paths.

@@ -1134,7 +1134,7 @@ def extract_local(
     Tier 1: Build ExtractionResult from locally-extracted text only (FREE).
 
     No API call. Uses the file name as title and the raw text as summary.
-    Still post-processes through corp-os-meta for normalization.
+    Still post-processes through corp.schema for normalization.
 
     Args:
         file: SourceFile metadata

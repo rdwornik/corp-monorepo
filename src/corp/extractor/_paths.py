@@ -1,4 +1,4 @@
-"""Centralized path resolution for corp.extractor (was corp-knowledge-extractor).
+"""Centralized path resolution for corp.extractor.
 
 All config/template/prompt paths resolve from here.
 Updated for unified src/corp/ package structure.

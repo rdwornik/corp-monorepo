@@ -254,7 +254,7 @@ def _check_ops_db(
                             ),
                             path=row["path"],
                             fix_hint=(
-                                "File was moved/deleted outside corp-by-os. Update or re-scan."
+                                "File was moved/deleted outside corp. Update or re-scan."
                             ),
                         )
                     )

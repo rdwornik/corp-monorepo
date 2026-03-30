@@ -253,7 +253,7 @@ def find_extraction_artifacts(mywork_root: Path) -> CleanupPlan:
 
 
 def find_staging_artifacts(app_data_path: Path) -> CleanupPlan:
-    """Find stale staging files in corp-by-os app data."""
+    """Find stale staging files in corp app data."""
     plan = CleanupPlan()
 
     staging_dir = app_data_path / "staging"

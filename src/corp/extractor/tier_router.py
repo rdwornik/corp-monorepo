@@ -4,7 +4,7 @@ Tiered extraction router — decides the cheapest extraction strategy per file.
 Tier 1: Local text extraction only (FREE)
     - Plain text files (TXT, MD, CSV)
     - Well-structured documents with good text extraction quality
-    - Still post-processed through corp-os-meta for normalization
+    - Still post-processed through corp.schema for normalization
 
 Tier 2: Text-only AI — Gemini 2.5 Flash ($0.001/file)
     - Documents with good local text but needing AI for structure/insight

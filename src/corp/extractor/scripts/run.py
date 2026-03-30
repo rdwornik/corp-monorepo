@@ -705,7 +705,7 @@ def process_manifest(
 ):
     """Process multiple files from a JSON manifest.
 
-    Used by corp-project-extractor for batch extraction.
+    Used by corp.project for batch extraction.
 
     Default mode: sequential Gemini API calls (immediate results).
 

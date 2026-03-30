@@ -1,4 +1,4 @@
-"""Data models for corp-by-os.
+"""Data models for corp.
 
 Dataclasses (not Pydantic) — lightweight, typed, frozen where appropriate.
 """

@@ -151,7 +151,7 @@ _BUILTIN_PRODUCT_ALIASES = {
 def normalize_product_names(products: list[str]) -> list[str]:
     """Normalize short product names to canonical Blue Yonder forms.
 
-    Applied after corp-os-meta normalization to catch remaining short forms.
+    Applied after corp.schema normalization to catch remaining short forms.
     Deduplicates: ["Demand Planning", "Blue Yonder Demand Planning"] → ["Blue Yonder Demand Planning"]
     """
     alias_map = _load_product_aliases() or _BUILTIN_PRODUCT_ALIASES
@@ -279,7 +279,7 @@ def post_process_extraction(
     client: str | None = None,
     project: str | None = None,
 ) -> PostProcessResult:
-    """Apply corp-os-meta normalization and validation to raw extraction result.
+    """Apply corp.schema normalization and validation to raw extraction result.
 
     Args:
         raw_result: Raw dict from Gemini extraction (parsed JSON)
@@ -291,7 +291,7 @@ def post_process_extraction(
     Returns:
         PostProcessResult with normalized data, links line, and validation status
     """
-    # Ensure required fields for corp-os-meta
+    # Ensure required fields for corp.schema
     raw_result.setdefault("source_tool", source_tool)
     raw_result.setdefault("source_file", source_file)
     raw_result.setdefault("schema_version", 2)
@@ -302,7 +302,7 @@ def post_process_extraction(
     if project:
         raw_result["project"] = project
 
-    # Map CKE field names to corp-os-meta field names if needed
+    # Map CKE field names to corp.schema field names if needed
     if "content_type" in raw_result and "type" not in raw_result:
         raw_result["type"] = raw_result.pop("content_type")
 
@@ -329,11 +329,11 @@ def post_process_extraction(
         if val:
             raw_result[str_field] = normalize_company_names(val)
 
-    # Normalize using corp-os-meta taxonomy
+    # Normalize using corp.schema taxonomy
     taxonomy = load_taxonomy()
     normalized_data, changes, unknown = normalize_frontmatter(raw_result, taxonomy)
 
-    # Apply company name normalization after corp-os-meta (it may copy raw strings)
+    # Apply company name normalization after corp.schema (it may copy raw strings)
     for str_field in ("title", "summary"):
         val = normalized_data.get(str_field, "")
         if val:
@@ -378,7 +378,7 @@ def post_process_extraction(
     if schema_warnings:
         logger.warning("Schema contract warnings: %s", schema_warnings)
 
-    # Validate using corp-os-meta
+    # Validate using corp.schema
     validation_result, validated_note, issues = validate_frontmatter(normalized_data)
 
     if issues:
@@ -543,7 +543,7 @@ _TAG_ALIASES: dict[str, str] = {
 
 
 def validate_tags(tags: list[str]) -> list[dict]:
-    """Validate tags against corp-os-meta taxonomy.
+    """Validate tags against corp.schema taxonomy.
 
     Returns list of {"tag": str, "valid": bool, "reason": str}.
     All tags are kept regardless of validity — this is informational only.

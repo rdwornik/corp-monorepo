@@ -2,7 +2,7 @@
 Tier 1 local metadata scanner — no API calls, fully local.
 
 Scans files and extracts structured metadata using local libraries only.
-Designed for corp-by-os `corp overnight --scope full-reshape` pre-scan.
+Designed for `corp overnight --scope full-reshape` pre-scan.
 
 Usage:
     from corp.extractor.scan import scan_path, ScanResult

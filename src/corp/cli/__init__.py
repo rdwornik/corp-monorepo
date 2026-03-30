@@ -1,4 +1,4 @@
-"""CLI entry point for corp-by-os.
+"""CLI entry point for corp.
 
 Commands:
     corp project list [--status active]

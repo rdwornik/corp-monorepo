@@ -163,7 +163,7 @@ class TextProviderStrategy(ExtractionStrategy):
         # Preserve raw output before post-processing mutates it
         raw_data = copy.deepcopy(data)
 
-        # Post-process via corp-os-meta
+        # Post-process via corp.schema
         pp = post_process_extraction(
             raw_result=data,
             source_tool="knowledge-extractor",

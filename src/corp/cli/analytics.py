@@ -274,7 +274,7 @@ def dedup_report_command(obj: dict, threshold: float, fmt: str) -> None:
     try:
         from corp.ingest.dedup import get_dedup_report
     except ImportError:
-        console.print('[red]datasketch not installed.[/red] Run: pip install "corp-by-os[dedup]"')
+        console.print('[red]datasketch not installed.[/red] Run: pip install "corp[dedup]"')
         return
 
     from corp.ops.database import OpsDB

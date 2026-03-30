@@ -1,7 +1,7 @@
 """Generate a CKE-compatible manifest.json from CPE scan results.
 
 Reads the CPE Manifest (YAML) and produces a JSON manifest that
-corp-knowledge-extractor's process-manifest command can consume.
+CKE's process-manifest command can consume.
 """
 
 from __future__ import annotations

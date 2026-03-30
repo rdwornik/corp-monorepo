@@ -1,6 +1,6 @@
 """Builds CKE-compatible manifest with v2.1 provenance fields.
 
-CKE Manifest Schema (from corp-knowledge-extractor/src/corp.extractor/manifest.py):
+CKE Manifest Schema (from corp.extractor.manifest):
 
     Format: JSON
     Schema version: 1
@@ -24,7 +24,7 @@ CKE Manifest Schema (from corp-knowledge-extractor/src/corp.extractor/manifest.p
 
     Extra fields in file entries are ignored by CKE but preserved
     in the manifest file. We add v2.1 provenance fields here for
-    downstream consumers (corp-os-meta, corp-by-os post-processing).
+    downstream consumers (corp.schema, corp post-processing).
 """
 
 from __future__ import annotations
@@ -126,7 +126,7 @@ def build_manifest(
             "path": str(scan.absolute_path),
             "doc_type": _resolve_doc_type(scan.extension),
             "name": scan.absolute_path.stem,
-            # v2.1 provenance fields (ignored by CKE, used by corp-by-os)
+            # v2.1 provenance fields (ignored by CKE, used by corp)
             "content_origin": route_info.content_origin,
             "source_category": route_info.source_category,
             "source_locator": source_locator,
