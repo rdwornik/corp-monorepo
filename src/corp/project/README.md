@@ -22,7 +22,7 @@ pipeline: scan -> extract -> render. Invoked via `cpe` CLI.
 
 ## Dependencies
 
-- **Depends on:** corp.project internal only (Layer 0-1)
+- **Depends on:** corp.project internal only (core layer)
 - **Used by:** corp.cli.project (via project_resolver)
 
 ## Data flow

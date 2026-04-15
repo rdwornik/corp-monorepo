@@ -22,7 +22,7 @@ decks from templates, and tracking opportunity stages. Invoked via `com` CLI.
 
 ## Dependencies
 
-- **Depends on:** corp.opportunity internal only (Layer 0-1)
+- **Depends on:** corp.opportunity internal only (core layer)
 - **Used by:** corp.cli (via agents.yaml registration)
 
 ## Data flow

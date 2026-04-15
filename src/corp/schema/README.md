@@ -2,7 +2,7 @@
 
 ## What this module does
 
-Foundation layer (Layer 0) for the entire system. Defines the taxonomy
+Foundation layer for the entire system. Defines the taxonomy
 (products, topics, domains), Pydantic models for note frontmatter, path
 resolution, and the frozen PipelineConfig used by all CLIs.
 

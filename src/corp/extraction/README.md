@@ -19,7 +19,7 @@ manifests, and writes extraction results to the vault.
 
 ## Dependencies
 
-- **Depends on:** corp.schema (no other corp.* deps -- Layer 0)
+- **Depends on:** corp.schema (no other corp.* deps -- foundation layer)
 - **Used by:** corp.cli.extract, corp.overnight, corp.ingest
 
 ## Data flow

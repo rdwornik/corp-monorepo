@@ -4,7 +4,7 @@
 
 Top-level CLI layer. All 40+ commands are Click groups/commands registered
 under the `corp` entry point. Each file maps to a command group. This is
-the highest dependency layer (L1-L9) -- it imports from all subsystems.
+the interface layer (top of the 4-layer stack) -- it imports from all subsystems.
 
 ## Key files
 
