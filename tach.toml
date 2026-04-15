@@ -1,0 +1,168 @@
+source_roots = ["src"]
+
+exclude = [
+    "**/__pycache__",
+    "**/tests/**",
+    "**/test_*.py",
+    "build/",
+    "dist/",
+    "docs/",
+    "scripts/",
+    ".venv/",
+    "data/",
+    "models/",
+    "eval/",
+]
+
+exact = true
+ignore_type_checking_imports = true
+forbid_circular_dependencies = true
+
+# Layer order: first = highest, last = lowest.
+# A module at layer N may import from layers N and below only.
+layers = [
+    "interface",
+    "orchestration",
+    "core",
+    "foundation",
+]
+
+# FOUNDATION — no corp.* imports, or only same-package / utility imports
+
+[[modules]]
+path = "corp.schema"
+layer = "foundation"
+utility = true
+
+[[modules]]
+path = "corp.models"
+layer = "foundation"
+
+[[modules]]
+path = "corp.routing_types"
+layer = "foundation"
+utility = true
+
+[[modules]]
+path = "corp.extraction"
+layer = "foundation"
+
+# CORE — imports from foundation only
+
+[[modules]]
+path = "corp.extractor"
+layer = "core"
+
+[[modules]]
+path = "corp.config"
+layer = "core"
+
+[[modules]]
+path = "corp.vault_io"
+layer = "core"
+
+[[modules]]
+path = "corp.intent_router"
+layer = "core"
+
+[[modules]]
+path = "corp.llm_router"
+layer = "core"
+
+[[modules]]
+path = "corp.audit"
+layer = "core"
+
+[[modules]]
+path = "corp.integrity"
+layer = "core"
+
+[[modules]]
+path = "corp.freshness_scanner"
+layer = "core"
+
+[[modules]]
+path = "corp.retrieve"
+layer = "core"
+
+[[modules]]
+path = "corp.cleanup"
+layer = "core"
+
+[[modules]]
+path = "corp.project"
+layer = "core"
+
+[[modules]]
+path = "corp.opportunity"
+layer = "core"
+
+[[modules]]
+path = "corp.rfp"
+layer = "core"
+
+[[modules]]
+path = "corp.ops"
+layer = "core"
+
+[[modules]]
+path = "corp.overnight"
+layer = "core"
+
+# ORCHESTRATION — imports from core and foundation
+# corp.ingest is orchestration (not core): router.py imports corp.ops.database
+# and corp.overnight.cke_client (ADR-26, Codex audit findings)
+
+[[modules]]
+path = "corp.ingest"
+layer = "orchestration"
+
+[[modules]]
+path = "corp.index_builder"
+layer = "orchestration"
+
+[[modules]]
+path = "corp.project_resolver"
+layer = "orchestration"
+
+[[modules]]
+path = "corp.task_manager"
+layer = "orchestration"
+
+[[modules]]
+path = "corp.template_manager"
+layer = "orchestration"
+
+[[modules]]
+path = "corp.workflow_engine"
+layer = "orchestration"
+
+[[modules]]
+path = "corp.actions"
+layer = "orchestration"
+
+[[modules]]
+path = "corp.built_in_actions"
+layer = "orchestration"
+
+# INTERFACE — imports from any lower layer
+
+[[modules]]
+path = "corp.query_engine"
+layer = "interface"
+
+[[modules]]
+path = "corp.sandbox"
+layer = "interface"
+
+[[modules]]
+path = "corp.chat"
+layer = "interface"
+
+[[modules]]
+path = "corp.test_pipeline"
+layer = "interface"
+
+[[modules]]
+path = "corp.cli"
+layer = "interface"
