@@ -5,6 +5,10 @@ Claude Code: read last 5 entries before starting work.
 
 ---
 
+## 2026-04-15 — Tach adoption Phase 1
+- **Did:** Bootstrapped tach.toml with 4 layers (foundation/core/orchestration/interface), 34 modules. corp.ingest correctly classified as orchestration (not core) after Codex audit found 3 upward deps in router.py:18,653,743. Ran tach sync — found 6 baseline violations in 3 dependency pairs (intent_router→project_resolver, llm_router→project_resolver, actions→query_engine); documented in docs/audits/2026-04-15-tach-baseline-violations.md. Wired tach check into pre-commit (local hook, triggers only on src/corp/*.py changes) and created .github/workflows/tach.yml (pinned v0.34.0). Added CONTRIBUTING.md with tach sync cultural rules. Replaced AGENTS.md import-direction check with Tach reference. Created ADR-26. **2495 tests passing, 0 failed.** 8 commits, merged to main.
+- **Failed:** `always_run: true` in pre-commit hook blocked non-Python commits — removed; hook now triggers only when src/corp/*.py files are staged (correct behavior).
+- **Next (Step 12, separate PR):** Update AGENTS.md + ARCHITECTURE.md to use 4-layer taxonomy (foundation/core/orchestration/interface) replacing 7-layer model. Two tach reclassifications resolve all 6 baseline violations: corp.project_resolver core→orchestration(wait, core), corp.query_engine interface→orchestration. See docs/audits/2026-04-15-tach-baseline-violations.md.
 
 ## 2026-03-30 — Diagrams v4 Pipeline
 - **Did:** Audited per-module READMEs: 12 existed, 1 generated (actions/). Created docs/diagrams/conventions.yaml (style guide, 31 lines). Generated 3 C4 diagrams from ARCHITECTURE.md: system-context (4 internal + 7 external nodes, 11 edges), container-module (4 layers, 14 nodes, 13 edges, vertical layout), magistrala-pipeline (4 phases, 15 nodes, side-channel DBs). All diagrams use 13px font, dark mode themeVariables, classDef colors per layer. Rendered SVGs via mmdc 11.12.0. Removed orphaned README.md from docs/diagrams/. Process: ARCHITECTURE.md + conventions.yaml -> .mermaid -> .svg (Council #25). **2495 tests passing, 0 failed.** 7 commits, merged to main (fast-forward).
