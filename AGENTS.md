@@ -81,7 +81,7 @@ When reviewing code changes, check ALL of the following:
 
 ### Critical (block merge)
 > CRITICAL = blocks merge. Runtime bugs, data loss risk, security issues, architectural invariant violations.
-- [ ] **Import direction** — no upward layer violations (e.g., schema importing from ingest)
+- [ ] **Import direction** — enforced by `tach check` in pre-commit and CI (see `tach.toml`). Codex skips this check.
 - [ ] **OneDrive safety** — no code modifies/deletes files under `OneDrive - Blue Yonder`
 - [ ] **API keys** — no secrets hardcoded in code or config files
 - [ ] **SQL injection** — all queries use parameterized `?` placeholders, never f-strings
