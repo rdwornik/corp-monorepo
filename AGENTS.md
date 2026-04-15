@@ -25,27 +25,32 @@ Single unified Python package at `src/corp/` with 5 CLI entry points: `corp`, `c
 ### Module Structure
 ```
 src/corp/
-  schema/        Layer 0 — taxonomy, models, validation, folder constants
-  extractor/     Layer 0-1 — CKE knowledge extraction engine (Gemini/Claude)
-  extraction/    Layer 0 — extraction orchestration, manifests, vault writing
-  ingest/        Layer 0-3 — file routing pipeline (classify → rename → route → extract)
-  ops/           Layer 0-2 — SQLite facade + 5 per-entity repositories
-  actions/       Layer 6 — 12 domain-split workflow action modules
-  retrieve/      Layer 0-1 — FTS5 retrieval engine
-  cleanup/       Layer 0-1 — MyWork file hygiene
-  overnight/     Layer 0-2 — batch extraction pipeline
-  project/       Layer 0-1 — project scanning/extraction
-  opportunity/   Layer 0-1 — opportunity lifecycle
-  rfp/           Layer 0-1 — RFP answering pipeline
-  cli/           Layer 1-9 — Click command groups
+  schema/        foundation — taxonomy, models, validation, folder constants
+  extractor/     core — CKE knowledge extraction engine (Gemini/Claude)
+  extraction/    foundation — extraction orchestration, manifests, vault writing
+  ingest/        orchestration — file routing pipeline (classify → rename → route → extract)
+  ops/           core — SQLite facade + 5 per-entity repositories
+  actions/       orchestration — 12 domain-split workflow action modules
+  retrieve/      core — FTS5 retrieval engine
+  cleanup/       core — MyWork file hygiene
+  overnight/     core — batch extraction pipeline
+  project/       core — project scanning/extraction
+  opportunity/   core — opportunity lifecycle
+  rfp/           core — RFP answering pipeline
+  cli/           interface — Click command groups
 ```
 
-### Dependency Rule (ENFORCE)
-Dependencies flow DOWN layers only. Layer N may import from Layer 0..N-1, never from N+1.
-- Layer 0: `schema/`, `models.py`, `extraction/`, `extractor/` base
-- Layer 1-3: `ingest/`, `ops/`, `config.py`, `vault_io.py`
-- Layer 4+: `intent_router`, `query_engine`, CLI modules
-- Violation example: if `schema/` imports from `ingest/` → CRITICAL
+### Dependency Rule (ENFORCED BY TACH)
+Dependencies flow DOWN layers only. A module in a higher layer may only import from layers below it.
+
+Layers (top → bottom):
+- interface — entry points: cli/, chat, sandbox, test_pipeline
+- orchestration — workflow coordination: actions/, workflow_engine, ingest/, query_engine, index_builder, task/template managers, built_in_actions
+- core — domain services: extractor, ops, retrieve, intent_router, llm_router, project, opportunity, rfp, overnight, vault_io, config, audit, integrity, freshness_scanner, cleanup, project_resolver
+- foundation — shared types and base config: schema/ (utility), models, routing_types (utility), extraction/
+
+Tach enforces this at pre-commit and CI. See `tach.toml` for canonical module-to-layer assignments.
+Violation example: if `schema/` imports from `ingest/` → Tach blocks the commit.
 
 ### Key Invariants
 1. `ingest/` is SOLE vault writer — CKE produces JSON, ingest writes .md
