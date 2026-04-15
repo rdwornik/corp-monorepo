@@ -7,3 +7,12 @@ repos:
       # ruff-format omitted: core.autocrlf=true on Windows causes CRLF/LF conflict
       # in pre-commit's stash/unstash cycle. Run `ruff format packages/` manually
       # or via dev-check.ps1 instead.
+
+  - repo: local
+    hooks:
+      - id: tach-check
+        name: tach (import boundaries)
+        entry: tach check
+        language: system
+        pass_filenames: false
+        files: ^src/corp/.*\.py$
