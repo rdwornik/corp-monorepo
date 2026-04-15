@@ -114,3 +114,21 @@ Tach checks import direction only. It does not replace:
 Step 12 (separate PR): Update AGENTS.md and ARCHITECTURE.md to use the 4-layer taxonomy
 (foundation/core/orchestration/interface) consistently, replacing the existing 7-layer
 static/runtime model description. The two models coexist during Phase 1.
+
+## Phase 2 Resolution (2026-04-15)
+
+After Phase 1 merge, CI surfaced 6 baseline violations from initial layer classification.
+Root cause: classification was based on runtime call-chain depth, not actual static import surface.
+
+Reclassifications:
+- corp.project_resolver: orchestration → core
+  Justification: imported by L1 modules (intent_router, llm_router). Must sit at or below their layer.
+- corp.query_engine: interface → orchestration
+  Justification: imported by orchestration-layer actions. Cannot be in interface layer.
+  Also depends on corp.index_builder (orchestration), confirming correct placement.
+
+Result: tach check clean. CI unblocked. Zero Python source changes.
+
+Lesson: Initial Tach classification should use tach sync --add output (actual import graph)
+as ground truth, not architectural intent. Architectural intent maps to layer order;
+classification of individual modules maps to actual imports.
