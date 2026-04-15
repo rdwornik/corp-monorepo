@@ -19,18 +19,18 @@ expose all operations.
 
 ```
 src/corp/
-  schema/          Taxonomy, models, validation, path config (Layer 0)
-  extractor/       CKE -- knowledge extraction engine (Layer 0-1)
-  extraction/      Extraction orchestration: scan, route, emit manifests (Layer 0)
-  ingest/          File routing, classification, dedup, inbox (Layer 0-3)
-  ops/             Operational DB facade, content registry, file registry (Layer 0-2)
-  retrieve/        Unified retrieval engine, client prep, RFP retrieval (Layer 0-1)
-  cleanup/         MyWork file scanner, classifier, proposer, executor (Layer 0-1)
-  overnight/       Batch extraction pipeline, state tracking, monitor (Layer 0-2)
-  project/         CPE -- project scanning, extraction, rendering (Layer 0-1)
-  opportunity/     COM -- opportunity lifecycle, folder management (Layer 0-1)
-  rfp/             RFP agent: answer selection, anonymization, Excel/Word (Layer 0-1)
-  cli/             Click commands for all operations (Layer 1-9)
+  schema/          Taxonomy, models, validation, path config (foundation)
+  extractor/       CKE -- knowledge extraction engine (core)
+  extraction/      Extraction orchestration: scan, route, emit manifests (foundation)
+  ingest/          File routing, classification, dedup, inbox (orchestration)
+  ops/             Operational DB facade, content registry, file registry (core)
+  retrieve/        Unified retrieval engine, client prep, RFP retrieval (core)
+  cleanup/         MyWork file scanner, classifier, proposer, executor (core)
+  overnight/       Batch extraction pipeline, state tracking, monitor (core)
+  project/         CPE -- project scanning, extraction, rendering (core)
+  opportunity/     COM -- opportunity lifecycle, folder management (core)
+  rfp/             RFP agent: answer selection, anonymization, Excel/Word (core)
+  cli/             Click commands for all operations (interface)
   (root-level)     config, models, vault_io, index_builder, query_engine,
                    intent_router, workflow_engine, chat, built_in_actions,
                    sandbox, audit, freshness_scanner, integrity, task/template mgr
@@ -163,64 +163,41 @@ src/corp/
 
 ## Dependency Layers
 
-Two views: **static** (module-level imports, determines load-time cost) and
-**runtime** (maximum transitive depth when all code paths execute).
-
-### Static Layers (module-level imports only)
-
-```
-Layer 0  schema, models, routing_types, extraction/*, extractor/*,
-         ingest base, ops base, cli._common
-         (no corp.* imports or only same-package / L0 imports)
-
-Layer 1  config, vault_io, audit, integrity, extractor submodules,
-         ingest.router, cleanup.*, overnight base, project.*, opportunity.*,
-         intent_router, llm_router, cli.misc
-
-Layer 2  index_builder, ops.database, project_resolver, template_manager,
-         overnight.state/monitor, task_manager, workflow_engine,
-         cli.cleanup/extract/overnight/task/workflow
-
-Layer 3  query_engine, sandbox, ingest.inbox, actions/, built_in_actions,
-         chat, test_pipeline,
-         cli.ingest/project/retrieve/rfp/system/template/vault/query/analytics
-```
-
-Static depth peaks at **Layer 3**. Lazy imports throughout the chain keep
-module loading lightweight — heavy dependencies (LLM clients, vault I/O,
-task manager) are only loaded when their code paths execute.
-
-### Runtime Layers (transitive depth including lazy imports)
+The codebase enforces a 4-layer dependency model via Tach (`tach.toml`).
+Modules in higher layers may import from lower layers; the reverse is forbidden
+and blocked by pre-commit and CI (`tach check`).
 
 ```
-Layer 0  schema, models, extraction/*, extractor/*, ingest base, ops base
-
-Layer 1  config, vault_io, audit, integrity, extractor submodules,
-         ingest.router, cleanup.*, overnight base, project.*, opportunity.*
-
-Layer 2  index_builder, ops.database, project_resolver, template_manager,
-         overnight.state/monitor, cli.cleanup/extract/overnight
-
-Layer 3  query_engine, sandbox, ingest.inbox, llm_router,
-         cli.ingest/project/retrieve/rfp/system/template/vault
-
-Layer 4  intent_router, test_pipeline, cli.query
-
-Layer 5  task_manager
-
-Layer 6  built_in_actions, cli.task
-
-Layer 7  cli.analytics, workflow_engine
-
-Layer 8  chat, cli.workflow
-
-Layer 9  cli.misc
+interface > orchestration > core > foundation
 ```
 
-Runtime depth reaches Layer 9 via the chain:
-`cli.misc` → `chat` → `workflow_engine` → `built_in_actions` → `task_manager` → `intent_router`.
-Each arrow is a **lazy import** — the full chain only materializes when
-a chat session executes a task-management workflow.
+### Layer Assignments
+
+**interface** — user-facing entry points:
+`cli/`, `chat.py`, `sandbox.py`, `test_pipeline.py`
+
+**orchestration** — workflow coordination, multi-service operations:
+`actions/`, `workflow_engine`, `built_in_actions`, `ingest/`, `query_engine`,
+`index_builder`, `task_manager`, `template_manager`
+
+**core** — domain services and business logic:
+`extractor/`, `ops/`, `retrieve/`, `intent_router`, `llm_router`, `project/`,
+`opportunity/`, `rfp/`, `overnight/`, `vault_io`, `config`, `audit`, `integrity`,
+`freshness_scanner`, `cleanup/`, `project_resolver`
+
+**foundation** — shared types, taxonomy, base config:
+`schema/` (utility†), `models`, `routing_types` (utility†), `extraction/`
+
+† Utility modules are exempt from layer ordering — they may be imported from any layer.
+See `tach.toml` for the canonical module-to-layer mapping.
+
+### Runtime vs Static Depth
+
+Runtime call chains can reach 9 levels deep via lazy imports
+(`cli.misc` → `chat` → `workflow_engine` → `built_in_actions` → `task_manager` → `intent_router`).
+This is **expected and accepted** — every link uses lazy imports, so static module-level
+depth stays within the 4-layer model. Tach enforces static structure only; runtime depth
+is not a violation.
 
 **No import cycle violations.** Former `llm_router` ↔ `intent_router`
 cycle was resolved by extracting `Intent` to `routing_types.py`.
@@ -384,7 +361,7 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
 
 ### What Works Well
 
-- **Clean layering**: schema (L0) -> extraction engine (L1) -> ingest pipeline (L2-3) -> CLI (L4+)
+- **Clean layering**: foundation → core → orchestration → interface (enforced by Tach)
 - **Database isolation**: ops.db, index.db, overnight_state.db in %LOCALAPPDATA% (not OneDrive)
 - **Content-hash identity**: files survive renames; extraction history tied to content, not path
 - **FTS5 triggers**: notes_fts and facts_fts stay in sync automatically
@@ -401,7 +378,7 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
 | ~~God module~~ | ~~Medium~~ | ~~built_in_actions.py (967 LOC)~~ | **RESOLVED** | Split into actions/ package with 12 domain modules |
 | ~~Long functions~~ | ~~Medium~~ | ~~extractor/extract.py (203-line func)~~ | **RESOLVED** | extract_from_text() → strategy dispatcher (1589→1184 LOC) |
 | ~~Mixed concerns~~ | ~~Low~~ | ~~ingest/inbox.py (1161 LOC)~~ | **RESOLVED** | Business logic extracted to inbox_ops.py |
-| **Deep CLI layers** | Low | cli.misc at Layer 9 | **ACCEPTED** | Runtime depth 9, static depth 3 — lazy imports already applied at every boundary; each layer has distinct responsibility |
+| **Deep CLI runtime chain** | Low | cli → chat → workflow → actions → tasks | **ACCEPTED** | Runtime depth 9 via lazy imports; static depth stays within 4-layer model. Each link is a deliberate boundary. |
 
 ### Accepted Limitations
 
