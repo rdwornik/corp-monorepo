@@ -5,6 +5,11 @@ Claude Code: read last 5 entries before starting work.
 
 ---
 
+## 2026-04-15 (Step 12 — 4-layer taxonomy reconciliation)
+- **Did:** Replaced 7-layer (L0-L6/L0-L9) model with 4-layer Tach taxonomy (foundation/core/orchestration/interface) in AGENTS.md, docs/ARCHITECTURE.md, and 5 per-module READMEs (cli, schema, extraction, opportunity, project). Single source of truth: tach.toml. Zero stale references remaining in living docs. docs/archive, docs/decisions, docs/audits preserved as frozen historical record.
+- **Failed:** Nothing.
+- **Next:** Magistrala verification — pipeline still unverified end-to-end since Council #24 MyWork restructure.
+
 ## 2026-04-15 (Tach Phase 2)
 - **Did:** Resolved 6 baseline Tach violations by reclassifying project_resolver (orchestration→core) and query_engine (interface→orchestration). Ran tach sync to clean stale depends_on entries (exact=true flagged them as unused after reclassification). tach check clean. Zero Python changes.
 - **Failed:** Nothing.
