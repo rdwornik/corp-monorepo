@@ -5,6 +5,11 @@ Claude Code: read last 5 entries before starting work.
 
 ---
 
+## 2026-04-15 (Tach Phase 2)
+- **Did:** Resolved 6 baseline Tach violations by reclassifying project_resolver (orchestration→core) and query_engine (interface→orchestration). Ran tach sync to clean stale depends_on entries (exact=true flagged them as unused after reclassification). tach check clean. Zero Python changes.
+- **Failed:** Nothing.
+- **Next:** Step 12 — reconcile AGENTS.md and ARCHITECTURE.md to use 4-layer taxonomy (foundation/core/orchestration/interface). Currently docs describe 7-layer model, tach.toml uses 4-layer. Active confusion source.
+
 ## 2026-04-15 — Tach adoption Phase 1
 - **Did:** Bootstrapped tach.toml with 4 layers (foundation/core/orchestration/interface), 34 modules. corp.ingest correctly classified as orchestration (not core) after Codex audit found 3 upward deps in router.py:18,653,743. Ran tach sync — found 6 baseline violations in 3 dependency pairs (intent_router→project_resolver, llm_router→project_resolver, actions→query_engine); documented in docs/audits/2026-04-15-tach-baseline-violations.md. Wired tach check into pre-commit (local hook, triggers only on src/corp/*.py changes) and created .github/workflows/tach.yml (pinned v0.34.0). Added CONTRIBUTING.md with tach sync cultural rules. Replaced AGENTS.md import-direction check with Tach reference. Created ADR-26. **2495 tests passing, 0 failed.** 8 commits, merged to main.
 - **Failed:** `always_run: true` in pre-commit hook blocked non-Python commits — removed; hook now triggers only when src/corp/*.py files are staged (correct behavior).
