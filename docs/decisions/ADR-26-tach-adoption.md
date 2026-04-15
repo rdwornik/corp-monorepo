@@ -44,14 +44,16 @@ foundation — no corp.* imports or only same-package/utility imports:
 core — imports from foundation only:
   corp.extractor, corp.config, corp.vault_io, corp.intent_router, corp.llm_router,
   corp.audit, corp.integrity, corp.freshness_scanner, corp.retrieve, corp.cleanup,
-  corp.project, corp.opportunity, corp.rfp, corp.ops, corp.overnight
+  corp.project, corp.opportunity, corp.rfp, corp.ops, corp.overnight,
+  corp.project_resolver (reclassified in Phase 2 — see Phase 2 Resolution section below)
 
 orchestration — imports from core and foundation:
-  corp.ingest, corp.index_builder, corp.project_resolver, corp.task_manager,
-  corp.template_manager, corp.workflow_engine, corp.actions, corp.built_in_actions
+  corp.ingest, corp.index_builder, corp.task_manager,
+  corp.template_manager, corp.workflow_engine, corp.actions, corp.built_in_actions,
+  corp.query_engine (reclassified in Phase 2 — see Phase 2 Resolution section below)
 
 interface — imports from any lower layer:
-  corp.query_engine, corp.sandbox, corp.chat, corp.test_pipeline, corp.cli
+  corp.sandbox, corp.chat, corp.test_pipeline, corp.cli
 
 ### corp.ingest classification: orchestration
 
