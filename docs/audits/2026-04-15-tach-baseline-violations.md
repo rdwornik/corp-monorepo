@@ -1,5 +1,9 @@
 # Tach Baseline Violations — 2026-04-15
 
+> STATUS: RESOLVED 2026-04-15 (Phase 2)
+> All 6 violations resolved by reclassifying project_resolver (→ core) and query_engine (→ orchestration).
+> See ADR-26 Phase 2 Resolution section for full justification.
+
 Captured on first `tach check` run after Phase 1 bootstrap.
 Status: DEFERRED — document only, no fixes in this session.
 To fix: create a separate branch per violation group (see Fix Directions below).
