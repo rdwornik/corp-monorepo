@@ -5,6 +5,10 @@
 - Three regression tests added, verified failing on main before fixes (pytest 2495 -> 2507 green; zero regressions)
 - Docs: ARCHITECTURE.md + .claude/skills/gotchas/gotchas.md updated; AGENTS.md deferred to ADR-27
 - P2 (vault single-writer) remains open — handled in ADR-27
+- Amendment: resolve paths before substring check in all 4 OneDrive guard sites (disk.py, _helpers.py, executor.py, renderer.py) — addresses Codex review H-C1/H-C2 and pre-existing same-class bugs
+- Split schema vs runtime traversal tests to assert exact exception per layer (Codex review M-C1)
+- Amendment test delta: 2507 -> 2515 green (+6 symlink bypass tests, +2 runtime-guard unit tests)
+- Codex re-review pending before merge
 
 ## [1.0.0] - 2026-03-28
 
