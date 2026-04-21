@@ -397,3 +397,20 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
 5. **OneDrive exclusion** -- cleanup/audit NEVER touch "OneDrive - Blue Yonder" paths
 6. **WAL mode** on all SQLite databases for crash safety
 7. **Record-before-move** -- ingest logs to ops.db BEFORE filesystem operations
+
+### OneDrive safety guards (hotfix 2026-04-21)
+
+The invariant above ("OneDrive exclusion") is enforced by explicit fail-closed
+guards at every known mutation site. Guards live next to the mutation; a
+single cross-cutting helper is deferred to ADR-27.
+
+| Site | Guard | Raises |
+|------|-------|--------|
+| `cleanup/disk.py::execute_plan` | `_guard_onedrive(item.path)` before `target.unlink()` | `OneDriveSafetyError` |
+| `cleanup/executor.py::execute_moves` | `_guard_onedrive(source)` + `_assert_within_root(...)` (runtime) and `MoveEntry` schema (load-time) | `OneDriveSafetyError`, `PathTraversalError`, `ValueError` |
+| `actions/_helpers.py::_resolve_project_path` | `_guard_writable(path, writable)` when `writable=True`; used by `archive_actions.py::archive_project` | `OneDriveSafetyError` |
+| `project/renderer.py::render_project` | `"onedrive" in str(project_path).lower()` check at entry | `ValueError` |
+
+Exception classes live in `corp.cleanup.errors`. Verified P1 findings are
+documented in `docs/audits/2026-04-21-p1-verification.md`. Centralization
+pending ADR-27.

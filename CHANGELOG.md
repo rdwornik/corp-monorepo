@@ -1,5 +1,11 @@
 # Changelog
 
+### 2026-04-21 (hotfix)
+- OneDrive safety hotfix: P1-1 execute_plan guard, P1-2 moves.yaml schema + traversal guard, P1-3 _resolve_project_path writable kwarg
+- Three regression tests added, verified failing on main before fixes (pytest 2495 -> 2507 green; zero regressions)
+- Docs: ARCHITECTURE.md + .claude/skills/gotchas/gotchas.md updated; AGENTS.md deferred to ADR-27
+- P2 (vault single-writer) remains open — handled in ADR-27
+
 ## [1.0.0] - 2026-03-28
 
 ### Changed
