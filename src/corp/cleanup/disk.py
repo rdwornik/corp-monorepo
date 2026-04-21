@@ -28,12 +28,30 @@ _DEFAULT_ONEDRIVE_MYWORK = Path.home() / _ONEDRIVE_BLOCKED / "MyWork_OneDrive"
 def _guard_onedrive(path: str | Path) -> None:
     """Refuse any write/delete that lands inside a synced tree.
 
-    Mirrors the pre-existing guard in ``cleanup/executor.py`` so a future
-    centralization (ADR-27) can replace both with one import.
+    Checks both the original string form and the resolved form so a
+    Windows junction, symlink, or configured alias cannot bypass the
+    substring check (Codex review H-C1, 2026-04-21). Fails closed if
+    ``Path.resolve`` itself raises — an unresolvable path is treated as
+    unverifiable, so refused.
+
+    Mirrors the sibling guards in ``cleanup/executor.py`` and
+    ``actions/_helpers.py`` so a future centralization (ADR-27) can
+    replace all three with one import.
     """
-    if _ONEDRIVE_BLOCKED in str(path):
+    original = str(path)
+    candidates = [original]
+    try:
+        candidates.append(str(Path(path).resolve(strict=False)))
+    except (OSError, RuntimeError) as exc:
         raise OneDriveSafetyError(
-            f"BLOCKED: refusing to mutate synced path {path}. "
+            f"BLOCKED: cannot resolve {original!r} to verify synced-tree "
+            f"safety: {exc}"
+        ) from exc
+
+    if any(_ONEDRIVE_BLOCKED in c for c in candidates):
+        raise OneDriveSafetyError(
+            f"BLOCKED: refusing to mutate synced path {path} "
+            f"(resolved candidates: {candidates}). "
             "See INCIDENT 2026-03-14; centralization pending (ADR-27)."
         )
 
