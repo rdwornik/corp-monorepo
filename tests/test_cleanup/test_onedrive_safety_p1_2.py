@@ -50,7 +50,9 @@ def test_execute_refuses_parent_traversal_in_source(tmp_path: Path) -> None:
         ],
     )
 
-    with pytest.raises((PathTraversalError, ValueError), match="traversal|moves.yaml|escape"):
+    # Schema layer (MoveEntry.from_dict) catches at load time — assert the
+    # exact exception class so a broken runtime guard can't hide behind this.
+    with pytest.raises(ValueError, match="traversal|\\.\\."):
         execute_moves(moves_file, mywork)
 
     assert outside.exists(), "File outside mywork_root must not be deleted"
@@ -77,7 +79,7 @@ def test_execute_refuses_absolute_source(tmp_path: Path) -> None:
         ],
     )
 
-    with pytest.raises((PathTraversalError, ValueError), match="absolute|moves.yaml"):
+    with pytest.raises(ValueError, match="absolute"):
         execute_moves(moves_file, mywork)
 
 
@@ -101,7 +103,7 @@ def test_execute_refuses_parent_traversal_in_destination(tmp_path: Path) -> None
         ],
     )
 
-    with pytest.raises((PathTraversalError, ValueError), match="traversal|moves.yaml|escape"):
+    with pytest.raises(ValueError, match="traversal|\\.\\."):
         execute_moves(moves_file, mywork)
 
 
@@ -125,7 +127,7 @@ def test_execute_refuses_parent_traversal_in_proposed_name(tmp_path: Path) -> No
         ],
     )
 
-    with pytest.raises((PathTraversalError, ValueError), match="traversal|moves.yaml|name"):
+    with pytest.raises(ValueError, match="traversal|\\.\\."):
         execute_moves(moves_file, mywork)
 
 
@@ -170,3 +172,35 @@ def test_move_entry_schema_accepts_clean_relative() -> None:
         approved=True,
     )
     assert entry.source == f"{INBOX}/file.txt"
+
+
+# --- Runtime-guard-only validation (bypasses schema layer) -----------------
+
+
+def test_assert_within_root_rejects_escape(tmp_path: Path) -> None:
+    """Runtime guard catches an escape even when schema did not fire.
+
+    Proves _assert_within_root() carries its own weight — simulates the case
+    where a symlink/junction or a programmatic caller slipped a bypass past
+    MoveEntry validation.
+    """
+    from corp.cleanup.executor import _assert_within_root
+
+    mywork = tmp_path / "MyWork"
+    mywork.mkdir()
+    escaped = tmp_path / "outside" / "secret.txt"
+
+    with pytest.raises(PathTraversalError, match="escapes mywork_root"):
+        _assert_within_root(escaped, mywork, field="source")
+
+
+def test_assert_within_root_accepts_path_inside_root(tmp_path: Path) -> None:
+    """Runtime guard allows paths genuinely inside the root."""
+    from corp.cleanup.executor import _assert_within_root
+
+    mywork = tmp_path / "MyWork"
+    mywork.mkdir()
+    inside = mywork / INBOX / "file.txt"
+
+    # Must not raise — file need not exist (strict=False).
+    _assert_within_root(inside, mywork, field="source")
