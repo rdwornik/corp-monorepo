@@ -197,6 +197,20 @@ Source: moved from ~/.claude/skills/gotchas/gotchas.md (global → project scope
 
 ## MyWork & OneDrive (filesystem safety)
 
+- **Gotcha:** Any write/delete action must explicitly guard synced-tree paths — hotfix 2026-04-21 added guards at execute_plan, execute_moves, and _resolve_project_path (writable=True); project/renderer.py already had one. A fourth unguarded site replays INCIDENT 2026-03-14. Centralization deferred to ADR-27. **ALWAYS `resolve(strict=False)` before the substring check**: substring-only guards are bypassable by a Windows junction / symlink / alias whose string form omits "OneDrive - Blue Yonder" but whose resolved target contains it (Codex review 2026-04-21 amendment).
+  - Trigger: Adding a new action/workflow that mutates a filesystem path derived from `_resolve_project_path`, `find_onedrive_overlap`, or raw `moves.yaml` strings
+  - Symptom: `shutil.move` / `.unlink()` / `.write_text()` succeeds on a synced-tree path, mutation propagates to SharePoint — OR substring check passes because the junction / alias masks the true target
+  - Fix: Import `OneDriveSafetyError` from `corp.cleanup.errors` and mirror the `_guard_onedrive` pattern used in `cleanup/executor.py` (resolve + dual-candidate check + fail-closed OSError). For resolver callers pass `writable=True` to `_resolve_project_path`. Regression test must use a fake `"OneDrive - Blue Yonder"` segment under `tmp_path` — never a real synced path. Symlink-bypass test can mock `Path.resolve` rather than creating real junctions
+  - verify: Grep("OneDrive - Blue Yonder", path="src/corp/") → every write/delete site has a guard call upstream AND each guard calls `.resolve(strict=False)` before the substring check; see docs/ARCHITECTURE.md "OneDrive safety guards" table
+  - **Last triggered:** 2026-04-21
+
+- **Gotcha:** moves.yaml must be loaded through `MoveEntry` schema, not raw `yaml.safe_load` — a `"../../etc/passwd"` source escapes `mywork_root` via `Path.__truediv__` (does not normalize). Hotfix 2026-04-21 added schema + runtime `is_relative_to` check.
+  - Trigger: Adding a new consumer of moves.yaml, or bypassing `execute_moves()` with a hand-built `MoveEntry`
+  - Symptom: Arbitrary-file delete/move outside `mywork_root`; `_guard_onedrive` alone does not stop this
+  - Fix: Load via `MoveEntry.from_dict` (rejects `..` and absolute paths at load time); call `_assert_within_root` after every `mywork_root / ...` join
+  - verify: Grep("yaml.safe_load", path="src/corp/cleanup/") → wrapped by `MoveEntry.from_dict` in executor.py
+  - **Last triggered:** 2026-04-21
+
 - **Gotcha:** OneDrive ReparsePoint attribute does NOT mean SharePoint shortcut — cloud-only placeholders also have it
   - Trigger: Any operation checking for shortcuts on OneDrive paths
   - Symptom: Files incorrectly classified as shortcuts, skipped or deleted

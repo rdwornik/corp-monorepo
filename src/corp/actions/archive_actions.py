@@ -33,7 +33,7 @@ def archive_project(params: dict[str, str]) -> StepResult:
             error="Missing 'project' parameter",
         )
 
-    project_path = _resolve_project_path(project, params)
+    project_path = _resolve_project_path(project, params, writable=True)
     if not project_path or not project_path.exists():
         return StepResult(
             step_index=0,

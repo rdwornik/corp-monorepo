@@ -15,12 +15,45 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
+from corp.cleanup.errors import OneDriveSafetyError
 from corp.schema.folder_names import CORP_INFRA
 
 logger = logging.getLogger(__name__)
 
 # OneDrive MyWork path (redundant copy of local MyWork after migration)
-_DEFAULT_ONEDRIVE_MYWORK = Path.home() / "OneDrive - Blue Yonder" / "MyWork_OneDrive"
+_ONEDRIVE_BLOCKED = "OneDrive - Blue Yonder"
+_DEFAULT_ONEDRIVE_MYWORK = Path.home() / _ONEDRIVE_BLOCKED / "MyWork_OneDrive"
+
+
+def _guard_onedrive(path: str | Path) -> None:
+    """Refuse any write/delete that lands inside a synced tree.
+
+    Checks both the original string form and the resolved form so a
+    Windows junction, symlink, or configured alias cannot bypass the
+    substring check (Codex review H-C1, 2026-04-21). Fails closed if
+    ``Path.resolve`` itself raises — an unresolvable path is treated as
+    unverifiable, so refused.
+
+    Mirrors the sibling guards in ``cleanup/executor.py`` and
+    ``actions/_helpers.py`` so a future centralization (ADR-27) can
+    replace all three with one import.
+    """
+    original = str(path)
+    candidates = [original]
+    try:
+        candidates.append(str(Path(path).resolve(strict=False)))
+    except (OSError, RuntimeError) as exc:
+        raise OneDriveSafetyError(
+            f"BLOCKED: cannot resolve {original!r} to verify synced-tree "
+            f"safety: {exc}"
+        ) from exc
+
+    if any(_ONEDRIVE_BLOCKED in c for c in candidates):
+        raise OneDriveSafetyError(
+            f"BLOCKED: refusing to mutate synced path {path} "
+            f"(resolved candidates: {candidates}). "
+            "See INCIDENT 2026-03-14; centralization pending (ADR-27)."
+        )
 
 
 @dataclass
@@ -311,6 +344,11 @@ def execute_plan(
                 "[DRY RUN] Would delete: %s (%.1f MB)", item.filename, item.size_bytes / 1024 / 1024
             )
             continue
+
+        # Safety: fail closed on any synced-tree path. find_onedrive_overlap()
+        # seeds plan items with such paths; executing them replays the
+        # 2026-03-14 incident class.
+        _guard_onedrive(item.path)
 
         if not target.exists():
             logger.warning("File not found, skipping: %s", item.path)
