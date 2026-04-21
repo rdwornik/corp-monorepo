@@ -10,9 +10,12 @@ from pathlib import Path
 
 import yaml
 
+from corp.cleanup.errors import OneDriveSafetyError
 from corp.config import get_config
 
 logger = logging.getLogger(__name__)
+
+_ONEDRIVE_BLOCKED = "OneDrive - Blue Yonder"
 
 
 def _project_display_name(proj) -> str:
@@ -53,12 +56,25 @@ def _resolve_project_id(project: str, params: dict[str, str]) -> str:
     return _slugify(project)
 
 
-def _resolve_project_path(project: str, params: dict[str, str]) -> Path | None:
-    """Resolve a project name to its OneDrive path."""
+def _resolve_project_path(
+    project: str,
+    params: dict[str, str],
+    *,
+    writable: bool = False,
+) -> Path | None:
+    """Resolve a project name to its on-disk path.
+
+    When ``writable=True``, the resolver refuses to return a path under the
+    synced tree ("OneDrive - Blue Yonder") and raises
+    :class:`corp.cleanup.errors.OneDriveSafetyError`. Read-intent callers
+    (``copy_to_vault_action``) leave the default so they can still stage
+    content. Write-intent callers (``archive_project``) must opt in.
+    """
     # Check if project_path was provided directly
     if "project_path" in params:
         path = Path(params["project_path"])
         if path.exists():
+            _guard_writable(path, writable)
             return path
 
     if not project:
@@ -69,6 +85,7 @@ def _resolve_project_path(project: str, params: dict[str, str]) -> Path | None:
 
         resolved = resolve_project(project)
         if resolved and resolved.onedrive_path:
+            _guard_writable(resolved.onedrive_path, writable)
             return resolved.onedrive_path
     except (ImportError, OSError) as e:
         logger.debug("OneDrive path not resolvable for %s: %s", project, e)
@@ -77,9 +94,24 @@ def _resolve_project_path(project: str, params: dict[str, str]) -> Path | None:
     cfg = get_config()
     for folder in cfg.projects_root.iterdir():
         if folder.is_dir() and folder.name.lower() == project.lower():
+            _guard_writable(folder, writable)
             return folder
 
     return None
+
+
+def _guard_writable(path: Path, writable: bool) -> None:
+    """Raise if ``writable=True`` and ``path`` is under the synced tree.
+
+    Mirrors ``cleanup/executor._guard_onedrive`` so future centralization
+    (ADR-27) can replace all three sites with one import.
+    """
+    if writable and _ONEDRIVE_BLOCKED in str(path):
+        raise OneDriveSafetyError(
+            f"BLOCKED: refusing write-intent resolution of synced path: {path}. "
+            "See INCIDENT 2026-03-14 and project/renderer.py (2026-03-30). "
+            "Stage the project to a local path before writing."
+        )
 
 
 def _serialize_issues(issues: list[dict[str, str]]) -> str:
