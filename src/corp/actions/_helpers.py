@@ -103,12 +103,32 @@ def _resolve_project_path(
 def _guard_writable(path: Path, writable: bool) -> None:
     """Raise if ``writable=True`` and ``path`` is under the synced tree.
 
-    Mirrors ``cleanup/executor._guard_onedrive`` so future centralization
-    (ADR-27) can replace all three sites with one import.
+    Checks both the original string form and the resolved form so a
+    Windows junction / symlink / configured alias cannot bypass the
+    substring check (Codex review H-C2, 2026-04-21). Fails closed if
+    ``Path.resolve`` itself raises (unresolvable = unverifiable = refused).
+
+    Mirrors ``cleanup/executor._guard_onedrive`` and
+    ``cleanup/disk._guard_onedrive`` so future centralization (ADR-27)
+    can replace all three sites with one import.
     """
-    if writable and _ONEDRIVE_BLOCKED in str(path):
+    if not writable:
+        return
+
+    original = str(path)
+    candidates = [original]
+    try:
+        candidates.append(str(path.resolve(strict=False)))
+    except (OSError, RuntimeError) as exc:
         raise OneDriveSafetyError(
-            f"BLOCKED: refusing write-intent resolution of synced path: {path}. "
+            f"BLOCKED: cannot resolve {original!r} to verify synced-tree "
+            f"safety for write-intent operation: {exc}"
+        ) from exc
+
+    if any(_ONEDRIVE_BLOCKED in c for c in candidates):
+        raise OneDriveSafetyError(
+            f"BLOCKED: refusing write-intent resolution of synced path: {path} "
+            f"(resolved candidates: {candidates}). "
             "See INCIDENT 2026-03-14 and project/renderer.py (2026-03-30). "
             "Stage the project to a local path before writing."
         )
