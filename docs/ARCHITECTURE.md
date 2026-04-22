@@ -390,7 +390,7 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
 
 ### Key Invariants
 
-1. **corp (ingest/) is SOLE vault writer** -- CKE produces JSON, ingest writes .md
+1. **corp (ingest/) is SOLE vault writer** -- CKE produces JSON, ingest writes .md (narrowed by ADR-27: `vault_io.write_note` remains sole writer for `.md` sources under `02_sources/`; `actions/*` may write directly to whitelisted non-source zones)
 2. **CKE (extractor/) is PURE extraction** -- no vault writes, no database writes
 3. **Forward slashes everywhere** in databases and stored paths
 4. **API keys in env vars** -- loaded from ~/Documents/.secrets/.env, never in config
@@ -401,8 +401,9 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
 ### OneDrive safety guards (hotfix 2026-04-21)
 
 The invariant above ("OneDrive exclusion") is enforced by explicit fail-closed
-guards at every known mutation site. Guards live next to the mutation; a
-single cross-cutting helper is deferred to ADR-27.
+guards at every known mutation site. Guards live next to the mutation. See
+ADR-27 for centralization design (`corp/safety/onedrive.py` + AST-based CI
+enforcement); implementation lands in three follow-up PRs.
 
 All four sites use the same pattern: resolve the path with
 `Path.resolve(strict=False)` and check BOTH the original and the resolved
@@ -422,5 +423,6 @@ means unverifiable means refused.
 Exception classes live in `corp.cleanup.errors`. Verified P1 findings are
 documented in `docs/audits/2026-04-21-p1-verification.md`; Codex review
 that drove the resolve-before-check amendment is in
-`docs/audits/2026-04-21-codex-hotfix-review.md`. Centralization pending
-ADR-27.
+`docs/audits/2026-04-21-codex-hotfix-review.md`. Centralization design
+captured in ADR-27; implementation follows in PR-1 (foundation), PR-2
+(migration), and PR-3 (CI enforcement).
