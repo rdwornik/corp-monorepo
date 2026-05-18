@@ -36,7 +36,7 @@ Max 20 lines each. Format: Context / Decision / Consequences.
 
 ## How to add a new ADR
 
-1. Copy `templates/ADR-template.md` (repo root) to `docs/decisions/ADR-NN-{slug}.md`
+1. Copy the canonical ADR template from `.dev-knowledge` (sibling repo at the `Dev/` level — `.dev-knowledge/templates/ADR-template.md`) to `docs/decisions/ADR-NN-{slug}.md`. The template is the source-of-truth per ADR-36; do not maintain a local copy.
 2. Assign the next available number
 3. Fill in the `Decommission:` field — list files/folders/sections this ADR makes obsolete, or write "none"
 4. Keep it under 20 lines (excluding title/metadata)
