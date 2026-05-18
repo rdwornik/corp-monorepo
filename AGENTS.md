@@ -1,5 +1,7 @@
 # AGENTS.md — Codex Code Review Configuration
 
+> **Read first:** `VISION.md` (repo root) — understand the project's purpose and scope before reviewing.
+
 > This file is read automatically by Codex CLI (OpenAI).
 > Codex is a **read-only code reviewer** in this repo. It does not build, fix, or modify.
 
