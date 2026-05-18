@@ -5,7 +5,7 @@
 **Decider:** AI Council 2026-04-22 (Decision 1); Rob with Claude review (Decision 2)
 **Panelists (Decision 1):** claude-opus-4-7, gemini-3.1-pro-preview, grok-4.20, gpt-5.4
 **Synthesizer (Decision 1):** claude-sonnet (non-participant)
-**Debate transcript:** `docs/decisions/ADR-27-council-onedrive-centralization.md`
+**Debate transcript:** `docs/decisions/transcripts/DECISION_27_onedrive_centralization.md`
 **Related:** ADR-23 (sole-writer invariant origin), ADR-26 (Tach 4-layer model), hotfix `onedrive-safety-p1` (merged 2026-04-21), INCIDENT 2026-03-14
 
 ## Context
