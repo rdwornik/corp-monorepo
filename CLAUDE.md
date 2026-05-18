@@ -71,7 +71,8 @@ src/corp/
   verify: Grep("json.loads", path="corp-monorepo/src/corp/") → confirm retry wrapper exists
 
 ## Session Protocol
-1. Read last 5 entries from JOURNAL.md before starting work
+1. **Read `VISION.md`** (repo root) — understand the project's purpose and scope before any work.
+2. Read last 5 entries from JOURNAL.md before starting work
 2. After implementation, self-review: focus on error handling, edge cases, gotchas
 3. Before merging, run: ./scripts/dev-check.ps1
 4. Append session summary to JOURNAL.md before ending
