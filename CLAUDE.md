@@ -1,5 +1,7 @@
 # Corporate OS Monorepo
 
+## Project Scale: L
+
 ## Architecture (unified src/corp/ layout)
 
 All 6 former packages consolidated into a single `src/corp/` namespace.
