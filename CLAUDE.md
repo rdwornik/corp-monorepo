@@ -26,7 +26,7 @@ src/corp/
   opportunity/     COM — opportunity manager
 ```
 
-### CLIs (2,404 tests)
+### CLIs (see `pytest --collect-only -q` for current test count)
 
 | CLI | Entry point | Module |
 |-----|-------------|--------|
@@ -51,7 +51,7 @@ src/corp/
 - Training data: `scripts/extract_training_data.py` → `tests/fixtures/`
 - Environment variables override config
 
-## Council Decisions: 24 (ADR summaries in `docs/decisions/`, full transcripts in `docs/decisions/transcripts/`)
+## Council Decisions (see `docs/decisions/README.md` for the current index; ADR summaries in `docs/decisions/`, full transcripts in `docs/decisions/transcripts/`)
 - #14: Naming convention v2 — `{YYYY-MM}_{TYPE}_{CLIENT}_{Description}.{ext}`
 - #23: Monorepo internal architecture — flatten, centralize, delete dead code
 
