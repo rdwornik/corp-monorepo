@@ -201,7 +201,7 @@ Source: moved from ~/.claude/skills/gotchas/gotchas.md (global → project scope
   - Trigger: Adding a new action/workflow that mutates a filesystem path derived from `_resolve_project_path`, `find_onedrive_overlap`, or raw `moves.yaml` strings
   - Symptom: `shutil.move` / `.unlink()` / `.write_text()` succeeds on a synced-tree path, mutation propagates to SharePoint — OR substring check passes because the junction / alias masks the true target
   - Fix: Import `OneDriveSafetyError` from `corp.cleanup.errors` and mirror the `_guard_onedrive` pattern used in `cleanup/executor.py` (resolve + dual-candidate check + fail-closed OSError). For resolver callers pass `writable=True` to `_resolve_project_path`. Regression test must use a fake `"OneDrive - Blue Yonder"` segment under `tmp_path` — never a real synced path. Symlink-bypass test can mock `Path.resolve` rather than creating real junctions
-  - verify: Grep("OneDrive - Blue Yonder", path="src/corp/") → every write/delete site has a guard call upstream AND each guard calls `.resolve(strict=False)` before the substring check; see docs/ARCHITECTURE.md "OneDrive safety guards" table
+  - verify: Grep("OneDrive - Blue Yonder", path="src/corp/") → every write/delete site has a guard call upstream AND each guard calls `.resolve(strict=False)` before the substring check; see ARCHITECTURE.md "OneDrive safety guards" table
   - **Last triggered:** 2026-04-21
 
 - **Gotcha:** moves.yaml must be loaded through `MoveEntry` schema, not raw `yaml.safe_load` — a `"../../etc/passwd"` source escapes `mywork_root` via `Path.__truediv__` (does not normalize). Hotfix 2026-04-21 added schema + runtime `is_relative_to` check.

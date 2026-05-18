@@ -115,7 +115,7 @@ Do not add new violations without architectural justification.
 
 ## Architecture Reference
 
-`docs/ARCHITECTURE.md` — module map, layer definitions, design patterns
+`ARCHITECTURE.md` — module map, layer definitions, design patterns
 `docs/decisions/` — all ADRs (26 decisions)
 `tach.toml` — authoritative layer assignments
 `AGENTS.md` — Codex review checklist (import boundary check deferred to Tach)
