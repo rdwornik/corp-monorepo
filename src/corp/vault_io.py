@@ -39,6 +39,28 @@ logger = logging.getLogger(__name__)
 FRONTMATTER_SEP = "---"
 
 
+# --- Vault writer invariant (ADR-27 Decision 2) ---
+
+# Zones that src/corp/actions/* may write to directly. Conceptually permits
+# DASHBOARDS, METADATA (project-info.yaml), and BRIEFS (brief.md); PROJECTS
+# subsumes METADATA and BRIEFS since both live under projects/{project_id}/,
+# so no new VaultZone entries are needed.
+_ACTIONS_WRITE_WHITELIST: frozenset[VaultZone] = frozenset(
+    {VaultZone.DASHBOARDS, VaultZone.PROJECTS}
+)
+
+
+def is_writable_by_actions(zone: VaultZone | str) -> bool:
+    """Return True iff ``src/corp/actions/*`` may write directly to this zone.
+
+    Writes to non-whitelisted zones (notably ``SOURCES``) must route through
+    :func:`write_note`. See ADR-27 Decision 2.
+    """
+    if isinstance(zone, str):
+        zone = VaultZone(zone)
+    return zone in _ACTIONS_WRITE_WHITELIST
+
+
 # --- Path resolution ---
 
 
