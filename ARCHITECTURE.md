@@ -44,7 +44,7 @@ src/corp/
 |--------|---------------|-------------|
 | `models.py` | Dataclasses for all domain objects | VaultZone, ProjectInfo, Workflow, Task, IndexStats |
 | `config.py` | Frozen AppConfig from .env + agents.yaml | AppConfig, get_config() |
-| `vault_io.py` | Single vault writer -- all vault I/O goes here | list_projects(), read_project_info(), write_note() |
+| `vault_io.py` | Sole writer for `02_sources/` notes (ADR-27); reads + helpers for all zones | list_projects(), read_project_info(), write_note(), is_writable_by_actions() |
 | `index_builder.py` | Rebuilds SQLite FTS5 index from vault | rebuild_index(), update_project(), get_index_stats() |
 | `query_engine.py` | Queries the FTS5 index (facts, projects, analytics) | search_facts(), search_projects(), get_analytics() |
 | `intent_router.py` | Two-stage routing: keywords then LLM | Intent, route() |
