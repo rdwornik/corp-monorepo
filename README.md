@@ -10,7 +10,7 @@ All code lives in `src/corp/` under a single `pyproject.toml`.
 |--------|-----|-------|------|
 | `corp/schema/` | `corp-meta` | 118 | Shared schema & taxonomy |
 | `corp/extractor/` | `cke` | 838 | Tiered AI extraction engine |
-| `corp/ingest/` `corp/retrieve/` `corp/cli/` | `corp` | 926 | Root orchestrator, sole vault writer |
+| `corp/ingest/` `corp/retrieve/` `corp/cli/` | `corp` | 926 | Root orchestrator; sole writer for `02_sources/` (ADR-27) |
 | `corp/project/` | `cpe` | 45 | Project folder classifier |
 | `corp/rfp/` | — | 155 | AI-powered RFP answering engine |
 | `corp/opportunity/` | `com` | 62 | Opportunity lifecycle management |

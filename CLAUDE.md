@@ -8,7 +8,7 @@ All 6 former packages consolidated into a single `src/corp/` namespace.
 One `pyproject.toml` at repo root. One `pip install -e .`.
 
 ### Architecture Rules (non-negotiable)
-- corp (ingest/) is SOLE vault writer
+- corp (ingest/) is SOLE writer for `02_sources/` `.md` notes (ADR-27 narrowed ADR-23). `actions/*` may write directly to three authorized categories: DASHBOARDS (top-level `dashboards/`), METADATA (`projects/{pid}/project-info.yaml` + `index.md`), BRIEFS (`projects/{pid}/brief.md`). All other writes route through `vault_io.write_note()`. Enforced by `tests/safety/test_vault_writer_invariant.py` (leaf-filename classification).
 - CKE (extractor/) is PURE extraction engine — no vault writes
 - Forward slashes everywhere in databases/paths
 - API keys in env vars, NEVER in config files
@@ -20,7 +20,7 @@ One `pyproject.toml` at repo root. One `pip install -e .`.
 src/corp/
   schema/          taxonomy, models, schema.yaml
   extractor/       CKE — knowledge extraction engine
-  ingest/          ingest pipeline (sole vault writer)
+  ingest/          ingest pipeline (sole writer for 02_sources/ — ADR-27)
   retrieve/        retrieval engine
   cli/             CLI modules
   project/         CPE — project extractor

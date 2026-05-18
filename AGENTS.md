@@ -55,7 +55,7 @@ Tach enforces this at pre-commit and CI. See `tach.toml` for canonical module-to
 Violation example: if `schema/` imports from `ingest/` → Tach blocks the commit.
 
 ### Key Invariants
-1. `ingest/` is SOLE vault writer — CKE produces JSON, ingest writes .md
+1. `ingest/` is SOLE writer for `02_sources/` `.md` notes — CKE produces JSON, ingest writes .md. Narrowed by ADR-27: `actions/*` may write directly to three named categories — DASHBOARDS, METADATA (`project-info.yaml` + `index.md`), BRIEFS (`brief.md`); all other writes route through `vault_io.write_note()`.
 2. `extractor/` is PURE extraction — no vault writes, no database writes
 3. Forward slashes in all database paths and stored references
 4. API keys only via env vars (never in config files or code)

@@ -39,6 +39,32 @@ logger = logging.getLogger(__name__)
 FRONTMATTER_SEP = "---"
 
 
+# --- Vault writer invariant (ADR-27 Decision 2) ---
+
+# Action-write categories that src/corp/actions/* may write to directly. Matches
+# the ADR-27 line 122 named whitelist exactly: DASHBOARDS (top-level dashboards
+# zone), METADATA (project-info.yaml + index.md under projects/), BRIEFS
+# (brief.md under projects/). METADATA and BRIEFS are virtual categories — they
+# classify writes by leaf filename, not by directory zone. The AST scanner at
+# tests/safety/test_vault_writer_invariant.py performs the (zone, leaf) →
+# category classification.
+_ACTIONS_WRITE_WHITELIST: frozenset[VaultZone] = frozenset(
+    {VaultZone.DASHBOARDS, VaultZone.METADATA, VaultZone.BRIEFS}
+)
+
+
+def is_writable_by_actions(zone: VaultZone | str) -> bool:
+    """Return True iff ``src/corp/actions/*`` may write directly to this category.
+
+    Argument is an ADR-27 action-write category (DASHBOARDS, METADATA, or
+    BRIEFS) — not necessarily a physical vault zone. Writes outside the
+    whitelist must route through :func:`write_note`. See ADR-27 Decision 2.
+    """
+    if isinstance(zone, str):
+        zone = VaultZone(zone)
+    return zone in _ACTIONS_WRITE_WHITELIST
+
+
 # --- Path resolution ---
 
 
@@ -53,6 +79,12 @@ def resolve_vault_path(
         config = PipelineConfig.production()
     if isinstance(zone, str):
         zone = VaultZone(zone)
+
+    if zone in (VaultZone.METADATA, VaultZone.BRIEFS):
+        raise ValueError(
+            f"{zone.name} is a virtual action-write category (ADR-27 Decision 2), "
+            f"not a vault directory; do not pass to resolve_vault_path"
+        )
 
     parts: list[str] = [zone.value]
     if project_id:

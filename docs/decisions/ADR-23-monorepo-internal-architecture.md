@@ -3,6 +3,7 @@
 
 **Date:** 2026-03-28
 **Status:** Accepted
+**Amended by:** ADR-27 Decision 2 (2026-04-22) — narrows the "corp (ingest/) is SOLE vault writer" invariant to `.md` notes with YAML frontmatter under `02_sources/`; approved `actions/*` modules may write directly to whitelisted non-source zones.
 **Council debate:** `.ecosystem/council_transcripts/DECISION_23_monorepo_internal_architecture.md`
 **Panelists:** deepseek-reasoner, gemini-3.1-pro-preview, grok-4.20-beta, gpt-5.4
 **Synthesizer:** claude (non-participant)

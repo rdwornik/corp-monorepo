@@ -44,7 +44,7 @@ src/corp/
 |--------|---------------|-------------|
 | `models.py` | Dataclasses for all domain objects | VaultZone, ProjectInfo, Workflow, Task, IndexStats |
 | `config.py` | Frozen AppConfig from .env + agents.yaml | AppConfig, get_config() |
-| `vault_io.py` | Single vault writer -- all vault I/O goes here | list_projects(), read_project_info(), write_note() |
+| `vault_io.py` | Sole writer for `02_sources/` notes (ADR-27); reads + helpers for all zones | list_projects(), read_project_info(), write_note(), is_writable_by_actions() |
 | `index_builder.py` | Rebuilds SQLite FTS5 index from vault | rebuild_index(), update_project(), get_index_stats() |
 | `query_engine.py` | Queries the FTS5 index (facts, projects, analytics) | search_facts(), search_projects(), get_analytics() |
 | `intent_router.py` | Two-stage routing: keywords then LLM | Intent, route() |
@@ -390,7 +390,7 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
 
 ### Key Invariants
 
-1. **corp (ingest/) is SOLE vault writer** -- CKE produces JSON, ingest writes .md (narrowed by ADR-27: `vault_io.write_note` remains sole writer for `.md` sources under `02_sources/`; `actions/*` may write directly to whitelisted non-source zones)
+1. **corp (ingest/) is SOLE vault writer** -- CKE produces JSON, ingest writes .md (narrowed by ADR-27: `vault_io.write_note` remains sole writer for `.md` sources under `02_sources/`; `actions/*` may write directly to three named categories — DASHBOARDS, METADATA, BRIEFS)
 2. **CKE (extractor/) is PURE extraction** -- no vault writes, no database writes
 3. **Forward slashes everywhere** in databases and stored paths
 4. **API keys in env vars** -- loaded from ~/Documents/.secrets/.env, never in config
