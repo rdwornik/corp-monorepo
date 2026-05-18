@@ -73,9 +73,11 @@ src/corp/
 ## Session Protocol
 1. **Read `VISION.md`** (repo root) — understand the project's purpose and scope before any work.
 2. Read last 5 entries from JOURNAL.md before starting work
-2. After implementation, self-review: focus on error handling, edge cases, gotchas
-3. Before merging, run: ./scripts/dev-check.ps1
-4. Append session summary to JOURNAL.md before ending
+3. After implementation, self-review: focus on error handling, edge cases, gotchas
+4. Before merging, run: ./scripts/dev-check.ps1
+5. Append session summary to JOURNAL.md before ending. Per-entry shape (ADR-49, cutover 2026-05-18):
+   `### YYYY-MM-DD — <topic>` then `- Did:` / `- Result:` / `- Changes:` / `- Abandoned:` / `- Next:`.
+   `Changes:` is the change record — there is no CHANGELOG anymore. Append-only; never edit prior entries.
 
 ## Session Handoff
 

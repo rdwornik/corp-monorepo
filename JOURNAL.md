@@ -1,9 +1,45 @@
 # Development Journal
 
-Append-only log. 3 lines per session. Never edit old entries.
-Claude Code: read last 5 entries before starting work.
+> Append-only log. Never edit old entries.
+> Per-entry shape (per ADR-49, cutover 2026-05-18):
+> `### YYYY-MM-DD — <session topic>` header, then bullets:
+> `- Did:` what was actually done
+> `- Result:` outcome / state on disk
+> `- Changes:` short list of files / areas touched (this is the change record — there is no CHANGELOG anymore)
+> `- Abandoned:` items deliberately dropped (each non-trivial drop also gets a short note in `docs/decisions/`; do not record reasoning inline here)
+> `- Next:` follow-ups
+> Entries above the cutover date use the older `Did / Failed / Next` shape and are preserved as-is.
+> Claude Code: read last 5 entries before starting work.
 
 ---
+
+### 2026-05-18 — Universalization rollout (VISION, gap review, ARCHITECTURE relocation, handoff retirement)
+- Did: Added Standard-tier `VISION.md` at repo root (ADR-33) and updated `CLAUDE.md` + `AGENTS.md` to require it on session start. Ran the universalization gap review and archived the report under `docs/audits/`. Relocated `ARCHITECTURE.md` to repo root per ADR-38 A3. Retired the legacy single-file handoff: deleted `docs/HANDOFF.md` and `scripts/update_handoff.py`, seeded `BACKLOG.md` from the open items, repointed CLAUDE.md's Session Handoff section at the `.dev-knowledge` ADR-42 convention, and added `docs/decisions/2026-05-18-retire-single-file-handoff.md`.
+- Result: Repo aligned with universal Corporate-OS doc layout — VISION at root, ARCHITECTURE at root, BACKLOG at root, JOURNAL append-only, handoffs owned by `.dev-knowledge`. Branches `docs/add-vision`, `docs/universalization-review`, `docs/architecture-to-root`, `docs/handoff-retirement` merged into `main` via `--no-ff`.
+- Changes: `VISION.md` (new), `ARCHITECTURE.md` (relocated to root), `BACKLOG.md` (new), `CLAUDE.md`, `AGENTS.md`, deleted `docs/HANDOFF.md` and `scripts/update_handoff.py`, added `docs/audits/<gap-review>.md` and `docs/decisions/2026-05-18-retire-single-file-handoff.md`.
+- Abandoned: None.
+- Next: Workstream B (this branch — retire `CHANGELOG.md`, JOURNAL shape adoption, JOURNAL catch-up). Workstream C — ADR template + `Decommission:` field, header normalizer port, `docs/decisions/README.md` index ADR-22..27, ADR-27 number collision.
+
+### 2026-04-24 — Council #28 / #29 research debate transcripts archived
+- Did: Archived AI Council #28 and #29 research-debate transcripts into `docs/decisions/transcripts/`.
+- Result: Council transcript history kept current; canonical filenames preserved per the manual-archival convention.
+- Changes: `docs/decisions/transcripts/` (two new council-out files for #28 and #29).
+- Abandoned: None.
+- Next: ADR-27 implementation prompts (OneDrive centralization + vault writer amendment).
+
+### 2026-04-22 — ADR-27 drafted: OneDrive safety centralization + vault writer invariant amendment
+- Did: Drafted ADR-27 combining two decisions — OneDrive safety centralization (Option C, sourced from AI Council 2026-04-22, 3-of-4 consensus) and the vault-writer invariant amendment (Option B, narrow invariant with zone whitelist; codifies the actual working architecture at 8 action write sites). Cross-referenced `ARCHITECTURE.md` and archived the council transcript. Invariant wording itself unchanged until implementation PRs land (3 PRs for OneDrive, 1 for vault writer).
+- Result: ADR-27 lands in `docs/decisions/` with the council transcript archived. Implementation deferred to follow-up PRs.
+- Changes: `docs/decisions/ADR-27-*.md` (new), `docs/decisions/transcripts/` (council OneDrive debate), `ARCHITECTURE.md` (cross-reference), `CHANGELOG.md` (recorded ADR-27 drafting — this was the final use of the changelog before retirement).
+- Abandoned: None.
+- Next: 3 OneDrive implementation PRs + 1 vault-writer narrowing PR per ADR-27.
+
+### 2026-04-21 — OneDrive safety P1 hotfix (+ symlink-bypass amendment)
+- Did: Landed three regression tests (verified failing on `main` before fixes), then shipped P1-1 `execute_plan` guard, P1-2 `moves.yaml` schema + traversal guard, and P1-3 `_resolve_project_path` writable kwarg. After Codex review flagged H-C1/H-C2, amended all four OneDrive guard sites (`disk.py`, `_helpers.py`, `executor.py`, `renderer.py`) to resolve paths *before* the substring check, and split schema-vs-runtime traversal tests to assert the exact exception per layer (Codex M-C1). Merged `hotfix/onedrive-safety-p1` to `main`. Docs updated in `ARCHITECTURE.md` and `.claude/skills/gotchas/gotchas.md`; `AGENTS.md` deferred to ADR-27.
+- Result: 2495 → 2515 tests green; +6 symlink-bypass tests, +2 runtime-guard unit tests; zero regressions. P2 (vault single-writer) deliberately deferred to ADR-27.
+- Changes: `src/corp/.../cleanup` (disk.py, executor.py), `src/corp/.../actions` (_helpers.py, built_in_actions), `src/corp/project/renderer.py`, new regression tests under `tests/`, `ARCHITECTURE.md`, `.claude/skills/gotchas/gotchas.md`, `docs/audits/` (Codex review + re-review outputs), `CHANGELOG.md`.
+- Abandoned: P2 (vault single-writer) intentionally deferred to ADR-27 — see ADR-27 entry below for follow-up.
+- Next: ADR-27 to consolidate OneDrive centralization + vault-writer invariant.
 
 ## 2026-04-15 (Step 12 — 4-layer taxonomy reconciliation)
 - **Did:** Replaced 7-layer (L0-L6/L0-L9) model with 4-layer Tach taxonomy (foundation/core/orchestration/interface) in AGENTS.md, ARCHITECTURE.md, and 5 per-module READMEs (cli, schema, extraction, opportunity, project). Single source of truth: tach.toml. Zero stale references remaining in living docs. docs/archive, docs/decisions, docs/audits preserved as frozen historical record.
