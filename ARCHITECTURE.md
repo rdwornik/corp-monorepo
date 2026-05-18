@@ -390,7 +390,7 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
 
 ### Key Invariants
 
-1. **corp (ingest/) is SOLE vault writer** -- CKE produces JSON, ingest writes .md (narrowed by ADR-27: `vault_io.write_note` remains sole writer for `.md` sources under `02_sources/`; `actions/*` may write directly to whitelisted non-source zones)
+1. **corp (ingest/) is SOLE vault writer** -- CKE produces JSON, ingest writes .md (narrowed by ADR-27: `vault_io.write_note` remains sole writer for `.md` sources under `02_sources/`; `actions/*` may write directly to three named categories — DASHBOARDS, METADATA, BRIEFS)
 2. **CKE (extractor/) is PURE extraction** -- no vault writes, no database writes
 3. **Forward slashes everywhere** in databases and stored paths
 4. **API keys in env vars** -- loaded from ~/Documents/.secrets/.env, never in config
