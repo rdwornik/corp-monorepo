@@ -27,11 +27,18 @@ Max 20 lines each. Format: Context / Decision / Consequences.
 | [ADR-19](ADR-19-light-scan-architecture.md) | Light Scan Architecture | Accepted |
 | [ADR-20](ADR-20-vault-restructure.md) | Vault Rebuild Strategy | Accepted |
 | [ADR-21](ADR-21-ontology-approach.md) | Knowledge Ontology and Tagging Approach | Accepted |
+| [ADR-22](ADR-22-rfp-kb-federation.md) | RFP KB Federation with Vault Search | Accepted |
+| [ADR-23](ADR-23-monorepo-internal-architecture.md) | Monorepo Internal Architecture Refactoring | Accepted |
+| [ADR-24](ADR-24-mywork-knowledge-architecture.md) | MyWork Knowledge Architecture | Accepted |
+| [ADR-25](ADR-25-diagram-strategy.md) | Diagram Strategy | Accepted |
+| [ADR-26](ADR-26-tach-adoption.md) | Tach Import Boundary Enforcement | Accepted |
+| [ADR-27](ADR-27-safety-invariants.md) | Safety Invariants — OneDrive Guard Centralization and Vault Writer Narrowing | Accepted |
 
 ## How to add a new ADR
 
-1. Copy any existing ADR as a template
+1. Copy `templates/ADR-template.md` (repo root) to `docs/decisions/ADR-NN-{slug}.md`
 2. Assign the next available number
-3. Keep it under 20 lines (excluding title/metadata)
-4. Add a row to this table
-5. If superseding an existing ADR, update the old ADR's status line
+3. Fill in the `Decommission:` field — list files/folders/sections this ADR makes obsolete, or write "none"
+4. Keep it under 20 lines (excluding title/metadata)
+5. Add a row to this table
+6. If superseding an existing ADR, update the old ADR's status line
