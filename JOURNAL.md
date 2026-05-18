@@ -13,6 +13,13 @@
 
 ---
 
+### 2026-05-18 — ADR-27 PR-4 vault-writer invariant narrowing
+- Did: Added `is_writable_by_actions(zone)` predicate to `src/corp/vault_io.py` codifying the ADR-27 Decision 2 whitelist (DASHBOARDS, PROJECTS). Implemented AST scanner at `tests/safety/test_vault_writer_invariant.py` that walks every `src/corp/actions/*.py`, resolves each file-mutation primitive (Path.write_text/write_bytes/replace/unlink/rmdir, shutil.copy*/move/rmtree, os.remove/rename/unlink, open(..., write-mode)) through local-variable assignment chains to its first `vault_path` segment, then asserts the resolved zone is whitelisted. Embeds two self-test fixtures (one deliberate SOURCES violation, one clean PROJECTS write) so a silently-broken scanner fails its own test. Tolerates the `00_dashboards` string-literal drift in `analytics_actions.py` via an explicit alias map (drift itself out of scope). Narrowed the "SOLE vault writer" wording in ARCHITECTURE.md, CLAUDE.md, AGENTS.md, README.md to "sole writer for `02_sources/`"; added "Amended by ADR-27" line on ADR-23.
+- Result: Scanner finds the 7 inventoried write sites and classifies all as PROJECTS or DASHBOARDS — zero `02_sources/` violations, confirming ADR-27 line 149's "inventory confirms they already target whitelisted zones". No production code rewrites were needed. Full suite: 2551 passed (was 2547 + 4 new safety tests), 6 skipped, no regressions. `tach check` green. Injected-violation rerun confirmed the scanner fails on a deliberate `SOURCES` write at the exact `file:lineno` with zone='SOURCES', then reverted to a clean tree.
+- Changes: `src/corp/vault_io.py` (predicate + whitelist constant), `tests/safety/__init__.py` (new), `tests/safety/test_vault_writer_invariant.py` (new — AST scanner + self-tests), `ARCHITECTURE.md`, `CLAUDE.md`, `AGENTS.md`, `README.md`, `docs/decisions/ADR-23-monorepo-internal-architecture.md` (amendment cross-ref).
+- Abandoned: New `VaultZone.METADATA` / `BRIEFS` enum entries — `VaultZone.PROJECTS` subsumes both concepts since `project-info.yaml` and `brief.md` live under `projects/{project_id}/`, per ADR-27 line 126 ("where the concept does not already map cleanly").
+- Next: ADR-27 PR-1/2/3 (OneDrive centralization — `src/corp/safety/onedrive.py`, four guard-site migrations, `renderer.py` `ValueError`→`OneDriveSafetyError`, `deck_actions.py:104` gap, `test_no_unguarded_writes.py` AST scanner — separate branches per ADR-27's migration plan). Resolve the `dashboards/` vs `00_dashboards/` directory drift in `analytics_actions.py:99` in a separate chore branch.
+
 ### 2026-05-18 — Universalization rollout (VISION, gap review, ARCHITECTURE relocation, handoff retirement)
 - Did: Added Standard-tier `VISION.md` at repo root (ADR-33) and updated `CLAUDE.md` + `AGENTS.md` to require it on session start. Ran the universalization gap review and archived the report under `docs/audits/`. Relocated `ARCHITECTURE.md` to repo root per ADR-38 A3. Retired the legacy single-file handoff: deleted `docs/HANDOFF.md` and `scripts/update_handoff.py`, seeded `BACKLOG.md` from the open items, repointed CLAUDE.md's Session Handoff section at the `.dev-knowledge` ADR-42 convention, and added `docs/decisions/2026-05-18-retire-single-file-handoff.md`.
 - Result: Repo aligned with universal Corporate-OS doc layout — VISION at root, ARCHITECTURE at root, BACKLOG at root, JOURNAL append-only, handoffs owned by `.dev-knowledge`. Branches `docs/add-vision`, `docs/universalization-review`, `docs/architecture-to-root`, `docs/handoff-retirement` merged into `main` via `--no-ff`.
@@ -51,12 +58,12 @@
 - **Failed:** Nothing.
 - **Next:** Step 12 — reconcile AGENTS.md and ARCHITECTURE.md to use 4-layer taxonomy (foundation/core/orchestration/interface). Currently docs describe 7-layer model, tach.toml uses 4-layer. Active confusion source.
 
-## 2026-04-15 — Tach adoption Phase 1
+### 2026-04-15 — Tach adoption Phase 1
 - **Did:** Bootstrapped tach.toml with 4 layers (foundation/core/orchestration/interface), 34 modules. corp.ingest correctly classified as orchestration (not core) after Codex audit found 3 upward deps in router.py:18,653,743. Ran tach sync — found 6 baseline violations in 3 dependency pairs (intent_router→project_resolver, llm_router→project_resolver, actions→query_engine); documented in docs/audits/2026-04-15-tach-baseline-violations.md. Wired tach check into pre-commit (local hook, triggers only on src/corp/*.py changes) and created .github/workflows/tach.yml (pinned v0.34.0). Added CONTRIBUTING.md with tach sync cultural rules. Replaced AGENTS.md import-direction check with Tach reference. Created ADR-26. **2495 tests passing, 0 failed.** 8 commits, merged to main.
 - **Failed:** `always_run: true` in pre-commit hook blocked non-Python commits — removed; hook now triggers only when src/corp/*.py files are staged (correct behavior).
 - **Next (Step 12, separate PR):** Update AGENTS.md + ARCHITECTURE.md to use 4-layer taxonomy (foundation/core/orchestration/interface) replacing 7-layer model. Two tach reclassifications resolve all 6 baseline violations: corp.project_resolver core→orchestration(wait, core), corp.query_engine interface→orchestration. See docs/audits/2026-04-15-tach-baseline-violations.md.
 
-## 2026-03-30 — Diagrams v4 Pipeline
+### 2026-03-30 — Diagrams v4 Pipeline
 - **Did:** Audited per-module READMEs: 12 existed, 1 generated (actions/). Created docs/diagrams/conventions.yaml (style guide, 31 lines). Generated 3 C4 diagrams from ARCHITECTURE.md: system-context (4 internal + 7 external nodes, 11 edges), container-module (4 layers, 14 nodes, 13 edges, vertical layout), magistrala-pipeline (4 phases, 15 nodes, side-channel DBs). All diagrams use 13px font, dark mode themeVariables, classDef colors per layer. Rendered SVGs via mmdc 11.12.0. Removed orphaned README.md from docs/diagrams/. Process: ARCHITECTURE.md + conventions.yaml -> .mermaid -> .svg (Council #25). **2495 tests passing, 0 failed.** 7 commits, merged to main (fast-forward).
 - **Failed:** render-diagrams.ps1 Join-Path fix (step 8) was already applied in prior commit 9db4302 — no-op.
 - **Next:** Magistrala verification. MISC rate measurement.
@@ -66,7 +73,7 @@
 - **Failed:** Nothing.
 - **Next:** Magistrala verification. MISC rate measurement.
 
-## 2026-03-30 — P0+P1 error handling + scripts fix (Code Quality Audit)
+### 2026-03-30 — P0+P1 error handling + scripts fix (Code Quality Audit)
 - **Did:** Fixed all 15 error-handling items from audit: 5 critical `except Exception: pass` → specific types + logging (`built_in_actions.py` × 3, `ingest/router.py` × 2); 9 high-severity broad catches narrowed (`integrity.py` × 5, `vault_io.py` × 3, `task_manager.py`, `index_builder.py` × 5, `retrieve/engine.py`). Fixed 4 broken scripts (`packages/` → `tests/extractor/fixtures/`; stale `sys.path` inserts removed; REPO_ROOT depth fixed). Archived 6 one-time migration scripts to `scripts/archive/`. Added `__main__` guards to 3 scripts. Removed hardcoded username from `project/cli.py`. `llm_router.py:212` kept broad — google-genai raises unknown exception hierarchy, already logs. Work landed on `feat/project-scoped-gotchas` (pre-commit stash cycle switched branches after 2nd commit). **2412 tests passing, 0 failed.**
 - **Failed:** `llm_router.py` narrowed exception broke `test_api_failure` (mock raises bare `Exception`); reverted. Pre-commit stash/restore switched active branch mid-session — all commits on `feat/project-scoped-gotchas` instead of `fix/p0-p1-error-handling-scripts`.
 - **Next:** Merge `feat/project-scoped-gotchas` to main. P2: refactor `extract_knowledge()` (235 lines), `process_file()` (218 lines), `ingest_folder()` (216 lines). Standardize config access pattern.
@@ -111,7 +118,7 @@
 - **Failed:** -
 - **Next:** Implement ADR-22, .sandbox/ review (Rob), v2/v3 _outputs/ audit.
 
-## 2026-03-28
+### 2026-03-28
 - **Did:** SQL analytics MVP (6/10 benchmark queries). People added to FTS. Gemini 2.0 Flash-Lite for Tier 2 (-75% cost). Scripts/ to Dev/ migration (11 files, 2673 DB rows). .ecosystem consolidated. ADRs synced (#13-#21). Phase 1 cleanup (archives deleted). Corp-pdf-toolkit archived. Council #22 RFP federation debate. Venvs recreated. Full health check passed.
 - **Failed:** -
 - **Next:** Ontology Q4 (canonical product map). RFP federation implementation. File renames (585 files). MinHash wire into inbox.
@@ -218,7 +225,7 @@
 - **Failed:** Classifier still 51.3% (filename-only ceiling, LLM needed for 70%+)
 - **Next:** Council CLI integration. Obsidian plugins install. Lenzing normalization. RFP KB + vault merge.
 
-## 2026-03-28
+### 2026-03-28
 - **Did:** SQL analytics MVP (6/10 benchmark queries). People added to FTS. Gemini 2.0 Flash-Lite for Tier 2 (-75% cost). Scripts/ to Dev/ migration (11 files, 2673 DB rows). .ecosystem consolidated. ADRs synced (#13-#21). Phase 1 cleanup (archives deleted). Corp-pdf-toolkit archived. Council #22 RFP federation debate. Venvs recreated. Full health check passed.
 - **Failed:** -
 - **Next:** Ontology Q4 (canonical product map). RFP federation implementation. File renames (585 files). MinHash wire into inbox.
@@ -234,39 +241,39 @@
 - **Errors:** 41 extraction errors, Haiku enrichment failures on all files (non-fatal, expected — returns empty JSON), `source_type=presentation` schema mismatch (pre-existing warn-only).
 - **Next:** Monitor trust-status drift. Consider `source_type` enum expansion for presentation/workshop. Eval baseline updated.
 
-## 2026-03-29 — refactor/centralize-hardcoded-paths
+### 2026-03-29 — refactor/centralize-hardcoded-paths
 
 - **Did:** Zero-blast-radius refactor centralizing all MyWork/vault folder name strings into `src/corp/schema/folder_names.py`. Replaced hardcoded literals across 20+ files in 4 batches (4 commits). Added `INBOX`, `PROJECTS`, `TEMPLATES`, `RFP`, `SOURCE_LIBRARY`, `ADMIN`, `ARCHIVE`, `SYSTEM`, `STAGING`, `UNMATCHED`, `QUARANTINE`, `ALL_MYWORK_FOLDERS`, `SCAN_SKIP_FOLDERS` constants. Final grep confirms zero hardcoded folder literals remain in `src/corp/` outside the canonical module.
 - **Gotcha:** Ruff pre-commit hook reformats import blocks in-place, causing "unstaged files" conflicts. Fix: always re-stage (git add) the modified file after a ruff-failed commit, then recommit. Happened 4× during this session.
 - **Tests:** 2412 passed, 6 skipped throughout all batches (no regressions).
 - **Next:** Step 5 (YAML config annotation), Step 6 (test assertion literals), merge to main.
 
-## 2026-03-29 — fix/stale-docs-post-consolidation
+### 2026-03-29 — fix/stale-docs-post-consolidation
 
 - **Did:** Cleaned up all stale references from the 6-package → unified `src/corp/` consolidation. Tier 1: fixed `run-all-tests.ps1` (6-package loop → single `pytest tests/`) and `dev-check.ps1` (`packages/` → `src/`). Tier 2: rewrote README.md for unified layout, updated MASTER_HANDOFF.md (council count 22→23, gotcha count 37→41), fixed ADR-14 config path, updated 20 verify: paths in `~/.claude/skills/gotchas/gotchas.md`. Tier 3: fixed `.env.example` (stale CKE_PATH comment), fixed `.gitignore` (`packages/cke/_outputs/` → `data/_outputs/`), moved 3 phase reports from `docs/` to `.ecosystem/archive/`, removed empty `docs/`, created `CHANGELOG.md` with 1.0.0 consolidation summary.
 - **Commits:** `453a0e3` (Tier 1), `39b95cb` (Tier 2), `7350265` (Tier 3), merged to main.
 - **Failed:** -
 - **Next:** Step 5 (YAML config annotation), Step 6 (test assertion literals), merge `refactor/centralize-hardcoded-paths` to main.
 
-## 2026-03-29 — Council #24: MyWork Knowledge Architecture
+### 2026-03-29 — Council #24: MyWork Knowledge Architecture
 
 - **Did:** Implemented Council #24 binding decisions. Rewrote `folder_names.py` (7 canonical folders + `.corp`). Removed TEMPLATES/SOURCE_LIBRARY/RFP/SYSTEM constants; added WORKFLOWS/REFERENCE/COMPLIANCE/CORP_INFRA + subfolder constants. Updated 17 source files (classifier routing, overnight scopes, integrity checks, path flattening SYSTEM/.corp/X → .corp/X). Updated all test files. Added 16 missing client aliases. Restructured MyWork on disk: created 90_Archive + .corp, moved 9 stale projects to archive, migrated pipeline infra from 90_System to .corp, deleted empty 40_Media and 90_System, merged legacy subdirs in 20_Workflows and 30_Reference.
 - **Tests:** 2412 passed, 6 skipped (no regressions across all steps).
 - **Next:** Verify magistrala pipeline end-to-end with new paths. Measure MISC rate at day 7. Monitor 20_Workflows file count (<75 threshold).
 
-## 2026-03-30 — refactor/align-with-playbook
+### 2026-03-30 — refactor/align-with-playbook
 
 - **Did:** Eliminated `.ecosystem/`. Moved: `MASTER_HANDOFF.md` → `docs/HANDOFF.md`, `archive/` (32 files) → `docs/archive/`, `council_transcripts/` (25 files) → `docs/decisions/transcripts/`, root `decisions/` (25 ADRs + README) → `docs/decisions/`. Updated all active references in `CLAUDE.md`, `update_handoff.py`, `extract_training_data.py`, `quarantine_fragments.py`, `tag_legacy_notes.py`, `docs/decisions/README.md`, `scripts/archive/*.py`. Updated `.gitignore` (`.ecosystem/rebuild_staging/` → `docs/staging/`). One convention, universally applied.
 - **Failed:** Nothing.
 - **Next:** Verify magistrala pipeline end-to-end with new paths. Measure MISC rate at day 7. Monitor 20_Workflows file count (<75 threshold).
 
-## 2026-03-30 — fix/stale-package-references
+### 2026-03-30 — fix/stale-package-references
 
 - **Did:** Purged all stale old-package name references following the 6→1 consolidation. 4 commits: (1) fixed 3 broken runtime paths in `cke_client.py`, `cke_invoker.py`, `extract_training_data.py`; (2) renamed agent keys in `agents.yaml`/`workflows.yaml` to CLI names (com, cpe, rfp); (3) updated `CLAUDE.md` source layout and CLI table; (4) updated docstrings in ~25 src/ files. Preserved intentionally: `%LOCALAPPDATA%/corp-by-os/` paths, `source_tool`/`generated_by` DB values, 3 excluded files. 20 remaining grep hits all confirmed intentional.
 - **Failed:** Nothing — 2495 tests passed.
 - **Next:** Merge fix/stale-package-references → main.
 
-## 2026-03-30 — chore/todo-audit-cleanup
+### 2026-03-30 — chore/todo-audit-cleanup
 
 - **Did:** Full TODO/FIXME/HACK audit across all repo files. Found zero actual comment markers anywhere in the codebase. All 10 hits were false positives: (1) `TaskStatus.TODO` enum values in `models.py`/`task_manager.py`/tests — legitimate code; (2) English noun "hacks" (e.g., "sys.path hacks") in frozen `docs/archive/` and `docs/decisions/transcripts/` — accurate technical prose; (3) "XXXX" substring in a template filename embedded in JSON data/fixture files. No docs needed editing. Added `todo-tree.filtering.excludeGlobs` to `corp-monorepo.code-workspace` — excludes `docs/archive/`, `docs/decisions/`, `*.json`, `JOURNAL.md`, `CHANGELOG.md`, `.venv`, `__pycache__`, `models/`, `data/`, `eval/`. Also added `todo-tree.general.tags` and `defaultHighlight` for explicit tag config. Merged to main.
 - **Failed:** Nothing.
