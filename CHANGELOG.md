@@ -5,7 +5,7 @@
 - Decision 1 sourced from AI Council 2026-04-22 (Option C, 3-of-4 consensus)
 - Decision 2 Option B (narrow invariant with zone whitelist; codifies actual working architecture at 8 action write sites)
 - Implementation prompts follow (3 PRs for OneDrive, 1 for vault writer)
-- `docs/ARCHITECTURE.md` cross-referenced; invariant wording itself unchanged until implementation PRs land
+- `ARCHITECTURE.md` cross-referenced; invariant wording itself unchanged until implementation PRs land
 
 ### 2026-04-21 (hotfix)
 - OneDrive safety hotfix: P1-1 execute_plan guard, P1-2 moves.yaml schema + traversal guard, P1-3 _resolve_project_path writable kwarg

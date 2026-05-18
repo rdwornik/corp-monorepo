@@ -13,7 +13,7 @@ new dependency, but must do so deliberately (see Cultural Rules).
 
 ## Context
 
-The repo uses a 4-layer static architecture documented in `docs/ARCHITECTURE.md`.
+The repo uses a 4-layer static architecture documented in `ARCHITECTURE.md`.
 Until now, import direction was enforced solely by a manual checklist item in `AGENTS.md`
 (Codex code review). Codex found 3 upward dependency violations in a single module during
 a routine diff review, proving that manual enforcement is insufficient at this repo's
