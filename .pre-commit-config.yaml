@@ -16,3 +16,10 @@ repos:
         language: system
         pass_filenames: false
         files: ^src/corp/.*\.py$
+
+      - id: normalize-headers
+        name: normalize dated-log headers (JOURNAL/LESSONS)
+        entry: py scripts/normalize_headers.py
+        language: system
+        pass_filenames: true
+        files: ^(JOURNAL|LESSONS)\.md$
