@@ -33,6 +33,13 @@ Max 20 lines each. Format: Context / Decision / Consequences.
 | [ADR-25](ADR-25-diagram-strategy.md) | Diagram Strategy | Accepted |
 | [ADR-26](ADR-26-tach-adoption.md) | Tach Import Boundary Enforcement | Accepted |
 | [ADR-27](ADR-27-safety-invariants.md) | Safety Invariants — OneDrive Guard Centralization and Vault Writer Narrowing | Accepted |
+| [ADR-30](ADR-30-retire-changelog.md) | Retire CHANGELOG.md | Accepted |
+| [ADR-31](ADR-31-retire-single-file-handoff.md) | Retire single-file HANDOFF (docs/HANDOFF.md + scripts/update_handoff.py) | Accepted |
+
+> ADR-28 and ADR-29 are intentionally skipped — reserved for future
+> distillations of `DECISION_28_community_patterns_research` and
+> `DECISION_29_spec_kit_kiro_research` (Council research debates in
+> `docs/decisions/transcripts/` not yet distilled to ADRs).
 
 ## How to add a new ADR
 
