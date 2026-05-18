@@ -71,7 +71,6 @@
             "**/docs/decisions/**",
             "**/*.json",
             "**/JOURNAL.md",
-            "**/CHANGELOG.md",
             "**/.venv/**",
             "**/__pycache__/**",
             "**/models/**",
