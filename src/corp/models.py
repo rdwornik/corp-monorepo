@@ -26,6 +26,12 @@ class VaultZone(StrEnum):
     EVERGREEN = "04_evergreen"
     PLAYBOOKS = "03_playbooks"
 
+    # Action-write categories (ADR-27 Decision 2 whitelist). These are
+    # SEMANTIC classifications for is_writable_by_actions, NOT physical
+    # vault directories. resolve_vault_path() refuses them.
+    METADATA = "metadata"  # project-info.yaml, index.md under projects/
+    BRIEFS = "briefs"  # brief.md under projects/
+
 
 class Mutability(StrEnum):
     """Folder mutability rules per INTEGRATION_SPEC."""
