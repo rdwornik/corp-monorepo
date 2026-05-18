@@ -1,7 +1,15 @@
 # Development Journal
 
-Append-only log. 3 lines per session. Never edit old entries.
-Claude Code: read last 5 entries before starting work.
+> Append-only log. Never edit old entries.
+> Per-entry shape (per ADR-49, cutover 2026-05-18):
+> `### YYYY-MM-DD — <session topic>` header, then bullets:
+> `- Did:` what was actually done
+> `- Result:` outcome / state on disk
+> `- Changes:` short list of files / areas touched (this is the change record — there is no CHANGELOG anymore)
+> `- Abandoned:` items deliberately dropped (each non-trivial drop also gets a short note in `docs/decisions/`; do not record reasoning inline here)
+> `- Next:` follow-ups
+> Entries above the cutover date use the older `Did / Failed / Next` shape and are preserved as-is.
+> Claude Code: read last 5 entries before starting work.
 
 ---
 
