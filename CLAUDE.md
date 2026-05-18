@@ -78,15 +78,21 @@ src/corp/
 4. Append session summary to JOURNAL.md before ending
 
 ## Session Handoff
-When starting a new Claude.ai chat session, paste:
-1. `docs/HANDOFF.md` (living doc, updated after each session)
-2. Latest Council debate output (if pending)
 
-`docs/HANDOFF.md` replaces per-session handoffs.
-Update it at end of every major session:
-```
-python scripts/update_handoff.py
-```
+Handoffs for this repo are generated in `.dev-knowledge` per
+ADR-42 / `HANDOFF_PROCESS.md`, NOT in this repo (ADR-36 read-only
+contract). Bundles live at
+`.dev-knowledge/docs/handoffs/{YYYY-MM-DD}-corp-monorepo-{type}/`
+(flat 11-file folder; type defaults to `session-sync`).
+
+Trigger: in Claude Code at `.dev-knowledge`, say
+"Make handoff for corp-monorepo" (Stage 1) → paste the OLD browser
+chat response into `stage2-response.md` → say "Complete handoff for
+corp-monorepo" (Stage 3).
+
+See `.dev-knowledge/protocols/HANDOFF_PROCESS.md` for the operational
+spec and `.dev-knowledge/docs/decisions/ADR-42-handoff-format-v3.md`
+for authority.
 
 ## Prompt Decision Rule
 - 1 file, 1 module → conversational (just talk to Claude Code)
