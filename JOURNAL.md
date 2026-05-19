@@ -13,6 +13,15 @@
 
 ---
 
+### 2026-05-19 — CLAUDE.md rewrite to v2.1 (Chunk 5, ADR-53 conformance)
+- Did: Rewrote corp-monorepo CLAUDE.md from pre-template structure to the v2.1 12-section template on branch `docs/chunk5-corp-monorepo-claude-md-v21`. Confirmed ARCHITECTURE.md already contains all architecture content (Source Layout, CLI Reference, Configuration Architecture, Key Invariants, Dependency Layers) — no ARCHITECTURE.md changes needed. Distributed all current content per the approved disposition map: architecture → §3 pointer; conventions → §4; critical rules + 4 learned rules with verify: lines → §5; session protocol + handoff pointer → §6; ADRs → §11. Added two approved additions: §2 Purpose line (from VISION.md) and §10 AGENTS.md durable guard (Codex review config — outside ADR-53 scope).
+- Result: CLAUDE.md is ADR-53 conformant at v2.1; all rules preserved; no content dropped; AGENTS.md untouched. Line count ~172 (under 200 budget).
+- Changes: `CLAUDE.md` rewritten to v2.1 12-section template. `ARCHITECTURE.md` unchanged (no gaps found).
+- Abandoned: Nothing — AGENTS.md deliberately untouched (Codex code-review config, not an ADR-53 instruction contract).
+- Next: `.dev-knowledge` correction of mislabeled ARCHITECTURE.md entry (separate session in `.dev-knowledge` repo).
+
+---
+
 ### 2026-05-18 — Rollout cleanup: three audit loose ends closed
 - Did: Ran post-rollout completeness audit against the 2026-05-18 universalization gap-review; confirmed 23/24 gap-items closed; identified three loose ends and executed cleanup on branch `docs/rollout-cleanup`. (1) Deleted `docs/handoffs/2026-04-15-handoff.md` (sole occupant; contradicted ADR-36/42 by keeping a handoff in a target repo). (2) Deleted `templates/ADR-template.md` (per-repo template not mandated by ADR-38 and already silently drifted from `.dev-knowledge/templates/ADR-template.md` — missing `Amends:` and `Source:` fields); repointed `docs/decisions/README.md` step 1 at the `.dev-knowledge` canonical, mirroring the cross-repo phrasing CLAUDE.md uses for ADR-42 handoffs. (3) Promoted the two date-prefixed decommission notes to numbered ADRs in the canonical template shape: `2026-05-18-retire-changelog.md` → `ADR-30-retire-changelog.md`; `2026-05-18-retire-single-file-handoff.md` → `ADR-31-retire-single-file-handoff.md`. Skipped ADR-28/29 (reserved for future distillations of `DECISION_28_community_patterns_research` and `DECISION_29_spec_kit_kiro_research` — pairing convention preserved); README.md carries a one-paragraph note explaining the skip.
 - Result: `docs/handoffs/` and `templates/` directories gone (both became empty after their sole file was removed). `docs/decisions/README.md` indexes ADR-01..ADR-27 plus ADR-30, ADR-31. The canonical ADR template lives only in `.dev-knowledge/templates/` per ADR-36 read-only contract. Four commits on `docs/rollout-cleanup`, each narrow + revertable; pre-commit ruff/tach/header-normalizer skipped (no `.py` or dated-log files touched after the JOURNAL step itself). Universalization rollout complete.
