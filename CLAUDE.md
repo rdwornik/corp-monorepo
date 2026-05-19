@@ -1,105 +1,147 @@
-# Corporate OS Monorepo
+# CLAUDE.md
+<!-- scope: meta -->
+<!-- version: 2.1 — 2026-05-19 -->
 
-## Project Scale: L
+> **Session contract for Claude Code in this repo.** Read on every session start (auto). Single canonical agent-instruction file (≤200 lines). Per ADR-53.
+>
+> **For universal rules:** read `../.dev-knowledge/protocols/ESSENTIALS.md` and `protocols/PLAYBOOK.md`.
 
-## Architecture (unified src/corp/ layout)
+## 1. First read (session start)
 
-All 6 former packages consolidated into a single `src/corp/` namespace.
-One `pyproject.toml` at repo root. One `pip install -e .`.
+In order, read:
+1. This file (you're here)
+2. `../.dev-knowledge/protocols/ESSENTIALS.md` — Rob's universal working style
+3. `../.dev-knowledge/protocols/PLAYBOOK.md` — universal protocols (only sections relevant to current task)
+4. Most recent `docs/handoffs/*.md` if continuing prior session
+5. Last 5 entries of `JOURNAL.md`
+6. `VISION.md` — project purpose and scope
 
-### Architecture Rules (non-negotiable)
-- corp (ingest/) is SOLE writer for `02_sources/` `.md` notes (ADR-27 narrowed ADR-23). `actions/*` may write directly to three authorized categories: DASHBOARDS (top-level `dashboards/`), METADATA (`projects/{pid}/project-info.yaml` + `index.md`), BRIEFS (`projects/{pid}/brief.md`). All other writes route through `vault_io.write_note()`. Enforced by `tests/safety/test_vault_writer_invariant.py` (leaf-filename classification).
-- CKE (extractor/) is PURE extraction engine — no vault writes
-- Forward slashes everywhere in databases/paths
-- API keys in env vars, NEVER in config files
-- GEMINI_API_KEY is the standard (not GOOGLE_API_KEY)
+**Skip if not applicable** — but always read 1–2.
 
-### Source Layout
+## 2. Repo identity
 
-```
-src/corp/
-  schema/          taxonomy, models, schema.yaml
-  extractor/       CKE — knowledge extraction engine
-  ingest/          ingest pipeline (sole writer for 02_sources/ — ADR-27)
-  retrieve/        retrieval engine
-  cli/             CLI modules
-  project/         CPE — project extractor
-  rfp/             RFP agent
-  opportunity/     COM — opportunity manager
-```
+- **Name:** `corp-monorepo`
+- **Purpose:** Corporate OS — AI-powered knowledge management for Blue Yonder presales (ingest corporate source material → LLM extraction → Obsidian vault notes → FTS5 search; five CLIs drive all operations)
+- **Scale:** `L` (per `.dev-knowledge/protocols/PLAYBOOK.md` Project Scale Tiers)
+- **Status:** `active`
 
-### CLIs (see `pytest --collect-only -q` for current test count)
+## 3. Architecture
 
-| CLI | Entry point | Module |
-|-----|-------------|--------|
-| `corp` | `corp.cli:cli` | ingest, retrieve, cli |
-| `corp-meta` | `corp.schema.cli:main` | schema |
-| `cke` | `corp.extractor.scripts.run:cli` | extractor |
-| `cpe` | `corp.project.cli:cli` | project |
-| `com` | `corp.opportunity.cli:cli` | opportunity |
+See `ARCHITECTURE.md` for the structural model; read it before structural changes (required at Scale M+, per ADR-51).
 
-## Development
-- Feature branches: `feat/`, `fix/`, `refactor/`, `chore/`
-- Commit messages: `feat:`, `fix:`, `test:`, `refactor:`, `chore:`, `docs:`
-- Run `./scripts/run-all-tests.ps1` before merging
-- Check `~/.claude/skills/gotchas/` before modifying any module
+Key facts (abbreviated; `ARCHITECTURE.md` is authoritative):
+- Unified `src/corp/` namespace — 6 former packages consolidated; one `pyproject.toml`
+- 4-layer dependency model: `interface > orchestration > core > foundation` (Tach-enforced)
+- 5 CLIs: `corp`, `corp-meta`, `cke`, `cpe`, `com`
 
-## Key Config
-- Centralized paths: `config/paths.toml`
-- Naming convention: `config/naming_config.yaml` (19 type codes, 15 client aliases)
-- Taxonomy: `src/corp/schema/taxonomy.yaml`
-- Schema contract: `src/corp/schema/data/schema.yaml`
-- Client aliases: `src/corp/extractor/data/client_aliases.yaml`
-- Training data: `scripts/extract_training_data.py` → `tests/fixtures/`
-- Environment variables override config
+## 4. Conventions
 
-## Council Decisions (see `docs/decisions/README.md` for the current index; ADR summaries in `docs/decisions/`, full transcripts in `docs/decisions/transcripts/`)
-- #14: Naming convention v2 — `{YYYY-MM}_{TYPE}_{CLIENT}_{Description}.{ext}`
-- #23: Monorepo internal architecture — flatten, centralize, delete dead code
+- **Naming:** `snake_case` Python, `kebab-case` markdown, UPPERCASE living docs; files: `{YYYY-MM}_{TYPE}_{CLIENT}_{Desc}.{ext}` (ADR-14)
+- **Commits:** Conventional Commits — `feat:/fix:/docs:/chore:/refactor:/test:`
+- **Branches:** `feat/`, `fix/`, `refactor/`, `chore/`, `docs/` off `main`; never commit to `main` directly
+- **Testing:** `pytest -x --tb=short`; run `./scripts/run-all-tests.ps1` before merging
+- **Linting:** pre-commit hooks — ruff (formatting/linting) + tach (dependency layers)
+- **Config:** centralized in `config/paths.toml`; `GEMINI_API_KEY` is standard (not `GOOGLE_API_KEY`); ENV > config > default
+- **Engagement:** 1 file/1 module → conversational; 2-3 files/1 module → conversational with context; 3+ files/2+ modules → formal `.md` prompt; architecture decision → AI Council debate
 
-## Safety
-- NEVER let cleanup touch "OneDrive - Blue Yonder" paths
-- Test after every change
-- Git feature branches, never commit to main directly
+**Out of scope for this repo:**
+- Client/pre-sales data → Obsidian vault
+- Cross-repo lessons → `.dev-knowledge/LESSONS.md`
 
-## Learned Rules (project-specific, graduated from corrections)
+## 5. Critical rules
+
+1. **corp (ingest/) is SOLE writer for `02_sources/` `.md` notes** (ADR-27; `actions/*` may write DASHBOARDS, METADATA, BRIEFS directly; all others via `vault_io.write_note()`). Enforced by `tests/safety/test_vault_writer_invariant.py`.
+2. **CKE (extractor/) is PURE extraction engine** — no vault writes, no database writes.
+3. **API keys in env vars ONLY** — loaded from `~/Documents/.secrets/.env`; NEVER in config files or code.
+4. **OneDrive exclusion** — NEVER let cleanup or audit touch `OneDrive - Blue Yonder` paths (fail-closed guards at every mutation site; see ARCHITECTURE.md §OneDrive safety guards).
+5. **Run `./scripts/run-all-tests.ps1` before merging; `./scripts/dev-check.ps1` before PR.**
+6. **Check `~/.claude/skills/gotchas/` before modifying any module.**
+7. **Forward slashes everywhere** in databases and stored paths.
+
+**Graduated learned rules (verify lines are mandatory — gotchas system):**
+
 - Never run `pip install` from `_archived_*` repos — overwrites monorepo CLI entry points. Only install from corp-monorepo root.
-  verify: Grep("pip install", path="corp-monorepo/") → confirm no install instructions point to archived repos
-- git subtree branches must NEVER be rebased — always merge. Rebase causes duplicate commits and lost history.
-  verify: manual (process rule — check before any rebase on monorepo branches)
+  `verify: Grep("pip install", path="corp-monorepo/") → confirm no install instructions point to archived repos`
+- git subtree branches must NEVER be rebased — always merge. Rebase → duplicate commits and lost history.
+  `verify: manual (process rule — check before any rebase on monorepo branches)`
 - CKE output must be staged in `scope/client/package/` hierarchy BEFORE running `corp ingest-extractions`. Flat dirs → 0 notes ingested.
-  verify: Grep("ingest-extractions", path="corp-monorepo/") → check any docs/scripts for flat-dir usage
-- status.json concurrent reads must use try/except with 2-3 retries — CKE writes while polling reads cause JSONDecodeError.
-  verify: Grep("json.loads", path="corp-monorepo/src/corp/") → confirm retry wrapper exists
+  `verify: Grep("ingest-extractions", path="corp-monorepo/") → check any docs/scripts for flat-dir usage`
+- `status.json` concurrent reads must use try/except with 2-3 retries — CKE writes while polling reads cause JSONDecodeError.
+  `verify: Grep("json.loads", path="corp-monorepo/src/corp/") → confirm retry wrapper exists`
 
-## Session Protocol
-1. **Read `VISION.md`** (repo root) — understand the project's purpose and scope before any work.
-2. Read last 5 entries from JOURNAL.md before starting work
-3. After implementation, self-review: focus on error handling, edge cases, gotchas
-4. Before merging, run: ./scripts/dev-check.ps1
-5. Append session summary to JOURNAL.md before ending. Per-entry shape (ADR-49, cutover 2026-05-18):
-   `### YYYY-MM-DD — <topic>` then `- Did:` / `- Result:` / `- Changes:` / `- Abandoned:` / `- Next:`.
-   `Changes:` is the change record — there is no CHANGELOG anymore. Append-only; never edit prior entries.
+## 6. Session start protocol
 
-## Session Handoff
+1. `/boot` (loads skills, memory, recent commits)
+2. `git status` — clean working tree?
+3. `git log --oneline -5` — recent context
+4. Read most recent handoff if continuing
+5. Read last 5 entries of `JOURNAL.md`
+6. Wait for Rob's prompt — never improvise
 
-Handoffs for this repo are generated in `.dev-knowledge` per
-ADR-42 / `HANDOFF_PROCESS.md`, NOT in this repo (ADR-36 read-only
-contract). Bundles live at
-`.dev-knowledge/docs/handoffs/{YYYY-MM-DD}-corp-monorepo-{type}/`
-(flat 11-file folder; type defaults to `session-sync`).
+**Session end:** Append entry to `JOURNAL.md` (ADR-49 shape, cutover 2026-05-18):
+`### YYYY-MM-DD — <topic>` then `- Did:` / `- Result:` / `- Changes:` / `- Abandoned:` / `- Next:`.
+`Changes:` is the sole change record (no CHANGELOG). Append-only; never edit prior entries.
 
-Trigger: in Claude Code at `.dev-knowledge`, say
-"Make handoff for corp-monorepo" (Stage 1) → paste the OLD browser
-chat response into `stage2-response.md` → say "Complete handoff for
-corp-monorepo" (Stage 3).
+**Handoffs:** Generated in `.dev-knowledge` per ADR-42/HANDOFF_PROCESS.md — NOT in this repo (ADR-36 read-only contract).
+Trigger: in Claude Code at `.dev-knowledge`, say "Make handoff for corp-monorepo".
 
-See `.dev-knowledge/protocols/HANDOFF_PROCESS.md` for the operational
-spec and `.dev-knowledge/docs/decisions/ADR-42-handoff-format-v3.md`
-for authority.
+## 7. Slash commands available
 
-## Prompt Decision Rule
-- 1 file, 1 module → conversational (just talk to Claude Code)
-- 2-3 files, 1 module → conversational with context
-- 3+ files, 2+ modules → formal .md prompt
-- Architecture decision → AI Council debate
+User-level (`~/.claude/commands/`):
+- `/session-summary` — generate handoff at session end
+- `/boot` — load context, skills, memory
+- `/codex-review` — invoke Codex review
+- `/evolve` — evolution audit
+
+Repo-level (`./.claude/commands/`): none currently
+
+## 8. Skills active
+
+User-level (`~/.claude/skills/`):
+- `gotchas` — universal dev gotchas (encoding, shell safety, test framework)
+- `verify` — domain-specific verification; run after pytest passes
+- `boot` — session boot; loads memory, verifies rules, checks trends
+
+Repo-level (`./.claude/skills/`):
+- `gotchas` — corp-monorepo patterns (CKE, vault ops, OneDrive safety, Graph API). **Read before changes.**
+
+## 9. Hooks active
+
+Pre-commit (from `.pre-commit-config.yaml`):
+- ruff — linting and formatting
+- tach — dependency layer enforcement (`interface > orchestration > core > foundation`)
+
+Other (`.claude/settings.json`):
+- Session startup hook — loads learned rules (6 lines)
+
+## 10. Anti-patterns specific to Claude Code in this repo
+
+- Do NOT modify, migrate, or delete `AGENTS.md` — it is a Codex code-review configuration that Codex reads natively, NOT an ADR-53 instruction contract. ADR-53 retired the AGENTS.md instruction contract; a tool-specific config file is outside its scope, and this file is deliberately kept.
+- Don't assume module paths from old package names (`corp_by_os`, `corp_os_meta`, `corp_knowledge_extractor`) — all are now under `src/corp/`
+- Don't run `pip install` from `_archived_*` repos — overwrites monorepo entry points
+- Don't skip `scope/client/package/` hierarchy when staging CKE output for `corp ingest-extractions`
+- Don't read `status.json` without try/except + retry (concurrent write risk from CKE)
+- Don't bypass pre-commit with `--no-verify` — tach violations are real architecture violations
+
+## 11. Recent ADRs binding here
+
+Full list: `docs/decisions/README.md`.
+
+- ADR-14: Naming convention v2 — `{YYYY-MM}_{TYPE}_{CLIENT}_{Description}.{ext}`
+- ADR-23: Monorepo internal architecture — flatten, centralize, delete dead code
+- ADR-27: Vault writer narrowed — `ingest/` SOLE writer for `02_sources/`; actions/* exempt for DASHBOARDS, METADATA, BRIEFS
+- ADR-36: Session handoffs generated in `.dev-knowledge` only (read-only contract for this repo)
+- ADR-42: Handoff format v3 — bundles at `.dev-knowledge/docs/handoffs/{YYYY-MM-DD}-corp-monorepo-{type}/`
+- ADR-49: JOURNAL.md entry shape (cutover 2026-05-18) — `Did/Result/Changes/Abandoned/Next`
+- ADR-51: ARCHITECTURE.md convention — read before structural changes (Scale M+)
+- ADR-53: CLAUDE.md as single canonical agent-instruction file (supersedes ADR-52)
+
+## 12. Section history
+
+- v1.0 (pre-2026-05-19) — original pre-template CLAUDE.md (Project Scale / Architecture / Development / Safety sections)
+- v2.1 (2026-05-19) — rewritten to v2.1 12-section template per ADR-53; architecture content homed in ARCHITECTURE.md; §3 is pointer; §2 Purpose added; §10 AGENTS.md guard added
+
+---
+
+**Last updated:** 2026-05-19  
+**Maintained by:** Rob
