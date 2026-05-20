@@ -17,7 +17,6 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 DOCS = [
     REPO_ROOT / "CLAUDE.md",
-    REPO_ROOT / "AGENTS.md",
     REPO_ROOT / "CONTRIBUTING.md",
     REPO_ROOT / "docs" / "ARCHITECTURE.md",
     *sorted((REPO_ROOT / "src" / "corp").rglob("README.md")),
