@@ -22,6 +22,15 @@
 
 ---
 
+### 2026-05-20 — Delete corp-monorepo AGENTS.md entirely (ADR-54 complete)
+- Did: Deleted `AGENTS.md` on branch `docs/delete-corp-monorepo-agents-md`. Confirmed `ARCHITECTURE.md` carries the vault-writer invariant (Key Invariants §1, line 393) before deleting the pointer. The stale-package-references check was already present in `CLAUDE.md` §10 — no relocation needed. Rewrote `CLAUDE.md` §10 bullet to a factual note (no per-repo `AGENTS.md`; global config at `~/.codex/AGENTS.md`, ADR-54). Removed stale `AGENTS.md` entry from `CONTRIBUTING.md` Architecture Reference. Found and removed stale `AGENTS.md` entry from `scripts/check_doc_refs.py` DOCS list (the `if not doc.exists(): continue` guard made it harmless, but it was a live script with a dead reference). Verified final grep: all remaining `AGENTS.md` references are in historical/immutable docs (ADRs, audits, transcripts, JOURNAL).
+- Result: `AGENTS.md` deleted; corp-monorepo has no per-repo Codex overlay — consistent with `.dev-knowledge` and `ai-council`. ADR-53/ADR-54 effort complete.
+- Changes: deleted `AGENTS.md`; `CLAUDE.md` §10 bullet updated; `CONTRIBUTING.md` Architecture Reference line removed; `scripts/check_doc_refs.py` DOCS list cleaned.
+- Abandoned: Nothing.
+- Next: ADR-53/ADR-54 effort is complete across all repos.
+
+---
+
 ### 2026-05-19 — Retire AGENTS.md to thin per-repo Codex overlay (ADR-54)
 - Did: Reduced `corp-monorepo/AGENTS.md` from 133-line full Codex reviewer config to a 17-line per-repo overlay on branch `docs/retire-corp-monorepo-agents-md`. Verified all Architecture Context sub-parts (repo structure, module table, dependency rule, layer list, invariants, databases, config) are covered by `ARCHITECTURE.md` — nothing dropped without coverage. Retained exactly two genuinely repo-specific review rules: vault-writer invariant as an active-check pointer to `ARCHITECTURE.md`/ADR-27 (not a restatement — avoids creating a drift pair), and stale package-name references (`corp_by_os`, `corp_os_meta`, `corp_knowledge_extractor`). Corrected `CLAUDE.md` §10 guard, which previously said "Do NOT modify/delete AGENTS.md" — now accurately describes AGENTS.md as a per-repo overlay with the global config at `~/.codex/AGENTS.md` (ADR-54). Updated `CONTRIBUTING.md` line 121 reference. Left all historical/immutable docs (ADRs, audits, transcripts, JOURNAL) untouched.
 - Result: `AGENTS.md` is 17 lines; `CLAUDE.md` §10 is accurate; `CONTRIBUTING.md` reference updated. No repo-specific review rules dropped. No drift pairs introduced.
