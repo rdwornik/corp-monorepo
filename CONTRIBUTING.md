@@ -118,4 +118,3 @@ Do not add new violations without architectural justification.
 `ARCHITECTURE.md` — module map, layer definitions, design patterns
 `docs/decisions/` — all ADRs (26 decisions)
 `tach.toml` — authoritative layer assignments
-`AGENTS.md` — corp-monorepo-specific Codex review overlay (global config at `~/.codex/AGENTS.md`, ADR-54)
