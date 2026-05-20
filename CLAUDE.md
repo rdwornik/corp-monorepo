@@ -116,7 +116,7 @@ Other (`.claude/settings.json`):
 
 ## 10. Anti-patterns specific to Claude Code in this repo
 
-- `AGENTS.md` is a per-repo Codex review overlay — corp-monorepo-specific review rules only (ADR-54). The generic Codex reviewer config is global at `~/.codex/AGENTS.md`. Per-repo additions and modifications to `AGENTS.md` are fine; updates to the generic config must go in `.dev-knowledge/codex/AGENTS.md`.
+- The Codex reviewer config is global (`~/.codex/AGENTS.md`, ADR-54); corp-monorepo has no per-repo `AGENTS.md`. Updates to the global config go in `.dev-knowledge/codex/AGENTS.md`.
 - Don't assume module paths from old package names (`corp_by_os`, `corp_os_meta`, `corp_knowledge_extractor`) — all are now under `src/corp/`
 - Don't run `pip install` from `_archived_*` repos — overwrites monorepo entry points
 - Don't skip `scope/client/package/` hierarchy when staging CKE output for `corp ingest-extractions`
