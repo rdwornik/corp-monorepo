@@ -1,10 +1,8 @@
 ---
 version: 1.0
-tier: standard
-scale: L
 owner: rob
 status: active
-last_reviewed: 2026-05-18
+last_reviewed: 2026-05-27
 ---
 
 # VISION — corp-monorepo
