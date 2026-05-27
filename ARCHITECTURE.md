@@ -1,9 +1,15 @@
-# Architecture Reference -- Corporate OS
+---
+last_reviewed: 2026-05-27
+status: active
+owner: Rob
+---
+
+# Architecture — `corp-monorepo`
 
 > Living document. Updated after structural changes.
-> Last updated: 2026-03-30 (dependency layers clarified)
+> Last updated: `2026-05-27` (`re-homed into ADR-51 canonical template; codemap + layer model → inline Mermaid; CORE section tagging`)
 
-## System Overview
+## Purpose [CORE]
 
 > **Visual diagrams** live in `docs/diagrams/`. Open the `.svg` files directly in VS Code for rendered architecture views (system context, module map, pipeline flow).
 
@@ -15,7 +21,68 @@ expose all operations.
 
 → System context diagram: `docs/diagrams/system-context.svg`
 
-## Source Layout
+## Codemap [CORE]
+
+The codemap answers *"what exists and how does it relate?"*. Hand-authored
+Mermaid (generator adoption is opt-in per ADR-51 amendment 2026-05-22; corp has
+`tach.toml`, so a future generator opt-in would derive layer colors — out of
+scope here). The top-level package graph is below; the full source layout
+follows as a textual complement. This Mermaid block is the canonical codemap,
+superseding the hand-drawn `container-module.svg` (retained only as a curated
+higher-level view under §Diagrams pointers).
+
+<!-- CODEMAP:START -->
+```mermaid
+flowchart TD
+    cli[cli/]:::interface
+    ingest[ingest/]:::orchestration
+    extractor[extractor/]:::core
+    retrieve[retrieve/]:::core
+    project[project/]:::core
+    opportunity[opportunity/]:::core
+    rfp[rfp/]:::core
+    ops[ops/]:::core
+    schema[schema/]:::foundation
+    extraction[extraction/]:::foundation
+
+    cli --> ingest
+    cli --> retrieve
+    cli --> extractor
+    cli --> project
+    cli --> opportunity
+    cli --> rfp
+    ingest --> extractor
+    ingest --> ops
+    extractor --> extraction
+    extractor --> schema
+    retrieve --> ops
+    retrieve --> schema
+    ingest --> schema
+    ops --> schema
+    project --> schema
+    opportunity --> schema
+    rfp --> retrieve
+
+    classDef foundation fill:#e8e8e8,stroke:#888
+    classDef core fill:#bde0fe,stroke:#1971c2
+    classDef orchestration fill:#a5d8ff,stroke:#1971c2
+    classDef interface fill:#74c0fc,stroke:#1864ab
+
+    click schema href "src/corp/schema/" "Open schema"
+    click extractor href "src/corp/extractor/" "Open extractor"
+    click extraction href "src/corp/extraction/" "Open extraction"
+    click ingest href "src/corp/ingest/" "Open ingest"
+    click ops href "src/corp/ops/" "Open ops"
+    click retrieve href "src/corp/retrieve/" "Open retrieve"
+    click project href "src/corp/project/" "Open project"
+    click opportunity href "src/corp/opportunity/" "Open opportunity"
+    click rfp href "src/corp/rfp/" "Open rfp"
+    click cli href "src/corp/cli/" "Open cli"
+```
+<!-- hand-authored Mermaid codemap per ADR-51 amendment 2026-05-22; not generator-managed -->
+<!-- CODEMAP:END -->
+
+**Full source layout (textual complement):**
 
 ```
 src/corp/
@@ -161,15 +228,30 @@ src/corp/
 | `rfp/` | llm_router, answer_selector, rfp_excel_agent, rfp_answer_word, vault_adapter, anonymization/ | RFP answering pipeline |
 | `cli/` | 18 files | All Click command groups (see CLI Reference below) |
 
-## Dependency Layers
+## Layer Boundaries & Invariants [CORE]
 
 The codebase enforces a 4-layer dependency model via Tach (`tach.toml`).
 Modules in higher layers may import from lower layers; the reverse is forbidden
 and blocked by pre-commit and CI (`tach check`).
 
+```mermaid
+flowchart TD
+    interface["interface<br/>cli/, chat, sandbox, test_pipeline"]:::interface
+    orchestration["orchestration<br/>actions/, ingest/, workflow_engine,<br/>query_engine, index_builder, task/template mgr"]:::orchestration
+    core["core<br/>extractor/, ops/, retrieve/, project/,<br/>opportunity/, rfp/, overnight/, cleanup/, vault_io, ..."]:::core
+    foundation["foundation<br/>schema/, models, routing_types, extraction/"]:::foundation
+
+    interface --> orchestration
+    orchestration --> core
+    core --> foundation
+
+    classDef foundation fill:#e8e8e8,stroke:#888
+    classDef core fill:#bde0fe,stroke:#1971c2
+    classDef orchestration fill:#a5d8ff,stroke:#1971c2
+    classDef interface fill:#74c0fc,stroke:#1864ab
 ```
-interface > orchestration > core > foundation
-```
+
+**Enforcement tool:** Tach. **Config file:** `tach.toml`. **Where enforced:** pre-commit hook + CI (`tach check`).
 
 ### Layer Assignments
 
@@ -203,6 +285,19 @@ is not a violation.
 cycle was resolved by extracting `Intent` to `routing_types.py`.
 
 → Module map diagram: `docs/diagrams/container-module.svg`
+
+### Key Invariants
+
+1. **corp (ingest/) is SOLE vault writer** -- CKE produces JSON, ingest writes .md (narrowed by ADR-27: `vault_io.write_note` remains sole writer for `.md` sources under `02_sources/`; `actions/*` may write directly to three named categories — DASHBOARDS, METADATA, BRIEFS)
+2. **CKE (extractor/) is PURE extraction** -- no vault writes, no database writes
+3. **Forward slashes everywhere** in databases and stored paths
+4. **API keys in env vars** -- loaded from ~/Documents/.secrets/.env, never in config
+5. **OneDrive exclusion** -- cleanup/audit NEVER touch "OneDrive - Blue Yonder" paths
+6. **WAL mode** on all SQLite databases for crash safety
+7. **Record-before-move** -- ingest logs to ops.db BEFORE filesystem operations
+
+→ OneDrive-exclusion (#5) enforcement detail: see § Architecture Assessment › OneDrive safety guards.
+→ Related decisions: ADR-27 (vault-writer narrowing; OneDrive-guard centralization).
 
 ## Database Schemas
 
@@ -388,19 +483,9 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
 | rfp_feedback.py non-atomic ID | Single-threaded CLI. Race condition impossible in current usage. |
 | schema/cli.py missing -> None annotations | Cosmetic. Click commands return None by convention. |
 
-### Key Invariants
-
-1. **corp (ingest/) is SOLE vault writer** -- CKE produces JSON, ingest writes .md (narrowed by ADR-27: `vault_io.write_note` remains sole writer for `.md` sources under `02_sources/`; `actions/*` may write directly to three named categories — DASHBOARDS, METADATA, BRIEFS)
-2. **CKE (extractor/) is PURE extraction** -- no vault writes, no database writes
-3. **Forward slashes everywhere** in databases and stored paths
-4. **API keys in env vars** -- loaded from ~/Documents/.secrets/.env, never in config
-5. **OneDrive exclusion** -- cleanup/audit NEVER touch "OneDrive - Blue Yonder" paths
-6. **WAL mode** on all SQLite databases for crash safety
-7. **Record-before-move** -- ingest logs to ops.db BEFORE filesystem operations
-
 ### OneDrive safety guards (hotfix 2026-04-21)
 
-The invariant above ("OneDrive exclusion") is enforced by explicit fail-closed
+The OneDrive-exclusion invariant (§ Layer Boundaries & Invariants #5) is enforced by explicit fail-closed
 guards at every known mutation site. Guards live next to the mutation. See
 ADR-27 for centralization design (`corp/safety/onedrive.py` + AST-based CI
 enforcement); implementation lands in three follow-up PRs.
