@@ -27,7 +27,7 @@ instead of ad-hoc manual effort. Two outcomes define "realised": the
 work is automated, and the corporate knowledge Rob accumulates is
 organised rather than lost.
 
-`corp-monorepo` is the largest repository in the ecosystem (Scale L) and
+`corp-monorepo` is the largest repository in the ecosystem and
 its product layer — the place where the ecosystem's methodology and
 tooling are turned into actual day-job leverage.
 
@@ -110,10 +110,14 @@ in-scope; `JOURNAL` entries trace back to VISION goals; ADRs implement
 VISION decisions. Any contradiction is a drift signal that triggers
 review.
 
-**Tier classification:** Standard tier, Scale L. `corp-monorepo` is the
-ecosystem's largest repository — multiple packages, deep history,
-extraction + orchestration + product surface — and carries the full
-Scale-L mandatory file set per ADR-38.
+**Tier classification:** retired 2026-05-23. The repo-tier system
+(ADR-33 `tier:`/`scale:` frontmatter; ADR-40 algorithmic computation) is
+deprecated ecosystem-wide; `corp-monorepo` declares no tier. The universal
+governance baseline (ADR-38 amendment A5) applies regardless of repo size —
+`corp-monorepo` carries the full mandatory file set (VISION + ARCHITECTURE +
+BACKLOG) as every repo does. Historically classified Standard / Scale L
+(the ecosystem's largest repository — multiple packages, deep history,
+extraction + orchestration + product surface).
 
 **Ownership:** Rob (sole authority).
 
