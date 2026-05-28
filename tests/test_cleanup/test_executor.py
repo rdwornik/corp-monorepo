@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+
 from corp.cleanup.executor import _guard_onedrive, execute_moves
 from corp.schema.folder_names import ADMIN, INBOX, REF_RFP_LIBRARY, REFERENCE
 

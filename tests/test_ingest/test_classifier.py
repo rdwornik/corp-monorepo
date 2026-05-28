@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+
 from corp.ingest.classifier import (
     _human_size,
     classify,

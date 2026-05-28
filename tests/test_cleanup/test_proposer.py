@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
+
 from corp.cleanup.classifier import Classification
 from corp.cleanup.proposer import generate_proposals
 from corp.cleanup.scanner import FileInfo

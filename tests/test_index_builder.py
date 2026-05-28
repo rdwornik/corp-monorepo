@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+
 from corp.index_builder import (
     _compute_rfp_visible,
     _connect,

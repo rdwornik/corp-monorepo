@@ -3,6 +3,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from corp.extractor.synthesize import write_transcript_note
 from corp.extractor.transcript import (
     MAX_RETRIES,

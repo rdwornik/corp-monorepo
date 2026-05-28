@@ -3,12 +3,13 @@
 from pathlib import Path
 
 import pytest
+from openpyxl import Workbook
+
 from corp.opportunity.excel_manager import (
     find_row_by_client,
     list_projects,
     update_folder_link,
 )
-from openpyxl import Workbook
 
 
 @pytest.fixture

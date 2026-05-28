@@ -4,6 +4,7 @@ import json
 from unittest.mock import MagicMock
 
 import pytest
+
 from corp.extractor.batch_api import (
     BatchJobRunner,
     build_batch_jsonl,

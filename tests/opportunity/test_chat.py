@@ -7,10 +7,11 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+from rich.console import Console
+
 from corp.opportunity.chat import ChatSession, _parse_date
 from corp.opportunity.config import AppConfig
 from corp.opportunity.models import IntentResult
-from rich.console import Console
 
 
 @pytest.fixture

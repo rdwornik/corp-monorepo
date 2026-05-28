@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import pytest
+
 from corp.extraction.folder_policy import ExtractionPolicy
 from corp.extraction.manifest_emitter import (
     _make_entry_id,

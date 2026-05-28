@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+
 from corp.cleanup.errors import PathTraversalError
 from corp.cleanup.executor import execute_moves
 from corp.schema.folder_names import INBOX

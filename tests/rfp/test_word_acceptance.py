@@ -1,6 +1,9 @@
 """Acceptance tests for Word agent -- structure checks only (no LLM calls)."""
 
 import pytest
+from docx import Document
+from docx.oxml.ns import qn
+
 from corp.rfp.rfp_answer_word import (
     build_section_tree,
     collect_answerable_sections,
@@ -8,8 +11,6 @@ from corp.rfp.rfp_answer_word import (
     insert_answer_after,
     insert_blank_after,
 )
-from docx import Document
-from docx.oxml.ns import qn
 
 
 # ---------------------------------------------------------------------------

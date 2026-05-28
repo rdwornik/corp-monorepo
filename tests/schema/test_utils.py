@@ -1,6 +1,7 @@
 """Tests for shared utilities."""
 
 import pytest
+
 from corp.schema import parse_llm_json
 
 

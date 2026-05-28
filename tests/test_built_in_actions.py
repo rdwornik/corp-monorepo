@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
+
 from corp.built_in_actions import (
     _slugify,
     archive_project,

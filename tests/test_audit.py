@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import pytest
+
 from corp.audit import (
     _build_file_listing,
     _build_project_listing,

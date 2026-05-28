@@ -4,6 +4,7 @@ import subprocess
 from unittest.mock import MagicMock, patch
 
 import fitz
+
 from corp.extractor.extract import _render_pdf_to_slides
 from corp.extractor.slides.pdf_converter import (
     _convert_via_com,

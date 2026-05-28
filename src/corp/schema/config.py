@@ -9,10 +9,9 @@ Usage:
 """
 
 import os
+import tomllib
 from functools import lru_cache
 from pathlib import Path
-
-import tomllib
 
 _CONFIG_SEARCH = [
     Path.cwd() / "config" / "paths.toml",

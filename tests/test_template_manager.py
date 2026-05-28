@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+
 from corp.models import TemplateInfo
 from corp.template_manager import (
     _make_id,

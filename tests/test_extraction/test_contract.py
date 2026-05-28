@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import pytest
+
 from corp.extraction.contract import ManifestValidationError, validate_manifest
 
 

@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+
 from corp.ops.registry import ContentRegistry
 from corp.schema.folder_names import (
     INBOX,

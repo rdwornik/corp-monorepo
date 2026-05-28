@@ -12,6 +12,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+
 from corp.actions._helpers import _resolve_project_path
 from corp.actions.archive_actions import archive_project
 from corp.cleanup.errors import OneDriveSafetyError

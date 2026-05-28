@@ -39,6 +39,7 @@ from pathlib import Path
 from typing import Iterable
 
 import pytest
+
 from corp.models import VaultZone
 from corp.vault_io import is_writable_by_actions
 

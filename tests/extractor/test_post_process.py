@@ -4,6 +4,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import yaml
+
 from corp.extractor.post_process import post_process_extraction
 from corp.schema import ValidationResult
 

@@ -4,8 +4,9 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from corp.extractor.extract import ExtractionResult, _estimate_gemini_cost
 from jinja2 import Environment, FileSystemLoader
+
+from corp.extractor.extract import ExtractionResult, _estimate_gemini_cost
 
 
 class TestEstimateGeminiCost:

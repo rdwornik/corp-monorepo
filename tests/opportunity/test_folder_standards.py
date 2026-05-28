@@ -4,6 +4,7 @@ from datetime import date
 from pathlib import Path
 
 import pytest
+
 from corp.opportunity.folder_standards import (
     check_structure,
     create_subfolder,

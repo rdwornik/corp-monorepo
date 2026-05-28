@@ -3,6 +3,7 @@
 from datetime import date
 
 import pytest
+
 from corp.schema import DocumentType, NoteFrontmatter
 
 

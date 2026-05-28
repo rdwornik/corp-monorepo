@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import date, timedelta
 
 import pytest
+
 from corp.intent_router import (
     _extract_date,
     _extract_priority,

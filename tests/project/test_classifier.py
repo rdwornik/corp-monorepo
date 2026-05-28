@@ -9,6 +9,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+
 from corp.project.classifier import classify_file
 
 ROOT = Path("/fake/project")

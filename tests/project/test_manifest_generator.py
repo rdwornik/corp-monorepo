@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import pytest
+
 from corp.project.manifest_generator import (
     CATEGORY_TO_DOC_TYPE,
     _resolve_client,

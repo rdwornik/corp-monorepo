@@ -5,6 +5,7 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import pytest
+
 from corp.chat import (
     QUIT_COMMANDS,
     _handle_special_command,
