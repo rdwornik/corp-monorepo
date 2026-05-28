@@ -44,6 +44,15 @@
         "files.insertFinalNewline": true,
         "files.autoSave": "onFocusChange",
 
+        // === Explorer (ADR-59 universal visual pattern + 2026-05-27 amendment) ===
+        // "upper" clusters ALL-CAPS canonical .md ahead of lowercase configs.
+        // "sortOrderReverse: true" gives newest-first inside dated folders.
+        // Template copied verbatim from corrected .dev-knowledge.code-workspace.
+        "explorer.sortOrder": "default",
+        "explorer.sortOrderLexicographicOptions": "upper",
+        "explorer.sortOrderReverse": true,
+        "explorer.compactFolders": false,
+
         // === Search — skip irrelevant dirs ===
         "search.exclude": {
             "data/_outputs": true,
