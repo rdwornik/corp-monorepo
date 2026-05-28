@@ -13,6 +13,15 @@
 
 ---
 
+### 2026-05-28 — Close Action 7c (ruff strictness → ADR-32) + investigate Action 6 (VISION routing)
+- Did: Closed the open ruff-select-strictness question (Action 7c from the universalization mega-session) by authoring ADR-32. Investigated Action 6 (VISION §Values "one routing authority" vs. actual distributed routing — deep audit D2 / CM-CF4) and produced a scope report with a recommendation. No code changes; docs only.
+- Result: ADR-32 (`docs/decisions/ADR-32-ruff-select-strictness.md`) documents the lenient `["E","F","I"]` select as the intentional, accurate baseline. Repo is 0-error under this config (89 I001 violations cleared by the 2026-05-28 hook bump v0.4.0→v0.15.8). ADR-59 corp-monorepo visual-pattern retrofit is now unblocked. Action 6 investigation findings and recommendation (Path B — amend VISION.md, no Council needed) captured in BACKLOG Action 6 entry. Branch `docs/close-7c-investigate-action6-2026-05-28` awaiting operator merge.
+- Changes: created `docs/decisions/ADR-32-ruff-select-strictness.md`; updated `BACKLOG.md` (closed Action 7c entry + new Action 6 entry with investigation findings); this JOURNAL entry.
+- Abandoned: Action 6 implementation — investigation + report only per directive; operator must confirm Path A (Council) vs Path B (focused VISION.md edit) before any change.
+- Next: Operator chooses Path A or B for Action 6. Path B = one focused session to amend VISION.md §Values lines 73-74; no Council. Path A = convene Council. Either way, merge this branch first. ADR-59 corp-monorepo retrofit is also unblocked.
+
+---
+
 ### 2026-05-25 — ADR-27 implementation status audit
 - Did: Read-only audit on branch `audit/adr27-status` resolving the two independent ADR-27 questions the prior handoff conflated — (Q1) is the ADR doc merged to `main`, (Q2) is the OneDrive implementation present. Verified via `git ls-files`/`git log`/`git merge-base`/`grep` against HEAD `32a47f8`; no execution, no source edits. Determined routing **branch (a)**.
 - Result: Q1 — ADR doc PRESENT in `main` (commits `a6e3942`, `a5a6789` both confirmed ancestors); operator memory "drafted-on-branch, no merge witness" was stale, handoff's VERIFIED claim correct. Q2 — SPLIT: Decision 2/PR-4 (vault-writer invariant) already DONE (`tests/safety/test_vault_writer_invariant.py`), but Decision 1/PR-1–3 (OneDrive centralization) ABSENT — no `src/corp/safety/onedrive.py`, no `tests/safety/test_no_unguarded_writes.py`, zero `from corp.safety` imports. Three drift sites confirmed and split by remediation profile: `renderer.py:42,48` ValueError (documented intent, PR-2), `deck_actions.py:104→117` unguarded write (undocumented gap — flagged to not survive a "PR-2 done" closure), errors-module location `cleanup/errors.py` vs `safety/onedrive.py` (structural, PR-1+PR-3). Audit at `docs/audits/2026-05-25-adr27-status.md`.
