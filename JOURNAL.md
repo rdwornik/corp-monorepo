@@ -13,6 +13,15 @@
 
 ---
 
+### 2026-05-28 — Resolve Action 6 (VISION §Values routing) via Path B
+- Did: Deep-read all four "routing" modules (`extraction/routing.py`, `ingest/router.py`, `overnight/classifier.py`, `retrieve/engine.py`) to determine whether VISION's "one routing authority" claim reflected hidden duplication (Path A — consolidate) or aspirational drift (Path B — amend). Confirmed Path B: no cross-imports, no shared dispatch table, disjoint inputs/outputs, four genuinely distinct domain concerns sharing only the word "routing". Amended VISION.md §Values to "Deterministic per-domain routing" with inline provenance note preserving the Council-origin original. Closed BACKLOG Action 6 entry. Deep-audit finding D2 (HIGH) closed.
+- Result: VISION.md §Values lines 73-74 replaced with accurate per-domain description + provenance HTML comment. BACKLOG Action 6 marked closed with summary; original entry preserved for history. Branch `docs/action6-vision-routing-2026-05-28` (1 commit: `0a9410c`) awaiting operator merge. No code changes; pytest unaffected (2524 prior).
+- Changes: `VISION.md` (§Values routing value amended); `BACKLOG.md` (Action 6 closed); this JOURNAL entry.
+- Abandoned: Path A (consolidate). Determination confirmed no duplication exists — consolidation would be a new architectural decision, not a drift fix; not warranted.
+- Next: Operator merges `docs/action6-vision-routing-2026-05-28` to main (no Codex review — docs-only). Deep-audit D2 HIGH now closed; remaining audit findings tracked separately.
+
+---
+
 ### 2026-05-28 — Close Action 7c (ruff strictness → ADR-32) + investigate Action 6 (VISION routing)
 - Did: Closed the open ruff-select-strictness question (Action 7c from the universalization mega-session) by authoring ADR-32. Investigated Action 6 (VISION §Values "one routing authority" vs. actual distributed routing — deep audit D2 / CM-CF4) and produced a scope report with a recommendation. No code changes; docs only.
 - Result: ADR-32 (`docs/decisions/ADR-32-ruff-select-strictness.md`) documents the lenient `["E","F","I"]` select as the intentional, accurate baseline. Repo is 0-error under this config (89 I001 violations cleared by the 2026-05-28 hook bump v0.4.0→v0.15.8). ADR-59 corp-monorepo visual-pattern retrofit is now unblocked. Action 6 investigation findings and recommendation (Path B — amend VISION.md, no Council needed) captured in BACKLOG Action 6 entry. Branch `docs/close-7c-investigate-action6-2026-05-28` awaiting operator merge.

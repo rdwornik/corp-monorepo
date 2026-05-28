@@ -70,8 +70,27 @@ in `corp-monorepo`'s own `CLAUDE.md` — VISION does not duplicate them.
   engine.
 - **Source / extract separation.** Source material is immutable;
   extracted artifacts are regenerable. The two never mix.
-- **One routing authority.** Routing configuration has a single source
-  of truth, not per-module copies.
+- **Deterministic per-domain routing.** Each domain owns its own
+  routing logic — extraction resolves provenance from
+  `routing_map.yaml`; ingest dispatches inbox files through
+  `ContentRegistry`; overnight classification proposes renames/moves
+  from local metadata; retrieval ranks notes via FTS5/BM25. The four
+  share the word "routing" but not the concept: their inputs, rules,
+  outputs, and side-effect profiles are disjoint. There is no global
+  routing authority, and the per-domain modules are not copies of one
+  router.
+
+<!-- Amended 2026-05-28 (Action 6 / deep-audit D2). The original
+"one routing authority, single source of truth, not per-module copies"
+language was aspirational (Council-origin) and never matched
+implementation. A deep-read of the four candidate modules
+(`extraction/routing.py`, `ingest/router.py`, `overnight/classifier.py`,
+`retrieve/engine.py`) confirmed they are genuinely distinct concerns
+with no shared dispatch table, no cross-imports, and no duplicated
+rule structures. Per-domain distributed routing is the validated,
+bug-free reality. Global routing consolidation, if ever desired, is a
+separate architectural decision and would require a Council. -->
+
 - **Incremental, never big-bang.** Structural change lands as small,
   independently revertable commits.
 - **Deterministic and low-friction.** The system favours predictable,

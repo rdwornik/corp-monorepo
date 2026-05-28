@@ -87,7 +87,21 @@ commit prior to retirement).
   unknown (measure before any future tightening). D1 cleanup (ruff.toml vs pyproject.toml
   duplication) remains a separate future chore.
 
-### [P2] [open] VISION §Values routing — resolve aspirational "one routing authority" claim (Action 6)
+### [P2] [closed 2026-05-28] VISION §Values routing — resolved via Path B (Action 6)
+
+**Closed 2026-05-28:** Path B executed. Deep-read of all 4 routing modules
+(`extraction/routing.py`, `ingest/router.py`, `overnight/classifier.py`,
+`retrieve/engine.py`) confirmed genuinely distinct per-domain concerns:
+no cross-imports, no shared dispatch table, disjoint inputs/outputs, and
+different confidence semantics. The shared word is "routing"; the concepts
+are not. VISION.md §Values amended to "Deterministic per-domain routing"
+with an inline provenance note preserving the Council-origin original.
+Deep-audit finding D2 (HIGH) closed. Commit: `0a9410c`.
+Branch: `docs/action6-vision-routing-2026-05-28` (awaiting operator merge).
+
+---
+
+### [P2] [closed 2026-05-28] VISION §Values routing — original entry (preserved for history)
 - **What:** VISION.md §Values (line 73) declares "One routing authority. Routing configuration
   has a single source of truth, not per-module copies." File-state contradicts this: routing
   logic is distributed across 4+ modules (`src/corp/extraction/routing.py`,
