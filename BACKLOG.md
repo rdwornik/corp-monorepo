@@ -1,6 +1,6 @@
 # corp-monorepo BACKLOG
 
-Cross-session pending items for `corp-monorepo`. Schema per ADR-41
+Cross-session pending items for `corp-monorepo`. Schema per ADR-41 as relaxed by ADR-47
 (`.dev-knowledge/docs/decisions/ADR-41-cross-session-backlog-architecture.md`):
 `[P{N}]` priority, `[open|superseded]` status, dated entries.
 

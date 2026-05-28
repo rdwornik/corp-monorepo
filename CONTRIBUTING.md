@@ -104,17 +104,12 @@ If `tach check` fails for your changes, options in order of preference:
 
 ### Known baseline violations (Phase 1)
 
-Six violations exist from the Phase 1 baseline. They are tracked in:
-`docs/audits/2026-04-15-tach-baseline-violations.md`
-
-These will be resolved in Phase 2:
-- `corp.project_resolver` should move from orchestration to core (fixes intent_router and llm_router upward deps)
-- `corp.query_engine` should move from interface to orchestration (fixes actions upward dep)
+The six Phase 1 baseline violations were resolved in Phase 2 — `tach check` now passes with **zero violations** (verified 2026-05-27). Original baseline tracked in `docs/audits/2026-04-15-tach-baseline-violations.md`.
 
 Do not add new violations without architectural justification.
 
 ## Architecture Reference
 
 `ARCHITECTURE.md` — module map, layer definitions, design patterns
-`docs/decisions/` — all ADRs (26 decisions)
+`docs/decisions/` — all ADRs (30 decisions)
 `tach.toml` — authoritative layer assignments
