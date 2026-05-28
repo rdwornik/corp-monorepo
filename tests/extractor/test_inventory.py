@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import pytest
+
 from corp.extractor.inventory import FileType, scan_input
 
 # Minimal config matching settings.yaml file_types section

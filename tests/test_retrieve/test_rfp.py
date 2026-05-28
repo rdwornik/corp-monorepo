@@ -8,6 +8,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from corp.retrieve.rfp import RFPAnswer, answer_rfp
 
 # --- Schema (same as test_prep.py) ---

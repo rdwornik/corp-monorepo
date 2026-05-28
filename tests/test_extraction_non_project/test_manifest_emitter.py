@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 
 import pytest
+
 from corp.extraction.folder_policy import ExtractionPolicy
 from corp.extraction.manifest_emitter import (
     _make_entry_id,

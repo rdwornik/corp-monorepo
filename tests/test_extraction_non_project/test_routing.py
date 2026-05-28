@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from corp.extraction.routing import (
     RoutingError,
     resolve_route,

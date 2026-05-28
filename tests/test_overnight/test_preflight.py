@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 import pytest
 import yaml
+
 from corp.overnight.preflight import run_preflight
 from corp.schema.folder_names import CORP_INFRA, REF_RFP_LIBRARY, WORKFLOWS
 

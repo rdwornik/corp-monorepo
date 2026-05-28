@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from corp.extractor.scan import (
     _determine_tier,
     _scan_csv,

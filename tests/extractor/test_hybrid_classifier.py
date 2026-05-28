@@ -41,9 +41,10 @@ SECURITY_FILENAME = "2024-02_SECURITY_Lenzing_SOC2-Type2-Audit-Report.pdf"
 @pytest.mark.skipif(not MODEL_PATH.exists(), reason="Model file not present")
 def test_hybrid_loader_from_json():
     """Model loads from JSON without pickle, returns correct types."""
-    from corp.extractor.hybrid_loader import load_hybrid_classifier
     from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.linear_model import LogisticRegression
+
+    from corp.extractor.hybrid_loader import load_hybrid_classifier
 
     tfidf_fn, tfidf_ct, clf, meta = load_hybrid_classifier(MODEL_PATH)
 

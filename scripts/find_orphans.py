@@ -19,13 +19,13 @@ from __future__ import annotations
 import json
 import logging
 import re
+import tomllib
 from collections.abc import Iterable, Iterator
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
 import click
-import tomllib
 from rich.console import Console
 from rich.logging import RichHandler
 from rich.table import Table

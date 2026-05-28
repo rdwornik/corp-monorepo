@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import yaml
 from click.testing import CliRunner
+
 from corp.cli import cli
 from corp.schema.folder_names import (
     CORP_INFRA,

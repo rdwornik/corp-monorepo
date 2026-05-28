@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from corp.extraction.scanner import scan_folder
 from corp.schema.folder_names import REF_RFP_LIBRARY, REFERENCE, WORKFLOWS
 

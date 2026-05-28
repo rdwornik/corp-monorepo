@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import pytest
+
 from corp.schema.folder_names import INBOX
 from corp.schema.pipeline_config import PipelineConfig
 

@@ -1,6 +1,7 @@
 """Tests for validate_profiles -- product profile validation."""
 
 import yaml
+
 from corp.rfp.validate_profiles import (
     ERROR,
     SUSPICIOUS,

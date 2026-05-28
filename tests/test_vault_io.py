@@ -6,6 +6,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+
 from corp.models import VaultZone
 from corp.vault_io import (
     _parse_frontmatter,

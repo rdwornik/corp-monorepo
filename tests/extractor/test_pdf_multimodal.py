@@ -334,6 +334,7 @@ class TestPdfCoverRendered:
     def test_cover_in_slide_image_paths(self, tmp_path):
         """PDF extraction sets slide_image_paths with cover PNG."""
         import fitz as real_fitz
+
         from corp.extractor.extract import _try_pdf_multimodal
         from corp.extractor.inventory import FileType, SourceFile
         from corp.extractor.text_extract import TextExtractionResult

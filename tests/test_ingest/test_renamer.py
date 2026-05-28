@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+
 from corp.ingest.classifier import classify
 from corp.ingest.renamer import (
     _infer_client,

@@ -4,6 +4,7 @@ from datetime import date
 
 import pytest
 import yaml
+
 from corp.opportunity.config import AppConfig
 from corp.opportunity.folder_manager import create_opportunity
 from corp.opportunity.models import OpportunityConfig

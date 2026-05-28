@@ -19,6 +19,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+
 from corp.actions._helpers import _guard_writable
 from corp.cleanup.disk import _guard_onedrive as _disk_guard_onedrive
 from corp.cleanup.errors import OneDriveSafetyError

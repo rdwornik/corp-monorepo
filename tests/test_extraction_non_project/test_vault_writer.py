@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+
 from corp.extraction.vault_writer import _read_trust_level, move_to_vault
 
 

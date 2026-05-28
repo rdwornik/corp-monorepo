@@ -4,6 +4,7 @@ import json
 from unittest.mock import patch
 
 import pytest
+
 from corp.rfp.rfp_feedback import (
     _extract_check_terms,
     _is_negated,

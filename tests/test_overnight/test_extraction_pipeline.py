@@ -13,6 +13,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+
 from corp.overnight.monitor import OvernightMonitor
 from corp.overnight.state import OvernightState
 from corp.schema.folder_names import CORP_INFRA, REF_RFP_LIBRARY, REFERENCE, WORKFLOWS

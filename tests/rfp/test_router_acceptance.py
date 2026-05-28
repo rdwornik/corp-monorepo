@@ -4,6 +4,7 @@ import time
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from corp.rfp.llm_router import (
     extract_answer,
     extract_question,

@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
+
 from corp.ingest.llm_classifier import (
     _get_all_destinations,
     _parse_llm_json,

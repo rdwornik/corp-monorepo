@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+
 from corp.ops.database import OpsDB
 from corp.schema.folder_names import (
     INBOX,

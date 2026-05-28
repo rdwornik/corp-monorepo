@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
+
 from corp.ingest.extractions import (
     _collect_packages,
     _find_cover_slide,

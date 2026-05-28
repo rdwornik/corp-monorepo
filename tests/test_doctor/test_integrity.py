@@ -6,6 +6,7 @@ import sqlite3
 from pathlib import Path
 
 import yaml
+
 from corp.integrity import (
     IntegrityReport,
     _check_config_files,

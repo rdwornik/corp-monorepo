@@ -1,6 +1,7 @@
 """Tests for canonical folder name constants."""
 
 import pytest
+
 from corp.schema.folder_names import (
     ADMIN,
     ALL_MYWORK_FOLDERS,

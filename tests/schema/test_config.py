@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import pytest
+
 from corp.schema.config import get_excluded_paths, get_path, load_config, vault_path
 
 

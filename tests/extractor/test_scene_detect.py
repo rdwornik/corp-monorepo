@@ -3,6 +3,7 @@
 from unittest.mock import patch
 
 import pytest
+
 from corp.extractor.frames.sampler import SampledFrame
 from corp.extractor.frames.scene_detect import (
     DYNAMIC_CAP_MAX,

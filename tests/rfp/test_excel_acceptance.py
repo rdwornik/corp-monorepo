@@ -1,5 +1,7 @@
 """Acceptance tests for Excel agent -- structure checks only (no LLM calls)."""
 
+from openpyxl import load_workbook
+
 from corp.rfp.rfp_excel_agent import (
     detect_answer_column,
     detect_question_column,
@@ -7,7 +9,6 @@ from corp.rfp.rfp_excel_agent import (
     is_green_cell,
     scan_green_cells,
 )
-from openpyxl import load_workbook
 
 
 # ---------------------------------------------------------------------------

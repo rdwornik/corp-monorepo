@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
+
 from corp.ingest.inbox import (
     _get_custom_destination,
     _list_events,

@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+
 from corp.index_builder import rebuild_index
 from corp.query_engine import (
     _sanitize_fts_query,

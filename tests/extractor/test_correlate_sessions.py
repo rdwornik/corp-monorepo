@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import pytest
+
 from corp.extractor.correlate_sessions import (
     CorrelationCandidate,
     confirm_stage2,

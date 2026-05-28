@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+
 from corp.ingest.router import (
     compute_file_hash,
     finalize_file,

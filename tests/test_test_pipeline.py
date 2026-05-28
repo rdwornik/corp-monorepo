@@ -12,6 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+
 from corp.schema.pipeline_config import PipelineConfig
 from corp.test_pipeline import (
     PipelineTestReport,

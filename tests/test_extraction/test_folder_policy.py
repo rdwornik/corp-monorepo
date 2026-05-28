@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+
 from corp.extraction.folder_policy import (
     ExtractionPolicy,
     PolicyError,
