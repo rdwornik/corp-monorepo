@@ -33,6 +33,7 @@ higher-level view under §Diagrams pointers).
 
 <!-- CODEMAP:START -->
 ```mermaid
+%%{init: {'theme':'dark'}}%%
 flowchart TD
     cli[cli/]:::interface
     ingest[ingest/]:::orchestration
@@ -235,6 +236,7 @@ Modules in higher layers may import from lower layers; the reverse is forbidden
 and blocked by pre-commit and CI (`tach check`).
 
 ```mermaid
+%%{init: {'theme':'dark'}}%%
 flowchart TD
     interface["interface<br/>cli/, chat, sandbox, test_pipeline"]:::interface
     orchestration["orchestration<br/>actions/, ingest/, workflow_engine,<br/>query_engine, index_builder, task/template mgr"]:::orchestration
