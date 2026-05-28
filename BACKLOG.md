@@ -74,6 +74,73 @@ commit prior to retirement).
   Decisions" item 9)
 - **Status:** open
 
+### [P3] [closed] Ruff select strictness decision (Action 7c)
+- **What:** Decide whether to keep the lenient ruff select (`["E","F","I"]` in `ruff.toml`)
+  or tighten it. Corp-monorepo had 89 pre-existing `I001` import-sort violations under the
+  hook-pinned v0.4.0 binary vs venv v0.11+ mismatch. Hook bumped to v0.15.8 on 2026-05-28;
+  89 violations fixed; repo is now 0-error under lenient select.
+- **Why:** The universalization mega-session deferred the strictness decision as ambiguous.
+  Resolving it unblocked the ADR-59 visual-pattern retrofit.
+- **Added:** 2026-05-28 by claude (closing Action 7c from the mega-session deferred list)
+- **Status:** closed 2026-05-28 — Decision: keep lenient select as intentional baseline.
+  Documented in ADR-32. Baseline: 0 errors at current select; strict-select error count
+  unknown (measure before any future tightening). D1 cleanup (ruff.toml vs pyproject.toml
+  duplication) remains a separate future chore.
+
+### [P2] [open] VISION §Values routing — resolve aspirational "one routing authority" claim (Action 6)
+- **What:** VISION.md §Values (line 73) declares "One routing authority. Routing configuration
+  has a single source of truth, not per-module copies." File-state contradicts this: routing
+  logic is distributed across 4+ modules (`src/corp/extraction/routing.py`,
+  `src/corp/ingest/router.py`, `src/corp/overnight/classifier.py`,
+  `src/corp/retrieve/engine.py`) and no central `routing_map.yaml` exists.
+  Deep audit finding D2 (2026-05-20-corp-monorepo-deep.md §9.D2) classified this as HIGH.
+  Resolution requires one of two paths — see Investigation below.
+- **Why:** A VISION principle that the file-state does not realize misleads future sessions
+  and produces incorrect conformance assessments. Either the code or the VISION must converge.
+- **Added:** 2026-05-28 by claude (surfaced from mega-session as CM-CF4 / Action 6,
+  Council-gated label)
+- **Status:** open — investigated 2026-05-28; see findings below. Awaiting operator routing
+  decision (Path A vs Path B).
+
+  **2026-05-28 investigation findings:**
+
+  *Scope (plain terms):* VISION.md §Values line 73-74 declares a principle (one routing
+  authority) that doesn't match how the codebase actually works. The code has deterministic,
+  per-aspect routing — not a violation of good architecture, just a mismatch between what
+  VISION says and what the code does.
+
+  *Two resolution paths:*
+  - **Path A — Consolidate routing into a single canonical module/config.** Create
+    `routing_map.yaml` or a top-level `corp.router` module that all 4 routing callsites
+    delegate to. Architectural change. Touches `src/corp/extraction/routing.py`,
+    `src/corp/ingest/router.py`, `src/corp/overnight/classifier.py`,
+    `src/corp/retrieve/engine.py`, plus any config YAMLs (content_registry.yaml,
+    agents.yaml, workflows.yaml). Requires ADR. Genuinely architectural — the original
+    VISION routing language came from an AI Council debate; changing the implementation to
+    match would be a material code refactor. **Council-worthy.**
+  - **Path B — Amend VISION.md §Values to reflect actual file-state.** Replace the
+    aspirational "single source of truth" language with accurate language, e.g., "routing
+    rules are deterministic and per-aspect; each domain owns its own routing logic with no
+    shared mutable state." Small documentation change. Touches only `VISION.md`. The deep
+    audit (D2) itself suggests this path. **Not Council-worthy** — it's correcting
+    documentation drift, not making an architectural decision. The architectural decision
+    (distributed routing) was already made in practice.
+
+  *Recommendation:* **Path B, implemented as a focused session.** The current distributed
+  routing works and has no reported bugs. The VISION language is aspirational drift from the
+  original Council debate, not a binding constraint. Correcting VISION to match reality is a
+  documentation fix, not a new architectural decision. If Rob disagrees and wants to actually
+  consolidate routing, convene Council (Path A). If Path B, no Council needed — one session,
+  one VISION.md edit, one ADR amendment noting the correction.
+
+  *Files Path B would touch:* `VISION.md` (lines 73-74 §Values), optionally
+  `docs/decisions/ADR-23-monorepo-internal-architecture.md` (cross-ref note).
+
+  *Dependencies / unknowns:* None for Path B. Path A depends on understanding which of the
+  4 routing modules has the canonical routing table (content_registry.yaml appears to be it
+  for file-pattern routing, but classification logic in overnight/classifier.py and
+  retrieve/engine.py is code-embedded).
+
 ---
 
 ## Pending Fixes
