@@ -44,5 +44,3 @@ docs/staging/
 
 # Sandbox (copied source files — never commit)
 .sandbox/
-
-data/_outputs/
