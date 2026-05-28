@@ -33,7 +33,7 @@ higher-level view under §Diagrams pointers).
 
 <!-- CODEMAP:START -->
 ```mermaid
-%%{init: {'theme':'dark'}}%%
+%%{init: {'theme':'base', 'themeVariables': {'darkMode':true,'background':'#1a1a1a','primaryColor':'#2d2d3d','primaryTextColor':'#f0f0f0','primaryBorderColor':'#8a86ff','lineColor':'#a0a0ff','textColor':'#f0f0f0','mainBkg':'#2d2d3d','secondaryColor':'#3d2d3d','tertiaryColor':'#22323a','clusterBkg':'#222232','clusterBorder':'#555577','edgeLabelBackground':'#1a1a1a','titleColor':'#f0f0f0','nodeBorder':'#8a86ff'}}}%%
 flowchart TD
     cli[cli/]:::interface
     ingest[ingest/]:::orchestration
@@ -64,10 +64,10 @@ flowchart TD
     opportunity --> schema
     rfp --> retrieve
 
-    classDef foundation fill:#e8e8e8,stroke:#888
-    classDef core fill:#bde0fe,stroke:#1971c2
-    classDef orchestration fill:#a5d8ff,stroke:#1971c2
-    classDef interface fill:#74c0fc,stroke:#1864ab
+    classDef foundation fill:#e8e8e8,stroke:#888,color:#222
+    classDef core fill:#bde0fe,stroke:#1971c2,color:#000
+    classDef orchestration fill:#a5d8ff,stroke:#1971c2,color:#000
+    classDef interface fill:#74c0fc,stroke:#1864ab,color:#000
 
     click schema href "src/corp/schema/" "Open schema"
     click extractor href "src/corp/extractor/" "Open extractor"
@@ -236,7 +236,7 @@ Modules in higher layers may import from lower layers; the reverse is forbidden
 and blocked by pre-commit and CI (`tach check`).
 
 ```mermaid
-%%{init: {'theme':'dark'}}%%
+%%{init: {'theme':'base', 'themeVariables': {'darkMode':true,'background':'#1a1a1a','primaryColor':'#2d2d3d','primaryTextColor':'#f0f0f0','primaryBorderColor':'#8a86ff','lineColor':'#a0a0ff','textColor':'#f0f0f0','mainBkg':'#2d2d3d','secondaryColor':'#3d2d3d','tertiaryColor':'#22323a','clusterBkg':'#222232','clusterBorder':'#555577','edgeLabelBackground':'#1a1a1a','titleColor':'#f0f0f0','nodeBorder':'#8a86ff'}}}%%
 flowchart TD
     interface["interface<br/>cli/, chat, sandbox, test_pipeline"]:::interface
     orchestration["orchestration<br/>actions/, ingest/, workflow_engine,<br/>query_engine, index_builder, task/template mgr"]:::orchestration
@@ -247,10 +247,10 @@ flowchart TD
     orchestration --> core
     core --> foundation
 
-    classDef foundation fill:#e8e8e8,stroke:#888
-    classDef core fill:#bde0fe,stroke:#1971c2
-    classDef orchestration fill:#a5d8ff,stroke:#1971c2
-    classDef interface fill:#74c0fc,stroke:#1864ab
+    classDef foundation fill:#e8e8e8,stroke:#888,color:#222
+    classDef core fill:#bde0fe,stroke:#1971c2,color:#000
+    classDef orchestration fill:#a5d8ff,stroke:#1971c2,color:#000
+    classDef interface fill:#74c0fc,stroke:#1864ab,color:#000
 ```
 
 **Enforcement tool:** Tach. **Config file:** `tach.toml`. **Where enforced:** pre-commit hook + CI (`tach check`).
