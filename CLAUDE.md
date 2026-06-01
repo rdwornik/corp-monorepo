@@ -81,7 +81,7 @@ Key facts (abbreviated; `ARCHITECTURE.md` is authoritative):
 `### YYYY-MM-DD — <topic>` then `- Did:` / `- Result:` / `- Changes:` / `- Abandoned:` / `- Next:`.
 `Changes:` is the sole change record (no CHANGELOG). Append-only; never edit prior entries.
 
-**Handoffs:** Generated in `.dev-knowledge` per ADR-42/HANDOFF_PROCESS.md — NOT in this repo (ADR-36 read-only contract).
+**Handoffs:** Generated in `.dev-knowledge` per ADR-62/HANDOFF_PROCESS.md (v4 canonical; supersedes ADR-42 v3) — NOT in this repo (ADR-36 read-only contract).
 Trigger: in Claude Code at `.dev-knowledge`, say "Make handoff for corp-monorepo".
 
 ## 7. Slash commands available
@@ -133,7 +133,7 @@ Full list: `docs/decisions/README.md`. **ADR namespaces:** corp-local ADRs (`doc
 
 **Ecosystem (`.dev-knowledge/docs/decisions/`):**
 - `.dev-knowledge` ADR-36: Session handoffs generated in `.dev-knowledge` only (read-only contract for this repo)
-- `.dev-knowledge` ADR-42: Handoff format v3 — bundles at `.dev-knowledge/docs/handoffs/{YYYY-MM-DD}-corp-monorepo-{type}/`
+- `.dev-knowledge` ADR-62: v4 handoff process ratification (supersedes ADR-42 v3) — bundles at `.dev-knowledge/docs/handoffs/{YYYY-MM-DD}-corp-monorepo-{type}/`
 - `.dev-knowledge` ADR-49: JOURNAL.md entry shape (cutover 2026-05-18) — `Did/Result/Changes/Abandoned/Next`
 - `.dev-knowledge` ADR-51: ARCHITECTURE.md convention — read before structural changes (universal)
 - `.dev-knowledge` ADR-53: CLAUDE.md as single canonical agent-instruction file (supersedes ADR-52)
