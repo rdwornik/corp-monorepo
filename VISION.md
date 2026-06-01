@@ -2,7 +2,7 @@
 version: 1.0
 owner: rob
 status: active
-last_reviewed: 2026-05-27
+last_reviewed: 2026-06-02
 ---
 
 # VISION — corp-monorepo
