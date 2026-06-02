@@ -1,3 +1,9 @@
+---
+last_reviewed: 2026-06-02
+status: active
+owner: Rob
+---
+
 # CLAUDE.md
 <!-- scope: meta -->
 <!-- version: 2.2 — 2026-05-27 -->
