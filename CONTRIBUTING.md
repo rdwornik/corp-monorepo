@@ -6,7 +6,7 @@ owner: Rob
 
 # Contributing to Corporate OS
 
-## Branch Naming
+## Branch naming
 
 ```
 feat/short-description
@@ -16,7 +16,7 @@ chore/short-description
 docs/short-description
 ```
 
-## Commit Style
+## Commit style
 
 Conventional commits. Format: `type: short imperative sentence`
 
@@ -31,6 +31,10 @@ ci: add Tach GitHub Actions workflow
 ```
 
 Never commit to main directly. Open a PR. Squash or merge as appropriate.
+
+### Backlog-id references (forward-only index)
+
+`BACKLOG.md` follows the ADR-66 story-map; tasks carry a `[#id]`. When a commit closes a backlog task, reference it in the message (`closes [#id]`) so the work is locatable via `git log --grep "closes \[#"`. Git history is the implementation record (ADR-65); done tasks leave the file.
 
 ## Development Flow
 
@@ -119,3 +123,7 @@ Do not add new violations without architectural justification.
 `ARCHITECTURE.md` — module map, layer definitions, design patterns
 `docs/decisions/` — all ADRs (31 decisions)
 `tach.toml` — authoritative layer assignments
+
+## Handoff process
+
+Handoffs centralize in `.dev-knowledge/docs/handoffs/` (ADR-42/60) — this repo carries no `docs/handoffs/`. Continuing a prior session: read the most recent bundle there, then the last 5 `JOURNAL.md` entries here.

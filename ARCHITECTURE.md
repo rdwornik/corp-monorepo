@@ -513,3 +513,39 @@ that drove the resolve-before-check amendment is in
 `docs/audits/2026-04-21-codex-hotfix-review.md`. Centralization design
 captured in ADR-27; implementation follows in PR-1 (foundation), PR-2
 (migration), and PR-3 (CI enforcement).
+
+---
+
+## Key conventions
+
+- **Namespace.** All source under `src/corp/` (snake_case package); submodules are directories with `__init__.py` (ADR-38).
+- **Layer discipline (Tach-enforced).** `interface > orchestration > core > foundation`; a module imports only its layer and below. Assignments in `tach.toml`; `tach check` gates pre-commit + CI (ADR-26).
+- **Naming.** kebab-case markdown; `ADR-NN-topic.md` decisions (ADR-34); MyWork files `{YYYY-MM}_{TYPE}_{CLIENT}_{Description}.{ext}` (ADR-14 naming v2).
+- **Append-only files.** `LESSONS.md` — never edit old entries (ADR-29). `JOURNAL.md` — newest-first prepend.
+- **OneDrive exclusion.** Never write/delete into a `OneDrive - Blue Yonder` path; fail-closed guards at every mutation site (Invariant #5; ADR-27).
+
+---
+
+## Authority and governance
+
+corp-monorepo is a **product/code repo** governed by `.dev-knowledge` (Layer-2 binding authority, ADR-31). It owns its local product/architecture ADRs (`docs/decisions/`) and conforms to ecosystem ADRs (naming, file lifecycle, the seven-file canonical baseline ADR-38 A6).
+
+- **Conformance:** verified out-of-band, read-only, by `.dev-knowledge/scripts/audit.py`. `.dev-knowledge` never writes here (Layer-2 invariant, ADR-28).
+- **Local decisions:** product/architecture choices (extraction, ingest, retrieval, Tach layers) live in `docs/decisions/ADR-NN`; immutable — supersede with a new ADR.
+
+---
+
+## Validators and enforcement
+
+- **`./scripts/dev-check.ps1`** — the pre-PR gate: `pytest` + `pre-commit run --all-files` + `tach check`.
+- **`tach check`** — 4-layer import-boundary enforcement (ADR-26); pre-commit + CI; 0 violations (verified 2026-05-27).
+- **`tests/`** — pytest suite: `pytest -x --tb=short`.
+- **`ruff`** — lenient select `["E","F","I"]` (ADR-32); 0 errors at baseline.
+- **External conformance (read-only):** `.dev-knowledge/scripts/audit.py` — seven-file canonical baseline + structural spine (ADR-38 A6).
+
+---
+
+## Governing ADRs
+
+- **Local** (`docs/decisions/`): incl. ADR-14 (naming v2) · ADR-16 (skill-eval split) · ADR-22 (RFP federation) · ADR-23 (internal architecture) · ADR-26 (Tach adoption) · ADR-27 (OneDrive safety centralization) · ADR-32 (ruff lenient select).
+- **Ecosystem** (`.dev-knowledge/docs/decisions/`): ADR-29 (append-only LESSONS) · ADR-34 (naming) · ADR-38 (`src/corp/` namespace + A6 seven-file baseline) · ADR-42 (handoffs centralized) · ADR-51 (ARCHITECTURE convention) · ADR-53 (CLAUDE.md) · ADR-59 (visual pattern) · ADR-60 (docs taxonomy).
