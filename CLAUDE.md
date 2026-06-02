@@ -12,7 +12,7 @@ In order, read:
 1. This file (you're here)
 2. `../.dev-knowledge/protocols/ESSENTIALS.md` — Rob's universal working style
 3. `../.dev-knowledge/protocols/PLAYBOOK.md` — universal protocols (only sections relevant to current task)
-4. Most recent `docs/handoffs/*.md` if continuing prior session
+4. Most recent corp-monorepo handoff bundle in `../.dev-knowledge/docs/handoffs/` if continuing prior session (ADR-36 — corp carries no local handoffs dir)
 5. Last 5 entries of `JOURNAL.md`
 6. `VISION.md` — project purpose and scope
 
