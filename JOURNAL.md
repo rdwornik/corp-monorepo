@@ -13,6 +13,13 @@
 
 ---
 
+### 2026-06-02 — Coherence cleanup (follow-up to G1)
+- Did: Doc-only cleanup on branch `chore/coherence-cleanup` — fixed CLAUDE.md §1 handoff ref to point at `../.dev-knowledge/docs/handoffs/` (ADR-36/60; corp carries no local handoffs dir); grounded 3 `check_doc_refs.py` `backtick:missing` cross-repo refs by adding the resolvable `../` prefix (PLAYBOOK/LESSONS/codex-AGENTS; targets verified to exist); added `last_reviewed: 2026-06-02` frontmatter to CLAUDE.md + CONTRIBUTING.md after genuine re-read (drift fixed first, then stamped); removed the regenerable git-ignored `.audit/` scratch.
+- Result: `audit_repo` **11/11 PASS, 0 WARN, 0 FAIL** (was 10 PASS/1 WARN); `check_doc_refs.py` broken **3→0**; pytest 2524 passed/7 skipped + ruff clean after each commit; CLAUDE.md 156 lines (≤200); working tree fully clean. Merged `--no-ff`; branch deleted.
+- Changes: `CLAUDE.md` (§1 handoff ref `931bcc6`; 3 cross-repo refs `6d11002`; +frontmatter `7f4351f`); `CONTRIBUTING.md` (+frontmatter `7f4351f`); removed `.audit/` (untracked); this JOURNAL entry.
+- Abandoned: Nothing.
+- Next: corp-monorepo universalization conformance complete — machine floor 11/11, coherence layer earned.
+
 ### 2026-06-02 — Universalization coherence audit (child-repo G1)
 - Did: Ran the per-child-repo universalization coherence audit (G1) on branch `chore/universalization-conformance` off `main`. Imported `.dev-knowledge/scripts/audit.py` read-only and ran `audit_repo` (did NOT run the writing CLI). Performed the deeper coherence layer the 10 machine checks don't cover: BACKLOG schema vs current standard, ARCHITECTURE invariants vs code reality, CLAUDE.md ADR-currency, cross-doc coherence, freshness. Grounded every finding file:line; classified MECHANICAL vs DECISION-REQUIRED.
 - Result: Machine floor moved from 1 FAIL → **GREEN (no FAILs)**; `canonical_freshness` FAIL → WARN (only the 2 standard-tolerated "no last_reviewed" WARNs on CLAUDE.md/CONTRIBUTING.md remain — child-repo-safe per the standard). 4 mechanical fixes landed (one revertable commit each). ARCHITECTURE re-read confirmed layer assignments match `tach.toml` exactly; VISION §Values routing claims verified against code (`extraction/routing.py` reads MyWork-resident `routing_map.yaml`; ContentRegistry; overnight/classifier; retrieve FTS5). 2524 passed / 7 skipped (baseline held). HARD criterion (coherence) **met** for everything in scope; the one open coherence question (BACKLOG vs ADR-64/65/66) was escalated, not guessed — operator chose **option C (status quo)**, so corp BACKLOG stays on ADR-41/47 with an additive `.dev-knowledge`-scoped clarifying note (no entries changed, no content removed). Operator gave merge GO.

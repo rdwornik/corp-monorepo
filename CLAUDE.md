@@ -1,10 +1,16 @@
+---
+last_reviewed: 2026-06-02
+status: active
+owner: Rob
+---
+
 # CLAUDE.md
 <!-- scope: meta -->
 <!-- version: 2.2 — 2026-05-27 -->
 
 > **Session contract for Claude Code in this repo.** Read on every session start (auto). Single canonical agent-instruction file (≤200 lines). Per ADR-53.
 >
-> **For universal rules:** read `../.dev-knowledge/protocols/ESSENTIALS.md` and `protocols/PLAYBOOK.md`.
+> **For universal rules:** read `../.dev-knowledge/protocols/ESSENTIALS.md` and `../.dev-knowledge/protocols/PLAYBOOK.md`.
 
 ## 1. First read (session start)
 
@@ -12,7 +18,7 @@ In order, read:
 1. This file (you're here)
 2. `../.dev-knowledge/protocols/ESSENTIALS.md` — Rob's universal working style
 3. `../.dev-knowledge/protocols/PLAYBOOK.md` — universal protocols (only sections relevant to current task)
-4. Most recent `docs/handoffs/*.md` if continuing prior session
+4. Most recent corp-monorepo handoff bundle in `../.dev-knowledge/docs/handoffs/` if continuing prior session (ADR-36 — corp carries no local handoffs dir)
 5. Last 5 entries of `JOURNAL.md`
 6. `VISION.md` — project purpose and scope
 
@@ -45,7 +51,7 @@ Key facts (abbreviated; `ARCHITECTURE.md` is authoritative):
 
 **Out of scope for this repo:**
 - Client/pre-sales data → Obsidian vault
-- Cross-repo lessons → `.dev-knowledge/LESSONS.md`
+- Cross-repo lessons → `../.dev-knowledge/LESSONS.md`
 
 ## 5. Critical rules
 
@@ -115,7 +121,7 @@ Other (`.claude/settings.json`):
 
 ## 10. Anti-patterns specific to Claude Code in this repo
 
-- The Codex reviewer config is global (`~/.codex/AGENTS.md`, ADR-54); corp-monorepo has no per-repo `AGENTS.md`. Updates to the global config go in `.dev-knowledge/codex/AGENTS.md`.
+- The Codex reviewer config is global (`~/.codex/AGENTS.md`, ADR-54); corp-monorepo has no per-repo `AGENTS.md`. Updates to the global config go in `../.dev-knowledge/codex/AGENTS.md`.
 - Don't assume module paths from old package names (`corp_by_os`, `corp_os_meta`, `corp_knowledge_extractor`) — all are now under `src/corp/`
 - Don't run `pip install` from `_archived_*` repos — overwrites monorepo entry points
 - Don't skip `scope/client/package/` hierarchy when staging CKE output for `corp ingest-extractions`
