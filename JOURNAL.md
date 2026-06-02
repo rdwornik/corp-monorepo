@@ -1,4 +1,4 @@
-# Development Journal
+# Journal — corp-monorepo
 
 > Append-only log. Never edit old entries.
 > Per-entry shape (per ADR-49, cutover 2026-05-18):
@@ -10,6 +10,20 @@
 > `- Next:` follow-ups
 > Entries above the cutover date use the older `Did / Failed / Next` shape and are preserved as-is.
 > Claude Code: read last 5 entries before starting work.
+
+---
+
+### 2026-06-02 — Ecosystem unification to the 7-file canonical standard (ADR-38 A6)
+
+- Did: Unified corp-monorepo to the locked `.dev-knowledge` canonical standard (ADR-38 A6). Built `LESSONS.md` (seeded with two real corp lessons: ruff hook-version mismatch, VISION-routing drift). Added ARCHITECTURE §Key conventions/§Authority and governance/§Validators and enforcement/§Governing ADRs. Case-fixed CONTRIBUTING headings (`Branch naming`/`Commit style`) + added §Handoff process + a Backlog-id note. Migrated `BACKLOG.md` from the ADR-41/47 stream schema to the ADR-66 story-map; changed this file's H1 to the canonical `# Journal`.
+- Result: `.dev-knowledge` structural audit passes (was 4 FAILs: missing LESSONS; ARCHITECTURE/CONTRIBUTING/JOURNAL spine gaps). 9 open backlog items preserved across 4 themes.
+- Changes: `LESSONS.md` (new), `ARCHITECTURE.md`, `CONTRIBUTING.md`, `BACKLOG.md`, `JOURNAL.md` (this entry + H1).
+- Backlog migration bridge (ADR-65 — done items leave; full text in git history at the pre-migration commit): three items already CLOSED before this migration left the active file —
+  - *Action 7c — ruff select strictness* (closed 2026-05-28): kept lenient select `["E","F","I"]` as baseline (ADR-32); pre-commit ruff bumped to v0.15.8, 89 phantom I001 violations cleared.
+  - *Action 6 — VISION §Values routing, resolved via Path B* (closed 2026-05-28, commit `0a9410c`): VISION §Values amended to "Deterministic per-domain routing"; deep-audit D2 closed.
+  - *Action 6 — VISION §Values routing, original entry* (the preserved-for-history duplicate of the above).
+- Abandoned: none — every open item preserved. The stale "story-map is `.dev-knowledge`-scoped, corp stays on ADR-41" BACKLOG note was removed (superseded by ADR-38 A6, which binds the story-map to all repos with proportional depth).
+- Next: corp-ops + corp-sca-time-automation unification.
 
 ---
 
