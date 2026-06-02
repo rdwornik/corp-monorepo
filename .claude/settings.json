@@ -1,0 +1,14 @@
+{
+  "//": "Tier-1 lifecycle plugin (ADR-70 #73 Unit-5b). Marketplace = .dev-knowledge hub. Plugin provides the closure loop (Stop -> propose, SessionStart -> surface, /review-closures). Ruff gate already present (.pre-commit-config.yaml v0.15.8). Operator: run `claude plugin install tier1-lifecycle@dev-knowledge-methodology --scope project` then `/reload-plugins` to activate.",
+  "extraKnownMarketplaces": {
+    "dev-knowledge-methodology": {
+      "source": {
+        "source": "directory",
+        "path": "C:\\Users\\1028120\\Documents\\Dev\\.dev-knowledge"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "tier1-lifecycle@dev-knowledge-methodology": true
+  }
+}
