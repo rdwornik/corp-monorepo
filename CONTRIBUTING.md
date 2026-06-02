@@ -111,5 +111,5 @@ Do not add new violations without architectural justification.
 ## Architecture Reference
 
 `ARCHITECTURE.md` — module map, layer definitions, design patterns
-`docs/decisions/` — all ADRs (30 decisions)
+`docs/decisions/` — all ADRs (31 decisions)
 `tach.toml` — authoritative layer assignments

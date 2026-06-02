@@ -4,6 +4,15 @@ Cross-session pending items for `corp-monorepo`. Schema per ADR-41 as relaxed by
 (`.dev-knowledge/docs/decisions/ADR-41-cross-session-backlog-architecture.md`):
 `[P{N}]` priority, `[open|superseded]` status, dated entries.
 
+> **Standard note (2026-06-02, universalization coherence audit G1):**
+> `.dev-knowledge` ADR-64/65/66 (2026-06-01) define a newer story-map backlog
+> architecture (Big Picture → Theme → Story → `[#id]` Task; done-items-leave).
+> Per the audit it is **`.dev-knowledge`-scoped** — framed around that repo and
+> enforced only by `.dev-knowledge`-local hooks (`validate-backlog`,
+> `backlog-id-on-close`); cross-repo adoption is not mandated (ADR-62 precedent).
+> corp's BACKLOG intentionally remains on ADR-41 (+ ADR-47 convention). Revisit
+> only if corp is opted into the story-map in a dedicated session.
+
 Seeded 2026-05-18 from `docs/HANDOFF.md` §"Open Decisions" + §"Pending
 Fixes" (file retired same day; snapshot preserved in git history at
 commit prior to retirement).
