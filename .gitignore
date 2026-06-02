@@ -44,3 +44,6 @@ docs/staging/
 
 # Sandbox (copied source files — never commit)
 .sandbox/
+
+# Ephemeral Tier-1 closure output
+logs/
