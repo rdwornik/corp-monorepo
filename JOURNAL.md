@@ -13,6 +13,15 @@
 
 ---
 
+### 2026-06-03 — Consume hub doc-tooling hooks (ADR-71 pilot, first consumer)
+- Did: First real consumer of the `.dev-knowledge` doc-tooling hook source repo (ADR-71). Added a `repo: ../.dev-knowledge` / `rev: 69558c7` stanza to `.pre-commit-config.yaml` consuming the hub's `toc-freshness` + `toc-generate` hooks (single-sourced, version-pinned). Inserted `<!-- TOC:START/END -->` markers in the 551-line ARCHITECTURE.md and generated a 40+ entry nested TOC via `toc-generate` (manual stage). Verified the gate fires: FAIL on missing markers, FAIL on stale TOC (throwaway header), PASS when fresh.
+- Result: ADR-71 consumption contract validated end-to-end for the TOC path — consume ✓ / regen ✓ / gate ✓. Anchors GitHub-correct (`[CORE]` tags stripped from link text, kept in slug). corp gates stayed green: ruff + tach clean, pytest baseline held. **Codemap path DEFERRED, not done:** corp's codemap is hand-authored (ADR-51 amendment, "not generator-managed") and the hub generator produces a strictly-worse 13-node ALL-orphan graph (0 edges, 0 layers) on corp's single-package `src/corp/` layout — edge match keys on first dotted import component (`corp` ≠ bare names) and tach layer keys are dotted vs bare nodes. Recommendation: do NOT flip ADR-71 to "validated" yet; the codemap generator needs a hub-side fix first.
+- Changes: `.pre-commit-config.yaml` (TOC hook stanza + pin/deferral note, `d764c79`); `ARCHITECTURE.md` (TOC markers + generated block, `3bf0192`); `.claude/skills/gotchas/gotchas.md` (codemap-generator-incompatibility gotcha); this JOURNAL entry. Branch `feat/consume-doctools-hooks`, merged `--no-ff` (no push). Hub NOT modified (consumed read-only).
+- Abandoned: Codemap hook consumption + frozen→live regen (would overwrite curated diagram with broken orphan graph; blocked by hub generator limitation, ratified with operator).
+- Next: Hub-side: teach the codemap generator to handle `corp.`-prefixed imports + dotted tach keys, then revisit corp codemap adoption + flip ADR-71 status. Rollout continues: ai-council, then corp-ops + corp-sca (need pre-commit bootstrapped first).
+
+---
+
 ### 2026-06-02 — Ecosystem unification to the 7-file canonical standard (ADR-38 A6)
 
 - Did: Unified corp-monorepo to the locked `.dev-knowledge` canonical standard (ADR-38 A6). Built `LESSONS.md` (seeded with two real corp lessons: ruff hook-version mismatch, VISION-routing drift). Added ARCHITECTURE §Key conventions/§Authority and governance/§Validators and enforcement/§Governing ADRs. Case-fixed CONTRIBUTING headings (`Branch naming`/`Commit style`) + added §Handoff process + a Backlog-id note. Migrated `BACKLOG.md` from the ADR-41/47 stream schema to the ADR-66 story-map; changed this file's H1 to the canonical `# Journal`.
