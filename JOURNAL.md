@@ -13,6 +13,13 @@
 
 ---
 
+### 2026-06-03 — Track ruff drift as BACKLOG item
+- Did: Added BACKLOG `[#12]` to track that committed `src/` has drifted from the current ruff config — `dev-check.ps1` runs `ruff format`+`ruff check --fix` in-place and reformats ~106 files on every invocation, surfaced 2026-06-03 during stale-branch resolution.
+- Result: `[#12] [P3][S]` in BACKLOG "Safety & code health" theme; drift not yet cleaned (that's the task).
+- Changes: `BACKLOG.md` (#12 added, grooming-log updated), `JOURNAL.md` (this entry). Branch `docs/backlog-ruff-drift`, merged `--no-ff` (no push). `src/` untouched.
+- Abandoned: nothing.
+- Next: Execute #12 — run ruff format+fix, review diff, commit.
+
 ### 2026-06-03 — Resolve 3 unmerged branches (preserve-then-delete)
 - Did: Closed the 3 stale unmerged branches surfaced by the fleet sweep without losing content. Triaged every P1/P2 finding in `verify/codex-p1-findings` (superset of `feature/dead-code-audit`) and `chore/extract-p1-2-to-backlog-2026-05-28` against the current tree, extracted only still-live findings fresh into BACKLOG (current ADR-66 form), then force-deleted all three.
 - Result: Preserved — **#10** path-traversal security finding (`cleanup/executor.py:68,85`, `is_relative_to`=0, STILL LIVE; was added in pre-migration old-format on the unmerged branch so it was absent from the current BACKLOG) and **#11** consolidated dead-code cleanup (H1–H4/M1/M3, all re-confirmed live 2026-06-03), under a new "Safety & code health" theme. Dropped as not-carried-over — P1-1 (`disk.py:351` `_guard_onedrive` FIXED), P1-3 (`_resolve_project_path(writable=True)`→`_guard_writable` FIXED), P2 vault single-writer (SUPERSEDED by ADR-27's actions/* carve-out, enforced by `test_vault_writer_invariant.py`), and the one-time audit scan artifacts (`.audit/*`, `find_orphans.py`, vulture/ruff dumps).
