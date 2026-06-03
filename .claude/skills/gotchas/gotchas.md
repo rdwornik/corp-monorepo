@@ -291,3 +291,10 @@ Source: moved from ~/.claude/skills/gotchas/gotchas.md (global → project scope
   - Fix: Intentional duplication is fine; keep providers independent
   - verify: Grep("from.*providers.*import", path="src/ai_council/providers/") → 0 cross-provider imports [scope: ai-council repo]
   - **Last triggered:** 2026-03-25
+
+- **Gotcha:** Do NOT consume the hub's `codemap-generate`/`codemap-freshness` hooks for corp — the generator can't model corp's `src/corp/` single-package layout
+  - Trigger: Wiring the .dev-knowledge doc-tooling hooks (ADR-71); tempted to regenerate ARCHITECTURE.md's codemap
+  - Symptom: Generator emits a 13-node ALL-orphan graph (0 edges, 0 layer colors) vs the curated 10-node/15-edge/4-layer hand-authored Mermaid. Edge detection matches imports by first dotted component — corp imports as `from corp.ingest` (top=`corp` ≠ bare names `{ingest,...}`) → 0 edges; tach.toml keys are dotted (`corp.schema`) but nodes are bare → 0 layers.
+  - Fix: Consume ONLY the TOC hooks. Codemap stays hand-authored (ADR-51 amendment 2026-05-22, "not generator-managed"). Codemap-generate adoption is deferred pending a hub-side fix (handle `corp.`-prefixed imports + dotted tach keys).
+  - verify: Grep("codemap-", path=".pre-commit-config.yaml") → 0 matches (codemap hooks NOT consumed)
+  - **Last triggered:** 2026-06-03
