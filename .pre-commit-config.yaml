@@ -23,3 +23,20 @@ repos:
         language: system
         pass_filenames: true
         files: ^(JOURNAL|LESSONS)\.md$
+
+  # Doc-tooling hooks single-sourced from the .dev-knowledge hub (ADR-71 pilot).
+  # rev pinned to a STABLE hub commit (69558c7 = "hub becomes the codemap+TOC
+  # hook source repo"; HEAD at pilot time, no tag). Never pin to a moving ref.
+  # NOTE: only the TOC hooks are consumed. The codemap hooks are intentionally
+  # NOT consumed: corp's codemap is hand-authored (ARCHITECTURE.md §Codemap,
+  # ADR-51 amendment 2026-05-22, "not generator-managed"), and the hub generator
+  # cannot model corp's single-package src/corp/ layout (corp.-prefixed imports +
+  # dotted tach.toml keys yield a 0-edge, 0-layer orphan graph). See JOURNAL
+  # 2026-06-03 + .claude/skills/gotchas. Codemap generator adoption is deferred
+  # pending a hub-side fix.
+  - repo: ../.dev-knowledge
+    rev: 69558c7
+    hooks:
+      - id: toc-freshness
+        files: '^ARCHITECTURE\.md$'
+      - id: toc-generate  # manual stage only: pre-commit run toc-generate --hook-stage manual
