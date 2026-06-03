@@ -298,3 +298,10 @@ Source: moved from ~/.claude/skills/gotchas/gotchas.md (global → project scope
   - Fix: Consume ONLY the TOC hooks. Codemap stays hand-authored (ADR-51 amendment 2026-05-22, "not generator-managed"). Codemap-generate adoption is deferred pending a hub-side fix (handle `corp.`-prefixed imports + dotted tach keys).
   - verify: Grep("codemap-", path=".pre-commit-config.yaml") → 0 matches (codemap hooks NOT consumed)
   - **Last triggered:** 2026-06-03
+
+- **Gotcha:** `scripts/dev-check.ps1` MUTATES the working tree — it runs `ruff format src/` + `ruff check src/ --fix` in place before the tests, so on a docs-only or clean-tree task it can leave ~100 reformatted `src/**.py` files staged-as-modified (committed src/ has drifted from the current ruff). Do NOT mistake this for your own change and do NOT sweep it into a docs/chore commit.
+  - Trigger: Running `dev-check.ps1` as a pre-merge gate during a task that doesn't touch `src/` (docs, backlog, journal, branch hygiene)
+  - Symptom: After dev-check passes, `git status` shows ~100 modified `src/corp/**.py` files (e.g. f-string reflows) that you never edited; they persist across `git switch`/`git merge` and would bloat a docs-only PR
+  - Fix: These are tool-generated ruff churn, not your work. `git restore src/` to return to the committed baseline (your real changes are elsewhere — BACKLOG/JOURNAL/etc.). The underlying ruff drift in committed src/ is a separate, real cleanup item — don't fix it incidentally inside an unrelated task.
+  - verify: after `git restore src/`, `git status` clean (only your intended files committed)
+  - **Last triggered:** 2026-06-03
