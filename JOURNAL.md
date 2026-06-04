@@ -426,3 +426,9 @@
 - Changes: `VISION.md` (new), `ARCHITECTURE.md` (root, formerly `docs/ARCHITECTURE.md`), `docs/HANDOFF.md` (retired), `BACKLOG.md` (retired), `templates/ADR-template.md` (new), `scripts/normalize_headers.py` (new), `.pre-commit-config.yaml` (hook added), `docs/decisions/README.md` (ADR-22..27 indexed), `docs/decisions/transcripts/ADR-27-*.md` (moved from collision path), `CLAUDE.md` (stale counts → source refs; `## Project Scale: L` added), `scripts/find_orphans.py` (new), `scripts/check_doc_refs.py` (new), `tests/scripts/test_find_orphans.py` (new).
 - Abandoned: Backfill of `Decommission:` field into existing ADRs — forward-only policy (§2.8); no-op workstreams §2.17 (scope-tags), §2.18 (BACKLOG_ARCHIVE), §2.19 (doc-format scripts) — confirmed out-of-scope; Workstream-E deferred items (dangling `ARCHITECTURE.md:423` reference, `conventions.yaml` layer-name drift) — remain deferred per gap-review §3-E.
 - Next: P2 — implement vault single-writer invariant (ADR-27 enforcement).
+
+### 2026-06-04 — graphify pilot (#88) REJECTED
+
+- Did/Result: Ran the #88 project-scoped graphify pilot on `chore/graphify-pilot` (security review SAFE, code-only graph build, graph-query-vs-grep measurements, maintenance assessment); operator REJECTED against the kill criterion (grep cheaper 2.5–5.6× + higher quality 3/3; maintenance conflicts with hub governance). Pilot branch deleted, `.graphify-venv` removed; report preserved on main with the ruling appended. No graphify trace on main beyond the audit report.
+- Changes: `docs/audits/2026-06-04-graphify-pilot.md` (new), this entry.
+- Next: none — backlog #88 resolved (reject).
