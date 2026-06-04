@@ -13,6 +13,13 @@
 
 ---
 
+### 2026-06-04 — Conformance baseline review (Dynamic Workflow, advances #81)
+- Did: Ran the read-only documentation-conformance pattern (validated on the .dev-knowledge hub, #81) on corp-monorepo for the first time — a Dynamic Workflow fanned out 3 verifiers (JOURNAL vs git, living-doc claims vs repo state, BACKLOG↔commits) → adversarial skeptic → digest; then Opus main-session re-ran every survivor's evidence command against live state. Write/Edit denied for the run (subagents auto-write otherwise); fleet-wide `git status --porcelain` tripwire clean (target repo untouched; dirty siblings predate the run by hours/months).
+- Result: 18 raw → 8 survived skeptic → 5 VERIFIED REAL + 3 DOWNGRADED. All 5 real findings are one class — ARCHITECTURE.md count drift: notes 1,972+→488, client_aliases 15→32, inbox.py 1161→951, database.py 705→542, type_codes 19→22 (no existing gate covers prose counts). Downgraded: actions/ "12" (=12 files incl __init__), corp "40+" (54, technically true), [#5] JLR (legitimately open). All 5 agents ran Haiku 4.5 (per-agent routing still non-functional, CC 2.1.162; no model options set). Output spend 75k/150k; gross 247k is cache-inflated. Gate green: 2548 pass / 6 skip, ruff clean, no src/ churn (dev-check avoided per mutation gotcha). No fixes applied — findings are operator-triage proposals.
+- Changes: `docs/audits/2026-06-04-conformance-baseline-digest.md` (new), this JOURNAL entry. Branch `docs/conformance-baseline`, merged `--no-ff` (no push). Hub/siblings NOT modified.
+- Abandoned: nothing (single-pass baseline; new verifier domains + per-repo profile #82 are iteration 2).
+- Next: Operator triage of the 5 count-drift findings (refresh ARCHITECTURE.md counts, re-stamp last_reviewed); #82 — add a deterministic count-verifier so non-LLM checks catch this class pre-emptively.
+
 ### 2026-06-03 — Track ruff drift as BACKLOG item
 - Did: Added BACKLOG `[#12]` to track that committed `src/` has drifted from the current ruff config — `dev-check.ps1` runs `ruff format`+`ruff check --fix` in-place and reformats ~106 files on every invocation, surfaced 2026-06-03 during stale-branch resolution.
 - Result: `[#12] [P3][S]` in BACKLOG "Safety & code health" theme; drift not yet cleaned (that's the task).
