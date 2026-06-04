@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-06-02
+last_reviewed: 2026-06-04
 status: active
 owner: Rob
 ---
@@ -7,7 +7,7 @@ owner: Rob
 # Architecture — `corp-monorepo`
 
 > Living document. Updated after structural changes.
-> Last updated: `2026-05-27` (`re-homed into ADR-51 canonical template; codemap + layer model → inline Mermaid; CORE section tagging`)
+> Last updated: `2026-06-04` (`count refresh — inbox/database LOC, type/client-alias, notes-table, agents counts re-verified live against repo state`)
 
 <!-- TOC:START -->
 - [Purpose](#purpose-core)
@@ -237,11 +237,11 @@ src/corp/
 | Module | Responsibility |
 |--------|---------------|
 | `router.py` | Core pipeline: detect -> match -> route -> record -> move -> extract (893 LOC) |
-| `inbox.py` | Interactive Rich UI for 00_Inbox routing (1161 LOC) |
+| `inbox.py` | Interactive Rich UI for 00_Inbox routing (951 LOC) |
 | `classifier.py` | TF-IDF + regex file classifier |
 | `llm_classifier.py` | Gemini-based classification for quarantined files |
 | `renamer.py` | Naming convention enforcement ({YYYY-MM}_{TYPE}_{CLIENT}_{Desc}.{ext}) |
-| `naming_config.py` | Type codes (19) and client aliases (15) from naming_config.yaml |
+| `naming_config.py` | Type codes (22) and client aliases (32) from naming_config.yaml |
 | `dedup.py` | MinHash near-duplicate detection (content_signatures table) |
 | `light_scan.py` | Fast file metadata scan (size, mtime, extension) |
 | `extractions.py` | Ingest CKE output into vault notes |
@@ -250,7 +250,7 @@ src/corp/
 
 | Module | Responsibility |
 |--------|---------------|
-| `database.py` | OpsDB class: assets, packages, events, routing feedback (705 LOC) |
+| `database.py` | OpsDB class: assets, packages, events, routing feedback (542 LOC) |
 | `registry.py` | ContentRegistry: YAML-driven file routing (series -> client -> rules) |
 | `file_registry.py` | Content-hash-based file identity tracking |
 
@@ -364,7 +364,7 @@ Location: `%LOCALAPPDATA%/corp-by-os/index.db` (WAL mode)
 | **projects** | project_id (PK), client, status, products, topics, domains | index_builder | Project metadata aggregation |
 | **facts** | project_id (FK), fact, source, topics, products | index_builder | Project fact database |
 | **facts_fts** | fact, source_title, topics, project_id (FTS5) | trigger on facts | Full-text search on facts |
-| **notes** | project_id, client, title, type, topics, products, note_path, rfp_visible | index_builder | CKE vault note index (1,972+ notes) |
+| **notes** | project_id, client, title, type, topics, products, note_path, rfp_visible | index_builder | CKE vault note index (488 notes, live 2026-06-04) |
 | **notes_fts** | title, topics, products, domains, people, client, project_id, doc_type (FTS5) | trigger on notes | Full-text search on notes |
 | **meta** | key, value | index_builder | Rebuild timestamps and stats |
 
@@ -385,10 +385,10 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
 | Source | Format | Loader | Purpose |
 |--------|--------|--------|---------|
 | `config/paths.toml` | TOML | schema.config.get_path() | Centralized path resolution (ENV > TOML > defaults) |
-| `config/agents.yaml` | YAML | config._load_agents() | Agent registry (5 agents) |
+| `config/agents.yaml` | YAML | config._load_agents() | Agent registry (6 agents) |
 | `config/workflows.yaml` | YAML | workflow_engine.load_workflows() | Workflow step definitions |
 | `config/content_registry.yaml` | YAML | ops.registry.ContentRegistry() | File pattern -> destination routing |
-| `config/naming_config.yaml` | YAML | ingest.naming_config | 19 type codes, 15 client aliases |
+| `config/naming_config.yaml` | YAML | ingest.naming_config | 22 type codes, 32 client aliases |
 | `config/extractor/*.yaml` | YAML | extractor.config_loader.get() | LLM settings, categories, prompts, filters |
 | `config/project/default.yaml` | YAML | project.config.get_settings() | CPE extraction settings |
 | `config/opportunity/default.yaml` | YAML | opportunity.config.load_config() | COM workflow settings |
