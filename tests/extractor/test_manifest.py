@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -164,6 +165,40 @@ def test_manifest_parses_client_project(tmp_path):
     manifest = Manifest.from_file(manifest_file)
     assert manifest.files[0].client == "Lenzing AG"
     assert manifest.files[0].project == "Lenzing_Planning"
+
+
+def test_load_status_retries_on_json_decode_error(tmp_path):
+    """load_status retries on JSONDecodeError (concurrent write from CKE) and succeeds on 2nd attempt."""
+    statuses = {"file-1": {"status": "done"}}
+    save_status(tmp_path, statuses)
+
+    good_json = json.dumps(statuses)
+    call_count = 0
+
+    original_load = json.load
+
+    def flaky_load(f):
+        nonlocal call_count
+        call_count += 1
+        if call_count == 1:
+            raise json.JSONDecodeError("Simulated partial write", "", 0)
+        return original_load(f)
+
+    with patch("corp.extractor.manifest.json.load", side_effect=flaky_load):
+        result = load_status(tmp_path)
+
+    assert result["file-1"] == FileStatus.DONE
+    assert call_count == 2
+
+
+def test_load_status_raises_after_all_retries_exhausted(tmp_path):
+    """load_status re-raises JSONDecodeError after 3 failed attempts."""
+    statuses = {"file-1": {"status": "done"}}
+    save_status(tmp_path, statuses)
+
+    with patch("corp.extractor.manifest.json.load", side_effect=json.JSONDecodeError("bad", "", 0)):
+        with pytest.raises(json.JSONDecodeError):
+            load_status(tmp_path)
 
 
 def test_manifest_client_project_optional(tmp_path):

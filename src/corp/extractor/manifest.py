@@ -5,6 +5,7 @@ Reads JSON manifest, validates entries, tracks status.
 
 import json
 import logging
+import time
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
@@ -77,9 +78,15 @@ def load_status(output_dir: Path) -> dict[str, FileStatus]:
     status_path = output_dir / "status.json"
     if not status_path.exists():
         return {}
-    with open(status_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return {k: FileStatus(v["status"]) for k, v in data.items()}
+    for attempt in range(3):
+        try:
+            with open(status_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return {k: FileStatus(v["status"]) for k, v in data.items()}
+        except json.JSONDecodeError:
+            if attempt == 2:
+                raise
+            time.sleep(0.05 * (attempt + 1))
 
 
 def save_status(output_dir: Path, statuses: dict[str, dict]):
