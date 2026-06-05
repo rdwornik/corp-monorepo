@@ -13,6 +13,13 @@
 
 ---
 
+### 2026-06-06 — Scoped CLAUDE.md conformance deep-audit (#75 closeout)
+- Did: Ran a scoped CLAUDE.md conformance deep-audit (Dynamic Workflow, #75) against §6–§9, checking for stale references left by the machinery-c3 cleanup (2026-06-05). Identified 6 proposals (P1–P6): P1 `/boot` removed from §6 step 1 and §7; P2 `/evolve` removed from §7; P3 `verify` re-pointed as bundled/plugin skill (not user-dir); P4 `boot` skill bullet deleted from §8; P5 SessionStart hook description corrected to reflect `surface-closures.ps1` (ADR-70) instead of the stale "loads learned rules" description; P6(a) retry wrapper added to `load_status()` in `manifest.py` (2–3 retries, small backoff) per the §5 graduated rule. Variant (b) (soften the rule) was declined by operator — (a) ratified and implemented. Test stub added to `tests/extractor/test_manifest.py` covering concurrent-read / transient-failure case.
+- Result: §6–§9 CLAUDE.md accurate as of 2026-06-06. §5 verify line passes — `load_status` has retry wrapper. Branch `chore/75-audit-closeout`, merged `--no-ff`.
+- Changes: `JOURNAL.md` (this entry), `CLAUDE.md` (§6–§9 refresh, P1–P5), `src/corp/extractor/manifest.py` (retry wrapper in `load_status`), `tests/extractor/test_manifest.py` (transient-failure retry test).
+- Abandoned: P6 variant (b) — soften the §5 graduated rule (operator declined; rule stands, code updated instead).
+- Next: #75 closed. Continue ecosystem audit schedule per hub backlog.
+
 ### 2026-06-04 — Refresh drifted ARCHITECTURE.md counts (closes baseline F1–F5)
 - Did/Result: Re-read ARCHITECTURE.md end-to-end, re-verified every count live; fixed 6 drifts (inbox 1161→951, database 705→542, type codes 19→22, client aliases 15→32, notes 1,972+→488, agents 5→6 — the agents one was mis-cleared by the baseline's hyphen-blind grep) and left the verified-correct ones (extract 1184, router 893, cli 18, actions 12, 5 repos, corp 40+); re-stamped last_reviewed 2026-06-04; deleted merged `docs/conformance-baseline`. Branch `docs/architecture-count-refresh`, merged `--no-ff`. Count-checker NOT built (that's #82/#84).
 

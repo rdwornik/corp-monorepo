@@ -76,12 +76,11 @@ Key facts (abbreviated; `ARCHITECTURE.md` is authoritative):
 
 ## 6. Session start protocol
 
-1. `/boot` (loads skills, memory, recent commits)
-2. `git status` — clean working tree?
-3. `git log --oneline -5` — recent context
-4. Read most recent handoff if continuing
-5. Read last 5 entries of `JOURNAL.md`
-6. Wait for Rob's prompt — never improvise
+1. `git status` — clean working tree?
+2. `git log --oneline -5` — recent context
+3. Read most recent handoff if continuing
+4. Read last 5 entries of `JOURNAL.md`
+5. Wait for Rob's prompt — never improvise
 
 **Session end:** Append entry to `JOURNAL.md` (ADR-49 shape, cutover 2026-05-18):
 `### YYYY-MM-DD — <topic>` then `- Did:` / `- Result:` / `- Changes:` / `- Abandoned:` / `- Next:`.
@@ -94,9 +93,7 @@ Trigger: in Claude Code at `.dev-knowledge`, say "Make handoff for corp-monorepo
 
 User-level (`~/.claude/commands/`):
 - `/session-summary` — generate handoff at session end
-- `/boot` — load context, skills, memory
 - `/codex-review` — invoke Codex review
-- `/evolve` — evolution audit
 
 Repo-level (`./.claude/commands/`): none currently
 
@@ -104,8 +101,9 @@ Repo-level (`./.claude/commands/`): none currently
 
 User-level (`~/.claude/skills/`):
 - `gotchas` — universal dev gotchas (encoding, shell safety, test framework)
+
+Bundled/plugin skills (loaded automatically by harness):
 - `verify` — domain-specific verification; run after pytest passes
-- `boot` — session boot; loads memory, verifies rules, checks trends
 
 Repo-level (`./.claude/skills/`):
 - `gotchas` — corp-monorepo patterns (CKE, vault ops, OneDrive safety, Graph API). **Read before changes.**
@@ -116,8 +114,7 @@ Pre-commit (from `.pre-commit-config.yaml`):
 - ruff — linting and formatting
 - tach — dependency layer enforcement (`interface > orchestration > core > foundation`)
 
-Other (`.claude/settings.json`):
-- Session startup hook — loads learned rules (6 lines)
+Other (`~/.claude/settings.json`): SessionStart hook — runs `surface-closures.ps1` (Tier-1 lifecycle closure surfacing, ADR-70).
 
 ## 10. Anti-patterns specific to Claude Code in this repo
 
