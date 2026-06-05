@@ -13,6 +13,13 @@
 
 ---
 
+### 2026-06-06 — Remote bookkeeping: GitHub push + sensitivity sweep record
+- Did: Ran a read-only pre-push sensitivity sweep across all 723 tracked files (client names, secrets, personal paths, logs). Pushed repo to private GitHub remote `rdwornik/corp-monorepo`. Added BACKLOG item #13 to sanitize real internal paths from fixtures and archives.
+- Result: Remote `rdwornik/corp-monorepo` (private) up to date as of 2026-06-06. Sweep found: secrets CLEAN (zero committed values); client names present in config/source/fixtures (informational for private repo); personal paths (`1028120`, OneDrive paths) in `config/paths.toml`, scripts, and test fixtures — recorded as informational, remediation tracked in BACKLOG #13.
+- Changes: `JOURNAL.md` (this entry), `BACKLOG.md` (added #13 sanitize-fixtures-archives item).
+- Abandoned: —
+- Next: Sanitize real internal paths per BACKLOG #13 when scoped.
+
 ### 2026-06-06 — Scoped CLAUDE.md conformance deep-audit (#75 closeout)
 - Did: Ran a scoped CLAUDE.md conformance deep-audit (Dynamic Workflow, #75) against §6–§9, checking for stale references left by the machinery-c3 cleanup (2026-06-05). Identified 6 proposals (P1–P6): P1 `/boot` removed from §6 step 1 and §7; P2 `/evolve` removed from §7; P3 `verify` re-pointed as bundled/plugin skill (not user-dir); P4 `boot` skill bullet deleted from §8; P5 SessionStart hook description corrected to reflect `surface-closures.ps1` (ADR-70) instead of the stale "loads learned rules" description; P6(a) retry wrapper added to `load_status()` in `manifest.py` (2–3 retries, small backoff) per the §5 graduated rule. Variant (b) (soften the rule) was declined by operator — (a) ratified and implemented. Test stub added to `tests/extractor/test_manifest.py` covering concurrent-read / transient-failure case.
 - Result: §6–§9 CLAUDE.md accurate as of 2026-06-06. §5 verify line passes — `load_status` has retry wrapper. Branch `chore/75-audit-closeout`, merged `--no-ff`.
