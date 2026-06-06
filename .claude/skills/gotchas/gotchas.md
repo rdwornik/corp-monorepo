@@ -305,3 +305,12 @@ Source: moved from ~/.claude/skills/gotchas/gotchas.md (global → project scope
   - Fix: These are tool-generated ruff churn, not your work. `git restore src/` to return to the committed baseline (your real changes are elsewhere — BACKLOG/JOURNAL/etc.). The underlying ruff drift in committed src/ is a separate, real cleanup item — don't fix it incidentally inside an unrelated task.
   - verify: after `git restore src/`, `git status` clean (only your intended files committed)
   - **Last triggered:** 2026-06-03
+
+## CI & gh CLI (nightly conformance loop)
+
+- **Gotcha:** `gh api .../contents/<path> --jq '.name'` on a MISSING file (404) prints the error BODY (`{"message":"Not Found",...,"status":"404"}`) to STDOUT, not just stderr — so a `2>$null` + stdout-truthiness existence check reads a MISSING file as "present" and the side-effect/silent-skip nudge never fires (the failure case it exists for is exactly the one it misses).
+  - Trigger: Any script checking file existence on a remote via `gh api .../contents/...` and branching on whether stdout is non-empty (e.g. `scripts/surface-conformance.ps1` digest-presence check)
+  - Symptom: A genuinely-absent digest/file is silently treated as found; the "expected digest is NOT on the default branch" surfacing never appears, defeating no-retry silent-skip detection
+  - Fix: Gate on the exit code — `$found = & $gh api ... --jq '.name' 2>$null; $present = ($LASTEXITCODE -eq 0) -and ($found -match '\.md\s*$')`. `gh api` exits non-zero on HTTP >= 400; do NOT trust stdout content for presence
+  - verify: Grep("LASTEXITCODE", path="scripts/surface-conformance.ps1") → digest-presence check gates on exit code, not stdout truthiness
+  - **Last triggered:** 2026-06-06
