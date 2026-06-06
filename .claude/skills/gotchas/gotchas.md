@@ -1,6 +1,6 @@
 # Corp-Monorepo Gotchas
 
-Last updated: 2026-03-30
+Last updated: 2026-06-06
 Source: moved from ~/.claude/skills/gotchas/gotchas.md (global → project scope)
 
 **Format preference:** Use negative constraints ("Do NOT...") over positive descriptions where possible. "Do NOT use print() in library code" is more effective than "use logging module."
@@ -313,4 +313,20 @@ Source: moved from ~/.claude/skills/gotchas/gotchas.md (global → project scope
   - Symptom: A genuinely-absent digest/file is silently treated as found; the "expected digest is NOT on the default branch" surfacing never appears, defeating no-retry silent-skip detection
   - Fix: Gate on the exit code — `$found = & $gh api ... --jq '.name' 2>$null; $present = ($LASTEXITCODE -eq 0) -and ($found -match '\.md\s*$')`. `gh api` exits non-zero on HTTP >= 400; do NOT trust stdout content for presence
   - verify: Grep("LASTEXITCODE", path="scripts/surface-conformance.ps1") → digest-presence check gates on exit code, not stdout truthiness
+  - **Last triggered:** 2026-06-06
+
+## Shell & Claude Code harness (PowerShell, Bash tool, commit/issue bodies)
+
+- **Gotcha:** Do NOT pass a multi-line or special-char commit/issue body to `git commit -m` / `gh issue comment -c` via an inline PowerShell here-string (`@'...'@`) — when the `@'` follows the flag on the same line PowerShell does NOT parse it as a command argument, so the here-string delimiters leak into the message (subject gets a leading `@ `, body gets a trailing `@`). Write the body to a temp file and use `git commit -F <file>` / `gh ... --body-file <file>` (or `"$(cat <file>)"`).
+  - Trigger: Committing, amending, or posting any GitHub comment whose body spans multiple lines or contains special chars (—, §, #) from PowerShell
+  - Symptom: `git log -1 --pretty=%s` shows the subject beginning `@ `, and `%b` shows a stray trailing `@`; the message looks fine in the shell invocation but is corrupted on disk
+  - Fix: Write the body via the Write tool to e.g. `.git/COMMIT_<topic>_MSG.txt`, then `git commit --amend -F <file>` (or `gh issue comment N --body-file <file>`); delete the temp file after. ALWAYS verify with `git log -1 --pretty=%s` BEFORE merging — catch corruption pre-merge, not after.
+  - verify: Grep("COMMIT", path=".claude/skills/gotchas/gotchas.md") → temp-file + `-F`/`--body-file` rule is documented
+  - **Last triggered:** 2026-06-06
+
+- **Gotcha:** The Claude Code **Bash tool runs bash even on this Windows box** — PowerShell-syntax (`Test-Path`, `Get-Content`, `if (...) {...}`, `Select-String`) sent to it fails with `/usr/bin/bash: syntax error near unexpected token '{'` or command-not-found. PS cmdlets MUST go to the dedicated PowerShell tool.
+  - Trigger: Reaching for the Bash tool to run a PowerShell cmdlet (Test-Path, Get-Content, Select-String, Get-ChildItem, New-Item) on Windows
+  - Symptom: `syntax error near unexpected token` on the first `{`, or `command not found` for the cmdlet — the command never runs
+  - Fix: Route PS cmdlets and Windows-path file ops to the PowerShell tool; keep the Bash tool for git and POSIX utilities. Do not mix syntaxes within one tool call.
+  - verify: manual (harness routing rule — PowerShell tool for cmdlets, Bash tool for git/POSIX)
   - **Last triggered:** 2026-06-06
