@@ -2,8 +2,9 @@
 #
 # Ported from the hub's scripts/surface_triage.ps1 (proven pattern), adapted to
 # corp-monorepo. READ-ONLY, fail-soft, ALWAYS exit 0, silent on the happy path
-# (gh absent / unauthenticated / offline, or nothing to report). Surfaces three
-# things, each only when there is something to say:
+# (gh absent / offline, or nothing to report). Surfaces four things, each only
+# when there is something to say:
+#   [gh]      — gh is present but NOT authenticated (skips all gh checks below)
 #   [triage]  — open `nightly-triage` Issues await review
 #   [nightly] — the last "Nightly Conformance Triage" Action run did NOT succeed
 #   [nightly] — the expected dated digest is missing from the default branch
@@ -20,6 +21,10 @@
 #   "[triage] N nightly finding(s) await: #a, #b ...". It emits a "[nightly]" line
 #   ONLY when the last Action run failed or the expected dated digest is missing
 #   from the default branch; on the all-green happy path it prints nothing, exit 0.
+#   When gh is present but unauthenticated (`gh auth status` exits non-zero) it
+#   prints exactly one "[gh] auth invalid -- run: gh auth refresh -h github.com"
+#   line and skips every gh-dependent check (still exit 0) -- this stops an auth
+#   failure from masquerading as a missing-digest "[nightly]" false alarm.
 
 $ErrorActionPreference = 'SilentlyContinue'
 try {
@@ -35,6 +40,21 @@ try {
     # Resolve the repo from the project dir (gh reads the cwd's git remote).
     $dir = $env:CLAUDE_PROJECT_DIR
     if ($dir -and (Test-Path -LiteralPath $dir)) { Set-Location -LiteralPath $dir }
+
+    # --- Leading gate: gh auth (mirrors hub e1e1abc) -------------------------
+    # gh is on PATH but may not be AUTHENTICATED. Without this gate an invalid /
+    # expired token makes every gh call below fail silently (2>$null) -- and the
+    # digest side-effect check (b) would then FALSE-ALARM "digest NOT on default
+    # branch" on what is really an auth problem (gh api 404s the same on auth
+    # failure as on a genuinely-missing file). Probe auth ONCE up front: on
+    # failure print a single actionable ASCII banner and skip ALL gh-dependent
+    # checks (still fail-soft, still exit 0). `gh auth status` exits non-zero
+    # when no usable token is stored.
+    & $gh auth status 2>$null | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Output "[gh] auth invalid -- run: gh auth refresh -h github.com"
+        exit 0
+    }
 
     # --- Surfacing 1: open nightly-triage Issues -----------------------------
     # NOTE: do NOT early-exit when there are zero open issues -- the nightly

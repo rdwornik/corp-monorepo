@@ -315,6 +315,10 @@ Source: moved from ~/.claude/skills/gotchas/gotchas.md (global → project scope
   - verify: Grep("LASTEXITCODE", path="scripts/surface-conformance.ps1") → digest-presence check gates on exit code, not stdout truthiness
   - **Last triggered:** 2026-06-06
 
+- **Pointer:** `scripts/surface-conformance.ps1` probes `gh auth status` (exit-code gate) BEFORE any gh-dependent check — on failure it prints `[gh] auth invalid -- run: gh auth refresh -h github.com` and skips them all, so an invalid/expired token can't masquerade as a missing-digest `[nightly]` false alarm. Full rationale lives hub-side in LESSONS (commit e1e1abc); not duplicated here.
+  - verify: Grep("gh auth status", path="scripts/surface-conformance.ps1") → leading auth gate present
+  - **Last triggered:** 2026-06-06
+
 ## Shell & Claude Code harness (PowerShell, Bash tool, commit/issue bodies)
 
 - **Gotcha:** Do NOT pass a multi-line or special-char commit/issue body to `git commit -m` / `gh issue comment -c` via an inline PowerShell here-string (`@'...'@`) — when the `@'` follows the flag on the same line PowerShell does NOT parse it as a command argument, so the here-string delimiters leak into the message (subject gets a leading `@ `, body gets a trailing `@`). Write the body to a temp file and use `git commit -F <file>` / `gh ... --body-file <file>` (or `"$(cat <file>)"`).
