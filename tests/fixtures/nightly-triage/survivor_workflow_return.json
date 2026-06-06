@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "counts": {
+    "raw_findings": 6,
+    "survived_skeptic": 2,
+    "killed_false_positive": 4
+  },
+  "counts_marker": "<!-- counts: raw=6 survived=2 killed=4 -->",
+  "survivors": [
+    {
+      "domain": "counts",
+      "claim": "ARCHITECTURE.md:244 client aliases (32)",
+      "location": "ARCHITECTURE.md:244",
+      "evidence_command": "grep -c '^  ' config/naming_config.yaml client_aliases section",
+      "severity": "high",
+      "proposed_fix": "Update ARCHITECTURE.md client-alias count to live value and re-stamp last_reviewed."
+    },
+    {
+      "domain": "counts",
+      "claim": "ARCHITECTURE.md:240 inbox.py (951 LOC)",
+      "location": "ARCHITECTURE.md:240",
+      "evidence_command": "wc -l src/corp/ingest/inbox.py",
+      "severity": "med",
+      "proposed_fix": "Refresh inbox.py LOC in ARCHITECTURE.md."
+    }
+  ],
+  "skeptic": {
+    "killed_findings": [
+      { "claim": "router.py (893 LOC) drift", "kill_reason": "evidence-not-definitive", "kill_detail": "wc -l confirms 893; verifier miscounted." },
+      { "claim": "extract.py (1184 LOC) drift", "kill_reason": "evidence-not-definitive", "kill_detail": "live wc -l matches 1184." },
+      { "claim": "corp '40+ commands' understated", "kill_reason": "true-but-irrelevant", "kill_detail": "54 satisfies '40+'." },
+      { "claim": "actions/ '12 modules'", "kill_reason": "documented-decision", "kill_detail": "12 files incl __init__; defensible per ARCHITECTURE.md." }
+    ]
+  },
+  "digest": {
+    "summary": "Nightly conformance: 6 raw findings, 2 survived the skeptic (67% kill-rate). Both survivors are ARCHITECTURE.md count drift (the repo's dominant class); no behavioral or safety defects. Proposals only.",
+    "findings_by_severity": {
+      "high": ["ARCHITECTURE.md:244 client aliases (32) -> live value differs; refresh count."],
+      "med": ["ARCHITECTURE.md:240 inbox.py (951 LOC) -> live wc -l differs; refresh count."],
+      "low": []
+    },
+    "next_actions": [
+      "Refresh the two drifted ARCHITECTURE.md counts and re-stamp last_reviewed (single doc cleanup).",
+      "Consider the deterministic count-verifier already covers this class; no code change needed."
+    ],
+    "checked_clean": [
+      "V1: last-10 JOURNAL entries corroborated against git",
+      "V2: 5 CLIs (corp, corp-meta, cke, cpe, com) declared in pyproject.toml",
+      "V3: extract.py=1184 and router.py=893 match the doc",
+      "V3: unverifiable-in-clone: notes count (index.db not in clone)"
+    ],
+    "counts_marker": "<!-- counts: raw=6 survived=2 killed=4 -->"
+  }
+}

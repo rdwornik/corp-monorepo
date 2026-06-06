@@ -1,4 +1,19 @@
 {
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/scripts/surface-conformance.ps1\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "//hooks": "Nightly-conformance SessionStart surfacing (read-only, fail-soft, exit 0). Merges with -- does not replace -- the user-level ~/.claude/settings.json SessionStart hooks (surface-closures.ps1 + the tier1-lifecycle plugin). Local-only nudge; not on the cloud executing path (ADR-72).",
   "enabledPlugins": {
     "tier1-lifecycle@dev-knowledge-methodology": true
   },

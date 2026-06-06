@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "counts": {
+    "raw_findings": 5,
+    "survived_skeptic": 0,
+    "killed_false_positive": 5
+  },
+  "counts_marker": "<!-- counts: raw=5 survived=0 killed=5 -->",
+  "survivors": [],
+  "skeptic": {
+    "killed_findings": [
+      { "claim": "extract.py LOC drift", "kill_reason": "evidence-not-definitive", "kill_detail": "live wc -l matches the doc." },
+      { "claim": "router.py LOC drift", "kill_reason": "evidence-not-definitive", "kill_detail": "live wc -l matches the doc." },
+      { "claim": "actions/ module count", "kill_reason": "documented-decision", "kill_detail": "count defensible per ARCHITECTURE.md." },
+      { "claim": "corp '40+ commands'", "kill_reason": "true-but-irrelevant", "kill_detail": "54 satisfies '40+'." },
+      { "claim": "[#5] JLR open", "kill_reason": "documented-decision", "kill_detail": "legitimately open; backlog correct." }
+    ]
+  },
+  "digest": {
+    "summary": "Nightly conformance: 5 raw findings, 0 survived the skeptic (100% kill-rate). All living-doc counts and structural claims conform to live repo state. Clean night.",
+    "findings_by_severity": { "high": [], "med": [], "low": [] },
+    "next_actions": [],
+    "checked_clean": [
+      "V1: last-10 JOURNAL entries corroborated against git",
+      "V2: 5 CLIs declared; ruff + tach in .pre-commit-config.yaml; ADR-14/23/27 exist",
+      "V3: extract.py=1184, router.py=893, inbox.py=951, database.py=542 all match",
+      "V3: unverifiable-in-clone: notes count (index.db not in clone)"
+    ],
+    "counts_marker": "<!-- counts: raw=5 survived=0 killed=5 -->"
+  }
+}
