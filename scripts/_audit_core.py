@@ -55,6 +55,7 @@ __all__ = [
     "build_inventory",
     "build_naming_metrics",
     "build_path_inventory",
+    "build_sot_violations",
     "collect_files",
     "is_cloud_placeholder",
     "iter_entries",
@@ -438,6 +439,7 @@ def build_inventory(
     inv.duplication = build_duplication(
         files, config, include_onedrive=include_onedrive
     )
+    inv.sot_violations = build_sot_violations(files)
     return inv
 
 
@@ -644,6 +646,73 @@ def _overlap_summary(files: list[HashedFile], include_onedrive: bool) -> str:
         f"(~{dup_bytes} B duplicated across trees); "
         f"by_name={len(shared_names)} shared filenames"
     )
+
+
+# --------------------------------------------------------------------------- #
+# Source-of-truth violations (Step 5).
+# --------------------------------------------------------------------------- #
+
+# Filenames that legitimately recur across directories (not SoT violations).
+_SOT_NAME_IGNORE: frozenset[str] = frozenset(
+    {
+        "__init__.py",
+        "__main__.py",
+        "conftest.py",
+        "setup.py",
+        "py.typed",
+        "readme.md",
+        "readme.txt",
+        "index.md",
+        "license",
+        "license.md",
+        "changelog.md",
+        "makefile",
+        "dockerfile",
+        ".gitignore",
+        ".gitkeep",
+        ".gitattributes",
+        ".ds_store",
+        "thumbs.db",
+    }
+)
+
+
+def build_sot_violations(files: list[HashedFile]) -> list[SourceOfTruthViolation]:
+    """Flag files that look authoritative in more than one location.
+
+    ``by_hash``: identical content (same SHA-256) in >= 2 distinct directories.
+    ``by_name``: same filename in >= 2 distinct directories (content may differ),
+    excluding ubiquitous framework filenames.
+    """
+    violations: list[SourceOfTruthViolation] = []
+
+    hash_paths: dict[str, set[str]] = {}
+    for f in files:
+        if f.sha256 is not None:
+            hash_paths.setdefault(f.sha256, set()).add(f.path)
+    for digest, paths in hash_paths.items():
+        if len({os.path.dirname(p) for p in paths}) >= 2:
+            violations.append(
+                SourceOfTruthViolation(
+                    key=digest, kind="by_hash", locations=tuple(sorted(paths))
+                )
+            )
+
+    name_paths: dict[str, set[str]] = {}
+    for f in files:
+        if f.name.lower() in _SOT_NAME_IGNORE:
+            continue
+        name_paths.setdefault(f.name, set()).add(f.path)
+    for name, paths in name_paths.items():
+        if len({os.path.dirname(p) for p in paths}) >= 2:
+            violations.append(
+                SourceOfTruthViolation(
+                    key=name, kind="by_name", locations=tuple(sorted(paths))
+                )
+            )
+
+    violations.sort(key=lambda v: (v.kind, -len(v.locations), v.key))
+    return violations
 
 
 # --------------------------------------------------------------------------- #

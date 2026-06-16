@@ -260,6 +260,42 @@ def test_onedrive_overlap_summary(tmp_path: Path) -> None:
     assert "not scanned" in not_scanned.onedrive_overlap
 
 
+# ------------------------- source of truth -------------------------------- #
+
+
+def test_sot_by_hash_spans_directories(tmp_path: Path) -> None:
+    cfg = _config(scan_paths=[str(tmp_path)])
+    # Same content (size 20) in two different dirs -> by_hash violation.
+    _mk(tmp_path / "dir1" / "x.txt", 20, NOW - DAY)
+    _mk(tmp_path / "dir2" / "x.txt", 20, NOW - DAY)
+    # Same content (size 33) but both in dir1 -> NOT a multi-location violation.
+    _mk(tmp_path / "dir1" / "y.txt", 33, NOW - DAY)
+    _mk(tmp_path / "dir1" / "ycopy.txt", 33, NOW - DAY)
+
+    files = core.collect_files(cfg)
+    by_hash = [v for v in core.build_sot_violations(files) if v.kind == "by_hash"]
+    assert len(by_hash) == 1
+    assert {Path(p).parent.name for p in by_hash[0].locations} == {"dir1", "dir2"}
+
+
+def test_sot_by_name_ignores_ubiquitous(tmp_path: Path) -> None:
+    cfg = _config(scan_paths=[str(tmp_path)])
+    # Same name, different content, two dirs -> by_name violation.
+    _mk(tmp_path / "dir1" / "report.docx", 10, NOW - DAY)
+    _mk(tmp_path / "dir2" / "report.docx", 20, NOW - DAY)
+    # __init__.py recurs everywhere -> ignored.
+    _mk(tmp_path / "dir1" / "__init__.py", 1, NOW - DAY)
+    _mk(tmp_path / "dir2" / "__init__.py", 2, NOW - DAY)
+
+    by_name = [v for v in core.build_sot_violations(core.collect_files(cfg))
+               if v.kind == "by_name"]
+    keys = {v.key for v in by_name}
+    assert "report.docx" in keys
+    assert "__init__.py" not in keys
+    report = next(v for v in by_name if v.key == "report.docx")
+    assert len(report.locations) == 2
+
+
 # --------------------------- OneDrive guard ------------------------------- #
 
 
