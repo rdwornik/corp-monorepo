@@ -25,6 +25,7 @@ import json
 import logging
 import os
 import re
+import stat
 import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -278,6 +279,7 @@ def walk_tree(
     exclude_dirs: list[str],
     *,
     allow_onedrive: bool = False,
+    errors: list[str] | None = None,
 ) -> Iterator[tuple[os.DirEntry, int, bool]]:
     """Yield ``(DirEntry, depth, is_dir)`` for every entry under ``root``.
 
@@ -309,7 +311,10 @@ def walk_tree(
                     except OSError:
                         continue
         except (OSError, PermissionError) as exc:
-            log.warning("scandir skipped %s: %s", current, exc)
+            msg = f"scandir skipped {_norm(current)}: {exc}"
+            log.warning(msg)
+            if errors is not None:
+                errors.append(msg)
 
 
 def iter_entries(
@@ -372,7 +377,7 @@ def build_path_inventory(
     heap: list[tuple[int, int, FileEntry]] = []
     idx = 0
     for entry, depth, is_dir in walk_tree(
-        root, config.exclude_dirs, allow_onedrive=allow_onedrive
+        root, config.exclude_dirs, allow_onedrive=allow_onedrive, errors=inv.errors
     ):
         if is_dir:
             inv.dir_count += 1
@@ -441,6 +446,11 @@ def build_inventory(
     files = collect_files(
         config, include_onedrive=include_onedrive, hash_onedrive=hash_onedrive
     )
+    for path_inv in inv.inventories:
+        prefix = path_inv.scan_path + "/"
+        path_inv.hashed_count = sum(
+            1 for f in files if f.sha256 is not None and f.path.startswith(prefix)
+        )
     inv.duplication = build_duplication(
         files, config, include_onedrive=include_onedrive
     )
@@ -759,11 +769,41 @@ _MODEL_TOKENS = (
 )
 _ROUTING_NAME_HINTS = ("rout", "model", "tier", "provider", "llm", "agent")
 _REPO_SKIP = frozenset({".git", "__pycache__", ".idea", ".vs", ".pytest_cache"})
+_FILE_ATTRIBUTE_REPARSE_POINT = 0x400
+
+
+def _is_plain_dir(path: Path) -> bool:
+    """True only for a real local directory: not a symlink/junction, not synced.
+
+    Used by the automation scan so ``glob``/``is_dir`` can't follow a reparse
+    point out of the intended repo tree (Codex review 2026-06-16).
+    """
+    if ONEDRIVE_MARKER in _norm(path):
+        return False
+    try:
+        st = os.stat(path, follow_symlinks=False)
+    except OSError:
+        return False
+    if not stat.S_ISDIR(st.st_mode):
+        return False
+    return not getattr(st, "st_file_attributes", 0) & _FILE_ATTRIBUTE_REPARSE_POINT
 
 
 def _read_text_safe(path: Path, max_bytes: int = 1_000_000) -> str:
+    """Read up to ``max_bytes`` of text without hydrating cloud-only files.
+
+    Stats without following symlinks and skips cloud placeholders (never opens
+    them), then streams at most ``max_bytes`` (Codex review 2026-06-16).
+    """
     try:
-        return path.read_bytes()[:max_bytes].decode("utf-8", errors="replace")
+        st = os.stat(path, follow_symlinks=False)
+    except OSError:
+        return ""
+    if is_cloud_placeholder(st):
+        return ""
+    try:
+        with open(_long_path(str(path)), "rb") as handle:
+            return handle.read(max_bytes).decode("utf-8", errors="replace")
     except OSError:
         return ""
 
@@ -825,21 +865,21 @@ def _build_repo_automation(repo: Path, config: AuditConfig) -> RepoAutomation:
         ra.entry_points = _parse_entry_points(pyproject)
 
     wf_dir = repo / ".github" / "workflows"
-    if wf_dir.is_dir():
+    if _is_plain_dir(wf_dir):
         for wf in sorted(list(wf_dir.glob("*.yml")) + list(wf_dir.glob("*.yaml"))):
             text = _read_text_safe(wf)
             cron = "schedule:" in text or "cron" in text
             ra.schedulers.append(f"{wf.name}{' (cron)' if cron else ''}")
     routines_dir = repo / ".claude" / "workflows"
-    if routines_dir.is_dir():
+    if _is_plain_dir(routines_dir):
         for routine in sorted(routines_dir.glob("*.js")):
             ra.schedulers.append(f"routine:{routine.name}")
 
     for rel in ("data", "output", "outputs", "dist", "build"):
-        if (repo / rel).is_dir():
+        if _is_plain_dir(repo / rel):
             ra.write_targets.append(rel)
     for base in (repo, repo / "src"):
-        if base.is_dir():
+        if _is_plain_dir(base):
             for db in sorted(base.glob("*.db")):
                 ra.write_targets.append(_norm(db.relative_to(repo)))
 

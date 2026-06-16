@@ -30,18 +30,18 @@ type: audit
 2. **Folders encode topic/access, not pipeline stages.** There is a real one-way ingest pipeline, but no `raw → desk → atoms → threads → express → briefings` refinement. CKE output lands flat in `01_Knowledge/`, and extraction byproducts sprawl (one filename appears in **161** directories; `synthesis.md` / `_meta.yaml` / `page_NNN.png` dominate the 1,216 by-name source-of-truth collisions) (L1).
 3. **The deterministic spine is the strongest layer — but unscheduled.** Sole-writer invariant + AST tests, Tach 4-layer enforcement, `ops.db` record-before-move, code-owned write paths all hold. What's missing: **autonomous scheduling** (no in-repo cron; runs are manual or external cloud Routines) and **git-commit-per-run** (L2).
 4. **Swarm and charter exist as ingredients, not as composed layers.** `ai-council` (multi-model debate) and tier-routing provide cheap-local + frontier judgment; `.dev-knowledge` holds ADRs, invariants and protocols. But there are **no explicit scout/cataloger/critic/editor roles**, and the charter is **mostly human-read prose, not machine-enforced** (L3/L4).
-5. **Disorganization is the dominant tax.** Across the four roots, **45–84% of files match no clean naming convention**, 5–6 conventions coexist, **308 junk-drawer directories** hold >40 loose files each, and **2.5 GB** of exact-duplicate content sits in the local trees alone (L1/L5 friction).
+5. **Disorganization is the dominant tax.** Across the four roots, **44–83% of files match no clean naming convention**, 5–6 conventions coexist, **308 junk-drawer directories** hold >40 loose files each, and **2.5 GB** of exact-duplicate content sits in the local trees alone (L1/L5 friction).
 
 ## Headline inventory (read-only scan, 2026-06-16)
 
 | Root | Files | Dirs | Size | Cloud-only | Max depth | No-convention | Junk dirs |
 |------|------:|-----:|-----:|-----------:|----------:|--------------:|----------:|
-| `Dev/corp-monorepo` | 4,306 | 408 | 17.1 GB | 0 | 9 | 1,931 (45%) | 20 |
+| `Dev/corp-monorepo` | 4,312 | 408 | 17.1 GB | 0 | 9 | 1,931 (45%) | 20 |
 | `Documents/MyWork` | 2,190 | 207 | 9.9 GB | 19 | 8 | 955 (44%) | 13 |
 | `Documents/ObsidianVault` | 876 | 17 | 39.4 MB | 0 | 3 | 403 (46%) | 1 |
-| `OneDrive…/MyWork_OneDrive` | 159,558 | 30,233 | 1.1 TB | 153,279 (96%) | 20 | 133,241 (84%) | 274 |
+| `OneDrive…/MyWork_OneDrive` | 159,826 | 30,233 | 1.1 TB | 153,547 (96%) | 20 | 133,241 (83%) | 274 |
 
-Supporting deterministic metrics: **550** exact-duplicate clusters wasting **2.5 GB** locally (447 files skipped as over the 50 MB hash cap; 153,312 cloud-only files never hashed); **986** filenames shared between local trees and the OneDrive mirror (by-name; hash-level overlap deferred to `--hash-onedrive` / `corp.cleanup.disk.find_onedrive_overlap`); **265** by-hash and **1,216** by-name source-of-truth collisions within the local trees.
+Supporting deterministic metrics: **550** exact-duplicate clusters wasting **2.5 GB** locally (447 files skipped as over the 50 MB hash cap; 153,579 cloud-only files never hashed); **986** filenames shared between local trees and the OneDrive mirror (by-name; hash-level overlap deferred to `--hash-onedrive` / `corp.cleanup.disk.find_onedrive_overlap`); **265** by-hash and **1,216** by-name source-of-truth collisions within the local trees.
 
 ---
 
@@ -112,7 +112,7 @@ Supporting deterministic metrics: **550** exact-duplicate clusters wasting **2.5
 | Metric | corp-monorepo | MyWork | ObsidianVault | OneDrive mirror |
 |--------|--------------:|-------:|--------------:|----------------:|
 | Coexisting naming conventions | 5 | 5 | 5 | 6 |
-| Files matching no clean convention | 1,931 (45%) | 955 (44%) | 403 (46%) | 133,241 (84%) |
+| Files matching no clean convention | 1,931 (45%) | 955 (44%) | 403 (46%) | 133,241 (83%) |
 | Junk-drawer dirs (>40 loose files) | 20 | 13 | 1 | 274 |
 | Generic-named dirs ("New folder"…) | 0 | 0 | 0 | 20 |
 

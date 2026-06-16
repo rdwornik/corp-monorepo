@@ -11,17 +11,17 @@
     {
       "scan_path": "C:/Users/1028120/Documents/Dev/corp-monorepo",
       "exists": true,
-      "file_count": 4306,
+      "file_count": 4312,
       "dir_count": 408,
-      "total_bytes": 18402591775,
+      "total_bytes": 18378284760,
       "cloud_only_count": 0,
       "cloud_only_bytes": 0,
-      "hashed_count": 0,
+      "hashed_count": 4168,
       "depth_histogram": {
         "1": 14,
         "2": 71,
-        "3": 959,
-        "4": 259,
+        "3": 963,
+        "4": 261,
         "5": 102,
         "9": 1227,
         "7": 265,
@@ -30,13 +30,13 @@
       },
       "ext_histogram": {
         ".code-workspace": 1,
-        "<none>": 600,
+        "<none>": 602,
         ".yaml": 121,
         ".toml": 4,
-        ".md": 1006,
+        ".md": 1009,
         ".py": 412,
         ".xlsx": 159,
-        ".json": 661,
+        ".json": 662,
         ".docx": 147,
         ".pptx": 205,
         ".txt": 91,
@@ -55,7 +55,7 @@
         ".js": 1
       },
       "mtime_buckets": {
-        "<=30d": 392,
+        "<=30d": 398,
         "31-180d": 3443,
         ">365d": 297,
         "181-365d": 174
@@ -272,7 +272,7 @@
       "total_bytes": 10658058852,
       "cloud_only_count": 19,
       "cloud_only_bytes": 33617460,
-      "hashed_count": 0,
+      "hashed_count": 2104,
       "depth_histogram": {
         "1": 2,
         "3": 256,
@@ -536,7 +536,7 @@
       "total_bytes": 41268132,
       "cloud_only_count": 0,
       "cloud_only_bytes": 0,
-      "hashed_count": 0,
+      "hashed_count": 864,
       "depth_histogram": {
         "1": 2,
         "2": 854,
@@ -759,11 +759,11 @@
     {
       "scan_path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive",
       "exists": true,
-      "file_count": 159558,
+      "file_count": 159826,
       "dir_count": 30233,
-      "total_bytes": 1197289876964,
-      "cloud_only_count": 153279,
-      "cloud_only_bytes": 1136690996256,
+      "total_bytes": 1197457298594,
+      "cloud_only_count": 153547,
+      "cloud_only_bytes": 1136858417886,
       "hashed_count": 0,
       "depth_histogram": {
         "4": 1948,
@@ -777,7 +777,7 @@
         "11": 14162,
         "13": 14196,
         "12": 6680,
-        "14": 17434,
+        "14": 17702,
         "16": 795,
         "15": 1656,
         "18": 789,
@@ -800,7 +800,7 @@
         ".exe": 17,
         ".mp4": 3088,
         ".pdf": 27170,
-        ".csv": 39349,
+        ".csv": 39617,
         ".pbix": 11,
         ".png": 6153,
         ".jpg": 2552,
@@ -1035,9 +1035,9 @@
       },
       "mtime_buckets": {
         "<=30d": 3952,
-        "31-180d": 11458,
-        "181-365d": 36994,
-        ">365d": 107154
+        "31-180d": 11726,
+        "181-365d": 36993,
+        ">365d": 107155
       },
       "largest_files": [
         {
@@ -1249,9 +1249,9 @@
       "scan_path": "C:/Users/1028120/Documents/Dev/corp-monorepo",
       "convention_counts": {
         "spaces": 513,
-        "underscore": 2901,
-        "hyphen": 1387,
-        "embedded_date": 565,
+        "underscore": 2904,
+        "hyphen": 1391,
+        "embedded_date": 569,
         "version_suffix": 133
       },
       "no_convention_count": 1931,
@@ -1328,7 +1328,7 @@
       "scan_path": "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive",
       "convention_counts": {
         "spaces": 50533,
-        "underscore": 99512,
+        "underscore": 99781,
         "hyphen": 28557,
         "camelCase": 1891,
         "embedded_date": 4697,
@@ -7090,7 +7090,7 @@
     ],
     "total_wasted_bytes": 2684551723,
     "onedrive_overlap": "onedrive_scanned=True; hashing_skipped=True (metadata-only, --hash-onedrive to enable); by_name=986 shared filenames; see corp.cleanup.disk.find_onedrive_overlap for hash-level overlap",
-    "skipped_cloud_only": 153312,
+    "skipped_cloud_only": 153579,
     "skipped_over_cap": 447
   },
   "sot_violations": [

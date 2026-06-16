@@ -318,6 +318,50 @@ def test_sot_excludes_onedrive_files() -> None:
     assert all(not loc.startswith("od/") for loc in by_name[0].locations)
 
 
+# --------------------------- review fixes --------------------------------- #
+
+
+def test_build_inventory_populates_hashed_count(tmp_path: Path) -> None:
+    _mk(tmp_path / "a.txt", 10, NOW - DAY)
+    _mk(tmp_path / "b.txt", 12, NOW - DAY)
+    _mk(tmp_path / "big.bin", 200, NOW - DAY)  # over cap -> not hashed
+    cfg = _config(scan_paths=[str(tmp_path)], hashable_size_cap_bytes=100)
+    inv = core.build_inventory(cfg, "2026-06-16", NOW)
+    assert inv.inventories[0].hashed_count == 2
+
+
+def test_read_text_safe_bounded_and_no_hydration(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    p = tmp_path / "f.txt"
+    p.write_text("hello world", encoding="utf-8")
+    assert core._read_text_safe(p, max_bytes=5) == "hello"  # bounded
+    monkeypatch.setattr(core, "is_cloud_placeholder", lambda st: True)
+    assert core._read_text_safe(p) == ""  # cloud-only -> never opened
+
+
+def test_is_plain_dir_guards(tmp_path: Path) -> None:
+    (tmp_path / "repo").mkdir()
+    (tmp_path / "OneDrive - Blue Yonder").mkdir()
+    (tmp_path / "file.txt").write_text("x", encoding="utf-8")
+    assert core._is_plain_dir(tmp_path / "repo") is True
+    assert core._is_plain_dir(tmp_path / "OneDrive - Blue Yonder") is False
+    assert core._is_plain_dir(tmp_path / "missing") is False
+    assert core._is_plain_dir(tmp_path / "file.txt") is False
+
+
+def test_walk_tree_records_scandir_errors(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def boom(*_a, **_k):
+        raise OSError("denied")
+
+    monkeypatch.setattr(core.os, "scandir", boom)
+    inv = core.build_path_inventory(tmp_path, _config(), NOW)
+    assert inv.errors and "scandir skipped" in inv.errors[0]
+    assert inv.file_count == 0
+
+
 # --------------------------- automation ----------------------------------- #
 
 
