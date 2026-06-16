@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import logging
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -126,7 +127,10 @@ def main(
 
     date = datetime.now().strftime("%Y-%m-%d")
     inventory = core.build_inventory(
-        config, generated_at=date, include_onedrive=include_onedrive
+        config,
+        generated_at=date,
+        now_ts=time.time(),
+        include_onedrive=include_onedrive,
     )
 
     console.print(_summary_table(inventory))

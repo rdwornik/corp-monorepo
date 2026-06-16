@@ -19,6 +19,7 @@ attributes ``FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS`` (0x00400000) and
 from __future__ import annotations
 
 import dataclasses
+import heapq
 import json
 import logging
 import os
@@ -48,11 +49,12 @@ __all__ = [
     "SourceOfTruthViolation",
     "WriteLedger",
     "build_inventory",
-    "count_root",
+    "build_path_inventory",
     "is_cloud_placeholder",
     "iter_entries",
     "load_config",
     "to_serializable",
+    "walk_tree",
     "write_inventory",
 ]
 
@@ -249,19 +251,21 @@ def is_cloud_placeholder(st: os.stat_result) -> bool:
     return bool(attrs & _CLOUD_ONLY_MASK)
 
 
-def iter_entries(
+def walk_tree(
     root: Path,
     exclude_dirs: list[str],
     *,
     allow_onedrive: bool = False,
-) -> Iterator[tuple[os.DirEntry, int]]:
-    """Yield ``(DirEntry, depth)`` for every file under ``root`` (metadata only).
+) -> Iterator[tuple[os.DirEntry, int, bool]]:
+    """Yield ``(DirEntry, depth, is_dir)`` for every entry under ``root``.
 
-    Read-only and hydration-safe:
+    The single read-only, hydration-safe traversal used by all metrics:
       * ``follow_symlinks=False`` — junctions/symlinks are never traversed.
       * Directories whose path contains the OneDrive marker are pruned unless
         ``allow_onedrive`` (set only for the explicit OneDrive root scan).
       * Every ``OSError``/``PermissionError`` is swallowed (partial inventory).
+
+    Reads metadata only; never opens file content (no hydration).
     """
     excluded = {d.lower() for d in exclude_dirs}
     stack: list[tuple[str, int]] = [(str(root), 0)]
@@ -276,55 +280,126 @@ def iter_entries(
                                 continue
                             if not allow_onedrive and ONEDRIVE_MARKER in entry.path:
                                 continue
+                            yield entry, depth + 1, True
                             stack.append((entry.path, depth + 1))
                         elif entry.is_file(follow_symlinks=False):
-                            yield entry, depth + 1
+                            yield entry, depth + 1, False
                     except OSError:
                         continue
         except (OSError, PermissionError) as exc:
             log.warning("scandir skipped %s: %s", current, exc)
 
 
-# --------------------------------------------------------------------------- #
-# Basic per-root counts (Step 1; richer metrics land in Step 2).
-# --------------------------------------------------------------------------- #
+def iter_entries(
+    root: Path,
+    exclude_dirs: list[str],
+    *,
+    allow_onedrive: bool = False,
+) -> Iterator[tuple[os.DirEntry, int]]:
+    """Yield ``(DirEntry, depth)`` for files only (thin wrapper over walk_tree)."""
+    for entry, depth, is_dir in walk_tree(
+        root, exclude_dirs, allow_onedrive=allow_onedrive
+    ):
+        if not is_dir:
+            yield entry, depth
 
 
-def count_root(
+# --------------------------------------------------------------------------- #
+# Per-root filesystem inventory (Step 2). Metadata only — no hashing here.
+# --------------------------------------------------------------------------- #
+
+_SECONDS_PER_DAY = 86400.0
+
+
+def _ext_of(name: str) -> str:
+    """Lowercased file extension, or ``<none>`` for extensionless files."""
+    suffix = Path(name).suffix.lower()
+    return suffix if suffix else "<none>"
+
+
+def _mtime_bucket(mtime: float, now_ts: float) -> str:
+    """Bucket a file's age (days since last modification)."""
+    age_days = (now_ts - mtime) / _SECONDS_PER_DAY
+    if age_days <= 30:
+        return "<=30d"
+    if age_days <= 180:
+        return "31-180d"
+    if age_days <= 365:
+        return "181-365d"
+    return ">365d"
+
+
+def build_path_inventory(
     root: Path,
     config: AuditConfig,
+    now_ts: float,
     *,
     allow_onedrive: bool = False,
 ) -> PathInventory:
-    """Cheap counts for one root: file/total bytes + cloud-only tally. No hashing."""
+    """Full inventory for one root: counts, histograms, largest files.
+
+    Cloud-only placeholders are tagged via :func:`is_cloud_placeholder` and
+    counted, but never hashed/opened (hashing arrives in Step 4). Reads metadata
+    only — no hydration.
+    """
     inv = PathInventory(scan_path=_norm(root))
     if not root.exists():
         inv.exists = False
         return inv
-    for entry, _depth in iter_entries(
+    top_n = config.largest_files_top_n
+    heap: list[tuple[int, int, FileEntry]] = []
+    idx = 0
+    for entry, depth, is_dir in walk_tree(
         root, config.exclude_dirs, allow_onedrive=allow_onedrive
     ):
+        if is_dir:
+            inv.dir_count += 1
+            continue
         try:
             st = entry.stat(follow_symlinks=False)
         except OSError as exc:
-            inv.errors.append(f"stat failed: {entry.path}: {exc}")
+            inv.errors.append(f"stat failed: {_norm(entry.path)}: {exc}")
             continue
-        inv.file_count += 1
         size = st.st_size
+        cloud = is_cloud_placeholder(st)
+        ext = _ext_of(entry.name)
+        inv.file_count += 1
         inv.total_bytes += size
-        if is_cloud_placeholder(st):
+        inv.depth_histogram[depth] = inv.depth_histogram.get(depth, 0) + 1
+        inv.ext_histogram[ext] = inv.ext_histogram.get(ext, 0) + 1
+        bucket = _mtime_bucket(st.st_mtime, now_ts)
+        inv.mtime_buckets[bucket] = inv.mtime_buckets.get(bucket, 0) + 1
+        if cloud:
             inv.cloud_only_count += 1
             inv.cloud_only_bytes += size
+        if top_n > 0:
+            fe = FileEntry(
+                path=_norm(entry.path),
+                name=entry.name,
+                ext=ext,
+                size_bytes=size,
+                mtime=st.st_mtime,
+                depth=depth,
+                cloud_only=cloud,
+            )
+            if len(heap) < top_n:
+                heapq.heappush(heap, (size, idx, fe))
+                idx += 1
+            elif size > heap[0][0]:
+                heapq.heapreplace(heap, (size, idx, fe))
+                idx += 1
+    inv.largest_files = [fe for _, _, fe in sorted(heap, key=lambda t: (-t[0], t[1]))]
     return inv
 
 
 def build_inventory(
     config: AuditConfig,
     generated_at: str,
+    now_ts: float,
     *,
     include_onedrive: bool = False,
 ) -> AuditInventory:
-    """Assemble the (Step 1) inventory skeleton: per-root counts only."""
+    """Assemble the full inventory across all scanned roots."""
     roots: list[tuple[Path, bool]] = [(Path(p), False) for p in config.scan_paths]
     if include_onedrive and config.onedrive_path:
         roots.append((Path(config.onedrive_path), True))
@@ -334,7 +409,9 @@ def build_inventory(
         onedrive_included=include_onedrive,
     )
     for root, allow in roots:
-        inv.inventories.append(count_root(root, config, allow_onedrive=allow))
+        inv.inventories.append(
+            build_path_inventory(root, config, now_ts, allow_onedrive=allow)
+        )
     return inv
 
 

@@ -1,0 +1,191 @@
+"""Unit tests for the current-state audit core metric functions.
+
+All tests use ``tmp_path`` fixtures — never real corporate data. The OneDrive
+guard/prune tests use a FAKE ``OneDrive - Blue Yonder`` segment created under
+``tmp_path`` (never a real synced path).
+"""
+
+from __future__ import annotations
+
+import os
+import sys
+from pathlib import Path
+from types import SimpleNamespace
+
+import pytest
+
+_SCRIPTS = Path(__file__).resolve().parents[2] / "scripts"
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
+
+import _audit_core as core
+
+NOW = 2_000_000_000.0
+DAY = 86400.0
+
+
+def _config(**over) -> core.AuditConfig:
+    base = dict(
+        scan_paths=[],
+        onedrive_path="",
+        exclude_dirs=["__pycache__", ".git"],
+        hashable_size_cap_bytes=50_000_000,
+        junk_drawer_loose_file_threshold=40,
+        generic_dir_names=[],
+        largest_files_top_n=5,
+        output_dir="docs/audits",
+        dev_root="",
+    )
+    base.update(over)
+    return core.AuditConfig(**base)
+
+
+def _mk(path: Path, size: int, mtime: float | None = None) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(b"x" * size)
+    if mtime is not None:
+        os.utime(path, (mtime, mtime))
+
+
+# ------------------------------- inventory -------------------------------- #
+
+
+def test_inventory_counts_histograms_and_largest(tmp_path: Path) -> None:
+    _mk(tmp_path / "a.txt", 10, NOW - 10 * DAY)
+    _mk(tmp_path / "b.md", 20, NOW - 10 * DAY)
+    _mk(tmp_path / "noext", 5, NOW - 10 * DAY)
+    _mk(tmp_path / "sub" / "c.txt", 30, NOW - 100 * DAY)
+    _mk(tmp_path / "sub" / "deep" / "d.log", 40, NOW - 400 * DAY)
+
+    inv = core.build_path_inventory(tmp_path, _config(), NOW)
+
+    assert inv.exists is True
+    assert inv.file_count == 5
+    assert inv.dir_count == 2  # sub, sub/deep
+    assert inv.total_bytes == 105
+    assert inv.depth_histogram == {1: 3, 2: 1, 3: 1}
+    assert inv.ext_histogram == {".txt": 2, ".md": 1, ".log": 1, "<none>": 1}
+    assert inv.mtime_buckets == {"<=30d": 3, "31-180d": 1, ">365d": 1}
+    assert [f.size_bytes for f in inv.largest_files] == [40, 30, 20, 10, 5]
+    assert inv.largest_files[0].name == "d.log"
+    # Step 2 never hashes — every largest-file entry must have sha256 unset.
+    assert all(f.sha256 is None for f in inv.largest_files)
+
+
+def test_largest_files_respects_top_n(tmp_path: Path) -> None:
+    for i, size in enumerate((1, 2, 3, 4)):
+        _mk(tmp_path / f"f{i}.bin", size, NOW - DAY)
+    inv = core.build_path_inventory(tmp_path, _config(largest_files_top_n=2), NOW)
+    assert [f.size_bytes for f in inv.largest_files] == [4, 3]
+
+
+def test_missing_root_marks_not_exists(tmp_path: Path) -> None:
+    inv = core.build_path_inventory(tmp_path / "does-not-exist", _config(), NOW)
+    assert inv.exists is False
+    assert inv.file_count == 0
+
+
+def test_excluded_dirs_are_pruned(tmp_path: Path) -> None:
+    _mk(tmp_path / "keep.txt", 3, NOW - DAY)
+    _mk(tmp_path / "__pycache__" / "junk.pyc", 9, NOW - DAY)
+    inv = core.build_path_inventory(tmp_path, _config(), NOW)
+    assert inv.file_count == 1
+    assert inv.dir_count == 0  # __pycache__ pruned before being yielded/counted
+
+
+# --------------------------- placeholder logic ---------------------------- #
+
+
+def test_is_cloud_placeholder_attribute_logic() -> None:
+    assert core.is_cloud_placeholder(SimpleNamespace(st_file_attributes=0x00400000))
+    assert core.is_cloud_placeholder(SimpleNamespace(st_file_attributes=0x00001000))
+    assert core.is_cloud_placeholder(
+        SimpleNamespace(st_file_attributes=0x00400000 | 0x00001000)
+    )
+    assert not core.is_cloud_placeholder(SimpleNamespace(st_file_attributes=0))
+    assert not core.is_cloud_placeholder(SimpleNamespace(st_file_attributes=0x20))
+    # Non-Windows stat_result has no st_file_attributes → treated as local.
+    assert not core.is_cloud_placeholder(SimpleNamespace())
+
+
+def test_inventory_tags_cloud_only_without_hashing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Cloud-only files are counted by metadata only; never hashed/opened."""
+    _mk(tmp_path / "local.txt", 10, NOW - DAY)
+    _mk(tmp_path / "ghost.cloud", 50, NOW - DAY)
+
+    # Simulate a cloud-only placeholder by size, without a real OneDrive
+    # placeholder on disk (the real attribute check is unit-tested above).
+    monkeypatch.setattr(
+        core,
+        "is_cloud_placeholder",
+        lambda st: getattr(st, "st_size", 0) == 50,
+    )
+
+    inv = core.build_path_inventory(tmp_path, _config(), NOW)
+    assert inv.file_count == 2
+    assert inv.total_bytes == 60
+    assert inv.cloud_only_count == 1
+    assert inv.cloud_only_bytes == 50
+    ghost = next(f for f in inv.largest_files if f.name == "ghost.cloud")
+    assert ghost.cloud_only is True
+    assert ghost.sha256 is None  # never hashed
+
+
+# --------------------------- OneDrive guard ------------------------------- #
+
+
+def test_onedrive_marker_pruned_in_local_walk(tmp_path: Path) -> None:
+    _mk(tmp_path / "normal.txt", 4, NOW - DAY)
+    _mk(tmp_path / "OneDrive - Blue Yonder" / "secret.txt", 4, NOW - DAY)
+
+    pruned = core.build_path_inventory(tmp_path, _config(), NOW, allow_onedrive=False)
+    assert pruned.file_count == 1  # secret.txt under the marker dir is pruned
+    assert pruned.dir_count == 0
+
+    allowed = core.build_path_inventory(tmp_path, _config(), NOW, allow_onedrive=True)
+    assert allowed.file_count == 2  # opt-in descends the marker dir
+    assert allowed.dir_count == 1
+
+
+def test_write_inventory_refuses_onedrive_destination(tmp_path: Path) -> None:
+    inv = core.AuditInventory(generated_at="2026-06-16")
+    ledger = core.WriteLedger()
+    out = tmp_path / "OneDrive - Blue Yonder" / "x.json"
+    with pytest.raises(core.OneDriveSafetyError):
+        core.write_inventory(inv, out, ledger)
+    assert ledger.writes == []
+
+
+def test_write_inventory_refuses_overwrite_and_missing_dir(tmp_path: Path) -> None:
+    inv = core.AuditInventory(generated_at="2026-06-16")
+    ledger = core.WriteLedger()
+
+    # Parent dir must already exist (tool never creates folders).
+    with pytest.raises(SystemExit):
+        core.write_inventory(inv, tmp_path / "nope" / "x.json", ledger)
+
+    out = tmp_path / "x.json"
+    written = core.write_inventory(inv, out, ledger)
+    assert ledger.writes == [str(written).replace("\\", "/")]
+    assert out.exists()
+
+    # Second write without --force is refused; with force it succeeds.
+    with pytest.raises(SystemExit):
+        core.write_inventory(inv, out, core.WriteLedger())
+    core.write_inventory(inv, out, core.WriteLedger(), force=True)
+
+
+def test_load_config_rejects_onedrive_scan_path(tmp_path: Path) -> None:
+    cfg = tmp_path / "audit.yaml"
+    cfg.write_text(
+        'scan_paths:\n  - "C:/Users/x/OneDrive - Blue Yonder/MyWork"\n',
+        encoding="utf-8",
+    )
+    with pytest.raises(SystemExit):
+        core.load_config(cfg)
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])
