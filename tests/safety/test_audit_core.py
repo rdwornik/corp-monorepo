@@ -296,6 +296,62 @@ def test_sot_by_name_ignores_ubiquitous(tmp_path: Path) -> None:
     assert len(report.locations) == 2
 
 
+# --------------------------- automation ----------------------------------- #
+
+
+def test_automation_inventory(tmp_path: Path) -> None:
+    repo_a = tmp_path / "repoA"
+    (repo_a / "src").mkdir(parents=True)
+    (repo_a / "pyproject.toml").write_text(
+        '[project]\nname = "a"\n\n[project.scripts]\nfoo = "a.cli:main"\n',
+        encoding="utf-8",
+    )
+    (repo_a / ".github" / "workflows").mkdir(parents=True)
+    (repo_a / ".github" / "workflows" / "ci.yml").write_text(
+        "on:\n  push:\n", encoding="utf-8"
+    )
+    (repo_a / ".github" / "workflows" / "nightly.yml").write_text(
+        "on:\n  schedule:\n    - cron: '0 0 * * *'\n", encoding="utf-8"
+    )
+    (repo_a / ".claude" / "workflows").mkdir(parents=True)
+    (repo_a / ".claude" / "workflows" / "wf.js").write_text("// routine\n", encoding="utf-8")
+    (repo_a / "config").mkdir()
+    (repo_a / "config" / "router.yaml").write_text(
+        "tiers:\n  text: gemini-3.1-flash-lite\n", encoding="utf-8"
+    )
+    (repo_a / "output").mkdir()
+    (repo_a / "CLAUDE.md").write_text("# rules\n", encoding="utf-8")
+
+    repo_b = tmp_path / "repoB"
+    (repo_b / "data").mkdir(parents=True)
+    (repo_b / "requirements.txt").write_text("requests\n", encoding="utf-8")
+
+    autos = core.build_automation_inventory(_config(dev_root=str(tmp_path)))
+    by_name = {Path(a.repo).name: a for a in autos}
+
+    assert set(by_name) == {"repoA", "repoB"}
+    a = by_name["repoA"]
+    assert a.entry_points == ["foo = a.cli:main"]
+    assert "nightly.yml (cron)" in a.schedulers
+    assert "ci.yml" in a.schedulers
+    assert "routine:wf.js" in a.schedulers
+    assert "output" in a.write_targets
+    assert "config/router.yaml" in a.model_routing
+    assert set(a.layer_candidates) == {"L2", "L3", "L4"}
+
+    b = by_name["repoB"]
+    assert b.entry_points == []
+    assert "data" in b.write_targets
+    assert b.layer_candidates == []  # no src/entry-points/routines/charter docs
+
+
+def test_automation_inventory_empty_dev_root(tmp_path: Path) -> None:
+    assert core.build_automation_inventory(_config(dev_root="")) == []
+    assert core.build_automation_inventory(
+        _config(dev_root=str(tmp_path / "missing"))
+    ) == []
+
+
 # --------------------------- OneDrive guard ------------------------------- #
 
 

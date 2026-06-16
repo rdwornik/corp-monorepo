@@ -25,6 +25,7 @@ import json
 import logging
 import os
 import re
+import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterator
@@ -51,6 +52,7 @@ __all__ = [
     "SourceOfTruthViolation",
     "WriteLedger",
     "HashedFile",
+    "build_automation_inventory",
     "build_duplication",
     "build_inventory",
     "build_naming_metrics",
@@ -440,6 +442,7 @@ def build_inventory(
         files, config, include_onedrive=include_onedrive
     )
     inv.sot_violations = build_sot_violations(files)
+    inv.automation = build_automation_inventory(config)
     return inv
 
 
@@ -713,6 +716,137 @@ def build_sot_violations(files: list[HashedFile]) -> list[SourceOfTruthViolation
 
     violations.sort(key=lambda v: (v.kind, -len(v.locations), v.key))
     return violations
+
+
+# --------------------------------------------------------------------------- #
+# Existing-automation inventory across sibling repos (Step 6).
+# --------------------------------------------------------------------------- #
+
+_MODEL_TOKENS = (
+    "gemini",
+    "claude",
+    "gpt-",
+    "opus",
+    "sonnet",
+    "haiku",
+    "ollama",
+    "llama",
+    "mistral",
+    "anthropic",
+)
+_ROUTING_NAME_HINTS = ("rout", "model", "tier", "provider", "llm", "agent")
+_REPO_SKIP = frozenset({".git", "__pycache__", ".idea", ".vs", ".pytest_cache"})
+
+
+def _read_text_safe(path: Path, max_bytes: int = 1_000_000) -> str:
+    try:
+        return path.read_bytes()[:max_bytes].decode("utf-8", errors="replace")
+    except OSError:
+        return ""
+
+
+def _parse_entry_points(pyproject: Path) -> list[str]:
+    try:
+        data = tomllib.loads(_read_text_safe(pyproject))
+    except (tomllib.TOMLDecodeError, ValueError):
+        return []
+    scripts = dict(data.get("project", {}).get("scripts", {}))
+    scripts.update(data.get("tool", {}).get("poetry", {}).get("scripts", {}))
+    return sorted(f"{name} = {target}" for name, target in scripts.items())
+
+
+def _scan_model_routing(
+    repo: Path,
+    config: AuditConfig,
+    *,
+    max_files: int = 4000,
+    max_hits: int = 20,
+) -> list[str]:
+    """Bounded content scan for model/routing config. Returns relative paths."""
+    hits: set[str] = set()
+    seen = 0
+    for entry, _depth, is_dir in walk_tree(repo, config.exclude_dirs):
+        if is_dir:
+            continue
+        seen += 1
+        if seen > max_files or len(hits) >= max_hits:
+            break
+        name = entry.name.lower()
+        if Path(name).suffix not in (".py", ".yaml", ".yml", ".toml", ".md"):
+            continue
+        path_low = entry.path.replace("\\", "/").lower()
+        if not (any(h in name for h in _ROUTING_NAME_HINTS) or "/config/" in path_low):
+            continue
+        text = _read_text_safe(Path(entry.path), 200_000).lower()
+        if any(tok in text for tok in _MODEL_TOKENS):
+            hits.add(_norm(os.path.relpath(entry.path, repo)))
+    return sorted(hits)
+
+
+def _layer_hints(repo: Path, ra: RepoAutomation) -> list[str]:
+    """Deterministic L0-L5 *hints* (the authoritative classification is Step 7)."""
+    hints: list[str] = []
+    if ra.entry_points or (repo / "src").is_dir():
+        hints.append("L2")
+    if any(s.startswith("routine:") for s in ra.schedulers) or ra.model_routing:
+        hints.append("L3")
+    if any((repo / doc).is_file() for doc in ("CLAUDE.md", "VISION.md", "ARCHITECTURE.md")):
+        hints.append("L4")
+    return hints
+
+
+def _build_repo_automation(repo: Path, config: AuditConfig) -> RepoAutomation:
+    ra = RepoAutomation(repo=_norm(repo))
+    pyproject = repo / "pyproject.toml"
+    if pyproject.is_file():
+        ra.entry_points = _parse_entry_points(pyproject)
+
+    wf_dir = repo / ".github" / "workflows"
+    if wf_dir.is_dir():
+        for wf in sorted(list(wf_dir.glob("*.yml")) + list(wf_dir.glob("*.yaml"))):
+            text = _read_text_safe(wf)
+            cron = "schedule:" in text or "cron" in text
+            ra.schedulers.append(f"{wf.name}{' (cron)' if cron else ''}")
+    routines_dir = repo / ".claude" / "workflows"
+    if routines_dir.is_dir():
+        for routine in sorted(routines_dir.glob("*.js")):
+            ra.schedulers.append(f"routine:{routine.name}")
+
+    for rel in ("data", "output", "outputs", "dist", "build"):
+        if (repo / rel).is_dir():
+            ra.write_targets.append(rel)
+    for base in (repo, repo / "src"):
+        if base.is_dir():
+            for db in sorted(base.glob("*.db")):
+                ra.write_targets.append(_norm(db.relative_to(repo)))
+
+    ra.model_routing = _scan_model_routing(repo, config)
+    ra.layer_candidates = _layer_hints(repo, ra)
+    return ra
+
+
+def build_automation_inventory(config: AuditConfig) -> list[RepoAutomation]:
+    """Inventory automation for every repo directly under ``dev_root``."""
+    out: list[RepoAutomation] = []
+    if not config.dev_root:
+        return out
+    root = Path(config.dev_root)
+    if not root.is_dir():
+        return out
+    try:
+        entries = sorted(os.scandir(root), key=lambda e: e.name)
+    except OSError:
+        return out
+    for entry in entries:
+        try:
+            if not entry.is_dir(follow_symlinks=False):
+                continue
+        except OSError:
+            continue
+        if entry.name in _REPO_SKIP or ONEDRIVE_MARKER in entry.path:
+            continue
+        out.append(_build_repo_automation(Path(entry.path), config))
+    return out
 
 
 # --------------------------------------------------------------------------- #
