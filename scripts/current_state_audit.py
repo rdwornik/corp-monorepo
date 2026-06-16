@@ -82,6 +82,11 @@ def _summary_table(inventory) -> Table:
     help="Also scan the OneDrive mirror (read-only, placeholder-safe). Default off.",
 )
 @click.option(
+    "--hash-onedrive",
+    is_flag=True,
+    help="Also content-hash hydrated OneDrive files (large; default metadata-only).",
+)
+@click.option(
     "--dry-run",
     is_flag=True,
     help="Walk metadata and report what would be scanned; write nothing.",
@@ -102,6 +107,7 @@ def _summary_table(inventory) -> Table:
 def main(
     config_path: Path | None,
     include_onedrive: bool,
+    hash_onedrive: bool,
     dry_run: bool,
     force: bool,
     output_path: Path | None,
@@ -131,6 +137,7 @@ def main(
         generated_at=date,
         now_ts=time.time(),
         include_onedrive=include_onedrive,
+        hash_onedrive=hash_onedrive,
     )
 
     console.print(_summary_table(inventory))
