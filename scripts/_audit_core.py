@@ -23,6 +23,7 @@ import heapq
 import json
 import logging
 import os
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterator
@@ -49,6 +50,7 @@ __all__ = [
     "SourceOfTruthViolation",
     "WriteLedger",
     "build_inventory",
+    "build_naming_metrics",
     "build_path_inventory",
     "is_cloud_placeholder",
     "iter_entries",
@@ -412,7 +414,95 @@ def build_inventory(
         inv.inventories.append(
             build_path_inventory(root, config, now_ts, allow_onedrive=allow)
         )
+        inv.naming.append(
+            build_naming_metrics(root, config, allow_onedrive=allow)
+        )
     return inv
+
+
+# --------------------------------------------------------------------------- #
+# Naming-entropy metrics (Step 3).
+# --------------------------------------------------------------------------- #
+
+# Clean recognized schemes (a stem matching any of these is "conventional").
+_SNAKE_RE = re.compile(r"^[a-z0-9]+(?:_[a-z0-9]+)*$")
+_KEBAB_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+_CAMEL_RE = re.compile(r"^[a-z]+(?:[A-Z][a-z0-9]*)+$")
+_DATED_PREFIX_RE = re.compile(r"^\d{4}-\d{2}(?:-\d{2})?[ _-]")
+
+# Signal patterns (a file may exhibit several at once).
+_DATE_RE = re.compile(r"(?:\d{4}[-_]\d{2}[-_]\d{2})|(?:\b\d{8}\b)|(?:\d{4}[-_]\d{2}\b)")
+_VERSION_RE = re.compile(
+    r"(?i)(?:_v\d+|[ _-](?:final|copy|draft|backup|bak|old|new)\b|\(\d+\)|"
+    r"final[ _-]?final)"
+)
+
+_NAMING_SIGNALS = (
+    "spaces",
+    "underscore",
+    "hyphen",
+    "camelCase",
+    "embedded_date",
+    "version_suffix",
+)
+
+
+def _classify_name(stem: str, full_name: str) -> dict[str, bool]:
+    """Return naming signals + a ``no_convention`` flag for one filename."""
+    is_camel = bool(_CAMEL_RE.match(stem))
+    conventional = bool(
+        _SNAKE_RE.match(stem)
+        or _KEBAB_RE.match(stem)
+        or is_camel
+        or _DATED_PREFIX_RE.match(full_name)
+    )
+    return {
+        "spaces": " " in stem,
+        "underscore": "_" in stem,
+        "hyphen": "-" in stem,
+        "camelCase": is_camel,
+        "embedded_date": bool(_DATE_RE.search(full_name)),
+        "version_suffix": bool(_VERSION_RE.search(stem)),
+        "no_convention": not conventional,
+    }
+
+
+def build_naming_metrics(
+    root: Path,
+    config: AuditConfig,
+    *,
+    allow_onedrive: bool = False,
+) -> NamingMetrics:
+    """Naming-entropy metrics for one root: coexisting conventions + junk drawers."""
+    nm = NamingMetrics(scan_path=_norm(root))
+    if not root.exists():
+        return nm
+    signals = {key: 0 for key in _NAMING_SIGNALS}
+    loose_counts: dict[str, int] = {}
+    generic: list[str] = []
+    generic_fragments = [frag.lower() for frag in config.generic_dir_names]
+    for entry, _depth, is_dir in walk_tree(
+        root, config.exclude_dirs, allow_onedrive=allow_onedrive
+    ):
+        if is_dir:
+            low = entry.name.lower()
+            if any(frag in low for frag in generic_fragments):
+                generic.append(_norm(entry.path))
+            continue
+        parent = _norm(os.path.dirname(entry.path))
+        loose_counts[parent] = loose_counts.get(parent, 0) + 1
+        flags = _classify_name(Path(entry.name).stem, entry.name)
+        for key in _NAMING_SIGNALS:
+            if flags[key]:
+                signals[key] += 1
+        if flags["no_convention"]:
+            nm.no_convention_count += 1
+    nm.convention_counts = {key: val for key, val in signals.items() if val}
+    nm.coexisting_convention_count = len(nm.convention_counts)
+    threshold = config.junk_drawer_loose_file_threshold
+    nm.junk_dirs = sorted(d for d, c in loose_counts.items() if c > threshold)
+    nm.generic_named = sorted(generic)
+    return nm
 
 
 # --------------------------------------------------------------------------- #

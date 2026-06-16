@@ -133,6 +133,58 @@ def test_inventory_tags_cloud_only_without_hashing(
     assert ghost.sha256 is None  # never hashed
 
 
+# --------------------------- naming entropy ------------------------------- #
+
+
+def test_naming_conventions_counted(tmp_path: Path) -> None:
+    for name in (
+        "My Report.docx",        # spaces, no_convention
+        "my_report.txt",         # snake (underscore)
+        "myReport.md",           # camelCase
+        "2026-06-16_notes.md",   # dated (underscore + hyphen + embedded_date)
+        "deck_v2_final_FINAL.pptx",  # version_suffix, no_convention (uppercase)
+        "kebab-case-name.txt",   # kebab (hyphen)
+        "plain.txt",             # plain lowercase = snake
+    ):
+        _mk(tmp_path / name, 3, NOW - DAY)
+
+    nm = core.build_naming_metrics(tmp_path, _config())
+
+    assert nm.convention_counts == {
+        "spaces": 1,
+        "underscore": 3,
+        "hyphen": 2,
+        "camelCase": 1,
+        "embedded_date": 1,
+        "version_suffix": 1,
+    }
+    assert nm.coexisting_convention_count == 6
+    assert nm.no_convention_count == 2  # "My Report" and "deck_v2_final_FINAL"
+
+
+def test_junk_drawers_and_generic_dirs(tmp_path: Path) -> None:
+    cfg = _config(
+        junk_drawer_loose_file_threshold=3,
+        generic_dir_names=["new folder", "copy of", "untitled"],
+    )
+    for i in range(4):  # 4 > threshold of 3 -> junk drawer
+        _mk(tmp_path / "loose" / f"f{i}.txt", 2, NOW - DAY)
+    _mk(tmp_path / "tidy" / "only.txt", 2, NOW - DAY)
+    (tmp_path / "New folder").mkdir()
+    (tmp_path / "Copy of stuff").mkdir()
+    (tmp_path / "Untitled").mkdir()
+
+    nm = core.build_naming_metrics(tmp_path, cfg)
+
+    assert any(d.endswith("/loose") for d in nm.junk_dirs)
+    assert not any(d.endswith("/tidy") for d in nm.junk_dirs)
+    assert sorted(Path(d).name for d in nm.generic_named) == [
+        "Copy of stuff",
+        "New folder",
+        "Untitled",
+    ]
+
+
 # --------------------------- OneDrive guard ------------------------------- #
 
 
