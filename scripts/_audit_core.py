@@ -19,6 +19,7 @@ attributes ``FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS`` (0x00400000) and
 from __future__ import annotations
 
 import dataclasses
+import hashlib
 import heapq
 import json
 import logging
@@ -49,9 +50,12 @@ __all__ = [
     "RepoAutomation",
     "SourceOfTruthViolation",
     "WriteLedger",
+    "HashedFile",
+    "build_duplication",
     "build_inventory",
     "build_naming_metrics",
     "build_path_inventory",
+    "collect_files",
     "is_cloud_placeholder",
     "iter_entries",
     "load_config",
@@ -138,6 +142,19 @@ class DuplicationReport:
     onedrive_overlap: str = ""
     skipped_cloud_only: int = 0
     skipped_over_cap: int = 0
+
+
+@dataclass(frozen=True)
+class HashedFile:
+    """One file in the dedup/source-of-truth index. ``sha256`` is None when the
+    file was not hashed (cloud-only, over the size cap, or empty)."""
+
+    path: str
+    name: str
+    size_bytes: int
+    sha256: str | None
+    cloud_only: bool
+    is_onedrive: bool
 
 
 @dataclass(frozen=True)
@@ -417,6 +434,10 @@ def build_inventory(
         inv.naming.append(
             build_naming_metrics(root, config, allow_onedrive=allow)
         )
+    files = collect_files(config, include_onedrive=include_onedrive)
+    inv.duplication = build_duplication(
+        files, config, include_onedrive=include_onedrive
+    )
     return inv
 
 
@@ -503,6 +524,126 @@ def build_naming_metrics(
     nm.junk_dirs = sorted(d for d, c in loose_counts.items() if c > threshold)
     nm.generic_named = sorted(generic)
     return nm
+
+
+# --------------------------------------------------------------------------- #
+# Content hashing, duplication, OneDrive overlap (Step 4).
+# --------------------------------------------------------------------------- #
+
+
+def _sha256(path: str, chunk: int = 8192) -> str:
+    """Streaming SHA-256 (mirrors corp.extraction.vault_writer._file_hash)."""
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(chunk), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def collect_files(
+    config: AuditConfig,
+    *,
+    include_onedrive: bool = False,
+) -> list[HashedFile]:
+    """Index every file across all roots, hashing ONLY eligible local files.
+
+    A file is hashed only when it is not a cloud placeholder and its size is in
+    ``(0, hashable_size_cap_bytes]`` — cloud-only files are never opened (no
+    hydration), and over-cap/empty files are left with ``sha256 = None``.
+    """
+    roots: list[tuple[Path, bool]] = [(Path(p), False) for p in config.scan_paths]
+    if include_onedrive and config.onedrive_path:
+        roots.append((Path(config.onedrive_path), True))
+    cap = config.hashable_size_cap_bytes
+    out: list[HashedFile] = []
+    for root, is_onedrive in roots:
+        if not root.exists():
+            continue
+        for entry, _depth, is_dir in walk_tree(
+            root, config.exclude_dirs, allow_onedrive=is_onedrive
+        ):
+            if is_dir:
+                continue
+            try:
+                st = entry.stat(follow_symlinks=False)
+            except OSError:
+                continue
+            size = st.st_size
+            cloud = is_cloud_placeholder(st)
+            digest: str | None = None
+            if not cloud and 0 < size <= cap:
+                try:
+                    digest = _sha256(_long_path(entry.path))
+                except OSError as exc:
+                    log.warning("hash failed %s: %s", entry.path, exc)
+            out.append(
+                HashedFile(
+                    path=_norm(entry.path),
+                    name=entry.name,
+                    size_bytes=size,
+                    sha256=digest,
+                    cloud_only=cloud,
+                    is_onedrive=is_onedrive,
+                )
+            )
+    return out
+
+
+def build_duplication(
+    files: list[HashedFile],
+    config: AuditConfig,
+    *,
+    include_onedrive: bool = False,
+) -> DuplicationReport:
+    """Exact-duplicate clusters (by content hash) + OneDrive overlap summary."""
+    report = DuplicationReport()
+    by_hash: dict[str, list[HashedFile]] = {}
+    for f in files:
+        if f.sha256 is not None:
+            by_hash.setdefault(f.sha256, []).append(f)
+
+    for digest, group in by_hash.items():
+        if len(group) < 2:
+            continue
+        size = group[0].size_bytes
+        report.clusters.append(
+            DupCluster(
+                sha256=digest,
+                size_bytes=size,
+                paths=tuple(sorted(f.path for f in group)),
+                wasted_bytes=(len(group) - 1) * size,
+            )
+        )
+    report.clusters.sort(key=lambda c: (-c.wasted_bytes, c.sha256))
+    report.total_wasted_bytes = sum(c.wasted_bytes for c in report.clusters)
+    cap = config.hashable_size_cap_bytes
+    report.skipped_cloud_only = sum(1 for f in files if f.cloud_only)
+    report.skipped_over_cap = sum(
+        1 for f in files if not f.cloud_only and f.size_bytes > cap
+    )
+    report.onedrive_overlap = _overlap_summary(files, include_onedrive)
+    return report
+
+
+def _overlap_summary(files: list[HashedFile], include_onedrive: bool) -> str:
+    if not include_onedrive:
+        return (
+            "OneDrive mirror not scanned (run --include-onedrive); see "
+            "corp.cleanup.disk.find_onedrive_overlap for the local<->synced map."
+        )
+    od_hashes = {f.sha256 for f in files if f.is_onedrive and f.sha256}
+    local_hashes = {f.sha256 for f in files if not f.is_onedrive and f.sha256}
+    shared_hashes = od_hashes & local_hashes
+    size_by_hash = {f.sha256: f.size_bytes for f in files if f.sha256}
+    dup_bytes = sum(size_by_hash.get(h, 0) for h in shared_hashes)
+    od_names = {f.name for f in files if f.is_onedrive}
+    local_names = {f.name for f in files if not f.is_onedrive}
+    shared_names = od_names & local_names
+    return (
+        f"onedrive_scanned=True; by_hash={len(shared_hashes)} files "
+        f"(~{dup_bytes} B duplicated across trees); "
+        f"by_name={len(shared_names)} shared filenames"
+    )
 
 
 # --------------------------------------------------------------------------- #

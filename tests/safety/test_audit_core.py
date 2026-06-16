@@ -185,6 +185,81 @@ def test_junk_drawers_and_generic_dirs(tmp_path: Path) -> None:
     ]
 
 
+# ---------------------------- duplication --------------------------------- #
+
+
+def test_duplication_clusters_and_skips(tmp_path: Path) -> None:
+    cfg = _config(scan_paths=[str(tmp_path)], hashable_size_cap_bytes=100)
+    _mk(tmp_path / "a.txt", 20, NOW - DAY)
+    _mk(tmp_path / "copy.txt", 20, NOW - DAY)  # byte-identical to a.txt
+    _mk(tmp_path / "unique.txt", 7, NOW - DAY)
+    _mk(tmp_path / "big.bin", 200, NOW - DAY)  # over cap -> not hashed
+    _mk(tmp_path / "empty.txt", 0, NOW - DAY)  # empty -> not hashed
+
+    files = core.collect_files(cfg)
+    dup = core.build_duplication(files, cfg)
+
+    assert len(dup.clusters) == 1
+    cluster = dup.clusters[0]
+    assert cluster.size_bytes == 20
+    assert cluster.wasted_bytes == 20
+    assert dup.total_wasted_bytes == 20
+    assert {Path(p).name for p in cluster.paths} == {"a.txt", "copy.txt"}
+    assert dup.skipped_over_cap == 1
+    assert dup.skipped_cloud_only == 0
+
+
+def test_collect_files_hashes_only_eligible(tmp_path: Path) -> None:
+    cfg = _config(scan_paths=[str(tmp_path)], hashable_size_cap_bytes=100)
+    _mk(tmp_path / "small.txt", 10, NOW - DAY)
+    _mk(tmp_path / "big.bin", 200, NOW - DAY)
+    _mk(tmp_path / "empty.txt", 0, NOW - DAY)
+    by_name = {f.name: f for f in core.collect_files(cfg)}
+    assert by_name["small.txt"].sha256 is not None
+    assert by_name["big.bin"].sha256 is None
+    assert by_name["empty.txt"].sha256 is None
+
+
+def test_cloud_only_never_hashed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    cfg = _config(scan_paths=[str(tmp_path)])
+    _mk(tmp_path / "local.txt", 10, NOW - DAY)
+    _mk(tmp_path / "ghost.cloud", 50, NOW - DAY)
+
+    calls: list[str] = []
+    real = core._sha256
+    monkeypatch.setattr(core, "_sha256", lambda p: calls.append(p) or real(p))
+    monkeypatch.setattr(
+        core, "is_cloud_placeholder", lambda st: getattr(st, "st_size", 0) == 50
+    )
+
+    files = core.collect_files(cfg)
+    assert not any("ghost.cloud" in c.replace("\\", "/") for c in calls)
+    ghost = next(f for f in files if f.name == "ghost.cloud")
+    assert ghost.cloud_only is True and ghost.sha256 is None
+    assert core.build_duplication(files, cfg).skipped_cloud_only == 1
+
+
+def test_onedrive_overlap_summary(tmp_path: Path) -> None:
+    cfg = _config(
+        scan_paths=[str(tmp_path / "local")],
+        onedrive_path=str(tmp_path / "od"),
+    )
+    _mk(tmp_path / "local" / "shared.txt", 30, NOW - DAY)
+    _mk(tmp_path / "od" / "shared.txt", 30, NOW - DAY)  # identical content + name
+    _mk(tmp_path / "od" / "onlyod.txt", 11, NOW - DAY)
+
+    files = core.collect_files(cfg, include_onedrive=True)
+    dup = core.build_duplication(files, cfg, include_onedrive=True)
+    assert "onedrive_scanned=True" in dup.onedrive_overlap
+    assert "by_hash=1" in dup.onedrive_overlap
+    assert "by_name=1" in dup.onedrive_overlap
+
+    not_scanned = core.build_duplication(files, cfg, include_onedrive=False)
+    assert "not scanned" in not_scanned.onedrive_overlap
+
+
 # --------------------------- OneDrive guard ------------------------------- #
 
 
