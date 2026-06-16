@@ -1,0 +1,51 @@
+# Configuration for scripts/current_state_audit.py — read-only ecosystem audit.
+# All scan paths, exclusions, caps, and thresholds live here (never hardcoded).
+# See docs/audits/ for generated inventory JSON + the authored gap report.
+
+# Always-scanned local roots (read-only). MUST NOT contain "OneDrive - Blue Yonder"
+# (enforced fail-closed at load time).
+scan_paths:
+  - "C:/Users/1028120/Documents/Dev/corp-monorepo"
+  - "C:/Users/1028120/Documents/MyWork"
+  - "C:/Users/1028120/Documents/ObsidianVault"
+
+# Scanned ONLY when --include-onedrive is passed. Read-only, placeholder-safe:
+# cloud-only files are inventoried by metadata only and never hashed/hydrated.
+onedrive_path: "C:/Users/1028120/OneDrive - Blue Yonder/MyWork_OneDrive"
+
+# Directory names pruned during traversal (never descended). Case-insensitive.
+exclude_dirs:
+  - ".git"
+  - ".venv"
+  - "venv"
+  - "node_modules"
+  - "__pycache__"
+  - ".mypy_cache"
+  - ".pytest_cache"
+  - ".ruff_cache"
+  - ".idea"
+  - ".vs"
+  - "dist"
+  - "build"
+  - ".obsidian"
+
+# Files larger than this are inventoried but never content-hashed (bytes).
+hashable_size_cap_bytes: 52428800  # 50 MiB
+
+# A directory holding more than this many loose files is flagged as a junk drawer.
+junk_drawer_loose_file_threshold: 40
+
+# Directory-name fragments that signal disorganization (case-insensitive substring).
+generic_dir_names:
+  - "new folder"
+  - "copy of"
+  - "untitled"
+
+# How many largest files to retain per scanned root.
+largest_files_top_n: 20
+
+# Durable output directory (must already exist — the tool never creates folders).
+output_dir: "docs/audits"
+
+# Root under which sibling repos are inventoried for automation (Step 6).
+dev_root: "C:/Users/1028120/Documents/Dev"
