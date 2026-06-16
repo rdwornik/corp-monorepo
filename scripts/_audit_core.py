@@ -420,6 +420,7 @@ def build_inventory(
     now_ts: float,
     *,
     include_onedrive: bool = False,
+    hash_onedrive: bool = False,
 ) -> AuditInventory:
     """Assemble the full inventory across all scanned roots."""
     roots: list[tuple[Path, bool]] = [(Path(p), False) for p in config.scan_paths]
@@ -437,7 +438,9 @@ def build_inventory(
         inv.naming.append(
             build_naming_metrics(root, config, allow_onedrive=allow)
         )
-    files = collect_files(config, include_onedrive=include_onedrive)
+    files = collect_files(
+        config, include_onedrive=include_onedrive, hash_onedrive=hash_onedrive
+    )
     inv.duplication = build_duplication(
         files, config, include_onedrive=include_onedrive
     )
@@ -549,12 +552,16 @@ def collect_files(
     config: AuditConfig,
     *,
     include_onedrive: bool = False,
+    hash_onedrive: bool = False,
 ) -> list[HashedFile]:
     """Index every file across all roots, hashing ONLY eligible local files.
 
     A file is hashed only when it is not a cloud placeholder and its size is in
     ``(0, hashable_size_cap_bytes]`` — cloud-only files are never opened (no
     hydration), and over-cap/empty files are left with ``sha256 = None``.
+    OneDrive files are inventoried by metadata but hashed only when
+    ``hash_onedrive`` is set (the synced mirror's hydrated tree is large; default
+    is metadata-only + by-name overlap).
     """
     roots: list[tuple[Path, bool]] = [(Path(p), False) for p in config.scan_paths]
     if include_onedrive and config.onedrive_path:
@@ -576,7 +583,10 @@ def collect_files(
             size = st.st_size
             cloud = is_cloud_placeholder(st)
             digest: str | None = None
-            if not cloud and 0 < size <= cap:
+            hashable = not cloud and 0 < size <= cap
+            if is_onedrive and not hash_onedrive:
+                hashable = False
+            if hashable:
                 try:
                     digest = _sha256(_long_path(entry.path))
                 except OSError as exc:
@@ -638,12 +648,19 @@ def _overlap_summary(files: list[HashedFile], include_onedrive: bool) -> str:
         )
     od_hashes = {f.sha256 for f in files if f.is_onedrive and f.sha256}
     local_hashes = {f.sha256 for f in files if not f.is_onedrive and f.sha256}
-    shared_hashes = od_hashes & local_hashes
-    size_by_hash = {f.sha256: f.size_bytes for f in files if f.sha256}
-    dup_bytes = sum(size_by_hash.get(h, 0) for h in shared_hashes)
     od_names = {f.name for f in files if f.is_onedrive}
     local_names = {f.name for f in files if not f.is_onedrive}
     shared_names = od_names & local_names
+    if not od_hashes:
+        return (
+            "onedrive_scanned=True; hashing_skipped=True (metadata-only, "
+            "--hash-onedrive to enable); "
+            f"by_name={len(shared_names)} shared filenames; see "
+            "corp.cleanup.disk.find_onedrive_overlap for hash-level overlap"
+        )
+    shared_hashes = od_hashes & local_hashes
+    size_by_hash = {f.sha256: f.size_bytes for f in files if f.sha256}
+    dup_bytes = sum(size_by_hash.get(h, 0) for h in shared_hashes)
     return (
         f"onedrive_scanned=True; by_hash={len(shared_hashes)} files "
         f"(~{dup_bytes} B duplicated across trees); "
@@ -686,7 +703,13 @@ def build_sot_violations(files: list[HashedFile]) -> list[SourceOfTruthViolation
     ``by_hash``: identical content (same SHA-256) in >= 2 distinct directories.
     ``by_name``: same filename in >= 2 distinct directories (content may differ),
     excluding ubiquitous framework filenames.
+
+    Scoped to LOCAL files only — the OneDrive mirror is a known redundant copy
+    whose overlap with local trees is reported separately in
+    ``DuplicationReport.onedrive_overlap`` (including it here would drown the
+    signal in expected synced-copy duplication).
     """
+    files = [f for f in files if not f.is_onedrive]
     violations: list[SourceOfTruthViolation] = []
 
     hash_paths: dict[str, set[str]] = {}

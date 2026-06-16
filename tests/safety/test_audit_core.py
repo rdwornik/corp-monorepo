@@ -250,13 +250,20 @@ def test_onedrive_overlap_summary(tmp_path: Path) -> None:
     _mk(tmp_path / "od" / "shared.txt", 30, NOW - DAY)  # identical content + name
     _mk(tmp_path / "od" / "onlyod.txt", 11, NOW - DAY)
 
-    files = core.collect_files(cfg, include_onedrive=True)
-    dup = core.build_duplication(files, cfg, include_onedrive=True)
+    # Opt-in hashing of OneDrive enables hash-level overlap.
+    hashed = core.collect_files(cfg, include_onedrive=True, hash_onedrive=True)
+    dup = core.build_duplication(hashed, cfg, include_onedrive=True)
     assert "onedrive_scanned=True" in dup.onedrive_overlap
     assert "by_hash=1" in dup.onedrive_overlap
     assert "by_name=1" in dup.onedrive_overlap
 
-    not_scanned = core.build_duplication(files, cfg, include_onedrive=False)
+    # Default (metadata-only) OneDrive: by-name overlap, hashing skipped.
+    meta_only = core.collect_files(cfg, include_onedrive=True)
+    dup_meta = core.build_duplication(meta_only, cfg, include_onedrive=True)
+    assert "hashing_skipped=True" in dup_meta.onedrive_overlap
+    assert "by_name=1" in dup_meta.onedrive_overlap
+
+    not_scanned = core.build_duplication(hashed, cfg, include_onedrive=False)
     assert "not scanned" in not_scanned.onedrive_overlap
 
 
@@ -294,6 +301,21 @@ def test_sot_by_name_ignores_ubiquitous(tmp_path: Path) -> None:
     assert "__init__.py" not in keys
     report = next(v for v in by_name if v.key == "report.docx")
     assert len(report.locations) == 2
+
+
+def test_sot_excludes_onedrive_files() -> None:
+    files = [
+        core.HashedFile("local/a/report.docx", "report.docx", 10, "h1", False, False),
+        core.HashedFile("local/b/report.docx", "report.docx", 20, "h2", False, False),
+        core.HashedFile("od/c/report.docx", "report.docx", 30, "h3", False, True),
+    ]
+    by_name = [
+        v for v in core.build_sot_violations(files)
+        if v.kind == "by_name" and v.key == "report.docx"
+    ]
+    assert len(by_name) == 1
+    assert len(by_name[0].locations) == 2  # the OneDrive copy is excluded
+    assert all(not loc.startswith("od/") for loc in by_name[0].locations)
 
 
 # --------------------------- automation ----------------------------------- #
