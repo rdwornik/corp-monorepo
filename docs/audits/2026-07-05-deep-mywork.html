@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MyWork Estate Map — 2026-07-05</title>
+<style>
+  :root {
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --border: rgba(11,11,11,.10);
+    --n1: #2a78d6; --n2: #1baf7a; --n3: #eda100; --n4: #008300;
+    --n5: #4a3aa7; --n6: #e34948; --adr: #e87ba4;
+    --good: #0ca30c; --warn: #fab219; --crit: #d03b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink2: #c3c2b7;
+      --muted: #898781; --grid: #2c2c2a; --border: rgba(255,255,255,.10);
+      --n1: #3987e5; --n2: #199e70; --n3: #c98500; --n4: #008300;
+      --n5: #9085e9; --n6: #e66767; --adr: #d55181;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 24px; max-width: 1200px; margin-inline: auto;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 36px 0 10px; }
+  .meta { color: var(--ink2); font-size: 12.5px; margin-bottom: 14px; }
+  .verdict {
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--crit);
+    border-radius: 6px; padding: 12px 16px; font-size: 14.5px; margin-bottom: 20px;
+  }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 12px; margin-bottom: 8px; }
+  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; }
+  .kpi .v { font-size: 26px; font-weight: 650; }
+  .kpi .l { color: var(--ink2); font-size: 12px; }
+  .kpi .s { color: var(--muted); font-size: 11.5px; }
+
+  .zones { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px,1fr)); gap: 14px; }
+  .zone { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+  .zone.rogue { border-style: dashed; border-color: var(--crit); }
+  .zone header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .zone h3 { margin: 0; font-size: 15px; }
+  .zone .decl { color: var(--muted); font-size: 11.5px; text-align: right; }
+  .really { font-size: 13px; margin: 6px 0 8px; }
+  .really b { font-weight: 650; }
+  .stats { display: flex; flex-wrap: wrap; gap: 4px 14px; color: var(--ink2); font-size: 12px; font-variant-numeric: tabular-nums; margin-bottom: 10px; }
+  .meterrow { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 8px; }
+  .meterrow .lab { color: var(--ink2); min-width: 52px; }
+  .meter { flex: 1; height: 8px; background: var(--grid); border-radius: 4px; overflow: hidden; }
+  .meter i { display: block; height: 100%; border-radius: 4px; }
+  .meter .crit { background: var(--crit); }
+  .meterrow .val { font-variant-numeric: tabular-nums; min-width: 78px; text-align: right; }
+  .mix { display: flex; gap: 2px; height: 12px; border-radius: 4px; overflow: hidden; }
+  .mix i { display: block; height: 100%; min-width: 2px; }
+  .mixlab { color: var(--muted); font-size: 11px; margin-top: 4px; }
+  .empty { color: var(--muted); font-style: italic; }
+
+  .tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th { text-align: left; color: var(--ink2); font-weight: 600; font-size: 12px; }
+  th, td { padding: 8px 12px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: baseline; }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: 12px; background: var(--grid); padding: 0 4px; border-radius: 3px; }
+  .flag { color: var(--crit); font-weight: 650; }
+  .note { color: var(--ink2); font-size: 12.5px; margin: 8px 2px; }
+  .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 800px) { .cols2 { grid-template-columns: 1fr; } }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+  .panel h3 { margin: 0 0 8px; font-size: 14px; }
+  ul { margin: 6px 0; padding-left: 20px; }
+  li { margin: 3px 0; }
+  footer { color: var(--muted); font-size: 12px; margin-top: 32px; }
+</style>
+</head>
+<body>
+
+<h1>MyWork Estate Map</h1>
+<div class="meta">Deep Audit F (Wave 2) · 2026-07-05 · branch <code>docs/deep-mywork</code> · read-only metadata scan of local <code>Documents/MyWork</code> · OneDrive mirror never traversed (figures by citation from the 2026-06-16 audit) · full evidence: <code>docs/audits/2026-07-05-deep-mywork.md</code></div>
+
+<div class="verdict"><b>Verdict:</b> a 2,236-file / ~10.2 GB estate where ADR-14 naming penetration is <b>10 files (0.4%) — all March <code>MISC_GEN</code> fallbacks</b>; the declared hot zone (20_Workflows) is cold while the real production studio hides in <code>30_Reference/Training/…Warsaw</code>; 10_Projects carries <b>196 byte-identical space↔underscore twin pairs (~756&nbsp;MB)</b>; 90_Archive is an empty shell; and the only living registry (<code>Project_Codes.xlsm</code>) sits unbacked in the wrong zone.</div>
+
+<div class="kpis">
+  <div class="kpi"><div class="v">2,236</div><div class="l">files scanned (9 targets)</div><div class="s">~10.2 GB local; mirror 159,826 files / 1.1 TB (cited)</div></div>
+  <div class="kpi"><div class="v">0.4%</div><div class="l">ADR-14 conformance, estate-wide</div><div class="s">10 files; docs-only basis 1.0% (10/995)</div></div>
+  <div class="kpi"><div class="v">196</div><div class="l">byte-identical twin pairs in 10_Projects</div><div class="s">~756 MB redundant; half-run rename residue</div></div>
+  <div class="kpi"><div class="v">0</div><div class="l">files in 90_Archive</div><div class="s">JOURNAL 03-29 says 9 projects moved here</div></div>
+</div>
+
+<h2>Zone cards — declared purpose vs reality</h2>
+<div class="zones">
+
+  <div class="zone">
+    <header><h3>00_Inbox</h3><div class="decl">declared: temporary intake<br>(magistrala entry)</div></header>
+    <div class="really"><b>Really:</b> frozen capture backlog + RFP style-corpus parking lot. Inflow stopped 2026-04-10. Undeclared <code>raw/</code>, <code>_Review/</code>; declared <code>_Staging</code>/<code>_quarantine</code> don't exist.</div>
+    <div class="stats"><span>75 files</span><span>221 MB</span><span>oldest 2025-01</span><span>median 2026-02</span><span>newest 2026-04-10</span></div>
+    <div class="meterrow"><span class="lab">ADR-14</span><div class="meter"><i class="crit" style="width:0%"></i></div><span class="val">0.0% · red</span></div>
+    <div class="mix">
+      <i style="flex:50;background:var(--n3)" title="SharePoint spaces 50"></i>
+      <i style="flex:17;background:var(--n2)" title="Underscored 17"></i>
+      <i style="flex:8;background:var(--n4)" title="Machine 8"></i>
+    </div>
+    <div class="mixlab">mix: spaces 67% · underscored 23% · machine 11%</div>
+  </div>
+
+  <div class="zone">
+    <header><h3>10_Projects</h3><div class="decl">declared: active client work<br><code>{Client}_{Product}/</code></div></header>
+    <div class="really"><b>Really:</b> active deals <i>and</i> the de-facto archive: 84% of bytes in 3 projects idle since March (Clicks 3.4 GB); 196 twin pairs; 1 empty shell folder; oldest file 2020. Alive: Unilever, Tata Steel, SGDBF, Wickes, Essity, Veronesi.</div>
+    <div class="stats"><span>620 files</span><span>6.11 GB</span><span>29 folders</span><span>median 2025-04</span><span>newest 2026-07-03</span></div>
+    <div class="meterrow"><span class="lab">ADR-14</span><div class="meter"><i class="crit" style="width:1.6%"></i></div><span class="val">1.6% · red</span></div>
+    <div class="mix">
+      <i style="flex:351;background:var(--n2)" title="Underscored 351"></i>
+      <i style="flex:230;background:var(--n3)" title="Spaces 230"></i>
+      <i style="flex:16;background:var(--n4)" title="Machine 16"></i>
+      <i style="flex:12;background:var(--n5)" title="YYYYMMDD 12"></i>
+      <i style="flex:10;background:var(--adr)" title="ADR-14 10"></i>
+      <i style="flex:1;background:var(--n6)" title="Type-first 1"></i>
+    </div>
+    <div class="mixlab">mix: underscored 57% · spaces 37% · machine 3% · YYYYMMDD 2% · ADR-14 1.6%</div>
+  </div>
+
+  <div class="zone rogue">
+    <header><h3>15_Extra_Inititives <span class="flag">(rogue, sic)</span></h3><div class="decl">declared: — (removed from<br>spec by Council #24)</div></header>
+    <div class="really"><b>Really:</b> 3 unrelated internal, non-deal items: a demo-ready Revlon/Databricks <i>workspace</i> (57 files, ⚠ plaintext credentials), 3 MBO decks (newest in zone), a time-entry training deck. See disposition panel below.</div>
+    <div class="stats"><span>63 files</span><span>84 MB</span><span>born 2026-03-10</span><span>newest 2026-05-15</span></div>
+    <div class="meterrow"><span class="lab">ADR-14</span><div class="meter"><i class="crit" style="width:0%"></i></div><span class="val">0.0% · red</span></div>
+    <div class="mix">
+      <i style="flex:37;background:var(--n2)" title="Underscored 37"></i>
+      <i style="flex:14;background:var(--n3)" title="Spaces 14"></i>
+      <i style="flex:11;background:var(--n4)" title="Machine 11"></i>
+      <i style="flex:1;background:var(--n6)" title="Type-first 1"></i>
+    </div>
+    <div class="mixlab">mix: underscored 59% · spaces 22% · machine 17%</div>
+  </div>
+
+  <div class="zone">
+    <header><h3>20_Workflows</h3><div class="decl">declared: HOT ZONE —<br>master decks, demos, kits</div></header>
+    <div class="really"><b>Really:</b> a display case, not a workshop. 30 files; <code>Master_Deck/</code> holds 3 files / 9.4 MB; median mtime = restructure day (03-30). Its declared function actually runs inside the Warsaw folder in 30_Reference.</div>
+    <div class="stats"><span>30 files</span><span>217 MB</span><span>median 2026-03-30</span><span>newest 2026-05-05</span></div>
+    <div class="meterrow"><span class="lab">ADR-14</span><div class="meter"><i class="crit" style="width:0%"></i></div><span class="val">0.0% · red</span></div>
+    <div class="mix">
+      <i style="flex:29;background:var(--n2)" title="Underscored 29"></i>
+      <i style="flex:1;background:var(--n3)" title="Spaces 1"></i>
+    </div>
+    <div class="mixlab">mix: underscored 97% · spaces 3%</div>
+  </div>
+
+  <div class="zone">
+    <header><h3>30_Reference</h3><div class="decl">declared: evergreen knowledge<br>(products, arch, RFP_Library)</div></header>
+    <div class="really"><b>Really:</b> 96% is the <b>Warsaw production studio</b> (1,302 files / 2.87 GB): deck generators, RFP-response build scripts (<code>Cortina/</code>), <code>_PPTX_TEMPLATE_KIT</code>, 1,027 extraction artifacts, 2.3 GB recordings, personal self-review decks — active <b>today</b>. True reference ≈ 54 files. Loose at root: <code>Project_Codes.xlsm</code> (mtime 06-19, unbacked).</div>
+    <div class="stats"><span>1,356 files</span><span>3.54 GB</span><span>median 2026-04-28</span><span>newest 2026-07-05</span></div>
+    <div class="meterrow"><span class="lab">ADR-14</span><div class="meter"><i class="crit" style="width:0%"></i></div><span class="val">0.0% · red</span></div>
+    <div class="mix">
+      <i style="flex:1114;background:var(--n1)" title="Artifacts 1114"></i>
+      <i style="flex:151;background:var(--n2)" title="Underscored 151"></i>
+      <i style="flex:41;background:var(--n3)" title="Spaces 41"></i>
+      <i style="flex:39;background:var(--n4)" title="Machine 39"></i>
+      <i style="flex:11;background:var(--n6)" title="Type-first 11"></i>
+    </div>
+    <div class="mixlab">mix: tool artifacts 82% · underscored 11% · spaces 3% · machine 3%</div>
+  </div>
+
+  <div class="zone">
+    <header><h3>70_Admin</h3><div class="decl">declared: corporate admin</div></header>
+    <div class="really"><b>Really:</b> matches purpose — benefits claims, Workday goals, invoices. Tiny and dormant since 03-26. (Rob's H1 self-review decks live in Warsaw instead.)</div>
+    <div class="stats"><span>17 files</span><span>0.8 MB</span><span>median 2026-03-03</span><span>newest 2026-03-26</span></div>
+    <div class="meterrow"><span class="lab">ADR-14</span><div class="meter"><i class="crit" style="width:0%"></i></div><span class="val">0.0% · red</span></div>
+    <div class="mix">
+      <i style="flex:8;background:var(--n2)" title="Underscored 8"></i>
+      <i style="flex:3;background:var(--n3)" title="Spaces 3"></i>
+      <i style="flex:6;background:var(--n4)" title="Machine 6"></i>
+    </div>
+    <div class="mixlab">mix: underscored 47% · machine 35% · spaces 18%</div>
+  </div>
+
+  <div class="zone">
+    <header><h3>80_Compliance</h3><div class="decl">declared: security/compliance<br>(certs, policies)</div></header>
+    <div class="really"><b>Really:</b> matches purpose. 27 SOC/ISO certificates in <code>Certificates/</code>; corporate filenames are self-describing; quietly accreting (04-24). Kernel value: LOW — whitelist as-is.</div>
+    <div class="stats"><span>29 files</span><span>13.7 MB</span><span>oldest 2024-06</span><span>newest 2026-04-24</span></div>
+    <div class="meterrow"><span class="lab">ADR-14</span><div class="meter"><i class="crit" style="width:0%"></i></div><span class="val">0.0% · red</span></div>
+    <div class="mix">
+      <i style="flex:16;background:var(--n2)" title="Underscored 16"></i>
+      <i style="flex:10;background:var(--n3)" title="Spaces 10"></i>
+      <i style="flex:3;background:var(--n4)" title="Machine 3"></i>
+    </div>
+    <div class="mixlab">mix: underscored 55% · spaces 35% · machine 10%</div>
+  </div>
+
+  <div class="zone">
+    <header><h3>90_Archive</h3><div class="decl">declared: completed/stale projects</div></header>
+    <div class="really"><b>Really:</b> <span class="flag">an empty shell — 0 files, 0 dirs.</span> The archive function never ran; stale projects are archived <i>in place</i> inside 10_Projects. <b>Discrepancy:</b> JOURNAL 2026-03-29 records 9 stale projects moved here — needs operator memory.</div>
+    <div class="stats"><span class="empty">empty since at least 2026-06-16</span></div>
+    <div class="meterrow"><span class="lab">ADR-14</span><div class="meter"></div><span class="val">n/a</span></div>
+  </div>
+
+  <div class="zone">
+    <header><h3>.corp</h3><div class="decl">declared: hidden pipeline infra<br>(config, logs, cache)</div></header>
+    <div class="really"><b>Really:</b> March incident-forensics freezer + the live half of a config split-brain; frozen 2026-03-30. Contains <code>cleanup_log.jsonl</code> (mtime = incident day 03-14), 3 orphan configs with no repo twin, and a <code>.logs/.corp/</code> double-nesting relic. Zero backup.</div>
+    <div class="stats"><span>46 files</span><span>9.4 MB</span><span>oldest 2026-02-19</span><span>newest 2026-03-30</span></div>
+    <div class="meterrow"><span class="lab">ADR-14</span><div class="meter"><i class="crit" style="width:0%"></i></div><span class="val">0.0% · exempt-candidate</span></div>
+    <div class="mix">
+      <i style="flex:44;background:var(--n4)" title="Machine 44"></i>
+      <i style="flex:2;background:var(--n2)" title="Underscored 2"></i>
+    </div>
+    <div class="mixlab">mix: machine 96% · underscored 4% (machine-owned names — exempt zone)</div>
+  </div>
+
+</div>
+
+<h2>Competing naming conventions — measured (legend for the zone mix bars)</h2>
+<div class="tablewrap"><table>
+  <tr><th>Convention</th><th>Example (real file)</th><th class="num">Files</th><th class="num">Estate share</th><th>Dominates</th></tr>
+  <tr><td><span class="sw" style="background:var(--n1)"></span>N1 · Tool-generated artifacts</td><td><code>slide_01.png</code>, <code>page_003.png</code></td><td class="num">1,114</td><td class="num">49.8%</td><td>30_Reference (Warsaw <code>_extracted/</code>, previews)</td></tr>
+  <tr><td><span class="sw" style="background:var(--n2)"></span>N2 · Underscored_TitleCase (no grammar)</td><td><code>Ahold_Delhaize_Tech_Workshop_28012026.pdf</code></td><td class="num">611</td><td class="num">27.3%</td><td>20_Workflows 97%, 10_Projects 57%</td></tr>
+  <tr><td><span class="sw" style="background:var(--n3)"></span>N3 · SharePoint-native spaces</td><td><code>Blue Yonder Response to Alfa Laval RFP November 2025.docx</code></td><td class="num">349</td><td class="num">15.6%</td><td>00_Inbox 67%, 10_Projects 37%</td></tr>
+  <tr><td><span class="sw" style="background:var(--n4)"></span>N4 · Machine lowercase</td><td><code>routing_map.yaml</code>, <code>bydm_tariff1008482_entity.csv</code></td><td class="num">127</td><td class="num">5.7%</td><td>.corp 96%</td></tr>
+  <tr><td><span class="sw" style="background:var(--n5)"></span>N5 · Date-first YYYYMMDD</td><td><code>20251003 Clicks A&amp;R Consolidated Pricing Calculator…xlsx</code></td><td class="num">12</td><td class="num">0.5%</td><td>Clicks only</td></tr>
+  <tr><td><span class="sw" style="background:var(--n6)"></span>N6 · Type-first v1 relics (ADR-10)</td><td><code>RFP_Database_AIML.xlsx</code>, <code>DEMO_PREP_LabelVie_TMS_032026.pptx</code></td><td class="num">13</td><td class="num">0.6%</td><td>RFP_Library databases</td></tr>
+  <tr><td><span class="sw" style="background:var(--adr)"></span><b>ADR-14 v2 (the target grammar)</b></td><td><code>2026-03_MISC_GEN_JAGUAR_Blue_Yonder_Overview_for_JLR.pptx</code></td><td class="num"><b>10</b></td><td class="num"><b>0.4%</b></td><td>10_Projects, March ingest only — <b>all 10 are MISC_GEN fallbacks; organic adoption is zero</b></td></tr>
+</table></div>
+<p class="note">N2 and N3 are largely the <b>same files twice</b>: 196 equal-size same-directory twin pairs (an N3 original beside its N2 underscore copy, ~756 MB) — the residue of a half-run normalization. Evidence for the foundation rule: <b>route new material, never bulk-rename old</b>. Conformance regex built from <code>config/naming_config.yaml</code> (22 type codes, 32 aliases + GEN).</p>
+
+<h2>15_Extra_Inititives — disposition evidence (decision is the operator's)</h2>
+<div class="cols2">
+  <div class="panel">
+    <h3>What's in it (63 files, 84 MB, all born after the March restructure)</h3>
+    <ul>
+      <li><b><code>Karthik_Revlon_Databrick_Demo/</code></b> (57 files, 45.7 MB, newest 04-28) — self-contained, demo-ready Databricks↔BY integration workspace (Rob + Karthik): 13 .py notebooks, 6 deck versions, template-extract kit, own CLAUDE.md/README/audit. Client = Revlon (<code>REVL</code> exists in the alias vocabulary). <span class="flag">⚠ Plaintext credentials on disk (databricks.token + PAT inside README) — flagged by the workspace's own 2026-04-28 audit; revoke before anything else.</span></li>
+      <li><b><code>MBO/</code></b> (3 decks, 32.6 MB, newest 05-15) — platform-overview decks, two derived from the Karthik deck line; one is a version fork of a deck also at Warsaw root.</li>
+      <li><b><code>SCA time calendar/</code></b> (3 files, 6 MB, 04-02) — internal time-entry training deck + transcript.</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h3>Disposition options</h3>
+    <ul>
+      <li><b>(A) Legitimize as <code>15_Initiatives</code></b> (spelling fixed) = the internal/non-deal <i>workspace</i> zone — which would also give the Warsaw studio a declared home. Reverses an explicit Council #24 removal.</li>
+      <li><b>(B) Migrate &amp; delete the zone:</b>
+        <ul>
+          <li>Karthik workspace → <code>10_Projects/Revlon_Databricks_Demo/</code> as an atomic workspace (credential cleanup first)</li>
+          <li>MBO decks → <code>20_Workflows/Technical_Presentations/</code> (reconcile the Warsaw version fork first)</li>
+          <li>SCA deck → <code>70_Admin/</code></li>
+        </ul>
+      </li>
+    </ul>
+    <p class="note">Not one coherent initiative — three unrelated items sharing one property the taxonomy can't express: internal, non-deal, workspace-shaped work.</p>
+  </div>
+</div>
+
+<h2>Template inventory — where templates actually live</h2>
+<div class="tablewrap"><table>
+  <tr><th>Template asset</th><th>Lives in</th><th class="num">Size / mtime</th><th>Status</th></tr>
+  <tr><td><code>BlueYonder-Powerpoint-Template_2025-RestrictedFooter-usecases.potx</code></td><td>10_Projects/Wurth_Retail/</td><td class="num">371.7 MB · 2025-06-15</td><td><b>The only .potx in the estate</b> — official corporate template buried in one client's folder (+364 MB .7z sibling)</td></tr>
+  <tr><td><code>_PPTX_TEMPLATE_KIT/</code> (template + <code>00_MASTER_PROMPT.md</code>)</td><td>30_Reference/Training/…Warsaw/</td><td class="num">8.2 MB · 2026-06-02</td><td><b>Current, actively used</b> — the generator kit; newest of the <code>_BY_template_clean</code> line</td></tr>
+  <tr><td><code>_BY_template_clean.pptx</code> ×2 (older copies)</td><td>Warsaw root · 15_Extra/Karthik…</td><td class="num">6.5 MB each · 2026-03-31</td><td>Stale ancestors of the kit</td></tr>
+  <tr><td><code>[Internal]_My_Technology_Template.docx</code></td><td>30_Reference/RFP_Library/Template_Word/</td><td class="num">0.76 MB · 2026-03-30</td><td>Only Word template; only one in anything like a declared home</td></tr>
+  <tr><td><code>Veronesi Template PPT.pptx</code> (+ underscore twin)</td><td>10_Projects/Veronesi_Planning/</td><td class="num">45.9 MB ×2 · 2025-12-12</td><td>Client template, twin-duplicated</td></tr>
+  <tr><td><code>Clicks-Group-PPT-Template.pptx</code> ×2</td><td>10_Projects/Clicks_Retail/ (two subdirs)</td><td class="num">7.5 MB each · 2023</td><td>Stale client templates</td></tr>
+  <tr><td><code>BlueYonder-Powerpoint-Template 2025-ConfidentialFooter…pptx</code> (+twin)</td><td>10_Projects/Wurth_Retail/</td><td class="num">1.9 MB ×2 · 2026-01-21</td><td>Confidential-footer variant, twin-duplicated</td></tr>
+</table></div>
+<p class="note"><b>Registry ground truth:</b> <code>template_manager.py</code> scans <code>30_Templates/</code> and maintains <code>90_System/template_registry.yaml</code> — <b>both zones are phantoms</b> (ADR-24 removed one; the other was deleted 03-29), and <b>no <code>template_registry.yaml</code> exists anywhere on disk</b>. The template manager is 100% disconnected from where templates live. No .dotx/.xltx anywhere. (Join point with Audit E's template_manager finding — unmerged at time of writing; evidence here is first-hand.)</p>
+
+<h2>Live-config (.corp) vs repo-config split</h2>
+<div class="tablewrap"><table>
+  <tr><th>.corp item</th><th class="num">mtime</th><th>Repo twin</th><th>Estate fact</th></tr>
+  <tr><td><code>content_registry.yaml</code> (21,376 B)</td><td class="num">2026-03-23</td><td><code>config/content_registry.yaml</code> (4,775 B, last commit 03-29)</td><td><b>DIVERGED</b> — hashes differ; live copy 4.5× the repo copy. Split brain; both halves stale since March. (Which one code reads = Audit B.)</td></tr>
+  <tr><td><code>routing_map.yaml</code> (2,352 B)</td><td class="num">2026-03-30</td><td><b>none</b></td><td>Orphan live config — no git history, no backup</td></tr>
+  <tr><td><code>config.json</code> · <code>solution_matrix.json</code></td><td class="num">03-10 · 02-19</td><td><b>none</b></td><td>Orphan machine configs</td></tr>
+  <tr><td><code>.audit/</code> 20 files, 7.2 MB</td><td class="num">03-12→03-24</td><td>n/a</td><td>March forensic corpus (migration/cleanup/template audits) — unique history</td></tr>
+  <tr><td><code>.logs/</code> 17 files, 2.1 MB</td><td class="num">03-12→03-14</td><td>n/a</td><td><b><code>cleanup_log.jsonl</code> mtime = the incident day (03-14)</b> + <code>moves.yaml</code>; incident forensics themselves</td></tr>
+  <tr><td><code>.scripts/</code> 3 .ps1 · <code>_corp_prep/</code> 2 briefs</td><td class="num">03-16→03-26</td><td>none</td><td>Estate-side scanner code + generated JLR briefs</td></tr>
+</table></div>
+<p class="note"><b>Precious operational state with zero backup today:</b> everything above (~10 MB) <b>plus <code>30_Reference/Project_Codes.xlsm</code></b> (mtime 2026-06-19 — the only registry still being edited). This is the set F0's backup seed must cover (extends lifecycle X1).</p>
+
+<h2>Backlog seeds (mirror of §7 in the .md)</h2>
+<div class="tablewrap"><table>
+  <tr><th>Seed</th><th>Goal (functional)</th><th>Evidence</th><th>Depends on</th><th class="num">Size</th><th>Decision first?</th></tr>
+  <tr><td>F-1 Precious-set backup</td><td>Off-machine copy of .corp + <code>Project_Codes.xlsm</code> + vault/rfp_kb (extends X1)</td><td>§5</td><td>—</td><td class="num">S</td><td>No</td></tr>
+  <tr><td>F-2 Credential revocation</td><td>Revoke Databricks PAT; purge creds from 15_Extra</td><td>§3</td><td>—</td><td class="num">S</td><td>No (removal = confirm)</td></tr>
+  <tr><td>F-3 Twin-pair dedup</td><td>Retire 196 byte-identical duplicates (~756 MB)</td><td>§2</td><td>F-1</td><td class="num">S–M</td><td><b>YES</b> (deletions)</td></tr>
+  <tr><td>F-4 15_Extra disposition</td><td>Legitimize vs migrate (panel above)</td><td>§3</td><td>F-2</td><td class="num">S</td><td><b>YES</b></td></tr>
+  <tr><td>F-5 Workspace-class concept</td><td>Workspaces = atomic addressable units; interiors exempt from naming</td><td>§1, §6</td><td>F-4</td><td class="num">M</td><td><b>YES</b></td></tr>
+  <tr><td>F-6 Template SSOT</td><td>One template home; rescue the .potx; fix/kill template_manager phantoms</td><td>§4</td><td>F-5</td><td class="num">M</td><td><b>YES</b> (join Audit E)</td></tr>
+  <tr><td>F-7 Inbox contract repair</td><td>Align <code>folder_names.py</code> sub-locations with disk before W1 restart</td><td>§1</td><td>—</td><td class="num">S</td><td>No</td></tr>
+  <tr><td>F-8 Registry split-brain</td><td>One authority for <code>content_registry.yaml</code></td><td>§5</td><td>Audit B</td><td class="num">S</td><td><b>YES</b></td></tr>
+  <tr><td>F-9 Alias completion</td><td>Add Unilever, Wickes, Tata Steel, Essity (+ Warsaw clients); folder↔alias contract</td><td>§6</td><td>—</td><td class="num">S</td><td>No</td></tr>
+  <tr><td>F-10 Kernel conformance policy</td><td>Cohort-based metric vs baseline 0.4%/1.0%; validator = new material + exempt zones</td><td>§2, §6</td><td>F-4–F-9</td><td class="num">M</td><td><b>YES</b></td></tr>
+  <tr><td>F-11 Archive activation</td><td>Resolve 90_Archive discrepancy; archive grammar + D5 trigger; then archive the 3 stale giants</td><td>§1, §6</td><td>F-10</td><td class="num">M</td><td><b>YES</b></td></tr>
+</table></div>
+
+<footer>Read-only audit. Sole writes: the .md report and this file. Conformance bars use the operator-prescribed thresholds (green ≥80 · yellow 50–79 · red &lt;50); every zone measured &lt;50. All values printed as text — color never carries meaning alone. Source data & method: <code>docs/audits/2026-07-05-deep-mywork.md</code>.</footer>
+
+</body>
+</html>
