@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deep Audit C — Knowledge Extraction Process Map (2026-07-05)</title>
+<style>
+  :root {
+    --page: #f9f9f7; --surface: #fcfcfb;
+    --ink: #0b0b0b; --ink-2: #52514e; --ink-3: #898781;
+    --hairline: #e1e0d9; --ring: rgba(11,11,11,0.10);
+    --alive: #0ca30c;   --alive-ink: #006300;   --alive-bg: rgba(12,163,12,0.08);
+    --dormant: #fab219; --dormant-ink: #7a5600; --dormant-bg: rgba(250,178,25,0.12);
+    --untested: #ec835a; --untested-ink: #93401f; --untested-bg: rgba(236,131,90,0.12);
+    --broken: #d03b3b;  --broken-ink: #a02020;  --broken-bg: rgba(208,59,59,0.10);
+    --phantom: #4a3aa7; --phantom-ink: #4a3aa7; --phantom-bg: rgba(74,58,167,0.10);
+    --missing: #898781; --missing-ink: #52514e; --missing-bg: rgba(137,135,129,0.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0d0d0d; --surface: #1a1a19;
+      --ink: #ffffff; --ink-2: #c3c2b7; --ink-3: #898781;
+      --hairline: #2c2c2a; --ring: rgba(255,255,255,0.10);
+      --alive-ink: #35c235; --dormant-ink: #fab219; --untested-ink: #ec835a;
+      --broken-ink: #e66767; --phantom-ink: #9085e9; --missing-ink: #a8a69e;
+      --alive-bg: rgba(12,163,12,0.16); --dormant-bg: rgba(250,178,25,0.14);
+      --untested-bg: rgba(236,131,90,0.14); --broken-bg: rgba(208,59,59,0.18);
+      --phantom-bg: rgba(144,133,233,0.16); --missing-bg: rgba(137,135,129,0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 28px 4vw 64px;
+  }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  h2 { font-size: 18px; margin: 40px 0 12px; }
+  h3 { font-size: 15px; margin: 20px 0 8px; }
+  .meta { color: var(--ink-2); font-size: 13px; margin-bottom: 14px; }
+  .verdict {
+    background: var(--surface); border: 1px solid var(--ring); border-left: 4px solid var(--dormant);
+    border-radius: 8px; padding: 12px 16px; max-width: 1200px; font-size: 15px;
+  }
+  .verdict strong { color: var(--ink); }
+  code { font: 12.5px/1.4 ui-monospace, Consolas, monospace; background: var(--hairline); padding: 1px 5px; border-radius: 4px; }
+  /* legend */
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 18px 0 6px; font-size: 13px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
+  .dot { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+  /* status chips — label always present, color never alone */
+  .chip {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+    padding: 2px 8px; border-radius: 999px; border: 1px solid;
+  }
+  .s-alive    { color: var(--alive-ink);    border-color: var(--alive);    background: var(--alive-bg); }
+  .s-dormant  { color: var(--dormant-ink);  border-color: var(--dormant);  background: var(--dormant-bg); }
+  .s-untested { color: var(--untested-ink); border-color: var(--untested); background: var(--untested-bg); }
+  .s-broken   { color: var(--broken-ink);   border-color: var(--broken);   background: var(--broken-bg); }
+  .s-phantom  { color: var(--phantom-ink);  border-color: var(--phantom);  background: var(--phantom-bg); }
+  .s-missing  { color: var(--missing-ink);  border-color: var(--missing);  background: var(--missing-bg); }
+  /* pipeline */
+  .flow-wrap { overflow-x: auto; padding-bottom: 8px; }
+  .flow { display: flex; align-items: stretch; gap: 0; min-width: 1150px; }
+  .stage {
+    background: var(--surface); border: 1px solid var(--ring); border-radius: 10px;
+    padding: 12px 14px; flex: 1 1 0; min-width: 200px; border-top: 4px solid var(--missing);
+  }
+  .stage.alive { border-top-color: var(--alive); }
+  .stage.dormant { border-top-color: var(--dormant); }
+  .stage.untested { border-top-color: var(--untested); }
+  .stage.broken { border-top-color: var(--broken); }
+  .stage.phantom { border-top-color: var(--phantom); }
+  .stage h4 { margin: 6px 0 6px; font-size: 14px; }
+  .stage p { margin: 4px 0; font-size: 12.5px; color: var(--ink-2); }
+  .stage .ref { font-size: 11.5px; color: var(--ink-3); }
+  .arrow { align-self: center; padding: 0 6px; color: var(--ink-3); font-size: 20px; flex: 0 0 auto; }
+  /* tier sublanes */
+  .lanes { display: grid; gap: 6px; margin-top: 8px; }
+  .lane {
+    border: 1px solid var(--ring); border-left: 4px solid var(--missing);
+    border-radius: 6px; padding: 6px 9px; font-size: 12px; color: var(--ink-2); background: var(--page);
+  }
+  .lane.alive { border-left-color: var(--alive); }
+  .lane.dormant { border-left-color: var(--dormant); }
+  .lane b { color: var(--ink); font-size: 12px; }
+  /* side rails (broken telemetry limbs) */
+  .rails { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 14px; max-width: 1400px; }
+  .rail { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 11px 14px; border-left: 4px solid var(--missing); }
+  .rail.broken { border-left-color: var(--broken); }
+  .rail.untested { border-left-color: var(--untested); }
+  .rail.missing { border-left-color: var(--missing); }
+  .rail.phantom { border-left-color: var(--phantom); }
+  .rail h4 { margin: 4px 0 6px; font-size: 13.5px; }
+  .rail p { margin: 3px 0; font-size: 12.5px; color: var(--ink-2); }
+  /* detail cards */
+  .detail { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 14px 18px; margin: 10px 0; max-width: 1200px; }
+  .detail h3 { margin-top: 2px; }
+  .detail ul { margin: 6px 0 2px 18px; padding: 0; }
+  .detail li { margin: 3px 0; font-size: 13.5px; color: var(--ink-2); }
+  .detail li b { color: var(--ink); }
+  /* tables */
+  .tbl-wrap { overflow-x: auto; max-width: 1400px; }
+  table { border-collapse: collapse; font-size: 13px; background: var(--surface); min-width: 900px; }
+  th, td { border: 1px solid var(--hairline); padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--page); color: var(--ink-2); font-weight: 600; white-space: nowrap; }
+  td { color: var(--ink-2); }
+  td b, td code { color: var(--ink); }
+  tr.hl td { background: var(--dormant-bg); }
+  .num { font-variant-numeric: tabular-nums; }
+  .foot { margin-top: 36px; color: var(--ink-3); font-size: 12px; }
+</style>
+</head>
+<body>
+
+<h1>Deep Audit C — Knowledge Extraction</h1>
+<div class="meta">2026-07-05 · branch <code>docs/deep-extraction</code> · read-only (DB <code>mode=ro</code>, no runs, no LLM calls) ·
+companion: <code>2026-07-05-deep-extraction.md</code> · Audit D owns the consume-from-vault side</div>
+
+<div class="verdict"><strong>Verdict:</strong> the extraction engine is genuinely strong on the <code>cke process</code> lane
+(scene detection, transcript generation, fact enrichment are all real) — but the telemetry and vault plumbing around it is
+systematically unwired: tier, cost, per-fact grounding, provenance, and facts are computed and then dropped before anything
+downstream can use them.</div>
+
+<div class="legend">
+  <span><i class="dot" style="background:var(--alive)"></i> ALIVE</span>
+  <span><i class="dot" style="background:var(--dormant)"></i> DORMANT</span>
+  <span><i class="dot" style="background:var(--untested)"></i> EXISTS-UNTESTED</span>
+  <span><i class="dot" style="background:var(--broken)"></i> BROKEN</span>
+  <span><i class="dot" style="background:var(--phantom)"></i> PHANTOM</span>
+  <span><i class="dot" style="background:var(--missing)"></i> MISSING</span>
+</div>
+
+<h2>Pipeline: source → tier routing → extract → post-process → emit</h2>
+<div class="flow-wrap">
+<div class="flow">
+
+  <div class="stage dormant">
+    <span class="chip s-dormant">DORMANT</span>
+    <h4>1 · Source intake</h4>
+    <p>Scan folder / manifest build. Two entries: <code>cke process &lt;path&gt;</code> (direct) and manifest lanes
+       (<code>corp extract</code>, <code>corp overnight</code>) with v2.1 provenance + folder policy.</p>
+    <p>Last real inflow 2026-03; sandbox e2e 5/5 on 2026-07-05.</p>
+    <p class="ref">inventory.py · extraction/scanner.py · manifest_emitter.py:113 · contract.py:14</p>
+  </div>
+  <div class="arrow">→</div>
+
+  <div class="stage alive">
+    <span class="chip s-alive">ALIVE</span>
+    <h4>2 · Tier routing</h4>
+    <p>video/audio→3 · pptx image-heavy→3 else 2 · xlsx/docx→2 always (upload-blocked) · pdf good-text→2, scanned→3 ·
+       small txt/md→1.</p>
+    <p><b>Gap:</b> decided per file inside CKE; never written back per file (601 rows stuck <code>tier='pending'</code> —
+       hardcoded literal, no update path).</p>
+    <p class="ref">tier_router.py:70-197 · cli/overnight.py:128 · state.py:143 (no tier param)</p>
+  </div>
+  <div class="arrow">→</div>
+
+  <div class="stage alive">
+    <span class="chip s-alive">ALIVE</span>
+    <h4>3 · Extract (tiered)</h4>
+    <p>Model truth: text tier ran mostly on <b>Claude Haiku/Sonnet</b> in March (8/11 sampled notes), not Gemini-only.
+       Three overlapping selectors; docstrings still say "Gemini 2.5 Flash".</p>
+    <div class="lanes">
+      <div class="lane alive"><b>LOCAL (T1)</b> — free, no API; post-processed via schema. <span class="ref">extract_local</span></div>
+      <div class="lane alive"><b>TEXT_AI (T2)</b> — local text → LLM (Haiku default w/ key; &gt;190K → Gemini; escalation Sonnet).
+        <span class="ref">providers/router.py:104-150</span></div>
+      <div class="lane alive"><b>MULTIMODAL (T3)</b> — video: <b>FFmpeg scene-detect 0.35</b> + histogram dedup (NOT pHash) on the
+        <code>process</code> lane; manifest lanes still uniform 10s sampling. PPTX→PNG render; transcript = dedicated 2nd Gemini call
+        (verbatim + [MM:SS] + prompt-level speaker labels — <b>no diarization</b>).
+        <span class="ref">scene_detect.py:31 · run.py:439,547 · batch.py:219 · transcript.py:50</span></div>
+    </div>
+  </div>
+  <div class="arrow">→</div>
+
+  <div class="stage alive">
+    <span class="chip s-alive">ALIVE</span>
+    <h4>4 · Post-process</h4>
+    <p>Fact enrichment: numeric cross-ref (±1%) → <code>verification_status</code>; anomaly regexes; polarity; Haiku top-up facts;
+       tags + taxonomy check; <code>quality_score</code> (facts 30 + verified-ratio 20 + overlay 20 + depth 15 + entities 15).</p>
+    <p><b>Gap:</b> no span grounding — <code>locator</code> is an unverified LLM page ref; no-number facts auto-"verified"
+       (93.6% rate is inflated).</p>
+    <p class="ref">fact_validation.py · extract.py:272-348 · synthesize.py:82-120</p>
+  </div>
+  <div class="arrow">→</div>
+
+  <div class="stage dormant">
+    <span class="chip s-dormant">DORMANT</span>
+    <h4>5 · Emit (package)</h4>
+    <p><code>{pkg}/index.md · source/{video,docs,frames,slides} · extract/{_meta.yaml, {date}_{name}_{hash4}.md,
+       {stem}.json, {stem}_transcript.md, synthesis.md}</code></p>
+    <p><b>Only the .md note survives past this point.</b> Sidecar (enriched facts), transcript, synthesis all die here —
+       ingest skips them by pattern.</p>
+    <p class="ref">synthesize.py:279-551 · run.py:603-663 · extractions.py:31-39</p>
+  </div>
+
+</div>
+</div>
+
+<h3>Output→vault: two lanes with different contracts</h3>
+<div class="flow-wrap">
+<div class="flow" style="min-width:900px">
+  <div class="stage dormant" style="max-width:46%">
+    <span class="chip s-dormant">DORMANT</span>
+    <h4>Lane A — <code>corp ingest-extractions</code> (built the real vault)</h4>
+    <p>Manual staging <code>scope/client/pkg/</code> → gates: title · <code>quality_score ≥ 25</code> <i>if present</i> ·
+       verified-overwrite protection → injects <code>trust_level: extracted</code> → flat <code>01_Knowledge/</code> →
+       quarantine on failure → ops <code>ingest_events</code>. Index rebuild is a separate manual command.</p>
+    <p><b>Gate reality:</b> only 1/11 sampled March notes carry <code>quality_score</code> — the gate no-oped for ~91% of the corpus.</p>
+    <p class="ref">ingest/extractions.py:200-332</p>
+  </div>
+  <div class="arrow" style="color:transparent">→</div>
+  <div class="stage broken" style="max-width:46%">
+    <span class="chip s-broken">BROKEN</span>
+    <h4>Lane B — <code>move_to_vault</code> (<code>corp extract</code> / overnight; never landed)</h4>
+    <p>Moves <b>whole package dirs</b> (sidecars, _meta, source/) into <code>vault/{vault_target}</code> — no quality gate,
+       no quarantine, no events, no trust injection.</p>
+    <p><b>Defects:</b> <code>10_Projects</code> route creates a literal <code>02_sources/{project_id}</code> folder (placeholder
+       never substituted); 20/30 targets are <code>04_evergreen/_generated/*</code> zones that exist nowhere on disk (proof no
+       Lane-B vault write ever completed); no staging teardown.</p>
+    <p class="ref">extraction/vault_writer.py:57-145 · routing_map.yaml routes · cli/extract.py:127-132</p>
+  </div>
+</div>
+</div>
+
+<h3>Severed telemetry &amp; dead limbs (computed, then dropped)</h3>
+<div class="rails">
+  <div class="rail broken"><span class="chip s-broken">BROKEN</span>
+    <h4>Overnight state machine</h4>
+    <p>4/9 runs stuck <code>running</code> since 2026-03-13: no try/finally between <code>create_run</code> and
+       <code>complete_run</code>; crash-retry signature in timestamps (launches 2.8 min, then 6 s apart). Two explicit
+       no-terminal <code>return</code> paths remain in full-reshape. No janitor; <code>--reset</code> deletes file rows only
+       (explains counter drift: run ab173039 "270 files", 0 rows).</p>
+    <p>cli/overnight.py:105-254,341,414 · state.py</p>
+  </div>
+  <div class="rail broken"><span class="chip s-broken">BROKEN</span>
+    <h4>Cost truth</h4>
+    <p>Every figure is a constant or an average: <code>files.cost</code> = run cost ÷ done; run cost = TIER_COSTS sum;
+       ledger <code>cost_log.jsonl</code> never created — <code>log_cost</code>/<code>check_budget</code> have <b>0 callers</b>.
+       ops <code>extractions</code> table (0 rows): writer wired only into interactive inbox extract, gated on a registry row
+       that rarely exists; bulk + overnight lanes never call it.</p>
+    <p>cost_tracker.py · cli/overnight.py:239 · inbox.py:322-329</p>
+  </div>
+  <div class="rail untested"><span class="chip s-untested">EXISTS-UNTESTED</span>
+    <h4>Batch API limb</h4>
+    <p>649-line <code>BatchJobRunner</code>, unit-tested, reachable via <code>--batch</code> flags — used 0 times ever.
+       Corp-side <code>batches</code> table is orphaned schema (its writers have 0 callers). Value ≈ <b>$0.12 per full corpus
+       run</b> (50% off T2 ≈ $0.001/file). Input: KILL unless volume grows ~100×.</p>
+    <p>batch_api.py · state.py:200-233 · cke_client.py:178</p>
+  </div>
+  <div class="rail broken"><span class="chip s-broken">BROKEN</span>
+    <h4>Facts pipeline (index <code>facts</code> = 0 rows ever)</h4>
+    <p>Three independent breaks: renderer globs <code>extract.json</code> (corpus emits <code>{stem}.json</code>) · expects
+       <code>_knowledge/_cke_output/</code> (outputs live in <code>data/_outputs/</code>) · <code>cpe render</code> never ran.
+       Even repaired, <code>facts.yaml</code> strips verification_status/locator. Operator lean: <b>KILL</b> — notes-as-truth-store;
+       nothing current is lost (consequences list in .md §5.3).</p>
+    <p>project/renderer.py:93-95,149 · index_builder.py:473-528 · cli/query.py:34</p>
+  </div>
+  <div class="rail phantom"><span class="chip s-phantom">PHANTOM</span>
+    <h4>v2.1 provenance handshake</h4>
+    <p><code>content_origin / source_category / source_locator / routing_confidence</code>: emitted into the manifest,
+       <b>required</b> by corp's validator, silently dropped by CKE's parser, absent from every template — yet the index
+       reserves 4 columns for them. Validated on the wire, ignored by the receiver.</p>
+    <p>contract.py:14 · extractor/manifest.py:56-64 · index_builder.py:687-690</p>
+  </div>
+  <div class="rail missing"><span class="chip s-missing">MISSING</span>
+    <h4>R2 trigger &amp; product scoping</h4>
+    <p>Coverage-gap→extraction loop: scoped per-folder extraction EXISTS (<code>corp extract</code>), staleness scan EXISTS,
+       resume EXISTS — but no product-scoped selection (scopes are folders; the coverage map keys are products), no runtime
+       coverage query, no scheduler, no auto index rebuild. Cost basis: $0.243 / 270 files measured (text-heavy);
+       multimodal ≈ 30× that.</p>
+    <p>cli/extract.py · OVERNIGHT_SCOPES · overnight_state.db (ro)</p>
+  </div>
+</div>
+
+<h2>Verify-first triad — settled</h2>
+<div class="detail">
+  <ul>
+    <li><b>Frame sampler → EXISTS (skip brainstorm item).</b> FFmpeg scene detection (threshold 0.35, showinfo parse) with
+        floor-supplement, circuit breaker 60→35, histogram-correlation dedup &gt;0.95, cap 35 — wired on the lane that produced
+        the entire v3 corpus. Residual: manifest lane still uniform; third sampler (<code>frames/extractor.py</code>) is dead code.</li>
+    <li><b>Transcripts → GENERATED (skip), diarization GAP.</b> Dedicated second Gemini call reusing the uploaded file URI;
+        no .vtt/.srt parsing anywhere; speaker labels are prompt-level only. New finding: ingest skips
+        <code>*_transcript.md</code> — generated transcripts never reach the vault.</li>
+    <li><b>Per-fact source-span grounding → GAP (confirm as real work).</b> Number cross-referencing + confidence only;
+        <code>locator</code> = unverified LLM page number with <b>zero consumers</b>; enriched facts live only in the sidecar,
+        which ingest skips. 5,046 facts in v3: 93.6% "verified" (inflated — no-number facts auto-verify), locator populated 59%.</li>
+  </ul>
+</div>
+
+<h2>Emit-side field table (join key for Audit D: [H] = handshake field)</h2>
+<div class="tbl-wrap">
+<table>
+  <tr><th>Field</th><th>Produced where</th><th class="num">Populated (of 11 sampled)</th><th>Intended consumer</th></tr>
+  <tr><td><code>source</code>, <code>type</code>, <code>title</code>, <code>date</code></td><td>extract.md.j2:2-5</td><td class="num">11</td><td><b>[H]</b> index notes.* ; <code>title</code> also ingest validation gate</td></tr>
+  <tr><td><code>source_type</code>, <code>layer</code></td><td>j2:6-7</td><td class="num">11</td><td><b>[H]</b> index + rfp_visible</td></tr>
+  <tr><td><code>domains</code> / <code>topics</code> / <code>products</code> / <code>people</code></td><td>j2:8-11</td><td class="num">11 / 11 / 10 / 6</td><td><b>[H]</b> index (comma-joined) → retrieval, coverage map</td></tr>
+  <tr><td><code>confidentiality</code></td><td>j2:12</td><td class="num">11</td><td><b>[H]</b> index</td></tr>
+  <tr><td><code>authority</code></td><td>j2:13</td><td class="num">11</td><td>none — not indexed</td></tr>
+  <tr><td><code>client</code></td><td>j2:14</td><td class="num">9</td><td><b>[H]</b> index notes.client (258/488 empty-client problem starts here)</td></tr>
+  <tr class="hl"><td><code>project</code></td><td>j2:15</td><td class="num"><b>0</b></td><td><b>[H]</b> index project_id — never populated on Lane A; project grouping dead on arrival</td></tr>
+  <tr><td><code>valid_to</code> · <code>language</code> · <code>quality</code></td><td>j2:16-18</td><td class="num">6 · 11 · 11</td><td>index (<code>quality</code> = LLM self-report; distinct from quality_score)</td></tr>
+  <tr><td><code>model</code>, <code>tokens_used</code></td><td>j2:20,23</td><td class="num">11</td><td>index — the model/tier truth that DOES survive</td></tr>
+  <tr><td><code>routing_reason</code>, <code>prompt_version</code></td><td>j2:21-22</td><td class="num">11</td><td>none (display provenance)</td></tr>
+  <tr class="hl"><td><code>quality_score</code></td><td>j2:24 (always emitted by current code)</td><td class="num"><b>1</b></td><td><b>[H]</b> ingest quality gate — no-ops when absent (~91% of March corpus)</td></tr>
+  <tr><td><code>extraction_cost_usd</code> · <code>tag_validation_warnings</code></td><td>j2:25-26</td><td class="num">1 · 0</td><td>none</td></tr>
+  <tr><td><code>source_tool</code> · <code>schema_version</code> · <code>extraction_version</code> · <code>depth</code> · <code>doc_type</code></td><td>j2:27-31</td><td class="num">11</td><td>index; <code>doc_type</code> also rfp_visible <b>[H]</b>; source_tool → writer-invariant test</td></tr>
+  <tr><td><code>key_facts</code> · <code>entities_mentioned</code></td><td>j2:32-33</td><td class="num">4 · 4</td><td>none — display only, never indexed</td></tr>
+  <tr><td><code>source_path</code> / <code>source_hash</code> / <code>source_mtime</code> / <code>extracted_at</code></td><td>j2:34-37 (freshness)</td><td class="num">11</td><td><b>[H]</b> index dedup, freshness scanner, resume-skip</td></tr>
+  <tr><td><code>tags</code> · <code>{doc_type}_overlay</code></td><td>j2:38-39</td><td class="num">11 · (when overlay)</td><td>Obsidian only / none</td></tr>
+  <tr class="hl"><td><code>trust_level</code></td><td><b>not emitted</b> — injected at ingest (extractions.py:295)</td><td class="num">n/a</td><td><b>[H]</b> index confidence + overwrite protection</td></tr>
+  <tr class="hl"><td><code>content_origin</code> / <code>source_category</code> / <code>source_locator</code> / <code>routing_confidence</code></td><td><b>not emitted</b> (manifest-only; dropped by CKE parser)</td><td class="num">0</td><td><b>phantom handshake [H]</b> — index columns exist, can never fill</td></tr>
+  <tr class="hl"><td>JSON sidecar <code>{stem}.json</code> (31 keys: enriched facts w/ verification_status + locator + polarity, overlay, freshness…)</td><td>run.py:603-654</td><td class="num">203/203</td><td><b>no consumer on the vault path</b> (ingest skips .json); intended: CPE render (wrong name+place) &amp; training-data script</td></tr>
+</table>
+</div>
+
+<h2>Backlog seeds (mirror of .md — R2 inputs)</h2>
+<div class="tbl-wrap">
+<table>
+  <tr><th>Seed</th><th>Goal (functional)</th><th>Evidence</th><th>Depends on</th><th>Size</th><th>Decision first?</th></tr>
+  <tr><td><b>E1</b> Per-fact span grounding</td><td>Facts carry quoted snippet + verified span; survive into index (R1 claim→cite)</td><td>locator unverified, 0 consumers; sidecars die at ingest</td><td>E5 verdict; prompt/schema change</td><td>M-L</td><td><b>Yes</b> — grounding design + carrier</td></tr>
+  <tr><td><b>E2</b> One extraction lane</td><td>Manifest lane gains scene-detect + transcripts, or <code>cke process</code> becomes the only lane</td><td>lane split; whole v3 corpus came from <code>process</code></td><td>E7</td><td>S-M</td><td>Yes — which lane wins</td></tr>
+  <tr><td><b>E3</b> Overnight terminal-state hardening</td><td>try/finally + janitor + per-file tier/cost write-back + staging teardown</td><td>4 stuck runs; tier=pending literal; cost averaged</td><td>—</td><td>S</td><td>No</td></tr>
+  <tr><td><b>E4</b> Kill Batch API limb</td><td>Remove batch_api + flags + orphaned batches table (or consciously revive)</td><td>0 uses; ≈$0.12 value/run; writers have 0 callers</td><td>—</td><td>S</td><td><b>Yes</b> — operator (lean: kill)</td></tr>
+  <tr><td><b>E5</b> Facts pipeline verdict</td><td>KILL (drop tables, repoint <code>corp query</code> to notes_fts) or FIX (new emitter w/ enriched facts)</td><td>3 independent breaks; 0 rows ever</td><td>—</td><td>S kill / L fix</td><td><b>Yes</b> — architect ruling</td></tr>
+  <tr><td><b>E6</b> v2.1 provenance handshake</td><td>Manifest provenance lands in frontmatter + index, or contract + columns deleted</td><td>validated-then-dropped; 4 empty columns</td><td>E2</td><td>S-M</td><td>Yes — propagate vs delete</td></tr>
+  <tr><td><b>E7</b> Lane B repair or retirement</td><td><code>corp extract</code> writes gated notes (quality gate, no sidecars, real targets, {project_id} substitution) — or retire for Lane A</td><td>literal {project_id} bug; no gates; phantom zones</td><td>vault-zone ruling (Audit D)</td><td>M</td><td><b>Yes</b> — joint w/ Audit D</td></tr>
+  <tr><td><b>E8</b> quality_score coverage</td><td>Gate actually gates: re-emit/backfill scores; threshold semantics for R2</td><td>1/11 notes scored; gate no-ops otherwise</td><td>—</td><td>S</td><td>No</td></tr>
+  <tr><td><b>E9</b> Product-scoped extraction + coverage query</td><td><code>corp extract --product</code> equivalent + runtime THIN/RICH query = the R2 loop</td><td>scopes are folders; coverage map audit-only</td><td>E7; W5 canonicalization</td><td>M</td><td>Yes — scoping mechanism</td></tr>
+  <tr><td><b>E10</b> Cost truth</td><td>Measured cost per extraction (API usage → ledger/frontmatter); budget guard live</td><td>ledger 0 callers; all figures constants/averages</td><td>—</td><td>S</td><td>No</td></tr>
+  <tr><td><b>E11</b> Transcript-to-vault carrier</td><td>Generated transcripts become searchable (stop skipping, or merge into note)</td><td>transcripts generated then stranded</td><td>E2</td><td>S-M</td><td>Yes — carrier form</td></tr>
+</table>
+</div>
+
+<p class="foot">Deep Audit C · Wave 2 · read-only · all SQLite <code>mode=ro</code> · no OneDrive traversal · evidence refs are <code>file:line</code> in corp-monorepo @ <code>b29b2a5</code>. Sequencing input: E3 + E10 are decision-free; E5 + E7 are the rulings everything else waits on; E9 is the R2 loop itself.</p>
+
+</body>
+</html>
