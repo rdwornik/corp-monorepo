@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deep Audit B — Magistrala Process Map (2026-07-05)</title>
+<style>
+  :root {
+    --bg: #fafafa; --fg: #1a1a1a; --muted: #666; --card-bg: #fff; --line: #d0d0d0;
+    --alive-bg:#e8f5e9;  --alive-bd:#2e7d32;  --alive-fg:#1b5e20;
+    --dorm-bg:#fff8e1;   --dorm-bd:#f9a825;   --dorm-fg:#7a5c00;
+    --untest-bg:#fff3e0; --untest-bd:#ef6c00; --untest-fg:#8a3d00;
+    --broken-bg:#ffebee; --broken-bd:#c62828; --broken-fg:#8e1c1c;
+    --phantom-bg:#f3e5f5;--phantom-bd:#7b1fa2;--phantom-fg:#5e1380;
+    --miss-bg:#f0f0f0;   --miss-bd:#9e9e9e;   --miss-fg:#555;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#141414; --fg:#e8e8e8; --muted:#9a9a9a; --card-bg:#1e1e1e; --line:#3a3a3a;
+      --alive-bg:#12291a;  --alive-bd:#4caf50;  --alive-fg:#a5d6a7;
+      --dorm-bg:#2b2410;   --dorm-bd:#e0b32e;   --dorm-fg:#ffe082;
+      --untest-bg:#2d1f10; --untest-bd:#fb8c00; --untest-fg:#ffcc80;
+      --broken-bg:#2d1416; --broken-bd:#ef5350; --broken-fg:#ef9a9a;
+      --phantom-bg:#261329;--phantom-bd:#ba68c8;--phantom-fg:#ce93d8;
+      --miss-bg:#242424;   --miss-bd:#757575;   --miss-fg:#bdbdbd;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:24px; background:var(--bg); color:var(--fg);
+         font:14px/1.5 "Segoe UI", system-ui, sans-serif; }
+  h1 { font-size:22px; margin:0 0 4px; }
+  h2 { font-size:17px; margin:36px 0 10px; border-bottom:1px solid var(--line); padding-bottom:4px; }
+  h3 { font-size:14px; margin:18px 0 6px; }
+  .meta { color:var(--muted); font-size:12.5px; margin-bottom:10px; }
+  .verdict { border-left:4px solid var(--broken-bd); background:var(--card-bg);
+             padding:10px 14px; margin:14px 0; font-size:14.5px; max-width:1100px; }
+  .legend { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 4px; }
+  .chip { display:inline-block; padding:2px 10px; border-radius:12px; font-size:11.5px;
+          font-weight:600; border:1.5px solid; }
+  .c-alive   { background:var(--alive-bg);   border-color:var(--alive-bd);   color:var(--alive-fg); }
+  .c-dorm    { background:var(--dorm-bg);    border-color:var(--dorm-bd);    color:var(--dorm-fg); }
+  .c-untest  { background:var(--untest-bg);  border-color:var(--untest-bd);  color:var(--untest-fg); }
+  .c-broken  { background:var(--broken-bg);  border-color:var(--broken-bd);  color:var(--broken-fg); }
+  .c-phantom { background:var(--phantom-bg); border-color:var(--phantom-bd); color:var(--phantom-fg); }
+  .c-miss    { background:var(--miss-bg);    border-color:var(--miss-bd);    color:var(--miss-fg); }
+
+  .lane-wrap { overflow-x:auto; padding-bottom:8px; }
+  .lane { display:flex; align-items:stretch; gap:0; margin:14px 0; min-width:max-content; }
+  .lane-label { writing-mode:vertical-rl; transform:rotate(180deg); text-align:center;
+                font-weight:700; font-size:12px; color:var(--muted); padding:6px 2px;
+                border-right:2px solid var(--line); margin-right:10px; letter-spacing:.04em; }
+  .stage { width:190px; flex:0 0 auto; border:1.5px solid; border-radius:8px;
+           padding:8px 10px; background:var(--card-bg); position:relative; }
+  .stage + .stage { margin-left:26px; }
+  .stage + .stage::before { content:"\2192"; position:absolute; left:-21px; top:42%;
+                            color:var(--muted); font-size:15px; }
+  .s-alive   { border-color:var(--alive-bd);   background:var(--alive-bg); }
+  .s-dorm    { border-color:var(--dorm-bd);    background:var(--dorm-bg); }
+  .s-untest  { border-color:var(--untest-bd);  background:var(--untest-bg); }
+  .s-broken  { border-color:var(--broken-bd);  background:var(--broken-bg); }
+  .s-phantom { border-color:var(--phantom-bd); background:var(--phantom-bg); }
+  .s-miss    { border-color:var(--miss-bd);    background:var(--miss-bg); }
+  .stage b { display:block; font-size:12.5px; margin-bottom:2px; }
+  .stage .st { font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
+  .stage p { margin:5px 0 0; font-size:11.5px; }
+  .stage .ref { display:block; margin-top:5px; font-size:10.5px; color:var(--muted);
+                font-family:Consolas, monospace; word-break:break-all; }
+  .gap { margin-top:4px; font-size:11px; font-style:italic; }
+
+  table { border-collapse:collapse; width:100%; max-width:1200px; background:var(--card-bg);
+          font-size:12.5px; margin:10px 0; }
+  th, td { border:1px solid var(--line); padding:5px 8px; text-align:left; vertical-align:top; }
+  th { background:var(--miss-bg); font-size:12px; }
+  td code, p code, li code { font-family:Consolas, monospace; font-size:11.5px; }
+  .tbl-wrap { overflow-x:auto; }
+  .num { text-align:right; font-variant-numeric:tabular-nums; }
+
+  .strip { display:flex; align-items:center; gap:0; overflow-x:auto; margin:12px 0; min-width:max-content; }
+  .art { flex:0 0 auto; border:1.5px dashed var(--line); border-radius:8px; padding:7px 12px;
+         background:var(--card-bg); font-size:12px; text-align:center; position:relative; }
+  .art + .art { margin-left:30px; }
+  .art + .art::before { content:"\2192"; position:absolute; left:-23px; top:36%; color:var(--muted); }
+  .art small { display:block; color:var(--muted); font-size:10.5px; margin-top:2px; }
+  footer { margin-top:36px; color:var(--muted); font-size:11.5px; border-top:1px solid var(--line); padding-top:8px; }
+</style>
+</head>
+<body>
+
+<h1>Deep Audit B — Magistrala / Capture Process Map</h1>
+<div class="meta">2026-07-05 · branch <code>docs/deep-magistrala</code> · read-only audit · companion to
+<code>2026-07-05-deep-magistrala.md</code> · baseline: Phase-1 functional audit (merged <code>2753601</code>)</div>
+
+<div class="verdict"><b>Verdict:</b> capture machinery DORMANT-but-sound; its <i>map</i> is what's broken —
+the live registry (2026-03-23) routes into the folder tree Council #24 abolished (2026-03-29), both lanes
+<code>mkdir</code> whatever it names, all identity/learning surfaces were wired 1–3 days <i>after</i> the last real run,
+and MinHash dedup is import-dead (<code>datasketch</code> never installed). Restarting without the F0 config-truth
+pass quarantines 61% of the backlog and silently re-creates the pre-#24 tree.</div>
+
+<div class="legend">
+  <span class="chip c-alive">ALIVE</span>
+  <span class="chip c-dorm">DORMANT</span>
+  <span class="chip c-untest">EXISTS-UNTESTED</span>
+  <span class="chip c-broken">BROKEN</span>
+  <span class="chip c-phantom">PHANTOM</span>
+  <span class="chip c-miss">MISSING</span>
+</div>
+
+<h2>Capture flow — inbox → zone → extract handoff (both lanes)</h2>
+
+<div class="lane-wrap">
+<div class="lane">
+  <div class="lane-label">LANE A — BATCH `corp ingest`</div>
+  <div class="stage s-dorm"><span class="st c-dorm chip">DORMANT</span><b>1 · Detect</b>
+    <p>Loose files + depth-1 folders-as-packages. Last real run 2026-03-14/15 (5 events, all into now-deleted <code>60_Source_Library</code>).</p>
+    <span class="ref">router.py:101-152</span></div>
+  <div class="stage s-miss"><span class="st c-miss chip">MISSING</span><b>2 · Dedup</b>
+    <p>SHA-256 computed then discarded — never checked. No FileRegistry, no MinHash, no <code>light_scan</code> call at all.</p>
+    <div class="gap">Seam: hash already in hand at router.py:202.</div>
+    <span class="ref">router.py:202</span></div>
+  <div class="stage s-broken"><span class="st c-broken chip">BROKEN (config)</span><b>3 · Match</b>
+    <p>Mechanism WIRED (series 0.95 → client 0.80 → rule 0.85) but live registry targets the pre-#24 tree: only 6/42 destinations exist. Folder packages matched by <b>name only</b> — both backlog folders would quarantine whole.</p>
+    <span class="ref">registry.py:71-103; router.py:404-432</span></div>
+  <div class="stage s-miss"><span class="st c-miss chip">MISSING</span><b>4 · Rename</b>
+    <p>No ADR-14 rename — files move under original names.</p>
+    <div class="gap">Seam: propose_name() is UI-free, insertable pre-move.</div>
+    <span class="ref">router.py:253,264</span></div>
+  <div class="stage s-dorm"><span class="st c-dorm chip">DORMANT</span><b>5 · Route + Record</b>
+    <p>≥0.75 route / &lt;0.75 stage / unmatched quarantine. Asset recorded <b>before</b> move (correct). Quarantine follow-ups <code>corp classify</code> + <code>finalize</code> EXISTS-UNTESTED.</p>
+    <span class="ref">router.py:204-246</span></div>
+  <div class="stage s-broken"><span class="st c-broken chip">BROKEN (drift)</span><b>6 · Move</b>
+    <p><code>shutil.move</code> + <code>mkdir(parents=True)</code> — creates ANY destination, so a v3.0-registry run re-creates the abolished <code>20_Workflows/PreSales</code>, <code>30_Reference/Product</code>, <code>40_Media</code> trees.</p>
+    <span class="ref">router.py:249-264</span></div>
+  <div class="stage s-untest"><span class="st c-untest chip">EXISTS-UNTESTED</span><b>7 · Extract handoff</b>
+    <p>Extracts routed <b>and staged</b> (low-confidence) files by default. Manifest → <code>%LOCALAPPDATA%</code> staging → <code>cke</code> subprocess.</p>
+    <span class="ref">router.py:292-312,720-810</span></div>
+</div>
+
+<div class="lane">
+  <div class="lane-label">LANE B — INTERACTIVE `ingest-inbox`</div>
+  <div class="stage s-broken"><span class="st c-broken chip">BROKEN (blind)</span><b>1 · Detect</b>
+    <p>Files only — <b>directories skipped</b>. Today it would find 0 of the 72 backlog files (all inside 2 folders).</p>
+    <span class="ref">inbox_ops.py:26-43</span></div>
+  <div class="stage s-untest"><span class="st c-untest chip">EXISTS-UNTESTED</span><b>2a · Hash dedup</b>
+    <p>FileRegistry SHA-256 check BEFORE move; skip/re-extract prompts. Wired ~2026-03-25 — after last real use (03-24). <code>files</code>=11 rows, <code>extractions</code>=0, ever.</p>
+    <span class="ref">inbox.py:200-273</span></div>
+  <div class="stage s-broken"><span class="st c-broken chip">BROKEN (dep)</span><b>2b · MinHash near-dup</b>
+    <p><code>datasketch</code> NOT in production venv; ImportError swallowed at DEBUG → silent no-op. <code>content_signatures</code>=0 forever. Wired 2026-03-27, never ran.</p>
+    <span class="ref">dedup.py:284-286; pyproject.toml:41</span></div>
+  <div class="stage s-dorm"><span class="st c-dorm chip">DORMANT</span><b>3 · Classify + Rename</b>
+    <p>Registry match (no folder_context) + ADR-14 rename. Gap: type <code>RFP</code> has no filename_hint → RFP responses rename to <code>MISC</code>.</p>
+    <span class="ref">classifier.py:63-111; renamer.py:111-180</span></div>
+  <div class="stage s-dorm"><span class="st c-dorm chip">DORMANT</span><b>4 · Route (human)</b>
+    <p>[a/e/d/c/s/q] loop; <code>--auto</code> ≥0.90; no staging/quarantine — human is the quarantine. 22 real routes ever (03-23/24); <b>12 of 22 undone</b> via <code>--undo</code>.</p>
+    <span class="ref">inbox.py:754-853</span></div>
+  <div class="stage s-untest"><span class="st c-untest chip">EXISTS-UNTESTED</span><b>5 · Record + feedback</b>
+    <p>Registers + logs AFTER move (reverse of batch). <code>routing_feedback</code> writer landed 2026-03-25 — one day after last real route. 0 rows ever.</p>
+    <span class="ref">inbox_ops.py:70-139,178-212</span></div>
+  <div class="stage s-untest"><span class="st c-untest chip">EXISTS-UNTESTED</span><b>6 · Extract handoff</b>
+    <p>Same <code>_run_extraction</code>; records to FileRegistry on success (interactive-only wrapper).</p>
+    <span class="ref">inbox.py:275-345</span></div>
+</div>
+
+<div class="lane">
+  <div class="lane-label">SHARED TAIL</div>
+  <div class="stage s-alive"><span class="st c-alive chip">ALIVE (sandbox)</span><b>8 · CKE engine</b>
+    <p>Subprocess <code>cke</code>; on PATH = True today; sandbox e2e 5/5 (2026-07-05); engine artifacts regenerated through 2026-06-16.</p>
+    <span class="ref">cke_client.py:63-73</span></div>
+  <div class="stage s-dorm"><span class="st c-dorm chip">DORMANT</span><b>9 · Vault write</b>
+    <p>Both ingest lanes hardcode <code>01_Knowledge</code>. But <code>corp extract</code>/<code>overnight</code> use routing_map's PHANTOM targets — would mkdir literal <code>02_sources/{project_id}</code>.</p>
+    <span class="ref">router.py:714,794; vault_writer.py:70-71</span></div>
+  <div class="stage s-miss"><span class="st c-miss chip">MISSING (auto)</span><b>10 · Index update</b>
+    <p>No lane triggers FTS rebuild — manual <code>corp index rebuild</code> required. Index frozen 2026-03-28.</p>
+    <span class="ref">cli/index.py:17-42</span></div>
+</div>
+</div>
+
+<h2>Config-truth table</h2>
+<div class="tbl-wrap">
+<table>
+  <tr><th>Config</th><th>Copy consumed at runtime</th><th>Status</th><th>Finding</th><th>Breaks if removed / fixed by</th></tr>
+  <tr>
+    <td><code>content_registry.yaml</code></td>
+    <td><b>MyWork/.corp</b> (v3.0, 2026-03-23) — repo copy is v1.0, two generations stale</td>
+    <td><span class="chip c-broken">BROKEN (targets)</span></td>
+    <td>Only 6/42 destinations exist post-#24 (series 0/4, rules 2/16, clients 17/22). ~55% of file (<code>destinations:</code>, <code>routing:</code>, <code>media_collocated</code>, <code>llm_escalation_threshold</code>, <code>review_destination</code>) has <b>zero code consumers</b> = PHANTOM surface. Declared priority (rules&gt;clients) contradicts coded order (clients&gt;rules).</td>
+    <td>F0-1 rewrite v4 to Council-#24 zones; <code>corp doctor</code> checks the <i>repo</i> copy (cli/system.py:75) — fix pointer</td>
+  </tr>
+  <tr>
+    <td><code>routing_map.yaml</code></td>
+    <td>MyWork/.corp (v2.0, updated 2026-03-30)</td>
+    <td><span class="chip c-phantom">PHANTOM targets</span> + wired</td>
+    <td>Phase-1 amended: NOT caller-less — <code>corp extract</code> + <code>corp overnight</code> consume it and would mkdir literal <code>02_sources/{project_id}</code>, <code>04_evergreen/_generated/*</code> in the vault (no template substitution exists). Reshape branch reads a <code>folders:</code> key the file doesn't have.</td>
+    <td>Removal breaks <code>corp extract</code> (exit 1), overnight preflight, doctor. F0-2: rewrite targets or guard the verbs</td>
+  </tr>
+  <tr>
+    <td><code>naming_config.yaml</code></td>
+    <td><b>repo config/</b> (schema/naming_config.py:18) — no .corp copy</td>
+    <td><span class="chip c-dorm">DORMANT + drift</span></td>
+    <td>22 type codes / 32 aliases vs ADR-14 body "19 / 15" — and ADR's example codes (DECK, CERT, QA, PROP) exist in no generation. <code>RFP</code> code unreachable by filename (no hint) → RFP responses rename MISC. Client vocab drifted from registry (no Rolls-Royce/Pure Health/Merz/Almajdouie aliases; auto-gens ROLLS/PUREH/MERZP).</td>
+    <td>F0-4: add RFP hint + sync aliases; ADR-14 body refresh optional</td>
+  </tr>
+  <tr>
+    <td><code>.corp/config.json</code></td>
+    <td>nothing (grep = 0)</td>
+    <td><span class="chip c-phantom">PHANTOM</span></td>
+    <td>Fossil: pre-v2 zone map (<code>30_Templates</code>, <code>90_System</code>), <code>FILL_IN</code> placeholders, 2026-03-10.</td>
+    <td>F0 cleanup (delete candidate — operator call)</td>
+  </tr>
+  <tr>
+    <td><code>.corp/solution_matrix.json</code></td>
+    <td>nothing (grep = 0)</td>
+    <td><span class="chip c-phantom">PHANTOM</span></td>
+    <td>Orphan (2026-02-19) while <code>rfp_excel_agent.py:103</code> wants missing <code>config/rfp/platform_matrix.json</code> — likely the same data under the old name.</td>
+    <td>R1 decision: rename-vs-rebuild</td>
+  </tr>
+  <tr>
+    <td>dedup extra</td>
+    <td><code>pyproject.toml:41</code> <code>dedup=["datasketch&gt;=1.6"]</code></td>
+    <td><span class="chip c-broken">BROKEN</span></td>
+    <td>Not installed in production venv (verified). MinHash silently no-ops; <code>content_signatures</code> can never gain a row.</td>
+    <td>F0-3: <code>pip install -e ".[dedup]"</code> or fold into base deps</td>
+  </tr>
+</table>
+</div>
+
+<h2>Artifact-flow strip (with lifetime row counts, ops.db read-only)</h2>
+<div class="lane-wrap">
+<div class="strip">
+  <div class="art"><b>00_Inbox</b><small>75 items · 2 folder packages<br>newest 2026-04-10</small></div>
+  <div class="art"><b>MyWork zones</b><small>7 canonical (Council #24)<br>registry names 36 phantom paths<br><code>mkdir</code>-on-move drift risk</small></div>
+  <div class="art"><b>ops.db</b><small>assets 33 · ingest_events 2,726<br>files 11 · extractions <b>0</b><br>content_signatures <b>0</b> · routing_feedback <b>0</b><br>registry_suggestions <b>0</b></small></div>
+  <div class="art"><b>%LOCALAPPDATA%/corp-by-os<br>staging/ingest/&lt;id&gt;</b><small>manifest.json → cke subprocess</small></div>
+  <div class="art"><b>CKE output</b><small>engine ALIVE (test artifacts → 2026-06-16)<br>sandbox e2e 5/5</small></div>
+  <div class="art"><b>Vault 01_Knowledge</b><small>ingest lanes hardcoded here<br>extract/overnight → PHANTOM 02_sources/…</small></div>
+  <div class="art"><b>index.db (FTS5)</b><small>frozen 2026-03-28<br>manual rebuild only</small></div>
+</div>
+</div>
+
+<h2>Backlog triage mirror (72 content files, dry-matched — zero moves)</h2>
+<div class="tbl-wrap">
+<table>
+  <tr><th>Group</th><th>Files</th><th>Dry destination</th><th>Q?</th><th>RFP</th><th>Disposition for approval</th></tr>
+  <tr><td>Rolls-Royce APS response (R1 pilot seed)</td><td class="num">1</td><td>10_Projects/Rolls_Royce_Planning (folder doesn't exist)</td><td>no</td><td><b>YES</b></td><td>Hold for R1 KB/style-store decision — no W1 routing, no extraction</td></tr>
+  <tr><td>Other RFP responses (.docx): Alfa Laval, CCI, Greencore, Pure Health, ASOS, anon template</td><td class="num">6</td><td>4× 10_Projects/{client} · 2× phantom 20_Workflows/PreSales/RFP</td><td>no</td><td>YES</td><td>Same — R1 seed set (note 91 MB CCI docx; confidentiality; active-RFP gotcha)</td></tr>
+  <tr><td>RFP/questionnaire .xlsx (BRC×4, LabelVie, 3.x set×10, RSCT×4, client-matched + misc×15)</td><td class="num">34</td><td>6 matched (4 client, 2 misrouted to "WMS product docs") · 28 → _Unmatched</td><td>82%</td><td>YES</td><td>R1 KB seed batch; BRC + LabelVie possibly ACTIVE deals — operator confirms first</td></tr>
+  <tr><td>Platform Training Feb 2026 hands-on PDFs</td><td class="num">15</td><td>30_Reference/Product/Platform (wrong: training ≠ product docs; phantom)</td><td>no</td><td>no</td><td><b>The W1 restart pilot</b> — add Training series to registry v4, route + extract + rebuild + probe</td></tr>
+  <tr><td>Training exercise payloads (xml/json/csv/xsd/trig)</td><td class="num">13</td><td>_Unmatched</td><td>YES</td><td>no</td><td>Never extract; keep with kit or archive</td></tr>
+  <tr><td>Credentials.xlsx / Participants.xlsx / Feedback.xlsx</td><td class="num">3</td><td>_Unmatched</td><td>YES</td><td>no</td><td><b>Credentials + PII — exclude from any extraction</b>; delete/keep = operator</td></tr>
+</table>
+</div>
+<p class="meta">As-is behaviour today: interactive lane sees <b>0 files</b> (all content inside folders); batch lane quarantines both folders whole on a name-only match. Per-file: 28/72 match, 44 (61%) quarantine, and every matched non-project destination is a phantom zone.</p>
+
+<h2>Backlog-seed mirror</h2>
+<div class="tbl-wrap">
+<table>
+  <tr><th>Seed</th><th>Goal</th><th>Depends on</th><th>Size</th><th>Decision first?</th></tr>
+  <tr><td>F0-1 Registry v4 rewrite</td><td>Routes only into Council-#24 zones; dry-run match-rate &gt;80%</td><td>—</td><td>M</td><td>Yes — keep/kill PreSales &amp; Media sub-zones</td></tr>
+  <tr><td>F0-2 routing_map fate</td><td><code>corp extract</code>/<code>overnight</code> can't split the vault</td><td>—</td><td>S</td><td>Yes — rewrite vs guard</td></tr>
+  <tr><td>F0-3 dedup dep + parity seams</td><td>Batch gains hash-dedup + rename; MinHash actually runs</td><td>F0-1</td><td>M</td><td>Lane-choice ruling (Phase-1 Q5)</td></tr>
+  <tr><td>F0-4 naming sync</td><td>RFP hint; aliases match registry; doctor checks live copy</td><td>—</td><td>S</td><td>No</td></tr>
+  <tr><td>W1 restart pilot (training kit)</td><td>15 PDFs routed → extracted → indexed → retrievable</td><td>F0-1..4</td><td>S-M</td><td>Rows 10–11 exclusion approved</td></tr>
+  <tr><td>R1-seed RFP corpus custody</td><td>41-file curated corpus feeds R1 KB design, not scattered by W1</td><td>R1 KB architecture decision</td><td>decision-only</td><td><b>Yes — blocks any touch of raw/</b></td></tr>
+  <tr><td>Config split-brain close-out</td><td>One source per config; fossils resolved (config.json, solution_matrix vs platform_matrix)</td><td>F0-1/2</td><td>S</td><td>Yes (platform_matrix rename-vs-rebuild)</td></tr>
+  <tr><td>Backlog hygiene</td><td>_Review, March triage infra, _Unmatched leftovers cleared</td><td>W1 restart done</td><td>S</td><td>Yes (deletions)</td></tr>
+</table>
+</div>
+
+<footer>Deep Audit B (Wave 2) · 2026-07-05 · read-only: no pipeline execution, no moves, no config edits; SQLite mode=ro; no OneDrive traversal.
+Full evidence and per-file triage: <code>docs/audits/2026-07-05-deep-magistrala.md</code>.</footer>
+
+</body>
+</html>
