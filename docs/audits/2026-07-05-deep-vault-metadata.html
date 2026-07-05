@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deep Audit D — Vault + Metadata Chain (2026-07-05)</title>
+<style>
+  :root{
+    --alive:#1a7f37; --alive-bg:#e6f4ea;
+    --dormant:#9a6700; --dormant-bg:#fff8c5;
+    --untested:#bc4c00; --untested-bg:#fff1e5;
+    --broken:#cf222e; --broken-bg:#ffebe9;
+    --phantom:#8250df; --phantom-bg:#fbefff;
+    --missing:#57606a; --missing-bg:#f0f2f5;
+    --ink:#1f2328; --muted:#57606a; --line:#d0d7de; --bg:#ffffff; --card:#f6f8fa;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:32px 24px 64px;font:15px/1.55 system-ui,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);max-width:1180px;margin-inline:auto}
+  h1{font-size:24px;margin:0 0 4px}
+  h2{font-size:19px;margin:44px 0 10px;border-bottom:2px solid var(--line);padding-bottom:6px}
+  h3{font-size:15.5px;margin:24px 0 8px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:14px}
+  .verdict{background:var(--card);border-left:5px solid var(--broken);padding:12px 16px;border-radius:0 8px 8px 0;font-size:15px;margin:18px 0}
+  .verdict b{color:var(--broken)}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+  .chip{font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;border:1px solid}
+  .c-alive{color:var(--alive);background:var(--alive-bg);border-color:var(--alive)}
+  .c-dormant{color:var(--dormant);background:var(--dormant-bg);border-color:var(--dormant)}
+  .c-untested{color:var(--untested);background:var(--untested-bg);border-color:var(--untested)}
+  .c-broken{color:var(--broken);background:var(--broken-bg);border-color:var(--broken)}
+  .c-phantom{color:var(--phantom);background:var(--phantom-bg);border-color:var(--phantom)}
+  .c-missing{color:var(--missing);background:var(--missing-bg);border-color:var(--missing)}
+  /* chain flow */
+  .flowwrap{overflow-x:auto;padding-bottom:8px}
+  .flow{display:flex;align-items:stretch;gap:0;min-width:1080px;margin:12px 0}
+  .stage{flex:1;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--card);position:relative;min-width:160px}
+  .stage h4{margin:0 0 2px;font-size:13.5px}
+  .stage .st{font-size:11px;font-weight:700;letter-spacing:.04em}
+  .stage ul{margin:6px 0 0;padding-left:16px;font-size:12px;color:var(--muted)}
+  .stage li{margin:3px 0}
+  .stage li.bad{color:var(--broken)}
+  .arrow{align-self:center;padding:0 4px;color:var(--muted);font-size:20px;flex:0 0 auto}
+  .s-dormant{border-color:var(--dormant);background:var(--dormant-bg)}
+  .s-broken{border-color:var(--broken);background:var(--broken-bg)}
+  .s-alive{border-color:var(--alive);background:var(--alive-bg)}
+  /* tables */
+  .twrap{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:13px;margin:10px 0}
+  th,td{border:1px solid var(--line);padding:5px 9px;text-align:left;vertical-align:top}
+  th{background:var(--card);font-size:12px}
+  td.v{font-weight:700;white-space:nowrap}
+  tr.live td.v{color:var(--alive)} tr.live{background:var(--alive-bg)}
+  tr.dead td.v{color:var(--missing)} tr.dead{background:#fafbfc}
+  tr.phantom td.v{color:var(--phantom)} tr.phantom{background:var(--phantom-bg)}
+  tr.broken td.v{color:var(--broken)} tr.broken{background:var(--broken-bg)}
+  tr.dormantr td.v{color:var(--dormant)} tr.dormantr{background:var(--dormant-bg)}
+  code{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:0 4px;font-size:12.5px}
+  /* census nested lists */
+  .sunburst{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin:12px 0}
+  .ring{border:1.5px solid var(--line);border-radius:10px;padding:12px 16px;background:var(--card)}
+  .ring h4{margin:0 0 6px;font-size:14px}
+  .ring ul{margin:0;padding-left:18px;font-size:13px}
+  .ring ul ul{font-size:12.5px;color:var(--muted)}
+  .n{font-weight:700;font-variant-numeric:tabular-nums}
+  .bar{height:9px;border-radius:5px;background:#dde2e8;overflow:hidden;margin:3px 0 8px}
+  .bar>span{display:block;height:100%}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;margin:12px 0}
+  .kcard{border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--card)}
+  .kcard .big{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
+  .kcard .lbl{font-size:12px;color:var(--muted)}
+  .kcard.red{border-color:var(--broken);background:var(--broken-bg)} .kcard.red .big{color:var(--broken)}
+  .kcard.amber{border-color:var(--dormant);background:var(--dormant-bg)} .kcard.amber .big{color:var(--dormant)}
+  .kcard.green{border-color:var(--alive);background:var(--alive-bg)} .kcard.green .big{color:var(--alive)}
+  .kcard.purple{border-color:var(--phantom);background:var(--phantom-bg)} .kcard.purple .big{color:var(--phantom)}
+  .foot{margin-top:40px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:10px}
+</style>
+</head>
+<body>
+
+<h1>Deep Audit D — Vault + Metadata Chain</h1>
+<div class="sub">Wave 2 · 2026-07-05 · branch <code>docs/deep-vault</code> · read-only (SQLite <code>mode=ro</code>, no OneDrive access, Obsidian never launched) · companion to <code>2026-07-05-deep-vault-metadata.md</code></div>
+
+<div class="verdict"><b>Verdict:</b> the chain works end-to-end for <b>six fields</b>; the vault fails its own written contract <b>813/813</b> (fixable to 87% with two mechanical repairs); the link tree is <b>0% built</b> (all navigation is dataview, invisible to the link graph); and the effective RFP-answerable corpus is <b>39 notes, not 182</b> — every major defect is mechanical and enumerated.</div>
+
+<div class="legend">
+  <span class="chip c-alive">ALIVE</span><span class="chip c-dormant">DORMANT</span><span class="chip c-untested">EXISTS-UNTESTED</span><span class="chip c-broken">BROKEN</span><span class="chip c-phantom">PHANTOM</span><span class="chip c-missing">MISSING</span>
+</div>
+
+<h2>1 · Metadata chain — stage map</h2>
+<div class="flowwrap"><div class="flow">
+  <div class="stage s-dormant">
+    <h4>CKE extract + post-process</h4>
+    <span class="st" style="color:var(--dormant)">DORMANT</span>
+    <ul>
+      <li>emits 30+ fields; normalize + validate (Pydantic) runs here — the only place it runs</li>
+      <li class="bad">Jinja template then renames <code>source_file</code>→<code>source</code>, drops <code>summary</code> to body — betrays its own validator</li>
+      <li>frozen since 2026-03-27</li>
+    </ul>
+  </div><div class="arrow">→</div>
+  <div class="stage s-broken">
+    <h4>Schema gate at ingest</h4>
+    <span class="st" style="color:var(--broken)">BROKEN (bypassed)</span>
+    <ul>
+      <li class="bad"><code>validate_frontmatter</code> never called on the ingest path</li>
+      <li>real gate = title-present + quality_score ≥ 25 (quarantined 22)</li>
+      <li class="bad">client known from <code>projects/{client}/</code> staging path — computed, then dropped</li>
+      <li>injects <code>trust_level: extracted</code></li>
+    </ul>
+  </div><div class="arrow">→</div>
+  <div class="stage s-dormant">
+    <h4>Vault (Obsidian)</h4>
+    <span class="st" style="color:var(--dormant)">DORMANT</span>
+    <ul>
+      <li>850 .md · 813 knowledge notes, flat (Council #7 ✓)</li>
+      <li class="bad">S1 contract pass rate 0% · 100% orphans</li>
+      <li class="bad">326 tombstones (deprecated) in-place</li>
+      <li>MOCs = dataview queries — zero link edges</li>
+    </ul>
+  </div><div class="arrow">→</div>
+  <div class="stage s-dormant">
+    <h4>index.db build</h4>
+    <span class="st" style="color:var(--dormant)">DORMANT</span>
+    <ul>
+      <li>30 columns · 488 rows · frozen 2026-03-28</li>
+      <li class="bad"><code>confidence</code> column stores <code>trust_level</code></li>
+      <li class="bad">lists stored comma-joined, read back expecting JSON → embedded-comma terms split</li>
+      <li>source_hash dedup removed 325 rows; computes <code>rfp_visible</code></li>
+    </ul>
+  </div><div class="arrow">→</div>
+  <div class="stage s-dormant">
+    <h4>Retrieval</h4>
+    <span class="st" style="color:var(--dormant)">DORMANT</span>
+    <ul>
+      <li>FTS5 + filters: client/products/domains/topics/source_type/type/rfp_only</li>
+      <li>excludes <code>deprecated</code> by default</li>
+      <li class="bad">effective RFP corpus after filter: <b>39 / 488</b></li>
+      <li>re-reads frontmatter per hit → key_facts &amp; overlays… then discards them</li>
+    </ul>
+  </div><div class="arrow">→</div>
+  <div class="stage s-dormant">
+    <h4>Answer context (prep / rfp)</h4>
+    <span class="st" style="color:var(--dormant)">DORMANT</span>
+    <ul>
+      <li>LLM sees: title · client · source_type · topics[:5] · products[:3] · body (2k cap/note)</li>
+      <li class="bad">nothing else survives — 30+ fields in, 6 out</li>
+    </ul>
+  </div>
+</div></div>
+
+<h2>2 · Field-survival table</h2>
+<div class="sub">Fill = non-empty /813 knowledge notes on disk. LIVE = reaches a filter or the answer; DEAD = produced, never consumed; PHANTOM = defined, never produced; BROKEN = a transform loses it.</div>
+<div class="twrap">
+<table>
+<tr><th>Field</th><th>Fill</th><th>Validated?</th><th>Vault?</th><th>Indexed?</th><th>Consumed by</th><th>Verdict</th></tr>
+<tr class="live"><td>title</td><td>813</td><td>required</td><td>✓</td><td>col+FTS</td><td>rank · citation · answer</td><td class="v">LIVE</td></tr>
+<tr class="live"><td>topics</td><td>770</td><td>max-8 warn</td><td>✓</td><td>col+FTS</td><td>filter · answer [:5]</td><td class="v">LIVE</td></tr>
+<tr class="live"><td>products</td><td>688</td><td>max-4 warn</td><td>✓</td><td>col+FTS</td><td>filter+expansion · answer [:3]</td><td class="v">LIVE ⚠ uncanonicalized</td></tr>
+<tr class="live"><td>client</td><td>440</td><td>—</td><td>✓</td><td>col+FTS</td><td>filter+aliases · citation · answer</td><td class="v">LIVE ⚠ 258/488 empty</td></tr>
+<tr class="live"><td>source_type</td><td>813</td><td>enum — 66 fail</td><td>✓</td><td>col</td><td>rfp_visible · filter · citation</td><td class="v">LIVE ⚠ enum drift</td></tr>
+<tr class="live"><td>trust_level</td><td>813</td><td><b>'deprecated' not an allowed value</b> (321)</td><td>✓</td><td>as <code>confidence</code></td><td>deprecated-filter · rank boost · rfp_visible · vault_adapter</td><td class="v">LIVE — most load-bearing</td></tr>
+<tr class="live"><td>type</td><td>813</td><td>enum — 80 fail</td><td>✓</td><td>col</td><td>type filter</td><td class="v">LIVE ⚠ enum drift</td></tr>
+<tr class="live"><td>doc_type</td><td>773</td><td>free-text</td><td>✓</td><td>col+FTS</td><td>rfp_visible · overlay select · MOC dataview</td><td class="v">LIVE (1 malformed)</td></tr>
+<tr class="live"><td>source_hash</td><td>778</td><td>—</td><td>✓</td><td>col</td><td>index dedup (325 rows)</td><td class="v">LIVE at index</td></tr>
+<tr class="live"><td>quality_score</td><td>253</td><td><b>unknown field</b></td><td>✓</td><td>—</td><td>ingest quality gate</td><td class="v">LIVE at ingest</td></tr>
+<tr class="live"><td>confidentiality</td><td>812</td><td>enum</td><td>✓</td><td>col</td><td>rfp_visible rule</td><td class="v">LIVE (99% default)</td></tr>
+<tr class="live"><td>project · date</td><td>250 · 812</td><td>—</td><td>✓</td><td>col</td><td>project filter · timeline</td><td class="v">LIVE (weak)</td></tr>
+<tr class="broken"><td>source_file</td><td>0 on disk</td><td>required</td><td><b>renamed → source</b></td><td>—</td><td>—</td><td class="v">BROKEN — 813/813 contract fail</td></tr>
+<tr class="broken"><td>summary</td><td>0 in fm</td><td>warn-if-missing</td><td><b>moved to body</b></td><td>—</td><td>(body survives)</td><td class="v">BROKEN (benign)</td></tr>
+<tr class="broken"><td>source_path</td><td>778</td><td>—</td><td>✓</td><td>col</td><td>freshness scanners (never run)</td><td class="v">BROKEN data — 69/488 resolve</td></tr>
+<tr class="dead"><td>key_facts</td><td>592</td><td>list[str]</td><td>✓</td><td>—</td><td>read per query, then discarded; facts table 0 rows ever</td><td class="v">DEAD</td></tr>
+<tr class="dead"><td>*_overlay (9 kinds)</td><td>434</td><td>unknown fields</td><td>✓</td><td>—</td><td>collected into overlay_data, never read by prep/rfp</td><td class="v">DEAD</td></tr>
+<tr class="dead"><td>entities_mentioned</td><td>589</td><td>—</td><td>✓</td><td>—</td><td>—</td><td class="v">DEAD</td></tr>
+<tr class="dead"><td>tags</td><td>445</td><td>informational</td><td>✓</td><td>—</td><td>Obsidian tag pane only</td><td class="v">DEAD in-chain</td></tr>
+<tr class="dead"><td>source · schema_version · source_tool · layer · authority · language · quality · model · tokens_used · routing_reason · prompt_version · extraction_cost_usd · tag_validation_warnings · extraction_version · depth · duration_min · people · rebuild_status</td><td>137–812</td><td>mixed</td><td>✓</td><td>partial</td><td>none on any answering path</td><td class="v">DEAD (18 fields)</td></tr>
+<tr class="dead"><td>valid_to</td><td>173</td><td>—</td><td>✓</td><td>col</td><td><b>no staleness gate exists</b></td><td class="v">DEAD (wanted by target design)</td></tr>
+<tr class="dormantr"><td>source_mtime</td><td>778</td><td>—</td><td>✓</td><td>—</td><td>freshness scanner (N3, never run)</td><td class="v">DORMANT</td></tr>
+<tr class="phantom"><td>content_origin · source_category · source_locator · routing_confidence</td><td>0</td><td>schema v2.1</td><td>never</td><td>4 empty cols</td><td>—</td><td class="v">PHANTOM (routing block)</td></tr>
+<tr class="phantom"><td>needs_review · last_verified · tool_meta · confidence (float)</td><td>0</td><td>schema fields</td><td>never</td><td>—</td><td>overnight CLI expects needs_review</td><td class="v">PHANTOM</td></tr>
+<tr class="live"><td>rfp_visible (derived)</td><td>—</td><td>n/a</td><td>n/a</td><td>col</td><td>rfp_only filter</td><td class="v">LIVE ⚠ 143/182 are deprecated</td></tr>
+</table>
+</div>
+
+<h2>3 · Vault census — 850 fully accounted</h2>
+<div class="sunburst">
+  <div class="ring">
+    <h4>Ring 1 · zones (850 .md)</h4>
+    <ul>
+      <li><span class="n">813</span> 01_Knowledge (flat ✓ Council #7)</li>
+      <li><span class="n">22</span> _quarantine (20 quality_fragment, 2 score&lt;25)</li>
+      <li><span class="n">9</span> 02_Navigate (MOCs — all dataview)</li>
+      <li><span class="n">2</span> 99_System · <span class="n">1</span> 00_Home · <span class="n">1</span> root CLAUDE.md · <span class="n">2</span> .claude/</li>
+      <li><span class="n">0</span> _assets .md (11 cover PNGs) · <b>no 02_sources/ zone exists</b> (ADR-27 names a phantom)</li>
+    </ul>
+  </div>
+  <div class="ring">
+    <h4>Ring 2 · the 850 vs 488 delta — exact</h4>
+    <div class="bar"><span style="width:57.5%;background:var(--alive)"></span></div>
+    <ul>
+      <li><span class="n">488</span> indexed (post-dedup)</li>
+      <li><span class="n">325</span> dedup losers — same <code>source_hash</code> as an indexed winner (v2/v3 double-extraction residue; files still on disk)</li>
+      <li><span class="n">22</span> quarantine · <span class="n">12</span> navigation/home/system · <span class="n">1</span> parse-fail (vault CLAUDE.md)</li>
+      <li>= <span class="n">848</span> note universe ✓ (+2 .claude rules = 850). No mystery residue.</li>
+    </ul>
+  </div>
+  <div class="ring">
+    <h4>Ring 3 · trust_level on disk (835 fm-parsed)</h4>
+    <div class="bar"><span style="width:60.7%;background:var(--alive);float:left"></span><span style="width:39%;background:var(--broken);float:left"></span></div>
+    <ul>
+      <li><span class="n">507</span> extracted</li>
+      <li><span class="n">326</span> deprecated — 291 source_inaccessible + 35 source_missing (de-facto S3 tombstones, in-place)</li>
+      <li><span class="n">2</span> draft</li>
+    </ul>
+  </div>
+  <div class="ring">
+    <h4>Ring 4 · index lifecycle × rfp_visible (488)</h4>
+    <ul>
+      <li>rfp_visible=1: <span class="n">182</span> → <span class="n">143</span> deprecated + <span class="n">39</span> extracted</li>
+      <li>rfp_visible=0: <span class="n">306</span></li>
+      <li><b>Effective RFP corpus after deprecated-filter: <span class="n">39</span> notes (8%)</b></li>
+    </ul>
+  </div>
+</div>
+
+<h2>4 · Link-graph baseline (from files; app never opened)</h2>
+<div class="cards">
+  <div class="kcard red"><div class="big">813 / 813</div><div class="lbl">knowledge notes with ZERO incoming links (100% orphans)</div></div>
+  <div class="kcard red"><div class="big">0</div><div class="lbl">notes reachable from the MOC spine — all 9 MOCs are dataview queries, zero link edges</div></div>
+  <div class="kcard amber"><div class="big">8,262</div><div class="lbl">unresolved link instances across 787 targets (auto-generated <b>Links:</b> lines)</div></div>
+  <div class="kcard green"><div class="big">78%</div><div class="lbl">of dangling links point at just 30 taxonomy hubs — the spine is already named; ~30–80 hub notes convert orphan graph → 2-hop tree</div></div>
+</div>
+
+<h2>5 · S0–S3 mapping snapshot (today)</h2>
+<div class="twrap">
+<table>
+<tr><th>State</th><th>Qualifying today</th><th>Blockers / evidence</th></tr>
+<tr class="dead"><td><b>S0 RAW</b> (&lt;48h)</td><td class="v">0</td><td>no capture since 2026-03-27; inbox inflow stopped 2026-04-10 (75-file backlog); a 48h SLA with no running mechanism is dead on arrival</td></tr>
+<tr class="broken"><td><b>S1 STRUCTURED</b> (contract as written)</td><td class="v">0 / 813 (0%)</td><td>source_file rename ×813 · type enum ×80 · source_type enum ×66 · quality enum ×43 · cardinality ×3 · bad key_facts ×1</td></tr>
+<tr class="dormantr"><td>S1 after 2 mechanical fixes</td><td class="v">704 / 813 (87%)</td><td>alias source→source_file + map off-enum type (measured in-memory)</td></tr>
+<tr class="live"><td>S1 after full enum-mapping table</td><td class="v">~809 / 813 (99%+)</td><td>residual: cardinality + malformed key_facts singletons</td></tr>
+<tr class="broken"><td><b>S2 CONSOLIDATED</b></td><td class="v">0 / 813 (0%)</td><td>0 MOC-reachable · 0 incoming links · 8,262 unresolved</td></tr>
+<tr class="phantom"><td><b>S3 ARCHIVED</b></td><td class="v">0 formal · 326 de-facto</td><td>deprecated tombstones sitting in 01_Knowledge; 143 leak into rfp_visible=1; 'deprecated' not in schema allowed values</td></tr>
+</table>
+</div>
+
+<h2>6 · Hygiene scope</h2>
+<div class="cards">
+  <div class="kcard amber"><div class="big">258</div><div class="lbl"><b>H1 clientless</b> (53% of index) · 202 (78%) deterministically recoverable (31 tag/project · 63 source_path · 108 filename/title) · 141 are source-library notes where client-free is <i>correct</i> · 210 overlap with H3 — triage tombstones first</div></div>
+  <div class="kcard green"><div class="big">2 + 6</div><div class="lbl"><b>H2 mojibake</b> · complete population: WÃ¼rth→Würth (1v2), Å»abka→Żabka (1v1) index pairs; 6 notes on disk · deterministic latin-1→UTF-8 repair · XS</div></div>
+  <div class="kcard red"><div class="big">326</div><div class="lbl"><b>H3 deprecated/source-lost</b> · 0 sources resolve at recorded path today · 63 findable by basename in MyWork (re-linkable) · 203 locally gone · 21 excluded-zone · decision: archive vs delete</div></div>
+  <div class="kcard amber"><div class="big">1 + 189</div><div class="lbl"><b>H4 literals</b> · 1 malformed type (<code>meeting|presentation|rfp|documentation</code>) · 189 off-enum values (type 80, source_type 66, quality 43) — one mapping table fixes all, same fix as S1 87%→99%</div></div>
+  <div class="kcard red"><div class="big">14%</div><div class="lbl"><b>H5 provenance rot</b> · source resolves for 69/488 indexed (219 missing · 165 excluded-zone · 35 empty) — the floor under any claim→cite verification</div></div>
+</div>
+
+<h2>7 · Taxonomy canonicalization (W5)</h2>
+<div class="cards">
+  <div class="kcard"><div class="big">1,975</div><div class="lbl">product-term instances · 322 distinct terms · 688 notes</div></div>
+  <div class="kcard green"><div class="big">62%</div><div class="lbl">already resolve via existing alias machinery (21 terms)</div></div>
+  <div class="kcard amber"><div class="big">744</div><div class="lbl">unresolved instances / 301 terms · ≈270 are non-BY tech leakage (Azure 177, Snowflake 36, SAP…) → move to entities, not canonicalize</div></div>
+  <div class="kcard green"><div class="big">~80</div><div class="lbl">real alias rows needed (+ drop/move list) — not 300; ~240 singletons go to review-or-drop</div></div>
+</div>
+<p><b>Seam evidence:</b> enforce at <b>index build</b> now — the single choke point all consumers read; retro-fixes all 813 notes on one rebuild with zero vault writes; <code>resolve_product_key</code> exists and has <b>zero call sites</b> today. Extraction-side aliases already failed once (unbounded LLM variance); ingest-gate becomes the enforcement point when the S1 promotion job exists. Also: store list columns as JSON — the reader already prefers it; fixes the embedded-comma term splitting.</p>
+
+<h2>8 · Operating-model grades (inputs, not decisions)</h2>
+<div class="twrap">
+<table>
+<tr><th>Element</th><th>Grade</th><th>Core evidence</th></tr>
+<tr class="dormantr"><td>1 · Tree in links, flat folders, ≤3 hops</td><td class="v">AMEND</td><td>flat-folders HOLDS (96% in one zone); link-tree 0% exists — but 78% of dangling links name 30 hubs: generate the spine from the taxonomy; MOCs must gain static links (dataview is invisible to every link audit)</td></tr>
+<tr class="dormantr"><td>2 · S0–S3 state machine, 48h S0 SLA</td><td class="v">AMEND</td><td>contract 0% passable as written — reconcile template↔model first (0→87→99% measured); add 'deprecated'/S3 to schema; 48h SLA only with a scheduled enforcement job (capture dead 3 months)</td></tr>
+<tr class="live"><td>3 · Promotion = CC job, hard gates</td><td class="v">RATIFY w/ dependency</td><td>best-supported element: only scheduled automation survived on this estate (N5); every passive loop died with 0 rows; gates need element-2 repair or they reject 100% and get bypassed like validate_frontmatter was</td></tr>
+<tr class="live"><td>4 · Obsidian CLI as mechanical layer</td><td class="v">RATIFY (EXISTS-UNTESTED)</td><td>app 1.12.4 installed, <code>Obsidian.com</code> CLI shim on PATH (never executed — policy); caveat: CLI link-audits blind to dataview until element 1 lands; kepano/obsidian-skills = later CC layer, not installed</td></tr>
+<tr class="dormantr"><td>5 · measure → spine → gate → backfill</td><td class="v">AMEND</td><td>insert S3-triage + dedup-loser disposition BEFORE backfill: real backfill universe ≈ 487 live notes (850 − 325 dupes − 326 tombstones − 22 quarantine), 87% S1-passable after mechanical fixes</td></tr>
+<tr class="phantom"><td>Omitted: index.db/Bases · S3×rfp_visible · migration cost</td><td class="v">MUST-ADD</td><td>index.db is the only answering surface (model must declare it a derived cache, rebuilt per transition); S3 must force rfp_visible=0 (143 leak today); migration ≈ all XS–M, no L items — risk is ordering, not size</td></tr>
+</table>
+</div>
+
+<h2>9 · Backlog seeds (mirror)</h2>
+<div class="twrap">
+<table>
+<tr><th>Seed</th><th>Goal</th><th>Size</th><th>Decision first?</th></tr>
+<tr><td><b>V1</b> Contract reconciliation</td><td>template↔model agree on source_file; enum maps; 'deprecated' modeled → S1 passable (0→99%)</td><td>XS–S</td><td><b>Yes</b> — which side wins the rename</td></tr>
+<tr><td><b>V2</b> S3 tombstone sweep</td><td>326 archived formally; rfp_visible=0 forced at index build</td><td>S</td><td><b>Yes</b> — archive vs delete; 63 re-linkable sources</td></tr>
+<tr><td><b>V3</b> Dedup-loser disposition</td><td>325 duplicate files resolved; disk truth = index truth</td><td>XS</td><td><b>Yes</b> — deletion approval</td></tr>
+<tr><td><b>V4</b> Client backfill</td><td>202 deterministic recoveries; client:null valid for library zones</td><td>S</td><td>No (after V2)</td></tr>
+<tr><td><b>V5</b> Mojibake repair</td><td>2 pairs + 6 notes, latin-1→UTF-8 round trip</td><td>XS</td><td>No</td></tr>
+<tr><td><b>W5</b> Product canonicalization</td><td>~80 aliases + drop/move list; enforce at index build; JSON list columns</td><td>M</td><td><b>Yes</b> — seam ruling</td></tr>
+<tr><td><b>OM1</b> Spine generation</td><td>30–80 hub notes from dangling-link taxonomy; MOCs gain static links</td><td>S–M</td><td>Ratify elem. 1</td></tr>
+<tr><td><b>OM2</b> Promotion job</td><td>scheduled S0→S1→S2 validator job — first mechanism-held vault loop</td><td>M</td><td>Ratify elems. 2+3</td></tr>
+<tr><td><b>OM3</b> Answer-layer uplift</td><td>stop discarding key_facts/overlays — or stop paying to extract them (join Audit C)</td><td>M</td><td>Architect (R1)</td></tr>
+<tr><td><b>OM4</b> Index-in-the-model</td><td>index.db declared derived cache; rebuild wired into every transition</td><td>XS+S</td><td>Ratification</td></tr>
+</table>
+</div>
+
+<div class="foot">Deep Audit D · 2026-07-05 · read-only throughout — index.db <code>mode=ro</code>; zero vault writes; zero OneDrive reads/traversal; Obsidian never launched, CLI never executed. Full evidence and appendix note-lists in <code>2026-07-05-deep-vault-metadata.md</code>.</div>
+
+</body>
+</html>
