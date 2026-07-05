@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deep Audit A — RFP Process Map (2026-07-05)</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1c2430; --muted:#5b6675; --line:#d8dde4;
+    --alive:#2e9e5b; --alive-bg:#e3f4ea;
+    --dormant:#b8860b; --dormant-bg:#faf2d8;
+    --untested:#d9702a; --untested-bg:#fdeadb;
+    --broken:#c43d3d; --broken-bg:#fbe3e3;
+    --phantom:#7d4fb3; --phantom-bg:#efe6fa;
+    --missing:#6b7480; --missing-bg:#e8eaee;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#14181e; --card:#1e242c; --ink:#e6eaef; --muted:#9aa5b1; --line:#333c47;
+      --alive-bg:#1d3527; --dormant-bg:#38301180; --untested-bg:#3d281680;
+      --broken-bg:#3d1d1d; --phantom-bg:#2c2138; --missing-bg:#272c33;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px;background:var(--bg);color:var(--ink);
+       font:14px/1.5 "Segoe UI",system-ui,sans-serif}
+  h1{font-size:22px;margin:0 0 4px}
+  h2{font-size:16px;margin:34px 0 10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+  .sub{color:var(--muted);margin:0 0 10px}
+  .verdict{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--untested);
+           border-radius:8px;padding:12px 16px;max-width:1100px}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 4px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .lane{margin:18px 0 6px}
+  .lane h3{font-size:13px;margin:0 0 8px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .flow{display:flex;gap:0;overflow-x:auto;padding-bottom:10px;align-items:stretch}
+  .card{min-width:172px;max-width:172px;background:var(--card);border:1px solid var(--line);
+        border-top:4px solid var(--missing);border-radius:8px;padding:9px 11px;flex:0 0 auto}
+  .card .st{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+  .card h4{margin:2px 0 4px;font-size:13px}
+  .card p{margin:0;font-size:11.5px;color:var(--muted)}
+  .card code{font-size:10.5px}
+  .arrow{flex:0 0 auto;align-self:center;color:var(--muted);padding:0 5px;font-size:15px}
+  .s-alive   {border-top-color:var(--alive)}   .s-alive .st{color:var(--alive)}
+  .s-dormant {border-top-color:var(--dormant)} .s-dormant .st{color:var(--dormant)}
+  .s-untested{border-top-color:var(--untested)}.s-untested .st{color:var(--untested)}
+  .s-broken  {border-top-color:var(--broken)}  .s-broken .st{color:var(--broken)}
+  .s-phantom {border-top-color:var(--phantom)} .s-phantom .st{color:var(--phantom)}
+  .s-missing {border-top-color:var(--missing)} .s-missing .st{color:var(--missing)}
+  .b-alive{background:var(--alive)} .b-dormant{background:var(--dormant)}
+  .b-untested{background:var(--untested)} .b-broken{background:var(--broken)}
+  .b-phantom{background:var(--phantom)} .b-missing{background:var(--missing)}
+  .tablewrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:8px}
+  table{border-collapse:collapse;width:100%;min-width:900px;font-size:12.5px}
+  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  code{background:var(--missing-bg);padding:1px 4px;border-radius:4px;font-size:11.5px;
+       font-family:Consolas,monospace;word-break:break-all}
+  .pill{display:inline-block;padding:1px 8px;border-radius:10px;font-size:10.5px;font-weight:700;
+        color:#fff;white-space:nowrap}
+  .stores{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+  .store{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px;
+         min-width:220px;flex:1 1 220px}
+  .store b{font-size:13px}
+  .store p{margin:4px 0 0;font-size:12px;color:var(--muted)}
+  .strip{display:flex;overflow-x:auto;gap:0;align-items:stretch;margin-top:8px}
+  .strip .card{min-width:190px;max-width:190px;border-top-width:3px}
+  .note{font-size:12px;color:var(--muted);max-width:1100px}
+  .warn{color:var(--broken);font-weight:600}
+</style>
+</head>
+<body>
+
+<h1>Deep Audit A — RFP Process (D3)</h1>
+<p class="sub">Wave 2 read-only audit · 2026-07-05 · branch <code>worktree-cm-deep-rfp</code> · companion to <code>2026-07-05-deep-rfp.md</code></p>
+<div class="verdict"><b>Verdict:</b> two disjoint, never-run RFP stacks are a salvageable parts bin around a retrieval core whose <b>effective answer pool is 39 notes</b> (143 of 182 RFP-visible notes are deprecated); the 1,329-file KB is reachable by <b>zero code</b> today, yet a <b>tested index-time federation switch</b> (<code>INDEX_EXTRA_ROOTS</code>) already exists — it just implements the approach ADR-22 rejected, so federate-vs-merge is a live decision, not a build gap. Of the 9 target stages: 4 wire-up, 5 genuinely greenfield.</div>
+
+<div class="legend">
+  <span><i class="dot b-alive"></i>ALIVE</span>
+  <span><i class="dot b-dormant"></i>DORMANT</span>
+  <span><i class="dot b-untested"></i>EXISTS-UNTESTED</span>
+  <span><i class="dot b-broken"></i>BROKEN</span>
+  <span><i class="dot b-phantom"></i>PHANTOM</span>
+  <span><i class="dot b-missing"></i>MISSING</span>
+</div>
+
+<h2>Current lane 1 — Stack A: <code>corp rfp answer</code> (console Q&amp;A)</h2>
+<div class="lane"><div class="flow">
+  <div class="card s-untested"><div class="st">EXISTS-UNTESTED</div><h4>CLI entry</h4><p>question + <code>--client/--product/--model</code><br><code>cli/rfp.py:14-53</code>. Registered; zero use telemetry.</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">EXISTS-UNTESTED</div><h4>Retrieve (FTS5)</h4><p>top-15, BM25 + trust boost. <b>Not</b> rfp_only &rarr; pool = 216 non-deprecated notes. <code>retrieve/rfp.py:104-115</code>, <code>engine.py:105-227</code></p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">design gap</div><h4>Filter fallback</h4><p>0 results &rarr; silently retries with <b>no</b> filters (cross-product leak). <code>retrieve/rfp.py:118-125</code></p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">EXISTS-UNTESTED</div><h4>Context build</h4><p>2k chars/note, 50k cap. <code>prep.py:185-226</code></p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">EXISTS-UNTESTED</div><h4>LLM synthesis</h4><p>Gemini, temp 0.3; prompt asks for [Note Title] citations (not verified). <code>prep.py:229-273</code></p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">EXISTS-UNTESTED</div><h4>Confidence + gaps</h4><p>count heuristic only (&ge;5 high / &ge;2 med). <code>retrieve/rfp.py:147-154</code></p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-missing"><div class="st">nothing persisted</div><h4>Console print</h4><p>terminal text only — no file, no answer log, no reuse. <code>cli/rfp.py:55-79</code></p></div>
+</div></div>
+
+<h2>Current lane 2 — Stack B: Excel agent (<code>rfp_excel_agent.py</code>, not CLI-registered)</h2>
+<div class="lane"><div class="flow">
+  <div class="card s-untested"><div class="st">EXISTS-UNTESTED</div><h4>Detect</h4><p>green-cell FF00FF00 scan; header/Q/A column heuristics. <code>:350-414, :181-347</code>. In-memory only — no manifest.</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-missing"><div class="st">MISSING</div><h4>Classify</h4><p>none per-question; one <code>--solution</code> flag/doc. <code>platform_matrix.json</code> absent &rarr; <b>zero validation</b>. <code>:103,769-784</code></p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">flag-gated (default OFF)</div><h4>Anonymize</h4><p>regex blocklist wrap around LLM call. <code>:590,438-450</code>; stale hardcoded session customer in YAML.</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">EXISTS-UNTESTED</div><h4>Retrieve</h4><p>subprocess <code>corp retrieve --rfp-only</code> &rarr; <b>39-note pool</b>; SQLite fallback filters neither rfp_visible nor deprecated. <span class="warn">Score-scale mismatch breaks thresholds.</span> <code>vault_adapter.py:31-232</code></p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-phantom"><div class="st">PHANTOM</div><h4>ChromaDB fallback</h4><p><code>data/kb/chroma_store</code> + canonical JSON absent &rarr; returns []. Dead path. <code>llm_router.py:54-56,204-291</code></p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">EXISTS-UNTESTED</div><h4>Generate</h4><p>copy-first universal prompt; abstains "Not in KB"; <b>prompt forbids citations</b>. <code>llm_router.py:306-371</code></p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-missing"><div class="st">MISSING</div><h4>Validate</h4><p>no forbidden-claims check, no overrides, no answer_selector — nothing gates.</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">EXISTS-UNTESTED</div><h4>De-anon + write-back</h4><p>answers &rarr; answer column; saves CWD-relative <code>data/output/&hellip;.xlsx</code> (never existed). <code>:636-704</code></p></div>
+</div></div>
+
+<h2>Current lane 3 — Stack B: Word agent (<code>rfp_answer_word.py</code>, not CLI-registered)</h2>
+<div class="lane"><div class="flow">
+  <div class="card s-broken"><div class="st">BROKEN</div><h4>Startup</h4><p>unconditionally opens absent <code>data/kb/schema/family_config.json</code> &rarr; FileNotFoundError. <code>:114-117,673</code>. Cannot run today.</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">EXISTS-UNTESTED</div><h4>Parse</h4><p>bold+numbering heading detection &rarr; section tree &rarr; answerable blocks. <code>:128-256</code></p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">semantics broken</div><h4>Retrieve</h4><p>per-section query; <code>--kb-threshold 0.75</code> incoherent (trusted notes never pass, drafts always do). <code>:381-385,738-741</code></p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">gemini-only</div><h4>Generate</h4><p>own inline prompt; provider hardcoded to Gemini &rarr; <code>--answer-model sonnet/gpt</code> would error. <code>:431-490</code></p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">unpersisted</div><h4>Interactive review</h4><p>Y/E/N/A/Q filters in-memory list; <b>decisions discarded</b>. <code>:564-614</code></p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">EXISTS-UNTESTED</div><h4>Write-back</h4><p>blue "BY Response:" paragraphs; saves <code>*_BY_RESPONSE.docx</code>. <code>:774-785</code></p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-missing"><div class="st">MISSING</div><h4>Anonymize</h4><p>module never imported on the Word path.</p></div>
+</div></div>
+
+<h2>Knowledge stores feeding both stacks</h2>
+<div class="stores">
+  <div class="store"><span class="pill b-untested">EFFECTIVE POOL: 39</span><br><b>index.db (vault notes)</b><p>488 notes; 182 rfp_visible, of which <b>143 deprecated</b> &rarr; 39 reachable with <code>--rfp-only</code>. Frozen since 2026-03-28 rebuild.</p></div>
+  <div class="store"><span class="pill b-dormant">ORPHANED: 1,329</span><br><b>RFP KB <code>corp_data/rfp_kb/</code></b><p>1,155 verified + 174 staging drafts. Read by <b>zero code</b>; <code>rfp_kb_path()</code> has no callers. Tested federation switch (<code>INDEX_EXTRA_ROOTS</code>) never set.</p></div>
+  <div class="store"><span class="pill b-phantom">PHANTOM</span><br><b>ChromaDB + canonical JSON</b><p><code>data/kb/</code> tree absent; fallback paths dead in both agents.</p></div>
+  <div class="store"><span class="pill b-missing">MISSING</span><br><b>Style store</b><p>Target stage 3/8 destination; nothing exists. Best seeds: KB <code>category</code> enum + derived answer length (§4.6).</p></div>
+</div>
+
+<h2>Target lane — the 9 stages vs what exists</h2>
+<div class="lane"><div class="flow">
+  <div class="card s-untested"><div class="st">wire-up · S</div><h4>0 Parse</h4><p>Excel green-cell + Word tree parsers survive. Missing: persisted manifest, CLI registration.</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-missing"><div class="st">greenfield · M–L</div><h4>1 Classify</h4><p>no per-question category&times;product&times;policy. Parts: 40 profiles, <code>expand_product_query</code>.</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-missing"><div class="st">greenfield · M</div><h4>2 Coverage check</h4><p>stubs of right shape: <code>_find_coverage_gaps</code>, caller-less NO_DATA contract (<code>vault_adapter.py:73-109</code>).</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-missing"><div class="st">truth S–M / style L</div><h4>3 Dual retrieval</h4><p>truth: engine + tested KB federation (decision-gated). style: nothing — no store, no pass.</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-dormant"><div class="st">gate greenfield · M</div><h4>4 Reuse-vs-derive</h4><p>answer_selector is DORMANT KB-maintenance tooling; no staleness gate anywhere. <code>source_hash</code>/<code>valid_to</code> columns exist, unconsumed.</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">wire S / target M</div><h4>5 Compose</h4><p>two real prompt assets + context formatting; facts-vs-form separation missing.</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-missing"><div class="st">gate S–M / cite L</div><h4>6 Verify + abstain</h4><p><code>check_forbidden_claims</code> exists &amp; tested, gates nothing; overrides.yaml has no loader; claim&rarr;cite greenfield (prompt forbids citations).</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">wire-up · S–M</div><h4>7 Operator review</h4><p>UI flow + JSONL writer both exist, unconnected; nothing persisted today.</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-missing"><div class="st">doc S / store L</div><h4>8 Write-back + anonymize</h4><p>doc write-back works (untested); anonymizer Excel-only; approved-answers&rarr;style-store loop entirely greenfield.</p></div>
+</div></div>
+
+<h2>Module &rarr; target-stage map</h2>
+<div class="tablewrap"><table>
+<tr><th>Module / config</th><th>Status</th><th>Serves target stage(s)</th><th>Key evidence</th></tr>
+<tr><td><code>cli/rfp.py</code> + <code>retrieve/rfp.py</code></td><td><span class="pill b-untested">EXISTS-UNTESTED</span></td><td>5, 6-abstain (prompt-only)</td><td>console Q&amp;A; count-based confidence; nothing persisted</td></tr>
+<tr><td><code>retrieve/engine.py</code></td><td><span class="pill b-untested">EXISTS-UNTESTED</span></td><td>3-truth, 2 (gap stub)</td><td>FTS5+BM25, trust rerank <code>:75-90</code>; product LIKE filter <code>:176-181</code></td></tr>
+<tr><td><code>rfp/rfp_excel_agent.py</code></td><td><span class="pill b-untested">EXISTS-UNTESTED</span></td><td>0, 8-doc</td><td>green-cell scan; CWD-relative output dir; never run (<code>data/output/</code> never existed)</td></tr>
+<tr><td><code>rfp/rfp_answer_word.py</code></td><td><span class="pill b-broken">BROKEN</span></td><td>0, 7 (unpersisted), 8-doc</td><td>startup FileNotFoundError <code>:114-117,673</code>; review discarded <code>:564-614</code></td></tr>
+<tr><td><code>rfp/llm_router.py</code></td><td><span class="pill b-untested">EXISTS-UNTESTED</span></td><td>5</td><td>silent <code>family="planning"</code> default <code>:193</code>; ChromaDB paths dead <code>:54-56</code></td></tr>
+<tr><td><code>rfp/vault_adapter.py</code></td><td><span class="pill b-untested">EXISTS-UNTESTED</span></td><td>3-truth bridge, 2 (caller-less)</td><td>score-scale mismatch <code>:63-68,96</code>; permissive SQLite fallback <code>:186-209</code></td></tr>
+<tr><td><code>rfp/answer_selector.py</code></td><td><span class="pill b-dormant">DORMANT</span></td><td>4 (scoring parts only)</td><td>KB-IMPROVE engine; callers = tests only</td></tr>
+<tr><td><code>rfp/rfp_feedback.py</code></td><td><span class="pill b-broken">BROKEN-as-pointed</span></td><td>6-gate parts, 7-writer</td><td>targets absent <code>data/kb/*.json</code> tree; <code>check_forbidden_claims :153-166</code> importable</td></tr>
+<tr><td><code>rfp/anonymization/</code></td><td><span class="pill b-untested">EXISTS-UNTESTED</span></td><td>8-anonymize</td><td>Excel-wired flag-gated; Word path never imports it</td></tr>
+<tr><td><code>rfp/validate_profiles.py</code></td><td><span class="pill b-untested">EXISTS-UNTESTED</span></td><td>6 (profile hygiene)</td><td><code>--merge</code> ImportError (Phase 1); offline profile QA only</td></tr>
+<tr><td><code>config/rfp/product_profiles/_effective/</code> (40)</td><td><span class="pill b-dormant">DORMANT data</span></td><td>1 (taxonomy), 6 (forbidden_claims)</td><td>loaded only by correction CLI — dead at answer time</td></tr>
+<tr><td><code>config/rfp/overrides.yaml</code></td><td><span class="pill b-missing">no loader</span></td><td>6</td><td>4 rebrand/SIEM rules; schema documented, zero code</td></tr>
+<tr><td><code>index_builder.py</code> extra-roots + <code>_compute_rfp_visible</code></td><td><span class="pill b-dormant">DORMANT (tested)</span></td><td>3-truth federation</td><td><code>:214-221,578-604</code>; <code>tests/test_index_builder.py:450-498</code>; env var never set</td></tr>
+<tr><td>ADR-22 design (<code>rfp_entries</code>, <code>corp rfp-index</code>, <code>--source</code>)</td><td><span class="pill b-phantom">PHANTOM</span></td><td>3-truth (ratified shape)</td><td>ratified 2026-03-28, zero code; ownership constraint now stale</td></tr>
+</table></div>
+
+<h2>Artifact flow — what enters / leaves each stage today</h2>
+<div class="strip">
+  <div class="card s-alive"><div class="st">enters</div><h4>Client RFP doc</h4><p>.xlsx (green cells) / .docx — operator-supplied path; no intake zone</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-missing"><div class="st">not persisted</div><h4>Question set</h4><p>in-memory list/blocks only; no manifest file (Phase-1 Q3)</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">39-note pool</div><h4>Retrieval context</h4><p>vault notes via index.db; KB + Chroma contribute nothing</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">transient</div><h4>LLM answers</h4><p>per-question strings; no gate, no citations (forbidden by prompt)</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-untested"><div class="st">only output</div><h4>Answered doc copy</h4><p>Excel: <code>data/output/&hellip;.xlsx</code> (CWD-relative) · Word: <code>*_BY_RESPONSE.docx</code> beside input</p></div>
+  <div class="arrow">&#8594;</div>
+  <div class="card s-missing"><div class="st">dead end</div><h4>Learning loop</h4><p>no review labels, no KB/style write-back, no feedback log rows — process terminates at the document</p></div>
+</div>
+<p class="note">KB corpus quality (Step 4): planning + aiml <b>GOLD</b>, logistics <b>GOLD-WITH-EXPIRY</b> (22 redaction-artifact files), network + wms <b>DRAFT despite <code>trust_level: verified</code></b> (97 files over-claimed), _staging <b>DRAFT</b> triage queue. Staleness is measurable: every Kafka mention (6 files) sits in unpromoted <code>_staging/</code>; verified integration answers use only the older REST/SFTP/Snowflake/Blob vocabulary.</p>
+
+<h2>Backlog seeds (mirror of the .md table)</h2>
+<div class="tablewrap"><table>
+<tr><th>Seed</th><th>Goal</th><th>Depends on</th><th>Size</th><th>Decision first?</th></tr>
+<tr><td>RFP-1</td><td>KB reachable by retrieval (pick federate a / built-variant a&prime; / merge b)</td><td>—</td><td>a&prime; S · a M · b L</td><td><b>Yes — federate vs merge</b></td></tr>
+<tr><td>RFP-2</td><td>Repair 39-note bottleneck (re-triage 143 deprecated rfp_visible notes)</td><td>W2 restart / F0 hygiene</td><td>M</td><td>No</td></tr>
+<tr><td>RFP-3</td><td>Register Stack B as <code>corp</code> subcommands; fix Word startup; fix CWD-relative output</td><td>—</td><td>S</td><td>No</td></tr>
+<tr><td>RFP-4</td><td>Single 0–1 score contract at vault_adapter boundary</td><td>—</td><td>S</td><td>No</td></tr>
+<tr><td>RFP-5</td><td>Family normalization across 3 stacks; kill silent planning default</td><td>—</td><td>S</td><td>No</td></tr>
+<tr><td>RFP-6</td><td>Wire forbidden_claims + overrides loader at the 3 identified seams</td><td>RFP-5</td><td>S–M</td><td>No</td></tr>
+<tr><td>RFP-7</td><td>Stage-1 per-question classifier (category &times; product &times; policy)</td><td>W5; RFP-5</td><td>M–L greenfield</td><td>Policy taxonomy (operator)</td></tr>
+<tr><td>RFP-8</td><td>Stage-2 coverage check wired into doc agents</td><td>RFP-1, RFP-4</td><td>M</td><td>No</td></tr>
+<tr><td>RFP-9</td><td>Stage-4 staleness gate (source_hash-first; consume valid_to)</td><td>RFP-1</td><td>M greenfield</td><td>Expiry semantics (Step 4)</td></tr>
+<tr><td>RFP-10</td><td>Claim&rarr;cite verification + abstain</td><td>RFP-6</td><td>L greenfield</td><td><b>Yes — citation UX vs copy-first prompt</b></td></tr>
+<tr><td>RFP-11</td><td>Persist stage-7 review labels; add Excel review</td><td>RFP-3</td><td>S–M</td><td>No</td></tr>
+<tr><td>RFP-12</td><td>Style store + style retrieval pass + approved-answer write-back</td><td>RFP-11; operator Q2</td><td>L greenfield</td><td><b>Yes — seed corpus</b></td></tr>
+<tr><td>RFP-13</td><td>Anonymization parity (Word path; per-run session customer)</td><td>RFP-3</td><td>S</td><td>No</td></tr>
+<tr><td>RFP-14</td><td>KB expiry/refresh pass (integration-method staleness)</td><td>RFP-1</td><td>M content</td><td>Verdict-dependent</td></tr>
+</table></div>
+
+<p class="note" style="margin-top:22px">Read-only audit. Evidence detail, federation decision inputs, and the KB sample record live in <code>docs/audits/2026-07-05-deep-rfp.md</code>. Phase-1 baseline: <code>2026-07-05-functional-{scenarios,telemetry,synthesis}.md</code>.</p>
+
+</body>
+</html>
