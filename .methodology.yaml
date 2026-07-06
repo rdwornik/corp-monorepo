@@ -1,0 +1,12 @@
+# Consumer conformance metadata read by the hub Informant
+# (.dev-knowledge scripts/enforcement_coverage.py, [#244] P4 / D2).
+# Each entry: component id + MANDATORY reason + time-box (expiry or review_date).
+sanctioned_divergences:
+  - component: ruff-gate
+    reason: >-
+      corp-monorepo runs its OWN ruff gate (v0.15.8, --fix, .ruff.toml E/F/I) --
+      consumer property adopted before the methodology, not methodology residue.
+      The v1.2.0 ruff-gate tombstone's removal does NOT propagate here (ADR-96
+      amendment 2026-07-06: greenfield deploy skipped the prune sweep; durable
+      per-consumer prune scoping is hub #276).
+    review_date: 2026-10-07

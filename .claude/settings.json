@@ -10,10 +10,36 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/check_floor_hash.py --require-present",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python -m pre_commit install",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/scripts/session_end_backpressure.py\"",
+            "timeout": 15
+          }
+        ]
       }
     ]
   },
-  "//hooks": "Nightly-conformance SessionStart surfacing (read-only, fail-soft, exit 0). Merges with -- does not replace -- the user-level ~/.claude/settings.json SessionStart hooks (surface-closures.ps1 + the tier1-lifecycle plugin). Local-only nudge; not on the cloud executing path (ADR-72).",
   "enabledPlugins": {
     "tier1-lifecycle@dev-knowledge-methodology": true
   },
@@ -25,5 +51,6 @@
       }
     }
   },
+  "//hooks": "Nightly-conformance SessionStart surfacing (read-only, fail-soft, exit 0). Merges with -- does not replace -- the user-level ~/.claude/settings.json SessionStart hooks (surface-closures.ps1 + the tier1-lifecycle plugin). Local-only nudge; not on the cloud executing path (ADR-72).",
   "//": "Tier-1 lifecycle plugin (ADR-70 #73 Unit-5b). Marketplace = .dev-knowledge hub. Plugin provides the closure loop (Stop -> propose, SessionStart -> surface, /review-closures). Ruff gate already present (.pre-commit-config.yaml v0.15.8). Operator: run `claude plugin install tier1-lifecycle@dev-knowledge-methodology --scope project` then `/reload-plugins` to activate."
 }

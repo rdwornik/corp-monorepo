@@ -47,3 +47,22 @@ docs/staging/
 
 # Ephemeral Tier-1 closure output
 logs/
+.claude/*
+!.claude/CLAUDE-FLOOR.md
+!.claude/CLAUDE-FLOOR.md.sha256
+!.claude/check_floor_hash.py
+
+# >>> enforcement-mesh (ADR-85 /override) >>>
+logs/.session-override-token
+logs/OVERRIDES.md
+!.claude/commands/
+!.claude/commands/override.md
+# <<< enforcement-mesh <<<
+
+# corp-owned: keep the tracked-.claude convention ("project .claude/ is config,
+# tracked") past the floor's `.claude/*` block above -- re-include the config
+# surfaces corp tracks; settings.local.json stays ignored (its rule above the
+# floor block is now redundant but kept for intent).
+!.claude/settings.json
+!.claude/skills/
+!.claude/workflows/
