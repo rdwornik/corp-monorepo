@@ -55,6 +55,10 @@ So that classifier/tag/product/people drift is caught and offline-only material 
 ## Safety & code health
 > As a maintainer, I want known security gaps closed and verified dead code removed, so the cleanup pipeline can't escape its root and the tree stays lean.
 
+### Adopt the ecosystem methodology corpus
+So that corp-monorepo runs the same hash-guarded floor + enforcement mesh as the rest of the fleet, with enforcement proven firing rather than merely present.
+- [#14] [P2][M] Adopt methodology corpus v1.2.0 (hub deploy tool, `.dev-knowledge` ADR-91/92; hub #221 n=2) — floor (`.claude/CLAUDE-FLOOR.md` + hash guard) + enforcement mesh (seb Stop hook, canonical_freshness gate, `/override`) + pinned pre-commit hooks + tier1 plugin install, deployed by the hub tool (stages, never commits), ratified here branch + `--no-ff`; all three git-hook stages armed via `default_install_hook_types` (closes the ai-council arming-gap class, hub #275) · Done when: the hub #230 conformance self-test passes against this repo AND all three hook stages are verified armed + firing (one trip test per stage) AND the hub registry records `deployed_methodology_version: 1.2.0` · refs `.dev-knowledge` ADR-91/92/96, hub #221/#230/#275
+
 ### Harden the cleanup pipeline and clear verified dead code
 So that untrusted `moves.yaml` specs can't traverse outside their root and abandoned modules stop misleading readers.
 - [#10] [P2][S] Add path-traversal guards to `cleanup/executor.py:68,85` — `source.resolve().is_relative_to(mywork_root)` gating at both join sites + a Pydantic schema for `moves.yaml` entries rejecting `..` segments and absolute paths at load time + traversal tests in `tests/test_cleanup/test_executor.py` · Done when: a `..`-bearing or absolute `moves.yaml` entry raises before any `unlink`/`shutil.move`, covered by tests · refs Codex P1-2 (verify-p1-2.md, 2026-04-21) — ADR-27 covers the OneDrive guard only, not this traversal class
@@ -71,4 +75,4 @@ Done tasks **leave** (ADR-65); git is the implementation record. The 3 items clo
 this migration (ruff-select Action 7c; VISION-routing Action 6 ×2) left the active file per
 ADR-65 — recorded in the 2026-06-02 JOURNAL migration entry, full text in git history.
 
-**Grooming log:** 2026-05-18 (stream-format seed from retired `docs/HANDOFF.md`) · 2026-06-02 (story-map migration; 9 open items preserved, 3 closed items retired) · 2026-06-03 (added "Safety & code health" theme; preserved #10 path-traversal security, #11 dead code from stale branches; added #12 ruff drift) · 2026-06-06 (added #13 sanitize-fixtures-archives from sensitivity sweep). Next quarterly: 2026-07-01.
+**Grooming log:** 2026-05-18 (stream-format seed from retired `docs/HANDOFF.md`) · 2026-06-02 (story-map migration; 9 open items preserved, 3 closed items retired) · 2026-06-03 (added "Safety & code health" theme; preserved #10 path-traversal security, #11 dead code from stale branches; added #12 ruff drift) · 2026-06-06 (added #13 sanitize-fixtures-archives from sensitivity sweep) · 2026-07-07 (added methodology-adoption story + #14, hub #221 n=2 deploy). Next quarterly: 2026-07-01.

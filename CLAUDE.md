@@ -1,12 +1,12 @@
 ---
-last_reviewed: 2026-06-02
+last_reviewed: 2026-07-07
 status: active
 owner: Rob
 ---
 
 # CLAUDE.md
 <!-- scope: meta -->
-<!-- version: 2.2 — 2026-05-27 -->
+<!-- version: 2.3 — 2026-07-07 -->
 
 > **Session contract for Claude Code in this repo.** Read on every session start (auto). Single canonical agent-instruction file (≤200 lines). Per ADR-53.
 >
@@ -112,9 +112,13 @@ Repo-level (`./.claude/skills/`):
 
 Pre-commit (from `.pre-commit-config.yaml`):
 - ruff — linting and formatting
-- tach — dependency layer enforcement (`interface > orchestration > core > foundation`)
+- tach-check — dependency layer enforcement (`interface > orchestration > core > foundation`)
+- normalize-headers — dated-log header normalization (JOURNAL/LESSONS)
+- toc-freshness / toc-generate — ARCHITECTURE.md TOC staleness check, hub-pinned (`repo: ../.dev-knowledge`)
 
-Other (`~/.claude/settings.json`): SessionStart hook — runs `surface-closures.ps1` (Tier-1 lifecycle closure surfacing, ADR-70).
+Other:
+- `~/.claude/settings.json` (user-level): SessionStart hook — runs `surface-closures.ps1` (Tier-1 lifecycle closure surfacing, ADR-70).
+- `./.claude/settings.json` (project-level): SessionStart hook — runs `scripts/surface-conformance.ps1` (nightly-conformance surfacing, read-only fail-soft; merges with the user-level hooks).
 
 ## 10. Anti-patterns specific to Claude Code in this repo
 
@@ -146,8 +150,9 @@ Full list: `docs/decisions/README.md`. **ADR namespaces:** corp-local ADRs (`doc
 - v1.0 (pre-2026-05-19) — original pre-template CLAUDE.md (Project Scale / Architecture / Development / Safety sections)
 - v2.1 (2026-05-19) — rewritten to v2.1 12-section template per ADR-53; architecture content homed in ARCHITECTURE.md; §3 is pointer; §2 Purpose added; §10 AGENTS.md guard added
 - v2.2 (2026-05-27) — struck tier-residue prose (§2 Scale line removed; §3/§11 "Scale M+" → "universal" per tier-system deprecation); §11 ADR references namespace-prefixed (corp vs `.dev-knowledge`; ADR-27 collision noted)
+- v2.3 (2026-07-07) — genuine end-to-end re-read + `last_reviewed` re-stamp (executes hub #100). §9 reconciled to the live config: `normalize-headers` + the hub-pinned TOC hooks were unlisted, and the project-level SessionStart hook (`surface-conformance.ps1`) was missing alongside the user-level one. Methodology-adoption reconcile (floor @-include, mesh hooks, `/override`) follows in the [#14] ratify arc as v2.4.
 
 ---
 
-**Last updated:** 2026-05-27  
+**Last updated:** 2026-07-07  
 **Maintained by:** Rob
