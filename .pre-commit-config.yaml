@@ -4,6 +4,13 @@
 # hub #275; hub arms the same three via scripts/arm_hooks.py).
 default_install_hook_types: [pre-commit, commit-msg, pre-push]
 
+# Scope stage-less hooks to the pre-commit stage. Without this, every hook
+# with no `stages:` re-runs at the commit-msg + pre-push stages too (now that
+# all three are installed), printing a misleading "(no files to check) Skipped"
+# second batch per commit. Hooks meant for other stages declare `stages:`
+# explicitly (same shape ai-council uses).
+default_stages: [pre-commit]
+
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.8

@@ -58,3 +58,11 @@ logs/OVERRIDES.md
 !.claude/commands/
 !.claude/commands/override.md
 # <<< enforcement-mesh <<<
+
+# corp-owned: keep the tracked-.claude convention ("project .claude/ is config,
+# tracked") past the floor's `.claude/*` block above -- re-include the config
+# surfaces corp tracks; settings.local.json stays ignored (its rule above the
+# floor block is now redundant but kept for intent).
+!.claude/settings.json
+!.claude/skills/
+!.claude/workflows/
