@@ -1,3 +1,9 @@
+# Arm ALL THREE git-hook stages on every `pre-commit install` (incl. the
+# methodology floor's plain SessionStart arm leg) -- without this, commit-msg /
+# pre-push stage hooks land wired-but-dormant (the ai-council arming gap,
+# hub #275; hub arms the same three via scripts/arm_hooks.py).
+default_install_hook_types: [pre-commit, commit-msg, pre-push]
+
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.8
