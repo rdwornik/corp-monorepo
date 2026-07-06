@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Code Quality Audit — src/corp — 2026-07-06</title>
+<style>
+  :root{
+    --bg:#12141a; --panel:#1b1e27; --line:#2c3040; --text:#e8eaf0; --muted:#9aa0b0;
+    --gA:#2e7d32; --gB:#7cb342; --gC:#f9a825; --gD:#ef6c00; --gE:#c62828;
+    --p1:#c62828; --p2:#ef6c00; --p3:#f9a825; --p4:#3f6bb5; --p5:#5c6370;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:2rem;background:var(--bg);color:var(--text);
+       font:15px/1.55 "Segoe UI",system-ui,sans-serif;max-width:1180px;margin-inline:auto}
+  h1{font-size:1.5rem;margin:.2rem 0 .3rem}
+  h2{font-size:1.15rem;margin:2.2rem 0 .6rem;border-bottom:1px solid var(--line);padding-bottom:.35rem}
+  .sub{color:var(--muted);font-size:.9rem;margin-bottom:1.4rem}
+  .verdict{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:1rem 1.3rem;margin:1rem 0}
+  .verdict ol{margin:.3rem 0 .2rem 1.2rem;padding:0}
+  .verdict li{margin:.35rem 0}
+  table{border-collapse:collapse;width:100%;font-size:.86rem;background:var(--panel);
+        border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .scroll{overflow-x:auto;border-radius:10px;margin:.6rem 0 1rem}
+  th,td{padding:.5rem .6rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  th{background:#232735;font-weight:600;white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  td.pkg{font-weight:600;white-space:nowrap}
+  .g{display:inline-block;width:2em;text-align:center;font-weight:700;border-radius:5px;color:#fff;padding:.1em 0}
+  .gA{background:var(--gA)} .gB{background:var(--gB);color:#10250e} .gC{background:var(--gC);color:#332600}
+  .gD{background:var(--gD)} .gE{background:var(--gE)}
+  .safe-yes{color:#8bd48f;font-weight:600} .safe-cond{color:#f4c95d;font-weight:600} .safe-no{color:#ff8a80;font-weight:600}
+  .prio{display:inline-block;min-width:1.6em;text-align:center;font-weight:700;border-radius:5px;color:#fff;padding:.05em .35em}
+  .p1{background:var(--p1)} .p2{background:var(--p2)} .p3{background:var(--p3);color:#332600} .p4{background:var(--p4)} .p5{background:var(--p5)}
+  code{background:#232735;border:1px solid var(--line);border-radius:4px;padding:.05em .3em;font-size:.85em}
+  .legend{color:var(--muted);font-size:.82rem;margin:.3rem 0 0}
+  .metrics td:nth-child(n+2){text-align:right;white-space:nowrap}
+  .metrics td:first-child{font-weight:600}
+  .note{color:var(--muted);font-size:.85rem}
+  .bad{color:#ff8a80;font-weight:600}
+</style>
+</head>
+<body>
+
+<h1>Code Quality Audit — <code>src/corp/</code></h1>
+<div class="sub">2026-07-06 · read-only · 193 files / 41,715 LOC · radon 6.0.1 + vulture 2.16 + ruff 0.15.8 (<code>--select ALL</code>, report-only) + whole-module deep reads · baseline <b>pytest 2,564 passed / 6 skipped</b> on untouched tree · companion to the <i>technical-architect intake</i> (functional handover) — full evidence in <code>2026-07-06-code-quality-audit.md</code></div>
+
+<div class="verdict">
+  <b>Executive verdict (10 lines)</b>
+  <ol>
+    <li><b>Bimodal, not uniformly messy</b> — half the repo is house-standard and good; the debt concentrates in known zones.</li>
+    <li><b>Build immediately on:</b> <code>extraction/</code>, <code>ops/</code>, <code>retrieve/</code> (after 2 small fixes), <code>vault_io</code>, <code>integrity</code>, <code>schema/</code>.</li>
+    <li><b>Refactor first:</b> the retrieval <i>score contract</i> (one field, two scales — "score-inversion fix first") and the <i>silent filter-drop retry</i>; both gate FR-1's zero-leakage metric.</li>
+    <li><b>Rewrite:</b> <code>rfp/</code> as a composition target — March-era pre-monorepo island (broken startup, broken import, argparse+print, <code># noqa</code> pasted inside an LLM prompt). Salvage parts.</li>
+    <li><b>Systemic debt = fragmentation:</b> 5 config systems (2 rival canonical objects), 5+ vocabulary homes, 5 model registries, 4 OneDrive guards, 5 frontmatter parsers, 3 LLM-JSON parsers, 3 live folder taxonomies.</li>
+    <li><b>Dead weight is measured &amp; mostly decided:</b> DR-4 kills + ~2,000 LOC zero-caller limbs (650-line BatchJobRunner, cost_tracker, frames, scripts) — with 51 passing tests maintained for two dead modules.</li>
+    <li><b>Zero of the 2026-04-17 dead-code findings were ever fixed</b> (BACKLOG #11 re-verified today) — dead code needs scheduled removal here.</li>
+    <li><b>The repo refactors for real:</b> four March god-object findings are genuinely resolved (ops facade, actions split, extract strategies, inbox split) — you inherit residue of a cadence, not neglect.</li>
+    <li><b>Tach-clean ≠ decoupled:</b> <code>rfp→retrieve</code> exists only as a subprocess call to the repo's own CLI — invisible to Tach, mis-drawn in the codemap.</li>
+    <li><b>Era debt is localized</b> to <code>rfp/</code> + <code>extractor/scripts/</code> (100% of 322 prints, all argparse) — two zones to fix, not fourteen.</li>
+  </ol>
+</div>
+
+<h2>Scorecard — 14 packages × 5 dimensions</h2>
+<div class="legend">A exemplary · B sound, minor debt · C workable but debt slows work · D debt risks defects for builders · E rework cheaper than reuse.&nbsp; Dimensions: <b>Arch</b>itecture fit · <b>Read</b>ability · <b>Cons</b>istency · <b>Patch</b>-smell · <b>Simpl</b>icity/efficiency.</div>
+<div class="scroll">
+<table>
+<tr><th>Package</th><th>Arch</th><th>Read</th><th>Cons</th><th>Patch</th><th>Simpl</th><th>Top issue (evidence in .md)</th><th>Safe to build on?</th></tr>
+<tr><td class="pkg">extraction</td><td><span class="g gA">A</span></td><td><span class="g gA">A</span></td><td><span class="g gA">A</span></td><td><span class="g gB">B</span></td><td><span class="g gA">A</span></td><td>Two dead functions; receiver drops its own validated contract (CKE side)</td><td class="safe-yes">YES — model package</td></tr>
+<tr><td class="pkg">ops</td><td><span class="g gA">A</span></td><td><span class="g gA">A</span></td><td><span class="g gA">A</span></td><td><span class="g gB">B</span></td><td><span class="g gA">A</span></td><td><code>_ = self.conn</code> lazy-init no-op ×15; untyped config param</td><td class="safe-yes">YES — facade refactor landed</td></tr>
+<tr><td class="pkg">retrieve</td><td><span class="g gB">B</span></td><td><span class="g gA">A</span></td><td><span class="g gA">A</span></td><td><span class="g gB">B</span></td><td><span class="g gB">B</span></td><td>Silent filter-drop retry (rfp.py:118); 240-line retrieve() CC=42; exported score-semantics trap; double file read per note</td><td class="safe-yes">YES — after RC-1 + RC-2</td></tr>
+<tr><td class="pkg">overnight</td><td><span class="g gB">B</span></td><td><span class="g gB">B</span></td><td><span class="g gB">B</span></td><td><span class="g gB">B</span></td><td><span class="g gB">B</span></td><td>Run lifecycle: no try/finally, no janitor → stale "running" rows; NotImplementedError stub</td><td class="safe-yes">YES — subprocess hygiene done right</td></tr>
+<tr><td class="pkg">schema</td><td><span class="g gB">B</span></td><td><span class="g gB">B</span></td><td><span class="g gC">C</span></td><td><span class="g gB">B</span></td><td><span class="g gB">B</span></td><td>Canonical normalizer nobody calls (resolve_product_key: 0 call sites); typing eras mixed in one file</td><td class="safe-yes">YES — wire it in, not around it</td></tr>
+<tr><td class="pkg">ingest</td><td><span class="g gB">B</span></td><td><span class="g gB">B</span></td><td><span class="g gB">B</span></td><td><span class="g gC">C</span></td><td><span class="g gB">B</span></td><td>Twin 60-line manifest builders; SHA-256 computed-never-checked; except (ValueError, Exception); 69% annotation</td><td class="safe-cond">Mostly — refactor with W1 restart</td></tr>
+<tr><td class="pkg">cleanup</td><td><span class="g gB">B</span></td><td><span class="g gB">B</span></td><td><span class="g gC">C</span></td><td><span class="g gC">C</span></td><td><span class="g gB">B</span></td><td>Classifier prompt speaks a dead folder taxonomy (30_Templates/50_RFP/60_*); own LLM-JSON parser; hardcoded model</td><td class="safe-cond">Executor/disk YES; classifier: fix taxonomy first</td></tr>
+<tr><td class="pkg">actions</td><td><span class="g gB">B</span></td><td><span class="g gB">B</span></td><td><span class="g gC">C</span></td><td><span class="g gC">C</span></td><td><span class="g gB">B</span></td><td>Stringly inter-step state; "00_dashboards" vs VaultZone.DASHBOARDS drift; silent vault-stamp no-op</td><td class="safe-cond">YES for the pattern; fix path drift</td></tr>
+<tr><td class="pkg">project</td><td><span class="g gC">C</span></td><td><span class="g gB">B</span></td><td><span class="g gC">C</span></td><td><span class="g gC">C</span></td><td><span class="g gB">B</span></td><td>Renderer bypasses schema models + 4th OneDrive-guard variant; COM-clobber seam; dead clients.yaml path</td><td class="safe-cond">With care — fix seams inside FR-6</td></tr>
+<tr><td class="pkg">opportunity</td><td><span class="g gC">C</span></td><td><span class="g gB">B</span></td><td><span class="g gC">C</span></td><td><span class="g gC">C</span></td><td><span class="g gB">B</span></td><td>Parallel mini-app: own config, 3rd taxonomy, byte-identical duplicate helpers</td><td class="safe-cond">Operator ruling FIX — inside FR-6</td></tr>
+<tr><td class="pkg">cli</td><td><span class="g gC">C</span></td><td><span class="g gC">C</span></td><td><span class="g gC">C</span></td><td><span class="g gC">C</span></td><td><span class="g gB">B</span></td><td>Dual-config idiom in every command; overnight.py fat orchestrator w/ fake F821 annotations; guard copy-pasted ×7</td><td class="safe-cond">Thin commands yes; overnight.py: relocate first</td></tr>
+<tr><td class="pkg">root-modules</td><td><span class="g gC">C</span></td><td><span class="g gB">B</span></td><td><span class="g gC">C</span></td><td><span class="g gC">C</span></td><td><span class="g gC">C</span></td><td>Rival config object; killed facts pipeline + comma-join seam in index_builder; dead managers w/ 51 tests; VaultZone ×3 generations</td><td class="safe-cond">vault_io/integrity YES · index_builder after RC-5/8 · managers NO</td></tr>
+<tr><td class="pkg">extractor</td><td><span class="g gC">C</span></td><td><span class="g gC">C</span></td><td><span class="g gC">C</span></td><td><span class="g gD">D</span></td><td><span class="g gD">D</span></td><td>Dead-limb density (650-line BatchJobRunner 0-callers, frames×2, cost_tracker, scripts×3, zombie-test shims); 5 model + 3 pricing homes; 35-field god-record; MI 19.4</td><td class="safe-cond">Core tiered path yes-with-care; limbs: remove</td></tr>
+<tr><td class="pkg">rfp</td><td><span class="g gD">D</span></td><td><span class="g gC">C</span></td><td><span class="g gD">D</span></td><td><span class="g gE">E</span></td><td><span class="g gC">C</span></td><td>Pre-monorepo island: broken startup, ImportError-on-use, score-scale misread, noqa-in-prompt, dead README, 224 prints, 63% annotation</td><td class="safe-no">NO — salvage parts, rebuild seam (= the R1 build)</td></tr>
+</table>
+</div>
+
+<h2>Breadth metrics (Step 1, tool-generated)</h2>
+<div class="scroll">
+<table class="metrics">
+<tr><th>Package</th><th>Files</th><th>LOC</th><th>Pub. annotated</th><th>avg CC</th><th>max CC</th><th>CC&gt;10</th><th>mean MI</th><th>worst MI</th><th>print</th><th>blind except</th></tr>
+<tr><td>actions</td><td>12</td><td>1,183</td><td>100%</td><td>5.5</td><td>14</td><td>2</td><td>64.8</td><td>47.9</td><td>0</td><td>1</td></tr>
+<tr><td>cleanup</td><td>7</td><td>1,115</td><td>100%</td><td>4.0</td><td>13</td><td>2</td><td>72.1</td><td>46.7</td><td>0</td><td>0</td></tr>
+<tr><td>cli</td><td>18</td><td>3,767</td><td>98%</td><td>8.3</td><td>31</td><td>17</td><td>53.7</td><td>27.6</td><td>0</td><td>12</td></tr>
+<tr><td>extraction</td><td>7</td><td>790</td><td>100%</td><td>5.0</td><td>23</td><td>4</td><td>72.2</td><td>60.6</td><td>0</td><td>0</td></tr>
+<tr><td>extractor</td><td>52</td><td>11,012</td><td>84%</td><td>6.0</td><td class="bad">79</td><td>38</td><td>66.6</td><td class="bad">19.4</td><td class="bad">98</td><td class="bad">36</td></tr>
+<tr><td>ingest</td><td>11</td><td>3,929</td><td class="bad">69%</td><td>5.8</td><td>28</td><td>16</td><td>56.4</td><td>23.3</td><td>0</td><td>25</td></tr>
+<tr><td>opportunity</td><td>10</td><td>1,461</td><td>100%</td><td>3.8</td><td>13</td><td>1</td><td>66.1</td><td>32.4</td><td>0</td><td>0</td></tr>
+<tr><td>ops</td><td>9</td><td>1,461</td><td>99%</td><td>2.0</td><td>11</td><td>1</td><td>71.2</td><td>43.1</td><td>0</td><td>0</td></tr>
+<tr><td>overnight</td><td>8</td><td>1,487</td><td>97%</td><td>4.0</td><td>15</td><td>3</td><td>65.7</td><td>48.3</td><td>0</td><td>1</td></tr>
+<tr><td>project</td><td>10</td><td>2,173</td><td>100%</td><td>6.0</td><td>60</td><td>7</td><td>57.8</td><td>27.2</td><td>0</td><td>10</td></tr>
+<tr><td>retrieve</td><td>4</td><td>1,015</td><td>100%</td><td>7.2</td><td>42</td><td>3</td><td>63.6</td><td>28.3</td><td>0</td><td>2</td></tr>
+<tr><td>rfp</td><td>12</td><td>4,263</td><td class="bad">63%</td><td>6.1</td><td>29</td><td>14</td><td>56.1</td><td>25.6</td><td class="bad">224</td><td>13</td></tr>
+<tr><td>root-modules</td><td>21</td><td>6,484</td><td>100%</td><td>5.0</td><td>25</td><td>21</td><td>56.9</td><td>32.8</td><td>0</td><td>13</td></tr>
+<tr><td>schema</td><td>12</td><td>1,575</td><td>90%</td><td>3.8</td><td>22</td><td>4</td><td>69.2</td><td>48.2</td><td>0</td><td>0</td></tr>
+<tr><td><b>TOTAL</b></td><td><b>193</b></td><td><b>41,715</b></td><td><b>89%</b></td><td>—</td><td>—</td><td><b>129</b></td><td>—</td><td>—</td><td><b>322</b></td><td><b>113</b></td></tr>
+</table>
+</div>
+<div class="note">Ruff <code>--select ALL</code>: 3,673 violations vs <b>1</b> under the committed lenient config (E,F,I). Vulture ≥60: 222 candidates (heavy Click/registry/Pydantic false-positive classes; caller-verified residue in the .md). CC=60 in <code>project/classifier.py</code> is a documented 20-rule decision table — benign; graded accordingly.</div>
+
+<h2>Refactor-candidate register (ranked by roadmap collision)</h2>
+<div class="legend">Priority: <span class="prio p1">1</span> blocks/endangers R1 (FR-1 RFP build) · <span class="prio p2">2</span> blocks F0 substrate · <span class="prio p3">3</span> systemic hygiene · <span class="prio p4">4</span> over-engineering removals · <span class="prio p5">5</span> cosmetic. DR-4 kills cited as decided, not re-proposed.</div>
+<div class="scroll">
+<table>
+<tr><th>ID</th><th>What</th><th>Why it matters</th><th>Size</th><th>Risk</th><th>Prio</th><th>Mode</th></tr>
+<tr><td>RC-1</td><td>Fix retrieval <b>score contract</b> — one scale for relevance_score; kill 999/0 sentinel ranks</td><td>R1 stages 4–7; every Stack-B threshold meaningless until fixed ("score-inversion fix first")</td><td>M</td><td>M</td><td><span class="prio p1">1</span></td><td>fold into R1</td></tr>
+<tr><td>RC-2</td><td>Remove <b>silent filter-drop retry</b> + silent matches[:2] fallback → honest NO_DATA/abstain</td><td>R1 zero cross-product leakage metric</td><td>S</td><td>Low</td><td><span class="prio p1">1</span></td><td>fold into R1</td></tr>
+<tr><td>RC-3</td><td><b>Retire rfp/ as composition target</b>; salvage anonymization, Word/Excel mechanics, selector logic; rebuild the 9-stage pipeline on the retrieve/ seam; rewrite false README</td><td>Building FR-1 onto the island imports E-grade debt into the priority process</td><td>L</td><td>M</td><td><span class="prio p1">1</span></td><td>= the R1 build</td></tr>
+<tr><td>RC-4</td><td>Conditional: if any rfp agent is salvaged as-is — fix startup load, dead import, subprocess encoding, tracked-config session write</td><td>R1 (conditional on RC-3)</td><td>S</td><td>Low</td><td><span class="prio p1">1</span></td><td>fold</td></tr>
+<tr><td>RC-5</td><td><b>JSON (not comma-join) list fields in notes table</b> (index_builder _join_list)</td><td>F0/FR-5 canonicalization seam; fixes IDSP comma-split class; feeds DR-5</td><td>S</td><td>Low</td><td><span class="prio p2">2</span></td><td>fold into F0</td></tr>
+<tr><td>RC-6</td><td><b>Config consolidation</b> — ONE canonical object (AppConfig ⇄ PipelineConfig), one dotenv entry, migrate cli/ dual sites, local configs read paths.toml</td><td>F0 — DR-1's INDEX_EXTRA_ROOTS parsed independently in BOTH rivals; registry v4 flows through config</td><td>M/L</td><td>M</td><td><span class="prio p2">2</span></td><td>standalone</td></tr>
+<tr><td>RC-7</td><td><b>One vocabulary owner</b> — wire resolve_product_key at index seam; merge extractor/tag/client aliases into schema</td><td>F0/FR-5 + DR-13 policy classifier needs one product taxonomy</td><td>M</td><td>M</td><td><span class="prio p2">2</span></td><td>fold into F0</td></tr>
+<tr><td>RC-8</td><td><b>Execute DR-4 kills</b> — facts pipeline out of index_builder + repoint corp query to notes_fts; N4 task_manager + wiring + 25 tests; Lane B move_to_vault</td><td>Decided (intake DR-4); execution + sequencing only</td><td>M</td><td>M</td><td><span class="prio p3">3</span></td><td>standalone arc</td></tr>
+<tr><td>RC-9</td><td><b>Centralize OneDrive guard</b> (4 copies → 1; each copy already requests it per ADR-27)</td><td>Safety-critical dedup of the P0 invariant</td><td>S/M</td><td>M</td><td><span class="prio p3">3</span></td><td>standalone</td></tr>
+<tr><td>RC-10</td><td>One frontmatter I/O home (vault_io canonical; retire 4 copies)</td><td>S1 contract fix (FR-5) needs one write path</td><td>S/M</td><td>Low</td><td><span class="prio p3">3</span></td><td>fold into F0</td></tr>
+<tr><td>RC-11</td><td>One LLM-JSON parser (schema.utils; retire audit.py repair machine + cleanup + rfp copies)</td><td>Parser divergence = divergent failure modes</td><td>S</td><td>Low</td><td><span class="prio p3">3</span></td><td>standalone sweep</td></tr>
+<tr><td>RC-12</td><td>Error-convention pass — 3 pointless-tuple excepts; silent-empty→logged status; make MinHash absence LOUD</td><td>P3/P4 pillars presuppose visible failures</td><td>M</td><td>Low</td><td><span class="prio p3">3</span></td><td>standalone</td></tr>
+<tr><td>RC-13</td><td>Retire dead taxonomies (cleanup prompt folders, VaultZone legacy aliases, template_manager phantoms via E12)</td><td>Live misroute risk; joins DR-6/DR-7 registry-v4 moment</td><td>M</td><td>M</td><td><span class="prio p3">3</span></td><td>fold into registry v4</td></tr>
+<tr><td>RC-16</td><td>Overnight lifecycle hardening — try/finally + stale-running janitor; move orchestration from cli/overnight.py into overnight/; fix fake F821 annotations</td><td>R2 gap-fill loop + heartbeat pillar need a ledger that can't wedge</td><td>M</td><td>M</td><td><span class="prio p3">3</span></td><td>fold into R2</td></tr>
+<tr><td>RC-17</td><td>ExtractionResult slimming — drop dead fields; dataclass serialization replaces hand-kept 25-key dict; finish frames dedup</td><td>R2/FR-4 grounding lands in this record — slim before extending (with DR-5)</td><td>M</td><td>M</td><td><span class="prio p3">3</span></td><td>fold into FR-4</td></tr>
+<tr><td>RC-18</td><td>Small correctness batch — dashboards path drift, vault-stamp phantom zone, unreachable CSV rule, double file read, private _call_llm, opportunity dup helpers</td><td>Bugs-in-waiting, each S</td><td>S</td><td>Low</td><td><span class="prio p3">3</span></td><td>batch; opp. items → FR-6</td></tr>
+<tr><td>RC-14</td><td><b>Dead-code sweep</b> — BACKLOG #11 set (frames×2, scripts×3, dup _log_ingest_event, PDF shims + zombie test) + new verified set + 6 shims</td><td>~2,000+ LOC misleading surface; BACKLOG intent exists; deletion sign-off per house rule</td><td>M</td><td>Low</td><td><span class="prio p4">4</span></td><td>standalone sweep</td></tr>
+<tr><td>RC-15</td><td><b>Kill batch_api.py</b> (650-line BatchJobRunner) + --batch flags + batches table</td><td>Zero uses ever; lean KILL but NOT in DR-4 — operator sign-off (seed E4)</td><td>S</td><td>Low</td><td><span class="prio p4">4</span></td><td>after sign-off</td></tr>
+<tr><td>RC-19</td><td>Ruff-format committed tree (BACKLOG #12) so dev-check stops mutating; widen select only after D/E zones fixed</td><td>Process hazard (phantom ~100-file diffs)</td><td>S</td><td>Low</td><td><span class="prio p5">5</span></td><td>standalone chore</td></tr>
+<tr><td>RC-20</td><td>Typing-era cleanup, lazy logging, docstring rot</td><td>Cosmetic</td><td>S</td><td>Low</td><td><span class="prio p5">5</span></td><td>opportunistic</td></tr>
+</table>
+</div>
+<div class="note"><b>Explicitly NOT proposed:</b> killing the chat→intent_router→workflow_engine stack (FR-9 revives it) · changes to COM beyond DR-8's decided config fix (operator ruling: FIX) · re-deciding DR-4 · repairing modules RC-3 retires.</div>
+
+<div class="note" style="margin-top:2rem">Full evidence (file:line for every claim), deep-read assessments, five cross-cutting inventories, shim table and method appendix: <code>docs/audits/2026-07-06-code-quality-audit.md</code></div>
+
+</body>
+</html>
