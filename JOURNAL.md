@@ -512,3 +512,11 @@
 - Changes: `.claude/{CLAUDE-FLOOR.md,+.sha256,check_floor_hash.py,commands/override.md,settings.json}`, `scripts/{session_end_backpressure.py,canonical_freshness_gate.py}`, `.pre-commit-config.yaml`, `.gitignore`, `.methodology.yaml` (new), `CLAUDE.md` (v2.3→v2.4), `BACKLOG.md` (+#14), this file.
 - Abandoned: No codemap-hook adoption (deliberate exclusion stands — hub generator can't model src/corp layout); corp's ruff gate NOT pruned (consumer property; sanctioned divergence).
 - Next: Verification battery → ./scripts/run-all-tests.ps1 → merge --no-ff to main → push; hub closes #221 after clause re-verification.
+
+### 2026-07-07 — close BACKLOG #14 (methodology adoption)
+
+- Did: Closed corp BACKLOG #14. Its final Done-when clause — the hub registry recording `deployed_methodology_version: 1.2.0` at n=2 — landed at hub commit `22def9f`, completing the three-clause gate (hub #230 conformance self-test + all three git-hook stages armed/firing + registry record). Verified the SHA-anchored adoption entry written by the Arc-4 deploy session (`### 2026-07-07 — chore/adopt-methodology-v1.2.0`, anchoring `17478db → 712a18e → 0cab8be → 249ff61`) is present in this JOURNAL. Retired the single-task "Adopt the ecosystem methodology corpus" story from BACKLOG per ADR-65 (done tasks leave; git is the record) and logged the closure in the grooming log.
+- Result: BACKLOG #14 closed. Working tree carries only the story removal + grooming-log note + this entry. Branch `chore/close-backlog-14` → merge `--no-ff` → push.
+- Changes: `BACKLOG.md` (removed "Adopt the ecosystem methodology corpus" story + #14; grooming-log closure note), this file.
+- Abandoned: none.
+- Next: none — #14 resolved; methodology-adoption arc complete.
