@@ -47,3 +47,14 @@ docs/staging/
 
 # Ephemeral Tier-1 closure output
 logs/
+.claude/*
+!.claude/CLAUDE-FLOOR.md
+!.claude/CLAUDE-FLOOR.md.sha256
+!.claude/check_floor_hash.py
+
+# >>> enforcement-mesh (ADR-85 /override) >>>
+logs/.session-override-token
+logs/OVERRIDES.md
+!.claude/commands/
+!.claude/commands/override.md
+# <<< enforcement-mesh <<<

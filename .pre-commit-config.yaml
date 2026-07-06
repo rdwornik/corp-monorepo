@@ -29,6 +29,18 @@ repos:
         language: system
         pass_filenames: true
         files: ^(JOURNAL|LESSONS)\.md$
+      - id: floor-hash-verify
+        name: Verify CLAUDE-FLOOR.md matches its sha256 sidecar
+        entry: python .claude/check_floor_hash.py
+        language: system
+        files: ^\.claude/CLAUDE-FLOOR\.md(\.sha256)?$
+        pass_filenames: false
+      - id: canonical_freshness
+        name: canonical_freshness last_reviewed gate (A2 FAIL blocks the commit)
+        entry: python scripts/canonical_freshness_gate.py
+        language: system
+        always_run: true
+        pass_filenames: false
 
   # Doc-tooling hooks single-sourced from the .dev-knowledge hub (ADR-71 pilot).
   # rev pinned to a STABLE hub commit (69558c7 = "hub becomes the codemap+TOC
@@ -41,7 +53,7 @@ repos:
   # 2026-06-03 + .claude/skills/gotchas. Codemap generator adoption is deferred
   # pending a hub-side fix.
   - repo: ../.dev-knowledge
-    rev: 69558c7
+    rev: v1.2.0
     hooks:
       - id: toc-freshness
         files: '^ARCHITECTURE\.md$'

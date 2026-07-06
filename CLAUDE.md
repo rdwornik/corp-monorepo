@@ -4,6 +4,8 @@ status: active
 owner: Rob
 ---
 
+@.claude/CLAUDE-FLOOR.md
+
 # CLAUDE.md
 <!-- scope: meta -->
 <!-- version: 2.3 — 2026-07-07 -->
