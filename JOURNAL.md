@@ -520,3 +520,11 @@
 - Changes: `BACKLOG.md` (removed "Adopt the ecosystem methodology corpus" story + #14; grooming-log closure note), this file.
 - Abandoned: none.
 - Next: none — #14 resolved; methodology-adoption arc complete.
+
+### 2026-07-07 — pin functional-architect briefs to audit library
+
+- Did: Copied two functional-architect briefs from Downloads into `docs/audits/` (exact names, no renames): `2026-07-07_BRIEF_golden-url-registry-knowledge-flow.md` + `2026-07-07_BRIEF_algorithmic-adopt-map.md`. Branch `docs/fa-briefs-golden-url-adopt-map` → merge `--no-ff` to main. `git commit` hung reproducibly in pre-commit's startup (zero output, every attempt, from the very first try before any orphans existed) — an environmental defect on this machine: 12 orphaned `python -mpre_commit hook-impl` processes (they run as `python.exe`, NOT `pre-commit.exe`, so name-based kills missed them) had accumulated holding the store lock; even after clearing all orphans + locks a fresh commit still hung at startup. Every hook passes in isolation (canonical_freshness exit 0; ruff/tach/normalize-headers/floor-hash/toc all skip `.md` by their `files:` patterns) and `pre-commit install-hooks` completes clean. Operator authorized a one-time `--no-verify` — no real gate skipped on these docs.
+- Result: Both briefs on main. Content commit `38cb00b` (2 files, +229), merge commit `0a9b9da` (main HEAD before this entry). Working tree clean; branch deleted post-merge. (Session also did read-only recon of the 2026-07-07 handoff §6 unknowns and a separate 259-note checkpoint commit in the ObsidianVault repo — not recorded here, different repo.)
+- Changes: `docs/audits/2026-07-07_BRIEF_golden-url-registry-knowledge-flow.md` (new), `docs/audits/2026-07-07_BRIEF_algorithmic-adopt-map.md` (new), this file.
+- Abandoned: Root-cause fix for the pre-commit startup hang — deferred (environmental; suspect Windows Defender scanning python subprocess spawns, or a wedged store lock survivor). Landed via the authorized `--no-verify` instead of chasing it further this session.
+- Next: Fresh-terminal restart to clear the wedged pre-commit/Python state before the next commit-bearing session; optionally log the `python.exe -mpre_commit` orphan-naming trap as a gotcha.
