@@ -552,3 +552,11 @@
 - Changes: `docs/audits/2026-07-07_HANDOFF_functional-architect.md`, `docs/audits/2026-07-07_BRAINSTORM-BACKLOG_functional-requirements.md`, `docs/audits/2026-07-07_AUDIT_demo-prep-recon.md`, `docs/audits/2026-07-07_EVIDENCE_by-product-docs-tree-analysis.md`, `docs/audits/2026-07-08_AUDIT_fa-campaign-self-review.md` (all new), this file.
 - Abandoned: The `state.yaml` seed — inapplicable to corp (documented, not fabricated). `2026-07-07_DK-EXTRACT_prompt-standards.md` deliberately NOT pinned — stays in Downloads by operator ruling. No merge/rebase from the worktree (integration is the operator's from the primary).
 - Next: Operator merges `--no-ff worktree-pin-campaign-docs` from the primary (keep both if `JOURNAL.md` conflicts), pushes, tears down the worktree.
+
+### 2026-07-09 — anchor pin-t1-charter session (metadata charter T1, FR-18/19)
+
+- Did: Pinned the metadata charter T1 brief (`2026-07-08_BRIEF_metadata-charter-T1.md`, 182 lines) from Downloads into `docs/audits/` — the tri-axial (industry × software × topic) metadata taxonomy closing the FR-18 (metadata charter) / FR-19 (deterministic auto-tagger) FR-addendum candidates from the FA campaign. Content: a 3-axis spine (industry/software/topic), a canonical field set separating KEY/PROVENANCE/CLASSIFICATION-AXES/DECISION-STATE fields, complete `sw:*` coverage of all 360 product families (12 new tags closing the v0 gap), an 8-section + 55-node platform-interior `topic:*` axis, 10 deterministic auto-tag rules with enforcement seams, and 6 open operator-ratification decisions (D1-D6). Branch `pin-t1-charter` off main, one content commit (`a788e20`), merged `--no-ff` (`807796d`).
+- Result: Charter brief landed on `main` in `docs/audits/`. This entry is the ADR-85 session-end JOURNAL anchor for that merge — no anchor was committed on the `pin-t1-charter` branch before it merged, so it is added retroactively here to satisfy the session-end gate.
+- Changes: `docs/audits/2026-07-08_BRIEF_metadata-charter-T1.md` (new, `a788e20`), this JOURNAL entry.
+- Abandoned: none.
+- Next: Operator ratification of D1-D6 (topic axis standalone vs nested, `sw` secondary-tag cap, per-asset topic-tag curation scope, cohort axis placement, the 12 new `sw:*` tag names, `facing`-flag pass over the 55 platform nodes); promote FR-18/FR-19 into the FR document once ratified.
