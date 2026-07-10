@@ -49,6 +49,7 @@ Key facts (abbreviated; `ARCHITECTURE.md` is authoritative):
 - **Testing:** `pytest -x --tb=short`; run `./scripts/run-all-tests.ps1` before merging
 - **Linting:** pre-commit hooks — ruff (formatting/linting) + tach (dependency layers)
 - **Config:** centralized in `config/paths.toml`; `GEMINI_API_KEY` is standard (not `GOOGLE_API_KEY`); ENV > config > default
+- **Methodology:** `.methodology.yaml` (root) declares corp's sanctioned methodology divergences; read by the hub Informant at the fixed path `<repo-root>/.methodology.yaml` — keep at root, do not move to `config/`.
 - **Engagement:** 1 file/1 module → conversational; 2-3 files/1 module → conversational with context; 3+ files/2+ modules → formal `.md` prompt; architecture decision → AI Council debate
 
 **Out of scope for this repo:**
