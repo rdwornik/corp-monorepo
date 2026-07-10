@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-10
 status: active
 owner: Rob
 ---
@@ -8,7 +8,7 @@ owner: Rob
 
 # CLAUDE.md
 <!-- scope: meta -->
-<!-- version: 2.4 — 2026-07-07 -->
+<!-- version: 2.5 — 2026-07-10 -->
 
 > **Session contract for Claude Code in this repo.** Read on every session start (auto). Single canonical agent-instruction file (≤200 lines). Per ADR-53.
 >
@@ -49,6 +49,7 @@ Key facts (abbreviated; `ARCHITECTURE.md` is authoritative):
 - **Testing:** `pytest -x --tb=short`; run `./scripts/run-all-tests.ps1` before merging
 - **Linting:** pre-commit hooks — ruff (formatting/linting) + tach (dependency layers)
 - **Config:** centralized in `config/paths.toml`; `GEMINI_API_KEY` is standard (not `GOOGLE_API_KEY`); ENV > config > default
+- **Methodology:** `.methodology.yaml` (root) declares corp's sanctioned methodology divergences; read by the hub Informant at the fixed path `<repo-root>/.methodology.yaml` — keep at root, do not move to `config/`.
 - **Engagement:** 1 file/1 module → conversational; 2-3 files/1 module → conversational with context; 3+ files/2+ modules → formal `.md` prompt; architecture decision → AI Council debate
 
 **Out of scope for this repo:**
@@ -159,8 +160,9 @@ Full list: `docs/decisions/README.md`. **ADR namespaces:** corp-local ADRs (`doc
 - v2.2 (2026-05-27) — struck tier-residue prose (§2 Scale line removed; §3/§11 "Scale M+" → "universal" per tier-system deprecation); §11 ADR references namespace-prefixed (corp vs `.dev-knowledge`; ADR-27 collision noted)
 - v2.3 (2026-07-07) — genuine end-to-end re-read + `last_reviewed` re-stamp (executes hub #100). §9 reconciled to the live config: `normalize-headers` + the hub-pinned TOC hooks were unlisted, and the project-level SessionStart hook (`surface-conformance.ps1`) was missing alongside the user-level one. Methodology-adoption reconcile (floor @-include, mesh hooks, `/override`) follows in the [#14] ratify arc as v2.4.
 - v2.4 (2026-07-07) — methodology corpus v1.2.0 adopted (hub deploy, [#14] / hub #221 n=2): floor `@.claude/CLAUDE-FLOOR.md` include (carrier-written, above §1), §7 gains `/override` + the tier1-lifecycle plugin commands, §9 gains floor-hash-verify + canonical_freshness pre-commit gates, the floor SessionStart legs, and the seb Stop gate. Same-day re-read basis as v2.3.
+- v2.5 (2026-07-10) — §4 Conventions gains a **Methodology** bullet permanently answering the recurring `.methodology.yaml`-root question (verdict sheet 2026-07-11 menu 8; text from the QA root-hygiene brief §3.2-A). Genuine end-to-end re-read + `last_reviewed` re-stamp per the canonical_freshness A2 gate.
 
 ---
 
-**Last updated:** 2026-07-07  
+**Last updated:** 2026-07-10  
 **Maintained by:** Rob
