@@ -141,7 +141,126 @@ Every real gate went red on cue and green on a clean commit. The only gaps are t
 
 ## 3. Phase 2 — Root hygiene audit
 
-_(filled in Phase 2 checkpoint)_
+**Scope.** Every top-level entry, in plain language, with evidence and a
+**proposal-only** verdict. Findings skew **KEEP** because corp is a converged repo
+— the value here is the three *permanent answers* (§3.2) + staleness flags, not
+manufactured relocations. **No KILL proposals**: every entry traces to a live
+consumer, ADR, or commit (checked). Nothing is deleted, moved, or renamed by this
+run.
+
+### 3.1 Full root inventory
+
+Last-touched = `git log -1 --format=%as` on the path (worktree checkout date is
+uniform 2026-07-10 and is *not* authorship — git dates below are the real signal).
+
+| Entry | What it is (plain language) | Why it exists (evidence) | Last-touched | Verdict |
+|---|---|---|---|---|
+| `.claude/` | Agent-instruction config: methodology floor + sha256 guard, `settings.json` (SessionStart/Stop hooks), `commands/override.md`, gotchas skill | Methodology v1.2.0 adoption (`0cab8be`, #14); tracked-`.claude` convention via `.gitignore` negations | 2026-07-07 | **KEEP** |
+| `.corp-monorepo.code-workspace` | VS Code multi-root workspace file (dot-prefixed, ADR-59 sort settings) | `8d11ca3` (ADR-59 sort settings) | 2026-05-28 | **KEEP** |
+| `.gitattributes` | Line-ending policy (LF for py/yaml, CRLF for ps1) | `2202c25` | 2026-03-25 | **KEEP** |
+| `.github/` | CI — `workflows/` (fail-closed nightly-triage Action) | `d7e8031` (nightly triage) | 2026-06-06 | **KEEP** |
+| `.gitignore` | Ignore rules + corp-owned `.claude` re-include negations | `3b5fbe8` (post-deploy reconcile) | 2026-07-07 | **KEEP** |
+| **`.methodology.yaml`** | **The standing-question YAML** — declares corp's sanctioned methodology divergences (currently: the ruff-gate, review 2026-10-07) | Read by hub Informant `enforcement_coverage.py`/`fleet_health.py` — see §3.2-A | 2026-07-07 | **KEEP-at-root** (§3.2-A) |
+| `.pre-commit-config.yaml` | Enforcement config (ruff, tach, floor-hash, canonical_freshness, TOC) | Enforcement surface (Phase 1 §2.1) | 2026-07-07 | **KEEP** |
+| `.ruff.toml` | Single ruff config (E/F/I), dot-prefixed (ADR-59) | `d3fa057`; the `.methodology.yaml`-sanctioned divergence | 2026-05-28 | **KEEP** |
+| `ARCHITECTURE.md` | Canonical structural doc (`last_reviewed: 2026-06-04`) | ADR-51 (read before structural change) | 2026-06-04 | **KEEP** — D4 staleness deferred (§3.3) |
+| `BACKLOG.md` | Canonical living backlog | 7-file canonical (ADR-38) | 2026-07-07 | **KEEP** |
+| `CLAUDE.md` | Session contract (single canonical agent-instruction file, ADR-53) | ADR-53 | 2026-07-07 | **KEEP** |
+| `config/` | Centralized runtime config: `paths.toml` (CWD>root>~/.corp), `naming_config.yaml`, `agents.yaml`, `audit.yaml`, per-domain subtrees (`extractor/ opportunity/ project/ rfp/`) | CLAUDE.md §4; `73631e3` (audit CLI scaffold) | 2026-06-16 | **KEEP** (minor clarify §3.2-C) |
+| `CONTRIBUTING.md` | Canonical contributor guide | `4c54dd5` (7-file canonical) | 2026-06-02 | **KEEP** |
+| `docs/` | `decisions/` (ADRs), `audits/`, `intake/`, `archive/`, `diagrams/` (Mermaid+SVG) | Doc tree | 2026-07-10 | **KEEP** |
+| `eval/` | CLI `--help` regression snapshots (`cli_snapshot_2026-03-28/`, 54 files), `eval_history.jsonl`, `ontology_benchmark.md` — 58 tracked files | Consumed by `scripts/eval.py`, `check_doc_refs.py`; `294b425` | **2026-03-30 (stale)** | **KEEP + clarify** (§3.2-C); operator: confirm still a live baseline |
+| `JOURNAL.md` | Canonical append-only session log | ADR-49 | 2026-07-10 | **KEEP** |
+| `LESSONS.md` | Canonical lessons log | 7-file canonical | 2026-06-02 | **KEEP** |
+| `models/` | **Confusing name** — classifier **train/test datasets** + CV report + eval results (`classifier_train/test.json`, `cv_report.txt`, `eval_results.json`, `hybrid_classifier.json`); 5 tracked files. NOT code models, NOT binaries | Consumed by `scripts/train_classifier.py`, `create_classifier_split.py`, `eval_classifier.py`; `271c919` | **2026-03-26 (stale)** | **KEEP + clarify/rename-proposal** (§3.2-C) |
+| `pyproject.toml` | Single build/deps/pytest config | Monorepo consolidation (ADR-23) | 2026-07-10 | **KEEP** |
+| `scripts/` | Dev/ops scripts (gates, audits, eval, training, session hooks) | Tooling | 2026-07-07 | **KEEP** |
+| `src/` | The `corp/` package (single-package layout, `src/corp/`) | ADR-23 | 2026-06-06 | **KEEP** |
+| `tach.toml` | 4-layer dependency config (interface>orchestration>core>foundation) | Enforcement (Phase 1 §2.4-c) | 2026-04-15 | **KEEP** |
+| `tests/` | Test suite (+ `tests/qa_lived/` probe from this run) | Testing; probe = §4 keep/discard | 2026-07-10 | **KEEP** (probe → §4) |
+| `VISION.md` | Canonical purpose/scope doc | ADR-38 | 2026-06-02 | **KEEP** |
+
+### 3.2 The three standing questions — answered permanently
+
+#### 3.2-A · The methodology/root YAML: `.methodology.yaml` — *why it is where it is*
+
+**This is the file the operator has asked about repeatedly. Self-contained answer:**
+
+- **Which YAML.** Exactly one methodology YAML sits at root: **`.methodology.yaml`**.
+  (The other root `.yaml` is the standard `.pre-commit-config.yaml`; `.ruff.toml`
+  and `tach.toml` are TOML, not YAML.)
+- **What it is.** A tiny (13-line) declaration of corp's **sanctioned methodology
+  divergences** — component id + a MANDATORY reason + a time-box. Today it holds
+  exactly one: `ruff-gate` (corp runs its own ruff v0.15.8; review_date 2026-10-07).
+- **What reads it (grep-verified consumers — all hub-side; corp code does NOT read it):**
+  - `.dev-knowledge/scripts/enforcement_coverage.py` — `ALLOWLIST_REL = ".methodology.yaml"`
+    (L169); reads `<root>/.methodology.yaml` `sanctioned_divergences` (L206); the
+    per-consumer drift/fire-test consults it (L881).
+  - `.dev-knowledge/scripts/fleet_health.py` — the divergence allowlist (contract 5,
+    "no central exception registry"; L253/285/320).
+  - `.dev-knowledge/deploy/release-v1.3.x-contract.md` — #276 `detect_prune` consults
+    the consumer-declared allowlist (L98/109/123).
+- **Why root, not `config/` (the crux of the recurring question).** The hub Informant
+  looks it up at a **fixed, well-known path: the consumer repo ROOT** —
+  `enforcement_coverage.py:161`: *"repo ROOT (`.methodology.yaml`), committed-by-default,
+  so it is read from the SAME working tree."* It is a **cross-repo contract file**, the
+  same class as `.pre-commit-config.yaml` / `.gitignore` / `.gitattributes`: tooling in
+  *another* repo hard-codes `<root>/.methodology.yaml`. Moving it to `config/` would
+  break `ALLOWLIST_REL` in two hub scripts. It is dot-prefixed precisely to satisfy
+  ADR-59 root dot-prefix discipline — i.e. it is *correctly* a root dotfile.
+- **Recommendation: KEEP at root (do not relocate).** Relocation has negative value
+  (breaks the hub contract) and no upside. **To end the recurring question**, add one
+  line to `CLAUDE.md` §4 (proposal text, §4 menu): *"`.methodology.yaml` (root) declares
+  corp's sanctioned methodology divergences; read by the hub Informant at the fixed
+  path `<repo-root>/.methodology.yaml` — keep at root, do not move to `config/`."*
+
+#### 3.2-B · Mermaid inventory — every block, current-vs-stale, and the #262 doctrine
+
+Five Mermaid blocks exist (2 fenced in ARCHITECTURE.md + 3 standalone `.mermaid` in
+`docs/diagrams/`). None in `BACKLOG.md`. Plus `docs/diagrams/conventions.yaml`.
+
+| # | Block | What it shows | Current vs stale (evidence) | Recommendation |
+|---|---|---|---|---|
+| M1 | `ARCHITECTURE.md:72` **codemap** (`CODEMAP:START/END`) | 10-node top-level package graph, 4 layer colors | **Current** — node layers (cli=interface, ingest=orchestration, extractor/retrieve/project/opportunity/rfp/ops=core, schema/extraction=foundation) match `tach.toml` exactly | **Keep hand-authored** — marker L120 "not generator-managed" (ADR-51 amdt). Folds into D4 *only when* hub #262 can model corp's layout |
+| M2 | `ARCHITECTURE.md:275` **layer boundary** | 4-node interface→orchestration→core→foundation flow | **Current** — matches `tach.toml` layer order + the §Layer-Assignments lists | **Keep hand-authored** (trivially accurate) |
+| M3 | `docs/diagrams/system-context.mermaid` (+`.svg`) | System-context view (referenced ARCHITECTURE.md L59) | **Stale** — last-touched **2026-03-30**; predates the ADR-30/31/38/53/54 governance churn | **Mark-stale → fold into D4 refresh** (re-render via `scripts/render-diagrams.ps1`) |
+| M4 | `docs/diagrams/container-module.mermaid` (+`.svg`) | Container/module view | **Stale + superseded** — 2026-03-30; ARCHITECTURE.md L68 says the L72 codemap "supersedes the hand-drawn `container-module.svg` (retained only as a curated higher-level view)" | **Mark-stale → fold into D4** (or retire in favor of M1 — operator call) |
+| M5 | `docs/diagrams/magistrala-pipeline.mermaid` (+`.svg`) | Ingest/pipeline flow | **Stale** — 2026-03-30 | **Mark-stale → fold into D4 refresh** |
+| — | `docs/diagrams/conventions.yaml` | Diagram layer-name legend | **Stale + known drift** — 2026-03-30; the deferred "conventions.yaml layer-name drift" (JOURNAL 2026-05-18, gap-review §3-E) | **Fold into D4 refresh** (reconcile layer names to `tach.toml`) |
+
+**How this squares with the hub codemap doctrine.** The hub's north star is a
+**generator-managed** codemap (#262). For corp that is **BLOCKED** (G11 / intake
+`2026-07-10-runbook-gap-notes.md`): the generator's node granularity is "top-level dir
+under `src/`", corp has exactly one (`corp`), so it collapses to a **single orphan node,
+0 edges, layer `-`**. Being tach-bearing does not rescue it. Therefore the two
+ARCHITECTURE.md Mermaids **correctly stay hand-authored** (M1's L120 marker already says
+so), and the pre-commit config **correctly does not consume the codemap hooks** (only the
+TOC hooks). **Nothing here is a defect to fix now** — M1/M2 are current; M3/M4/M5 +
+conventions.yaml are the *visual-diagram* set that needs a manual refresh, which belongs
+to the D4 session (§3.3), gated on #262 only for the codemap sub-dimension.
+
+#### 3.2-C · Folder names that don't self-explain
+
+| Folder | What it actually holds | Proposed one-line clarification (proposal-only) |
+|---|---|---|
+| **`models/`** | Classifier **training/test datasets** + CV report + eval results (5 JSON/txt). **Not** code models (`src/corp/models.py`), **not** model binaries. Consumed by `scripts/train_classifier.py` etc. | Add `models/README.md`: *"Classifier training/test datasets + evaluation artifacts consumed by `scripts/*classifier*.py`. NOT code models (see `src/corp/models.py`), NOT binaries."* **Optional rename-proposal** (operator-gated, a move → not executed): `models/` → `classifier_data/`. |
+| **`eval/`** | CLI `--help` regression snapshots (`cli_snapshot_2026-03-28/`), `eval_history.jsonl`, `ontology_benchmark.md`. Baseline for CLI/docs drift; consumed by `scripts/eval.py`. Stale (2026-03). | Add `eval/README.md`: *"CLI `--help` regression snapshots + eval history + ontology benchmark; baseline for CLI/doc drift (`scripts/eval.py`). Snapshots captured 2026-03-28 — re-capture before trusting as a live gate."* |
+| `config/` | Centralized runtime config: `paths.toml` + per-domain subtrees. Clear-ish | Optional: one line in `config/` referenced from CLAUDE.md §4 (already documents `paths.toml`). Low priority. |
+
+### 3.3 Cross-link — this audit is the INPUT PACKAGE for the D4 ARCHITECTURE.md refresh
+
+This run **surfaces, does not resolve** the D4 finding (*"ARCHITECTURE.md 7+ weeks
+stale / not in canonical generator-managed form"*; origin `docs/audits/2026-05-20-corp-monorepo-deep.md`,
+re-surfaced in the B-S2 intake). Per the B-S2 operator ruling, the D4 refresh is a
+**separate, dedicated `fix/`-scoped session — NOT started here.** This §3 is its
+**input package**:
+- **Staleness dimension** → the ADR-30/31/38/53/54 prose references in ARCHITECTURE.md
+  (deferred; not edited by this run).
+- **Codemap dimension** → M1 stays hand-authored; gate any generator adoption on hub
+  **#262** (G11 requirement input: generator must model `src/<pkg>/<subpkg>/` granularity).
+- **Visual diagrams** → M3/M4/M5 + `conventions.yaml` need a manual re-render
+  (`render-diagrams.ps1`); fold into the same D4 pass.
+- **Go/no-go** for that session is a §4 menu row.
 
 ---
 
