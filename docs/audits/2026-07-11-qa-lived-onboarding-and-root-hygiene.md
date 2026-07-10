@@ -20,16 +20,29 @@ hub_ref: 47f31b5 (read-only, untouched by this run)
 
 ## 1. Executive so-what
 
-_(filled in Phase 3 — see MORNING ACTION MENU §4 for the one-word decisions)_
-
-**Headline (Phase 1):** the freshly onboarded (n=2) repo **held under a lived agent
-arc**. Every enforcement organ that *exists* fired exactly when it should
-(floor-hash-verify, tach-check, ruff, canonical_freshness) and passed when it
-should. Two **absences** (not breakages) surfaced and are already hub-tracked or
-discipline-only: **no commit-msg conventional-commit gate** and **no `block_ff_push`
-pre-push guard** (hub **#302**). **P1 count (broken/failed-to-fire gates): 0.**
-Two enforcement **coverage gaps** flagged for an operator ruling (commit-msg,
-pre-push) — neither is a broken gate; both are "guard absent by current config."
+1. **Did the onboarded (n=2) repo hold under a lived agent arc? Yes.** Every
+   enforcement organ that *exists* fired on cue and passed on a clean commit.
+2. **Positive:** probe committed through the gates green (`bb2e16e`); closing
+   organ battery = **2 organs enforcing-local FIRED** + **floor_conformance 9/9**.
+3. **Negatives that fired:** floor-hash-verify **blocked** a floor mutation;
+   tach-check **blocked** a core→interface import. Both reverted to clean.
+4. **P1 findings (a gate that exists failing to fire): 0.**
+5. **Two absences (not breakages), for an operator ruling:** no commit-msg
+   conventional-commit gate (discipline-only); no pre-push `block_ff_push`
+   (hub **#302** — a non-ff push is stopped only by git-native remote rejection,
+   so `--force` has no corp guard).
+6. **The `.methodology.yaml` answer (asked 4×, now permanent):** it **stays at
+   root** — a fixed cross-repo contract read by the hub Informant
+   (`enforcement_coverage.py` `ALLOWLIST_REL`, `fleet_health.py`); moving it to
+   `config/` breaks them. It declares corp's one sanctioned divergence (ruff-gate).
+7. **Root inventory:** 24 entries, **all KEEP, zero KILL** — each traces to a live
+   consumer/ADR/commit. Flags: `models/`, `eval/`, `docs/diagrams/*` are stale
+   (2026-03) → clarify + fold into D4.
+8. **Mermaids:** 2 in ARCHITECTURE.md are current + correctly hand-authored (#262/G11
+   blocks generator adoption); 3 in `docs/diagrams/` are stale → D4 refresh.
+9. **Guardrails honored:** nothing deleted/moved/renamed; hub `.dev-knowledge`
+   verified untouched at `47f31b5`; `main` untouched; all evidence on the lane branch.
+10. **Decisions for the morning:** §4 MORNING ACTION MENU (paste-ready).
 
 ---
 
@@ -266,4 +279,65 @@ re-surfaced in the B-S2 intake). Per the B-S2 operator ruling, the D4 refresh is
 
 ## 4. MORNING ACTION MENU
 
-_(filled in Phase 3 checkpoint)_
+Paste-ready. Write your **one-word verdict** in the last column. Recommendation is
+the default if you do nothing. Nothing below has been executed — all proposal-only.
+
+### 4.1 Lane branch / evidence disposition
+
+| # | Item | Options | Recommendation | Your verdict |
+|---|---|---|---|---|
+| 1 | This brief `docs/audits/2026-07-11-…md` | KEEP-MERGE / DISCARD | **KEEP-MERGE** (cherry-pick to `main` via `--no-ff`; it is the audit record) | `______` |
+| 2 | `tests/qa_lived/` probe (`bb2e16e`) | DISCARD / KEEP-AS-FIXTURE | **DISCARD** (throwaway; it served its purpose) | `______` |
+| 3 | Whole lane branch `worktree-lane-q-qa-lived-audit` | CHERRY-PICK-BRIEF / MERGE-ALL / DELETE | **CHERRY-PICK-BRIEF** (take the brief to `main`, drop the probe) | `______` |
+
+### 4.2 Enforcement gaps (Phase 1)
+
+| # | Item | Options | Recommendation | Your verdict |
+|---|---|---|---|---|
+| 4 | commit-msg conventional-commit gate | ADD-GATE / ACCEPT-DISCIPLINE-ONLY / FILE-PARITY-ITEM | **FILE-PARITY-ITEM** (hub backlog, sibling to #302) | `______` |
+| 5 | pre-push `block_ff_push` (#302) | DEPLOY-NOW / DEFER-TO-#302 | **DEFER-TO-#302** (already tracked PARITY-DEPLOY) | `______` |
+| 6 | T2 `precommit present-not-wired` (Informant) | INVESTIGATE / IGNORE | **INVESTIGATE** (likely the empty commit-msg/pre-push stages; confirm carrier criterion) | `______` |
+
+### 4.3 The `.methodology.yaml` recurring question
+
+| # | Item | Options | Recommendation | Your verdict |
+|---|---|---|---|---|
+| 7 | Keep `.methodology.yaml` at root | KEEP-ROOT / RELOCATE-CONFIG | **KEEP-ROOT** (relocation breaks the hub contract) | `______` |
+| 8 | Add the CLAUDE.md §4 one-line note (text in §3.2-A) | ADD / SKIP | **ADD** (ends the recurring question permanently) | `______` |
+
+### 4.4 README clarifications / renames (proposal-only)
+
+| # | Item | Options | Recommendation | Your verdict |
+|---|---|---|---|---|
+| 9 | `models/README.md` (classifier data, not code models) | ADD / SKIP | **ADD** | `______` |
+| 10 | `eval/README.md` (CLI help-snapshot baseline) | ADD / SKIP | **ADD** | `______` |
+| 11 | Rename `models/` → `classifier_data/` (a move) | RENAME / KEEP-NAME | **KEEP-NAME** (README suffices; rename = churn + breaks `scripts/*classifier*`) | `______` |
+
+### 4.5 Mermaid dispositions
+
+| # | Item | Options | Recommendation | Your verdict |
+|---|---|---|---|---|
+| 12 | M1 codemap + M2 layer-boundary (ARCHITECTURE.md) | KEEP-HAND-AUTHORED / GENERATOR | **KEEP-HAND-AUTHORED** (#262/G11 blocks the generator) | `______` |
+| 13 | M3/M4/M5 `docs/diagrams/*.mermaid` + `conventions.yaml` (stale 2026-03-30) | FOLD-INTO-D4 / REFRESH-NOW / RETIRE | **FOLD-INTO-D4** | `______` |
+
+### 4.6 D4 ARCHITECTURE.md refresh session
+
+| # | Item | Options | Recommendation | Your verdict |
+|---|---|---|---|---|
+| 14 | Schedule the D4 `fix/`-scoped refresh (this §3 is its input package) | GO / DEFER | **GO** — separate session; gate the codemap sub-dimension on hub #262 | `______` |
+
+### 4.7 Staleness flags (operator awareness)
+
+| # | Item | Options | Recommendation | Your verdict |
+|---|---|---|---|---|
+| 15 | `eval/` snapshots (2026-03-28) as a live baseline | KEEP / RE-CAPTURE / RETIRE | **RE-CAPTURE** if used as a gate, else KEEP | `______` |
+| 16 | `models/` datasets (2026-03-26) currency | KEEP / REFRESH / RETIRE | **KEEP** (fixtures; refresh only if classifier is retrained) | `______` |
+
+---
+
+**Run provenance.** Lane `worktree-lane-q-qa-lived-audit`; commits `bb2e16e`
+(probe) → `66695be` (Phase 1) → `ed43d83` (Phase 2) → this finalization. Base
+`af3a793` (B-S2 merge). Hub `.dev-knowledge` @ `47f31b5`, verified clean before/after
+every organ. `main` never touched. No deletions/moves/renames of existing content;
+no new root paths (probe nested under `tests/`). No hub or `~/.claude` writes.
+End posture: **commit-and-STOP** on the lane branch.
