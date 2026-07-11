@@ -48,6 +48,17 @@ repos:
         language: system
         always_run: true
         pass_filenames: false
+      # ADR-101 R4 (fleet ruling d1): every ADDED docs/audits/*.md name must be all-lowercase
+      # kebab-case. Carries ONLY the casing branch of the hub validate_hermetization gate
+      # (Rule A tree-seal + Rule B enum/date-grammar stay hub-local -- see .methodology.yaml
+      # audit-casing-r4). Prospective-only + 11-name enumerated skip-set; the script does its
+      # own `git diff --cached --diff-filter=A`, so always_run + no pass_filenames.
+      - id: validate-audit-casing
+        name: docs/audits/*.md lowercase-kebab casing gate (ADR-101 R4, prospective)
+        entry: python scripts/validate_audit_casing.py
+        language: system
+        always_run: true
+        pass_filenames: false
 
   # Doc-tooling + enforcement hooks single-sourced from the .dev-knowledge hub, pinned to the
   # published methodology tag v1.3.1 (canonical GitHub source = fleet-standard form; ai-council parity).
