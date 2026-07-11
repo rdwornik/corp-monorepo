@@ -10,3 +10,17 @@ sanctioned_divergences:
       amendment 2026-07-06: greenfield deploy skipped the prune sweep; durable
       per-consumer prune scoping is hub #276).
     review_date: 2026-10-07
+  - component: hub-codemap-hooks
+    reason: >-
+      corp-monorepo does NOT consume the codemap-freshness / codemap-generate hub
+      hooks. Its codemap is hand-authored (ARCHITECTURE.md §Codemap, ADR-51 amendment
+      2026-05-22, "not generator-managed"): corp is a single-package src/corp/ layout
+      whose corp.-prefixed imports + dotted tach.toml keys make the hub generator
+      degenerate to a 0-edge, 0-layer orphan graph, so `codemap check` ALWAYS reports a
+      diff -- wiring it as an active gate would block every commit touching src/*.py /
+      ARCHITECTURE.md / pyproject.toml / tach.toml. Same exclusion as ai-council (also
+      hand-authored, single-package). hub-codemap-hooks is waivable:true in
+      manifest-v1.3.x. NOTE: the deploy tool does not yet read this waiver (hub #276
+      design-deferred) -- a real deploy/tool.py --execute would re-append
+      codemap-freshness on a rev bump; re-remove until #276 lands.
+    review_date: 2026-10-11

@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-06-04
+last_reviewed: 2026-07-11
 status: active
 owner: Rob
 ---
@@ -7,7 +7,7 @@ owner: Rob
 # Architecture — `corp-monorepo`
 
 > Living document. Updated after structural changes.
-> Last updated: `2026-06-04` (`count refresh — inbox/database LOC, type/client-alias, notes-table, agents counts re-verified live against repo state`)
+> Last updated: `2026-07-11` (`§Authority ADR-31/Layer-2 citation split — D4 staleness fix; structural counts unchanged since the 2026-06-04 refresh`)
 
 <!-- TOC:START -->
 - [Purpose](#purpose-core)
@@ -565,7 +565,7 @@ captured in ADR-27; implementation follows in PR-1 (foundation), PR-2
 
 ## Authority and governance
 
-corp-monorepo is a **product/code repo** governed by `.dev-knowledge` (Layer-2 binding authority, ADR-31). It owns its local product/architecture ADRs (`docs/decisions/`) and conforms to ecosystem ADRs (naming, file lifecycle, the seven-file canonical baseline ADR-38 A6).
+corp-monorepo is a **product/code repo** governed by `.dev-knowledge` (Layer-2 architecture, `.dev-knowledge` ADR-28; binding authority via conformance audit, `.dev-knowledge` ADR-31). It owns its local product/architecture ADRs (`docs/decisions/`) and conforms to ecosystem ADRs (naming, file lifecycle, the seven-file canonical baseline ADR-38 A6).
 
 - **Conformance:** verified out-of-band, read-only, by `.dev-knowledge/scripts/audit.py`. `.dev-knowledge` never writes here (Layer-2 invariant, ADR-28).
 - **Local decisions:** product/architecture choices (extraction, ingest, retrieval, Tach layers) live in `docs/decisions/ADR-NN`; immutable — supersede with a new ADR.
