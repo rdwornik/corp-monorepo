@@ -24,3 +24,16 @@ sanctioned_divergences:
       design-deferred) -- a real deploy/tool.py --execute would re-append
       codemap-freshness on a rev bump; re-remove until #276 lands.
     review_date: 2026-10-11
+  - component: hub-toc-hooks
+    reason: >-
+      corp-monorepo no longer consumes the toc-freshness / toc-generate hub hooks.
+      Its ARCHITECTURE.md ToC block was removed per fleet ticket #326 (operator ruling:
+      ARCHITECTURE.md is CC-facing; a rendered ToC is human-facing chrome -- the hub set
+      the precedent by stripping its own ToC in the #326 hub leg). With no ToC markers to
+      keep fresh, the toc-freshness binding (was keyed ^ARCHITECTURE\.md$) is withdrawn and
+      toc-generate (manual stage) with it. The hooks stay AVAILABLE from the hub at v1.3.1 --
+      only corp's binding is removed. NOTE: manifest v1.3.1's fleet-generic install set still
+      DECLARES toc-freshness/toc-generate keyed on ARCHITECTURE.md even though the hub itself
+      dropped toc-on-ARCHITECTURE; this waiver is expected to RETIRE when the manifest re-scopes
+      (or removes) the toc hooks from the generic set -- at which point corp is no-longer-divergent.
+    review_date: 2026-10-11

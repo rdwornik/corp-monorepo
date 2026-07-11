@@ -51,18 +51,19 @@ repos:
 
   # Doc-tooling + enforcement hooks single-sourced from the .dev-knowledge hub, pinned to the
   # published methodology tag v1.3.1 (canonical GitHub source = fleet-standard form; ai-council parity).
-  # Consumed: the two TOC hooks + the two enforcement gates -- backlog-id-on-close (commit-msg) and
-  # block-ff-push (pre-push, armed at v1.3.1 which post-dates the #318/#319 range-reconstruction fixes).
-  # The codemap hooks are intentionally NOT consumed: corp's codemap is hand-authored (ARCHITECTURE.md
+  # Consumed: the two enforcement gates -- backlog-id-on-close (commit-msg) and block-ff-push
+  # (pre-push, armed at v1.3.1 which post-dates the #318/#319 range-reconstruction fixes).
+  # The two TOC hooks are NO LONGER consumed: corp dropped its ARCHITECTURE.md ToC block per fleet
+  # ticket #326 (ARCHITECTURE.md is CC-facing; a rendered ToC is human-facing chrome -- hub set the
+  # precedent). With no ToC markers to keep fresh, the toc-freshness binding (was keyed ^ARCHITECTURE\.md$)
+  # and toc-generate are withdrawn; the hooks stay AVAILABLE from the hub, only corp's binding is removed.
+  # The codemap hooks are also intentionally NOT consumed: corp's codemap is hand-authored (ARCHITECTURE.md
   # §Codemap, ADR-51 amendment 2026-05-22, "not generator-managed"), and the hub generator cannot model
   # corp's single-package src/corp/ layout (corp.-prefixed imports + dotted tach.toml keys yield a
-  # 0-edge, 0-layer orphan graph). See JOURNAL 2026-06-03 + .claude/skills/gotchas; recorded
-  # machine-readably in .methodology.yaml (hub-codemap-hooks waiver).
+  # 0-edge, 0-layer orphan graph). See JOURNAL 2026-06-03 + .claude/skills/gotchas; both divergences
+  # recorded machine-readably in .methodology.yaml (hub-toc-hooks + hub-codemap-hooks waivers).
   - repo: https://github.com/rdwornik/dev-knowledge
     rev: v1.3.1
     hooks:
-      - id: toc-freshness
-        files: '^ARCHITECTURE\.md$'
-      - id: toc-generate  # manual stage only: pre-commit run toc-generate --hook-stage manual
       - id: backlog-id-on-close
       - id: block-ff-push
