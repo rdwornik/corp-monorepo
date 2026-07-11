@@ -37,3 +37,34 @@ sanctioned_divergences:
       dropped toc-on-ARCHITECTURE; this waiver is expected to RETIRE when the manifest re-scopes
       (or removes) the toc hooks from the generic set -- at which point corp is no-longer-divergent.
     review_date: 2026-10-11
+  - component: audit-casing-r4
+    reason: |-
+      corp enforces the R4 casing branch ONLY of hub ADR-101's validate_hermetization
+      gate: every ADDED docs/audits/*.md must be all-lowercase kebab-case (no UPPERCASE,
+      no _underscore_, no CamelCase; sole carve-out a literal `.` for a repo/version token).
+      Authority: hub ADR-101 R4 (fleet ruling d1, hub
+      docs/audits/2026-07-11-technical-fleet-parity-register.md) -- cross-repo pointer; the
+      register lives in the hub, not corp; do not hunt for it here.
+      Two hub-gate branches are NOT carried and stay hub-local:
+        (1) Rule A top-level tree-seal (sanctioned Tier-1 dirs/files + docs/<genre> set);
+        (2) Rule B CLOSED 11-class audit-class enum + YYYY-MM-DD date-shape grammar --
+            corp audit files use free lowercase slugs (estate-recon, deep-dealloop,
+            foundation-review) outside that enum, so carrying it would over-block.
+      corp runs the casing branch via scripts/validate_audit_casing.py, prospective-only
+      (git diff --cached --diff-filter=A; MODIFIED/existing files never checked).
+      Boundary: corp ADR-14 still governs MyWork content-file naming
+      ({YYYY-MM}_{TYPE}_{CLIENT}_ UPPERCASE codes, config/naming_config.yaml) -- OUT OF SCOPE.
+      The 11 pre-existing UPPERCASE _TYPE_ files are grandfathered by ENUMERATION (declared
+      here + carried as a skip-set in the script), never by pattern:
+        2026-07-07_AUDIT_demo-prep-recon.md
+        2026-07-07_BRAINSTORM-BACKLOG_functional-requirements.md
+        2026-07-07_BRIEF_algorithmic-adopt-map.md
+        2026-07-07_BRIEF_golden-url-registry-knowledge-flow.md
+        2026-07-07_BRIEF_obsidian-operating-model-v2.md
+        2026-07-07_BRIEF_ontology-north-star.md
+        2026-07-07_EVIDENCE_by-product-docs-tree-analysis.md
+        2026-07-07_HANDOFF_functional-architect.md
+        2026-07-08_AUDIT_fa-campaign-self-review.md
+        2026-07-08_BRIEF_metadata-charter-T1.md
+        2026-07-11_AUDIT_root-parity-disposition.md
+    review_date: 2026-10-12
