@@ -60,6 +60,20 @@ repos:
         always_run: true
         pass_filenames: false
 
+      # BACKLOG.md story-map schema gate. This is the PLUGIN TWIN of the hub validator
+      # (.dev-knowledge/plugins/tier1-lifecycle/scripts/validate_backlog.py, 239-line
+      # E/S-agnostic form), copied byte-identical per ADR-78 carrier-doctrine (NOT the hub
+      # root 356-line E/S-coupled script, which is HUB-ONLY and would hard-fail corp). Early
+      # adoption ahead of the #281/#286 durable carrier -- operator D1 disposition / #331
+      # consumer-adoption ruling. To be superseded by the carrier when it ships.
+      - id: validate-backlog
+        name: validate BACKLOG.md story-map schema
+        entry: python scripts/validate_backlog.py
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+
   # Doc-tooling + enforcement hooks single-sourced from the .dev-knowledge hub, pinned to the
   # published methodology tag v1.3.1 (canonical GitHub source = fleet-standard form; ai-council parity).
   # Consumed: the two enforcement gates -- backlog-id-on-close (commit-msg) and block-ff-push
