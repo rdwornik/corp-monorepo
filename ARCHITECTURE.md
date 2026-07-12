@@ -1,5 +1,5 @@
 ---
-last_reviewed: 2026-07-11
+last_reviewed: 2026-07-12
 status: active
 owner: Rob
 ---
@@ -7,19 +7,15 @@ owner: Rob
 # Architecture — `corp-monorepo`
 
 > Living document. Updated after structural changes.
-> Last updated: `2026-07-11` (`[#326] ToC + Mermaid strip; codemap → textual edge list; structural counts unchanged since the 2026-06-04 refresh`)
+> Last updated: `2026-07-12` (`docs/diagrams/ deleted (fleet ruling 2026-07-12); diagram pointers removed`)
 
 ## Purpose [CORE]
-
-> **Visual diagrams** live in `docs/diagrams/`. Open the `.svg` files directly in VS Code for rendered architecture views (system context, module map, pipeline flow).
 
 Corporate OS is a knowledge management system for Blue Yonder presales. It ingests
 files from a MyWork folder hierarchy, extracts structured knowledge via LLM (Gemini/Claude),
 stores results as Obsidian vault notes with YAML frontmatter, and serves queries
 through a full-text search index. Five CLIs (`corp`, `corp-meta`, `cke`, `cpe`, `com`)
 expose all operations.
-
-→ System context diagram: `docs/diagrams/system-context.svg`
 
 ## Codemap [CORE]
 
@@ -28,9 +24,7 @@ The codemap answers *"what exists and how does it relate?"*. Hand-authored
 `tach.toml`, so a future generator opt-in would derive layer colors — out of
 scope here). The top-level package graph is below as a textual edge list; the
 full source layout follows as a further textual complement. This dependency
-edge list is the canonical codemap, superseding the hand-drawn
-`container-module.svg` (retained only as a curated higher-level view under
-§Diagrams pointers).
+edge list is the canonical codemap.
 
 <!-- CODEMAP:START -->
 ```
@@ -239,8 +233,6 @@ is not a violation.
 **No import cycle violations.** Former `llm_router` ↔ `intent_router`
 cycle was resolved by extracting `Intent` to `routing_types.py`.
 
-→ Module map diagram: `docs/diagrams/container-module.svg`
-
 ### Key Invariants
 
 1. **corp (ingest/) is SOLE vault writer** -- CKE produces JSON, ingest writes .md (narrowed by ADR-27: `vault_io.write_note` remains sole writer for `.md` sources under `02_sources/`; `actions/*` may write directly to three named categories — DASHBOARDS, METADATA, BRIEFS)
@@ -388,8 +380,6 @@ Location: `%LOCALAPPDATA%/corp-by-os/overnight_state.db`
 9. query_engine / retrieve/ reads from index.db
        |  FTS5 BM25 ranking + metadata filters + vault content loading
 ```
-
-→ Pipeline diagram: `docs/diagrams/magistrala-pipeline.svg`
 
 ## Design Patterns
 
