@@ -3,8 +3,9 @@
 <!-- scope: hybrid -->
 
 > **Format:** `### YYYY-MM-DD | source | lesson | category | [scope: X] | action taken`
-> New entries go at the top. Never edit old entries. Never delete (ADR-29).
+> New entries go at the top of the Entries section. Never edit old entries. Never delete (ADR-29).
 > Cross-ecosystem lessons live in `../.dev-knowledge/LESSONS.md`; this file is corp-monorepo-local.
+> Last updated: 2026-07-13
 
 ---
 

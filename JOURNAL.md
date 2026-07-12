@@ -1,6 +1,8 @@
 # Journal — corp-monorepo
 
-> Append-only log. Never edit old entries.
+<!-- scope: meta -->
+
+> Per-session tactical log of corp-monorepo Claude Code work. **Newest-first prepend ordering** — never edit old entries; prepend the new entry at the top of the entry list (under this intro blockquote, before existing entries).
 > Per-entry shape (per ADR-49, cutover 2026-05-18):
 > `### YYYY-MM-DD — <session topic>` header, then bullets:
 > `- Did:` what was actually done
