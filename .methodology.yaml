@@ -6,7 +6,9 @@ sanctioned_divergences:
     reason: >-
       corp-monorepo runs its OWN ruff gate, now UNIFIED to the fleet-canonical
       check-only, pinned-rev form: rev v0.15.5, args: [] (check-only -- no --fix;
-      violations surface + block, not auto-fixed), .ruff.toml E/F/I. It stays a
+      violations surface + block, not auto-fixed), the E/F/I ruleset (homed in
+      pyproject [tool.ruff.lint] as of 2026-07-13; the dot-prefixed .ruff.toml was
+      retired, consolidating to a single ruff config source). It stays a
       sanctioned divergence because the fleet-generic manifest DROPPED ruff as an
       add-target ([#244] P2) -- the managed hook set carries no ruff at all, so any
       consumer that keeps a ruff gate is divergent-by-definition (form-parity only;

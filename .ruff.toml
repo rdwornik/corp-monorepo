@@ -1,7 +1,0 @@
-[lint]
-# Start lenient, tighten over time
-select = ["E", "F", "I"]  # errors, pyflakes, imports only
-ignore = ["E501"]  # line length — don't fight this battle now
-
-[lint.per-file-ignores]
-"tests/**" = ["E", "F"]  # lenient in tests for now

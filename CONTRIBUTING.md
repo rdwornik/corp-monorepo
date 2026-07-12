@@ -110,7 +110,7 @@ pre-commit run --all-files
 
 | Hook | Stage | What it does |
 |------|-------|--------------|
-| `ruff` | pre-commit | Lint gate (check-only; `.ruff.toml` E/F/I — violations block, not auto-fixed) |
+| `ruff` | pre-commit | Lint gate (check-only; `pyproject.toml [tool.ruff.lint]` E/F/I — violations block, not auto-fixed) |
 | `tach-check` | pre-commit | Import-layer boundaries (`interface > orchestration > core > foundation`) |
 | `normalize-headers` | pre-commit | Normalize dated-log headers (JOURNAL/LESSONS) |
 | `floor-hash-verify` | pre-commit | `.claude/CLAUDE-FLOOR.md` matches its sha256 sidecar (ADR-93) |
