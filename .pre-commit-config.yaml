@@ -13,10 +13,10 @@ default_stages: [pre-commit]
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.8
+    rev: v0.15.5
     hooks:
       - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
+        args: []   # check-only gate (fleet-canonical form): violations surface + block, not auto-fixed
       # ruff-format omitted: core.autocrlf=true on Windows causes CRLF/LF conflict
       # in pre-commit's stash/unstash cycle. Run `ruff format packages/` manually
       # or via dev-check.ps1 instead.
