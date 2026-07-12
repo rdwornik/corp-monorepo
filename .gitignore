@@ -13,7 +13,9 @@ venv/
 env/
 
 # IDE
-.vscode/
+.vscode/*
+# tracked: hub files.watcherExclude for .claude/worktrees (PLAYBOOK §8)
+!.vscode/settings.json
 .idea/
 
 # OS
