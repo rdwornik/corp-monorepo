@@ -68,3 +68,12 @@ sanctioned_divergences:
         2026-07-08_BRIEF_metadata-charter-T1.md
         2026-07-11_AUDIT_root-parity-disposition.md
     review_date: 2026-10-12
+  - component: github-ci-local
+    reason: >-
+      corp-monorepo tracks a .github/ CI surface (2 workflows:
+      nightly-conformance-triage.yml, tach.yml) that is NOT hub-methodology
+      residue -- it is a legitimate corp-only CI surface, DECLARE-LOCAL per the
+      fleet-parity register verdict e3 (hub
+      docs/audits/2026-07-11-technical-fleet-parity-register.md) -- cross-repo
+      pointer; the register lives in the hub, not corp; do not hunt for it here.
+    review_date: 2026-10-12
