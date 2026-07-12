@@ -133,7 +133,7 @@ Verify after updates: ESSENTIALS ↔ PLAYBOOK alignment; ENVIRONMENT ↔ `~/.cla
 `### YYYY-MM-DD — <topic>` then `- Did:` / `- Result:` / `- Changes:` / `- Abandoned:` / `- Next:`.
 `Changes:` is the sole change record (no CHANGELOG). Append-only newest-first; never edit prior entries.
 
-**Handoffs:** Generated in `.dev-knowledge` per ADR-62/HANDOFF_PROCESS.md (v4 canonical; supersedes ADR-42 v3) — NOT in this repo (ADR-36 read-only contract).
+**Handoffs:** Generated in `.dev-knowledge` per the hub `HANDOFF_PROCESS.md` (**v5**; ADR-62 ratified the earlier v4 process, since superseded) — NOT in this repo (ADR-36 read-only contract).
 Trigger: in Claude Code at `.dev-knowledge`, say "Make handoff for corp-monorepo".
 <!-- methodology:end id=session-end-corp -->
 

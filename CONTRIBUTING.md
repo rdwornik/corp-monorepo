@@ -61,7 +61,7 @@ docs(adr): ADR-65 done-item disposition           # ADR number is itself the ind
 - **Touching** a backlog item: append `[#<id>]` to the summary.
 - **Closing** a backlog item: add `closes [#<id>]` (summary or body) — pairs with the item leaving `BACKLOG.md` in the same or a following commit.
 - **`closes` vs `advances`:** use `closes [#<id>]` on the commit that **finishes** an item — not `advances [#<id>]`. `advances` records intermediate progress only: the item stays open in `BACKLOG.md` **and** invisible to the closure detector (which keys on `closes`), so it silently accumulates as done-but-open and must be closed manually (this is what forced the manual close of #73). A multi-commit arc may use `advances` along the way, but the commit that completes the work must use `closes`.
-- `<id>` is the entry's stable `id:` field (monotonic, never reused — PLAYBOOK §10 schema).
+- `<id>` is the task's stable inline `[#id]` marker (monotonic, never reused; corp uses the ADR-66 story-map inline id, not a YAML `id:` field).
 - **Cross-repo references are repo-qualified.** A bare `[#<id>]` denotes a task in THIS repo only. To reference another fleet repo's backlog item, qualify it: `hub#<id>`, `ai#<id>`, `corp#<id>`. (Operator ruling, content-parity inventory D2 / #331 — qualified-refs chosen over a global allocator. Automated enforcement lands with #328; this is the convention it will check.)
 
 This indexes commits **going forward only.** Git history is immutable — **historical commits are never rewritten** (ADR-65). Pre-convention closures are located via the SHAs already embedded in retired entries (preserved in the one-time migration JOURNAL map).
@@ -72,7 +72,7 @@ This indexes commits **going forward only.** Git history is immutable — **hist
 pre-commit install --hook-type commit-msg
 ```
 
-<!-- LOCAL: the concrete gate script in this repo is `scripts/check_backlog_commit_msg.py` (pre-commit `commit-msg` stage). -->
+<!-- LOCAL: in this repo the commit-msg gate is `backlog-id-on-close`, sourced from the pinned `.dev-knowledge` pre-commit repo (v1.3.1) — not a local script. -->
 
 **"What's been implemented" query.** Because done tasks **leave** `BACKLOG.md` (ADR-65) and git is the implementation record, the list of completed tasks with their implementing commits is:
 
