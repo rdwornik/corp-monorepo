@@ -25,8 +25,15 @@ Thumbs.db
 # Environment
 .env
 
-# Claude — project .claude/ is config (tracked). Runtime data lives in ~/.claude/ not here.
+# Claude — project `.claude/` is config, tracked by default (tracked-.claude
+# convention). Only per-machine / runtime surfaces are ignored: per-machine
+# settings, the scheduled-tasks lock, and the parallel-session worktrees dir.
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
+# Native parallel-session worktrees live in-repo here (ADR-61/#107); ignore so they don't
+# show as untracked AND so gitignore-respecting walkers (ruff) don't descend into the full
+# checkout. pytest is already safe via its default `.*` norecursedirs (dot-dir skip).
+.claude/worktrees/
 
 # Data
 *.db
@@ -49,22 +56,8 @@ docs/staging/
 
 # Ephemeral Tier-1 closure output
 logs/
-.claude/*
-!.claude/CLAUDE-FLOOR.md
-!.claude/CLAUDE-FLOOR.md.sha256
-!.claude/check_floor_hash.py
 
 # >>> enforcement-mesh (ADR-85 /override) >>>
 logs/.session-override-token
 logs/OVERRIDES.md
-!.claude/commands/
-!.claude/commands/override.md
 # <<< enforcement-mesh <<<
-
-# corp-owned: keep the tracked-.claude convention ("project .claude/ is config,
-# tracked") past the floor's `.claude/*` block above -- re-include the config
-# surfaces corp tracks; settings.local.json stays ignored (its rule above the
-# floor block is now redundant but kept for intent).
-!.claude/settings.json
-!.claude/skills/
-!.claude/workflows/
