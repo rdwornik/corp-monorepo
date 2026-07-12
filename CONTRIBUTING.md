@@ -141,7 +141,7 @@ Decisions that bind future sessions live in `docs/decisions/ADR-NN-topic.md`.
 
 <!-- scope: meta -->
 
-Protocol: the hub methodology protocol `HANDOFF_PROCESS.md` (read at the hub `.dev-knowledge/protocols/` set; hub-pointer, never copied into a consumer) — **v5**. Handoffs centralize in `.dev-knowledge/docs/handoffs/` per ADR-36/62 — **this repo carries no `docs/handoffs/`** (ADR-36 read-only contract; a handoff never writes to a target repo). Continuing a prior session: read the most recent corp-monorepo bundle there (start with its `HANDOFF_BOOT.md`), then the last 5 `JOURNAL.md` entries here.
+Protocol: the hub methodology protocol `HANDOFF_PROCESS.md` (read at the hub `../.dev-knowledge/protocols/` set; hub-pointer, never copied into a consumer) — **v5**. Handoffs centralize in `../.dev-knowledge/docs/handoffs/` per ADR-36/62 — **this repo carries no `docs/handoffs/`** (ADR-36 read-only contract; a handoff never writes to a target repo). Continuing a prior session: read the most recent corp-monorepo bundle there (start with its `HANDOFF_BOOT.md`), then the last 5 `JOURNAL.md` entries here.
 
 Trigger: in Claude Code at `.dev-knowledge`, say "Make handoff for corp-monorepo".
 
@@ -152,7 +152,7 @@ Trigger: in Claude Code at `.dev-knowledge`, say "Make handoff for corp-monorepo
 
 <!-- scope: meta -->
 
-The hub methodology protocol `DEFINITION_OF_DONE.md` (read at the hub `.dev-knowledge/protocols/` set; hub-pointer, never copied into a consumer) is the single source of truth for what "done" means at session close (ADR-85): a session that produces commits adds a `JOURNAL.md` entry naming ≥1 commit SHA from this arc (**hard-gated**), and should update `BACKLOG.md` with a structural marker (**advisory** in v1). It is enforced **mechanically and deterministically** by the carried session-end Stop-hook (no LLM in the gate) — and the only escape is `/override [reason]`. The other living docs (`ARCHITECTURE`, `VISION`, `LESSONS`, this file) are "update when materially affected", not per-session-gated. Pointer only — the rules live in that file, not here (resident copies drift).
+The hub methodology protocol `DEFINITION_OF_DONE.md` (read at the hub `../.dev-knowledge/protocols/` set; hub-pointer, never copied into a consumer) is the single source of truth for what "done" means at session close (ADR-85): a session that produces commits adds a `JOURNAL.md` entry naming ≥1 commit SHA from this arc (**hard-gated**), and should update `BACKLOG.md` with a structural marker (**advisory** in v1). It is enforced **mechanically and deterministically** by the carried session-end Stop-hook (no LLM in the gate) — and the only escape is `/override [reason]`. The other living docs (`ARCHITECTURE`, `VISION`, `LESSONS`, this file) are "update when materially affected", not per-session-gated. Pointer only — the rules live in that file, not here (resident copies drift).
 
 <!-- LOCAL: the concrete Stop-hook script in this repo is `scripts/session_end_backpressure.py`. -->
 
