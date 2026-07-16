@@ -93,6 +93,9 @@ class ExtractionResult:
     freshness: dict = field(default_factory=dict)
     # Gemini File API URI for reuse (e.g., transcript generation)
     gemini_file_uri: str | None = None
+    # Actual mime the File API resolved for the upload (reused for transcript;
+    # a literal video/mp4 breaks non-mp4 containers — see #15)
+    gemini_mime_type: str | None = None
     # Temp slide PNGs rendered from PDF (moved to output by run.py)
     slide_image_paths: list[Path] = field(default_factory=list)
     # Provenance metadata
@@ -495,7 +498,7 @@ def _build_extraction_contents(
     """Build Gemini request content parts based on file type.
 
     Returns:
-        (contents, gemini_file_uri, estimated_duration_min)
+        (contents, gemini_file_uri, gemini_mime_type, estimated_duration_min)
     """
     from google.genai import types
 
@@ -503,6 +506,7 @@ def _build_extraction_contents(
 
     INLINE_SIZE_LIMIT = 20 * 1024 * 1024  # 20MB
     gemini_file_uri = None
+    gemini_mime_type = None
 
     # Estimate duration from sampled frames for token budget
     estimated_duration_min = 0
@@ -526,6 +530,7 @@ def _build_extraction_contents(
 
             uploaded = _upload_and_wait(client, file.path, config)
             gemini_file_uri = uploaded.uri
+            gemini_mime_type = uploaded.mime_type
             contents = [types.Part.from_uri(file_uri=uploaded.uri, mime_type=uploaded.mime_type)]
 
             selected = sampled_frames[:MAX_FRAMES_PER_REQUEST]
@@ -551,6 +556,7 @@ def _build_extraction_contents(
         prompt = _prepend_user_context(_get_prompt(config, "extract", custom_prompt=custom_prompt), user_context)
         uploaded = _upload_and_wait(client, file.path, config)
         gemini_file_uri = uploaded.uri
+        gemini_mime_type = uploaded.mime_type
         contents = [
             types.Part.from_uri(file_uri=uploaded.uri, mime_type=uploaded.mime_type),
             types.Part.from_text(text=prompt),
@@ -584,7 +590,7 @@ def _build_extraction_contents(
     else:
         raise ExtractionError(f"Unsupported file type {file.type} for {file.path.name}")
 
-    return contents, gemini_file_uri, estimated_duration_min
+    return contents, gemini_file_uri, gemini_mime_type, estimated_duration_min
 
 
 def _assemble_extraction_result(
@@ -597,6 +603,7 @@ def _assemble_extraction_result(
     routing_reason: str,
     user_context: str,
     gemini_file_uri: str | None,
+    gemini_mime_type: str | None = None,
 ) -> ExtractionResult:
     """Post-process extraction data and build ExtractionResult."""
     from corp.extractor.freshness import compute_freshness_fields
@@ -638,8 +645,9 @@ def _assemble_extraction_result(
     # Freshness tracking
     result.freshness = compute_freshness_fields(file.path)
 
-    # Store Gemini file URI for transcript reuse
+    # Store Gemini file URI + resolved mime for transcript reuse
     result.gemini_file_uri = gemini_file_uri
+    result.gemini_mime_type = gemini_mime_type
 
     # Provenance metadata
     result.model_used = model
@@ -710,7 +718,7 @@ def extract_knowledge(
     use_deep = should_extract_deep(doc_type) and custom_prompt is None
 
     # Build content parts for the request
-    contents, gemini_file_uri, duration_min = _build_extraction_contents(
+    contents, gemini_file_uri, gemini_mime_type, duration_min = _build_extraction_contents(
         client, file, config, sampled_frames, custom_prompt, user_context, doc_type, use_deep
     )
 
@@ -738,7 +746,7 @@ def extract_knowledge(
 
     return _assemble_extraction_result(
         data, file, tokens, use_deep, doc_type,
-        model, routing_reason, user_context, gemini_file_uri,
+        model, routing_reason, user_context, gemini_file_uri, gemini_mime_type,
     )
 
 
