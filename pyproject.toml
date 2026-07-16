@@ -43,6 +43,7 @@ graph = ["msal>=1.24"]
 dev = [
     "pytest>=8.0",
     "pytest-cov>=4.1",
+    "pytest-xdist>=3.8",
     "ruff>=0.8",
     "hypothesis",
     "pre-commit>=4.0",
