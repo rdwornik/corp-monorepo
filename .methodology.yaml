@@ -87,3 +87,14 @@ sanctioned_divergences:
       docs/audits/2026-07-11-technical-fleet-parity-register.md) -- cross-repo
       pointer; the register lives in the hub, not corp; do not hunt for it here.
     review_date: 2026-10-12
+
+  # --- fleet_parity ARC-B DECLARE set (2026-07-16 operator ruling): declaration only ----
+  - component: .vscode
+    reason: >-
+      corp-monorepo tracks .vscode/ (shared workspace editor settings, adopted 2026-07-12).
+      Not part of the intake #12 fleet template, so the #328 root-sweep flags it undeclared.
+      Declared as a sanctioned local editor-config surface. Fleet-parity register e1
+      (shared-editor-config vs ignore) is an OPEN hub ruling; SHORT shelf-life so this is
+      revisited with the fleet-template-membership question (the hub's own .vscode entry
+      carries the same 2026-08-13 review_date).
+    review_date: 2026-08-13
