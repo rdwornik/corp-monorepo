@@ -544,7 +544,7 @@ def process(
             if result.gemini_file_uri:
                 _print(f"  Generating transcript for {f.path.name}...")
                 try:
-                    tr = generate_transcript(f.path, result.gemini_file_uri, config)
+                    tr = generate_transcript(f.path, result.gemini_file_uri, config, result.gemini_mime_type)
                     tr.duration_min = result.duration_min or 0
                     transcripts[f.name] = tr
                     if tr.status == "complete":

@@ -51,6 +51,7 @@ def generate_transcript(
     video_path: Path,
     gemini_file_uri: str,
     config: dict,
+    mime_type: str | None = None,
 ) -> TranscriptResult:
     """Dedicated Gemini call for full verbatim transcript.
 
@@ -58,6 +59,11 @@ def generate_transcript(
         video_path: Original video path (for metadata)
         gemini_file_uri: URI of already-uploaded video in Gemini File API
         config: Unified config dict
+        mime_type: Actual mime of the uploaded video (e.g. ``video/x-matroska``
+            for ``.mkv``). Pass the value resolved by the File API upload
+            (``uploaded.mime_type``); a literal ``video/mp4`` is rejected by
+            Gemini with ``400 INVALID_ARGUMENT`` for non-mp4 containers. Falls
+            back to ``video/mp4`` only when the caller supplies nothing.
 
     Returns:
         TranscriptResult with status "complete" or "failed"
@@ -78,7 +84,7 @@ def generate_transcript(
     model = config.get("model_override") or config.get("gemini", {}).get("model", "gemini-3.1-flash-lite")
 
     contents = [
-        types.Part.from_uri(file_uri=gemini_file_uri, mime_type="video/mp4"),
+        types.Part.from_uri(file_uri=gemini_file_uri, mime_type=mime_type or "video/mp4"),
         types.Part.from_text(text=TRANSCRIPT_PROMPT),
     ]
 

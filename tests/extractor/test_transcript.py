@@ -93,6 +93,61 @@ class TestGenerateTranscript:
         assert mock_client.models.generate_content.call_count == MAX_RETRIES
 
 
+class TestTranscriptMimeType:
+    """Regression: #15 — transcript must use the uploaded file's actual mime,
+    not a literal video/mp4, or non-mp4 containers 400 at Gemini and the
+    transcript is silently dropped."""
+
+    def test_non_mp4_mime_reaches_gemini(self, tmp_path, config):
+        """.mkv → the resolved video/x-matroska mime is passed to from_uri (not video/mp4)."""
+        video = tmp_path / "meeting.mkv"
+        video.touch()
+
+        mock_response = MagicMock()
+        mock_response.text = "[00:00] Speaker 1: Recording from an mkv container."
+
+        with (
+            patch.dict("os.environ", {"GEMINI_API_KEY": "fake-key"}),
+            patch("corp.extractor.transcript.genai") as mock_genai,
+            patch("corp.extractor.transcript.types") as mock_types,
+        ):
+            mock_client = MagicMock()
+            mock_client.models.generate_content.return_value = mock_response
+            mock_genai.Client.return_value = mock_client
+
+            result = generate_transcript(
+                video, "gs://fake/uri", config, mime_type="video/x-matroska"
+            )
+
+        assert result.status == "complete"
+        mock_types.Part.from_uri.assert_called_once_with(
+            file_uri="gs://fake/uri", mime_type="video/x-matroska"
+        )
+
+    def test_mime_defaults_to_mp4_when_absent(self, tmp_path, config):
+        """No mime supplied → falls back to video/mp4 (backward-compatible)."""
+        video = tmp_path / "talk.mp4"
+        video.touch()
+
+        mock_response = MagicMock()
+        mock_response.text = "[00:00] Legacy caller without a mime argument."
+
+        with (
+            patch.dict("os.environ", {"GEMINI_API_KEY": "fake-key"}),
+            patch("corp.extractor.transcript.genai") as mock_genai,
+            patch("corp.extractor.transcript.types") as mock_types,
+        ):
+            mock_client = MagicMock()
+            mock_client.models.generate_content.return_value = mock_response
+            mock_genai.Client.return_value = mock_client
+
+            generate_transcript(video, "gs://fake/uri", config)
+
+        mock_types.Part.from_uri.assert_called_once_with(
+            file_uri="gs://fake/uri", mime_type="video/mp4"
+        )
+
+
 class TestTranscriptNoteWriting:
     def test_transcript_file_written(self, tmp_path):
         """Synthesize writes _transcript.md with frontmatter."""
