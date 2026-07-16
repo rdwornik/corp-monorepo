@@ -462,3 +462,87 @@ Note the 2,607 (JOURNAL) vs 2,583 (witnessed today, same-day) discrepancy is une
 ## Appendix B — per-cluster raw-evidence pointers
 
 Each cluster agent produced a raw-evidence appendix (verbatim grep output per claim). Retained in the session transcript; representative file:line sites are embedded in the tables above.
+
+---
+
+## Addendum A — Codex cross-derivation reconciliation (appended 2026-07-16)
+
+> **Amendment marker (append-only; CLAUDE.md §5 rule 3 — audits are immutable, supersede via a new file or an in-file amendment marker).** This addendum was appended after the audit's original assembly to reconcile an **independent second derivation** of the `src/corp/` dependency map. **Nothing in §0–§7 or Appendices A/B above was rewritten** — the original §1c tables stand as-witnessed. Cross-derivation source, pinned into the evidence library this session: `docs/audits/2026-07-16-codex-edge-diff.md` (gpt-5.6-sol, local Codex `sol` config).
+
+### A.1 Provenance & method delta
+
+The Codex derivation read **`src/corp/` Python source only** — it did **not** read `ARCHITECTURE.md` or this audit's body (a separate comparison pass read only this audit's §1). So the agreements below are genuine double-derivation, not an echo. Codex's normalization frame (verbatim from the diff header):
+
+- **Static:** distinct unit-level absolute `from corp.*` / `import corp.*` edges; **relative imports excluded by definition**.
+- **CLI:** distinct unit-level subprocess edges to `corp`/`cke`/`cpe`/`com`/`corp-meta` or a dynamically-configured agent CLI; external-tool subprocesses excluded.
+- **Data:** distinct unit × **production-store** × direction tuples — **defaults bound to Vault/MyWork count; temporary sandbox / test-pipeline analogues and arbitrary caller-supplied destinations do not.**
+
+### A.2 Static imports + subprocess: double-derivation agreement (89 + 6)
+
+| kind | agreements | Codex-found-but-audit-missed | audit-has-but-Codex-disputes |
+|---|---|---|---|
+| static import edges | **89** | 0 | 1 (definitional — below) |
+| subprocess / CLI edges | **6** | 0 | 0 |
+
+- **Subprocess boundary is cleanly double-derived** — 6 agreements, zero disputes. §1b's subprocess-only corp→CKE finding (and the `rfp → corp retrieve` subprocess edge mis-drawn as an import in the codemap) is independently confirmed.
+- **Sole static dispute — `__main__ → cli` (§1a row 51) — is definitional, not substantive.** Codex excludes it because `src/corp/__main__.py:1` is the **relative** import `from .cli import cli`, outside Codex's "absolute `corp.*`" task definition. This audit witnessed the *same line* and recorded it exactly as such ("relative `from .cli import cli` — invisible to `^from corp` grep, resolved manually"). Both derivations agree on the fact; they differ only on whether a relative import counts as an in-scope edge. **Nothing changes** — the edge is real, the frames just draw the scope line differently.
+
+### A.3 Data edges: normalization-frame reconciliation + read-binding table
+
+Data-set arithmetic after Codex's normalization (from the diff): Codex in-scope set **71** (ops.db 7 + index.db 11 + overnight_state.db 4 + Vault 24 + MyWork 25); this audit's normalized in-scope set **32**; **intersection 32** (the audit's normalized set is a strict subset of Codex's). The **~39-edge delta is not contradiction** — §1c deliberately enumerated store *owners* and WRITE/relocate sites plus representative reads, whereas Codex enumerated **per-consumer READ bindings** at finer grain. The two are complementary; the delta is read-binding enumeration §1c did not spell out row-by-row.
+
+**Spot-verification:** an independent read-only agent re-checked a **10-of-39 sample (~26%)** against source at the cited `file:line` — **10/10 CONFIRMED** (verbatim snippets recorded in the session transcript, e.g. `SELECT key, value FROM meta` for index.db→index_builder; `output_path.write_text(...)` for retrieve→MyWork). The table below transcribes Codex's full 39-edge delta; ✓ marks the spot-checked rows.
+
+| store | edge (direction) | witnessed at (Codex) | spot-checked |
+|---|---|---|---|
+| ops.db | ops.db → ops **READ** | `ops/database.py:225,463-483` | ✓ |
+| index.db | index.db → index_builder **READ** | `index_builder.py:322` | ✓ |
+| index.db | index.db → actions **READ** | `actions/analytics_actions.py:18-20`; `actions/knowledge_actions.py:16-28` | |
+| index.db | actions → index.db **WRITE** | `actions/index_actions.py:16-18` | |
+| index.db | index.db → cli **READ** | `cli/analytics.py:24-30`; `cli/index.py:48-55` | ✓ |
+| index.db | cli → index.db **WRITE** | `cli/index.py:22-36` | |
+| index.db | ingest → index.db **WRITE** | `ingest/inbox.py:550-553` | |
+| overnight_state.db | overnight_state.db → cli **READ** | `cli/overnight.py:205,260,286` | ✓ |
+| vault | vault → actions **READ** | `actions/brief_actions.py:39-43`; `actions/archive_actions.py:63-67` | |
+| vault | vault → chat **READ** | `chat.py:205-209` | ✓ |
+| vault | vault → cli **READ** | `cli/system.py:116-134` | |
+| vault | cli → vault **WRITE** | `cli/extract.py:129-131`; `cli/overnight.py:248-250` | |
+| vault | vault → extraction **READ** | `extraction/vault_writer.py:86-93` | |
+| vault | vault → ingest **READ** | `ingest/extractions.py:248-252`; `ingest/inbox_ops.py:215-230` | |
+| vault | vault → integrity **READ** | `integrity.py:327-332` | |
+| vault | vault → intent_router **READ** | `intent_router.py:355-365` (via production-default `resolve_project`) | |
+| vault | vault → overnight **READ** | `overnight/preflight.py:45-48,67-69` | |
+| vault | vault → project_resolver **READ** | `project_resolver.py:105-112` | |
+| vault | vault → retrieve **READ** | `retrieve/engine.py:441,457` | ✓ |
+| vault | vault → task_manager **READ** | `task_manager.py:197,274,317` | ✓ |
+| vault | vault → template_manager **READ** | `template_manager.py:211-215` | |
+| MyWork | MyWork → actions **READ** | `actions/inbox_actions.py:18-29` | |
+| MyWork | actions → MyWork **WRITE** | `actions/archive_actions.py:47-59` | |
+| MyWork | MyWork → chat **READ** | `chat.py:205-209` | |
+| MyWork | MyWork → cli **READ** | `cli/cleanup.py:32-35`; `cli/extract.py:53-63` | |
+| MyWork | MyWork → extraction **READ** | `cli/extract.py:80-95`; `extraction/scanner.py:44-68,133` | |
+| MyWork | MyWork → extractor **READ** | `cli/extract.py:89-95`; `extractor/extract.py:577,585` | |
+| MyWork | MyWork → freshness_scanner **READ** | `freshness_scanner.py:160-184` | |
+| MyWork | MyWork → ingest **READ** | `ingest/router.py:111-125,671` | ✓ |
+| MyWork | MyWork → integrity **READ** | `integrity.py:393-394,414-430` | |
+| MyWork | MyWork → intent_router **READ** | `intent_router.py:301-303,355-358` (production-default) | |
+| MyWork | MyWork → llm_router **READ** | `llm_router.py:131-133` (production-default) | |
+| MyWork | MyWork → ops **READ** | `ops/registry.py:24-26,59` | |
+| MyWork | MyWork → overnight **READ** | `overnight/monitor.py:66-68`; `overnight/preflight.py:55-60` | |
+| MyWork | MyWork → project_resolver **READ** | `project_resolver.py:55-61,120-122` | |
+| MyWork | MyWork → retrieve **READ** | `cli/retrieve.py:187-200` | |
+| MyWork | retrieve → MyWork **WRITE** | `cli/retrieve.py:200`; `retrieve/prep.py:170` | ✓ |
+| MyWork | MyWork → template_manager **READ** | `template_manager.py:157-168,350-358` | |
+| MyWork | MyWork → vault_io **READ** | `vault_io.py:309-310` | ✓ |
+
+### A.4 Disputed data edges: both frames recorded, nothing resolved
+
+Codex disputes three data-edge families the audit's §1c includes. Each is a **normalization-frame difference** (production-default binding vs any-access), **not a factual disagreement** — the underlying code is identical in both derivations. Per the reconciliation mandate, both frames are recorded and **nothing is resolved here**:
+
+| disputed edge | audit §1c frame (any-access) | Codex frame (production-store only) | disposition |
+|---|---|---|---|
+| `sandbox → {ops.db, index.db, overnight_state.db}` **WRITE** (`sandbox.py:71-86`) | counted — sandbox writes DDL/rows into the three DB files (copies) | excluded — "temporary sandbox copies, not production stores" | frame difference; both correct in-frame — **unresolved** |
+| `test_pipeline → {MyWork, vault}` **WRITE** (`test_pipeline.py:314-316,436-474,524-527`) | counted — writes to MyWork/vault filesystems | excluded — "operates on the temporary sandbox pipeline, not production filesystems" | frame difference — **unresolved** |
+| `project → vault` **WRITE** (`project/cli.py:284-289`) | counted (§1c project row; **§4.2 D6**) — a write to a "vault" path | excluded — "destination is only arbitrary `--copy-to-vault` input; **no production/default vault binding**" | see below |
+
+**The `project → vault` dispute independently confirms the Arc-N1 hole.** Codex's exclusion reason — *"arbitrary `--copy-to-vault` input, no production/default vault binding"* — is a second, blind derivation of exactly what §4.2 **D6** flagged: `project/cli.py:284-289` writes an **arbitrary, unguarded, user-supplied destination** with no vault-root binding and no OneDrive/ADR-27 guard. The two derivations agree on the fact (unbound arbitrary destination); they differ only on whether to *count* it as a data edge. Its disposition is not a counting question — it is the **Arc-N1 `--copy-to-vault` guard** (OneDrive raise + vault-root containment), tracked separately.
