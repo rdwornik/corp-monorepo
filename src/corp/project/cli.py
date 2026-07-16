@@ -15,6 +15,8 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from corp.safety.onedrive import OneDriveSafetyError
+
 console = Console()
 
 # ── Category colour map (Rich markup colours) ────────────────────────────────
@@ -263,7 +265,7 @@ def render(ctx: click.Context, project_path: str, copy_to_vault: str | None) -> 
 
     try:
         stats = render_project(path)
-    except (FileNotFoundError, ValueError) as e:
+    except (FileNotFoundError, ValueError, OneDriveSafetyError) as e:
         console.print(f"[red]{e}[/red]")
         sys.exit(1)
 

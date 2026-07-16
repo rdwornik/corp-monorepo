@@ -12,39 +12,19 @@ from pathlib import Path, PurePosixPath, PureWindowsPath
 
 import yaml
 
-from corp.cleanup.errors import OneDriveSafetyError, PathTraversalError
+from corp.safety.onedrive import PathTraversalError, guard_path
 
 log = logging.getLogger(__name__)
-
-_ONEDRIVE_BLOCKED = "OneDrive - Blue Yonder"
 
 
 def _guard_onedrive(path: Path) -> None:
     """Raise if path is under a synced tree — hard safety guard.
 
-    Checks both the original and resolved string forms so a Windows
-    junction or symlink cannot bypass the substring check (Codex review
-    follow-up, 2026-04-21). Fails closed if ``Path.resolve`` itself raises.
-
-    Mirrors the sibling guards in ``cleanup/disk`` and
-    ``actions/_helpers`` pending ADR-27 centralization.
+    Thin wrapper over :func:`corp.safety.onedrive.guard_path` (ADR-27
+    Decision 1 centralization). Kept as a named function so the existing
+    call site below and test importers do not need to change.
     """
-    original = str(path)
-    candidates = [original]
-    try:
-        candidates.append(str(Path(path).resolve(strict=False)))
-    except (OSError, RuntimeError) as exc:
-        raise OneDriveSafetyError(
-            f"BLOCKED: cannot resolve {original!r} to verify synced-tree "
-            f"safety: {exc}"
-        ) from exc
-
-    if any(_ONEDRIVE_BLOCKED in c for c in candidates):
-        raise OneDriveSafetyError(
-            f"BLOCKED: Cannot modify synced path: {path} "
-            f"(resolved candidates: {candidates}). "
-            "Synced paths are read-only. See gotchas for details."
-        )
+    guard_path(path, reason="cleanup/executor move")
 
 
 def _is_absolute_like(s: str) -> bool:
