@@ -9,49 +9,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from corp.index_builder import _SCHEMA
 from corp.retrieve.rfp import RFPAnswer, answer_rfp
 
-# --- Schema (same as test_prep.py) ---
-
-_TEST_SCHEMA = """\
-CREATE TABLE IF NOT EXISTS notes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    project_id TEXT NOT NULL,
-    client TEXT,
-    title TEXT NOT NULL,
-    type TEXT,
-    source_type TEXT,
-    layer TEXT,
-    source TEXT,
-    topics TEXT,
-    products TEXT,
-    domains TEXT,
-    people TEXT,
-    confidentiality TEXT,
-    quality TEXT,
-    language TEXT,
-    date TEXT,
-    valid_to TEXT,
-    model TEXT,
-    tokens_used INTEGER,
-    content_origin TEXT,
-    source_category TEXT,
-    source_locator TEXT,
-    routing_confidence REAL,
-    confidence TEXT,
-    note_path TEXT NOT NULL
-);
-
-CREATE VIRTUAL TABLE IF NOT EXISTS notes_fts USING fts5(
-    title, topics, products, domains, client, project_id,
-    content=notes, content_rowid=id
-);
-
-CREATE TRIGGER IF NOT EXISTS notes_ai AFTER INSERT ON notes BEGIN
-    INSERT INTO notes_fts(rowid, title, topics, products, domains, client, project_id)
-    VALUES (new.id, new.title, new.topics, new.products, new.domains, new.client, new.project_id);
-END;
-"""
+# Schema for test index.db: imported from corp.index_builder._SCHEMA (the canonical
+# DDL) rather than hand-copied, so this fixture cannot silently drift from the real
+# notes/notes_fts tables (ground-truth audit D-8). The full _SCHEMA also creates
+# projects/facts/facts_fts/meta -- unused here, harmless.
 
 
 def _insert_note(
@@ -98,7 +62,7 @@ def rfp_db(tmp_path: Path) -> tuple[Path, Path]:
     vault.mkdir()
 
     conn = sqlite3.connect(str(db_path))
-    conn.executescript(_TEST_SCHEMA)
+    conn.executescript(_SCHEMA)
 
     _insert_note(
         conn,
@@ -261,7 +225,7 @@ class TestConfidenceLevels:
         vault.mkdir()
 
         conn = sqlite3.connect(str(db_path))
-        conn.executescript(_TEST_SCHEMA)
+        conn.executescript(_SCHEMA)
         conn.close()
 
         mg, mt = _mock_llm()
