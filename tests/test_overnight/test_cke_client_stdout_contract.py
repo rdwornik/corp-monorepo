@@ -15,6 +15,17 @@ router's _run_extraction. It only monkeypatches _resolve_cke_cmd() -- which mere
 picks WHICH executable to invoke -- to point at a fake `cke` stand-in script. The real
 subprocess.run call inside _run_cke and the real _parse_summary regex parsing both
 execute against that fake process's genuine stdout.
+
+Scope (deliberate; Codex N2 review): this pins the CORP-SIDE half of the contract --
+_parse_summary's regexes, the side corp owns and can regress independently. It does
+NOT catch drift in the CKE PRODUCER's printed labels (e.g. "Done:" -> "Completed:"),
+because the corp->CKE boundary is a subprocess (corp.overnight.cke_client's docstring:
+"no direct Python imports from corp.extractor"), and the producer's summary lines are
+printed inline inside the CKE command at src/corp/extractor/scripts/run.py:758-775 --
+not an isolatable pure renderer. A fully non-circular producer<->consumer pin would
+require isolating that renderer into a callable (a PRODUCTION change, out of scope for
+this tests-only arc) and asserting its output parses; that is a tracked follow-up.
+CKE-side label drift is the extractor package's own test responsibility.
 """
 
 from __future__ import annotations

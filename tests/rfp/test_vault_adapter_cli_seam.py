@@ -26,8 +26,10 @@ subprocess.run, since vault_adapter.py never passes an explicit env= kwarg).
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import sqlite3
+import sysconfig
 from pathlib import Path
 
 import pytest
@@ -94,10 +96,19 @@ def cli_seam_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setenv("VAULT_PATH", str(vault))
     monkeypatch.setenv("APP_DATA_PATH", str(appdata))
 
+    # Pin the spawned `corp` to THIS checkout's entry point, not an arbitrary
+    # PATH corp: prepend the running interpreter's Scripts dir (where the corp
+    # console-script is installed for this interpreter -- sysconfig, so it is
+    # correct for both a venv and a system/user install) so subprocess.run
+    # resolves it first. Without this a stale/global corp could pass even if the
+    # checked-out producer is broken (Codex N2). vault_adapter passes no env=, so
+    # this os.environ PATH is what the child inherits.
+    scripts_dir = sysconfig.get_path("scripts")
+    monkeypatch.setenv("PATH", str(scripts_dir) + os.pathsep + os.environ.get("PATH", ""))
+
     return db_path
 
 
-@pytest.mark.skipif(shutil.which("corp") is None, reason="corp CLI not on PATH")
 def test_retrieve_cli_seam_round_trip_unmocked(cli_seam_env: Path) -> None:
     """Real ``corp retrieve --format json`` subprocess -> real vault_adapter._retrieve_via_cli.
 
@@ -121,6 +132,22 @@ def test_retrieve_cli_seam_round_trip_unmocked(cli_seam_env: Path) -> None:
     or the consumer's dict.get(...) calls (vault_adapter.py:57-66,94,98) drift to a
     different key name, this test fails.
     """
+    # A missing corp CLI is a FAILURE, not a skip -- corp is an editable-install
+    # entry point for the running interpreter and is always present when the suite
+    # runs (the whole suite imports corp). Skipping would silently omit this seam
+    # gate (Codex N2). The fixture prepended the interpreter's Scripts dir to PATH,
+    # so this must resolve to THIS checkout's corp, not an unrelated/global install.
+    resolved_corp = shutil.which("corp")
+    assert resolved_corp is not None, (
+        "corp CLI entry point not resolvable -- the checkout's editable install is "
+        "broken; the producer<->consumer seam gate cannot run"
+    )
+    scripts_dir = sysconfig.get_path("scripts")
+    assert os.path.samefile(Path(resolved_corp).parent, scripts_dir), (
+        f"corp resolved to {resolved_corp!r}, not this interpreter's entry-point dir "
+        f"{scripts_dir!r} -- refusing to pass against an unrelated/global corp"
+    )
+
     notes = _retrieve_via_cli(_QUERY, limit=5)
 
     assert notes, (
