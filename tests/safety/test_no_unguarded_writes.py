@@ -172,25 +172,61 @@ def _handler_catches_guard_error(handler: ast.ExceptHandler) -> bool:
     return False
 
 
-def _handler_prevents_continuation(handler: ast.ExceptHandler) -> bool:
-    """True if the handler re-raises or unconditionally halts -- i.e. does
-    NOT silently swallow the guard failure and fall through to the write."""
-    for node in ast.walk(handler):
-        if isinstance(node, ast.Raise):
+def _iter_own_nodes(func: ast.AST) -> Iterable[ast.AST]:
+    """Yield nodes in ``func``'s OWN body, not descending into nested
+    function/lambda scopes.
+
+    A ``guard_path`` or a dangerous write inside a nested ``def``/``lambda``
+    belongs to that inner scope, not ``func`` — counting it against ``func``
+    let "guard in an unrelated nested function" falsely satisfy Rule 1
+    (Codex 2026-07-17). Nested functions are still scanned in their own right
+    by ``_scan_source``'s top-level ``ast.walk``.
+    """
+    _SCOPES = (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)
+    stack: list[ast.AST] = [s for s in getattr(func, "body", []) if not isinstance(s, _SCOPES)]
+    while stack:
+        node = stack.pop()
+        yield node
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, _SCOPES):
+                continue  # do not descend into a nested scope
+            stack.append(child)
+
+
+def _stmt_terminates(stmt: ast.stmt) -> bool:
+    """Whether a single TOP-LEVEL handler statement unconditionally ends the
+    flow that would otherwise fall through to the guarded write: a bare
+    ``raise``, a ``return``, or a halt call (``sys.exit``/``exit``/``quit``/
+    ``os._exit``).
+
+    Only top-level handler statements are inspected — a ``raise``/exit nested
+    inside an ``if``/loop is conditional and does NOT guarantee termination,
+    so ``if debug: raise`` must not count as unconditional (Codex 2026-07-17).
+    """
+    if isinstance(stmt, (ast.Raise, ast.Return)):
+        return True
+    if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
+        f = stmt.value.func
+        if isinstance(f, ast.Attribute) and f.attr in _UNCONDITIONAL_HALT_CALLS:
             return True
-        if isinstance(node, ast.Call):
-            f = node.func
-            if isinstance(f, ast.Attribute) and f.attr in _UNCONDITIONAL_HALT_CALLS:
-                return True
-            if isinstance(f, ast.Name) and f.id in _UNCONDITIONAL_HALT_CALLS:
-                return True
+        if isinstance(f, ast.Name) and f.id in _UNCONDITIONAL_HALT_CALLS:
+            return True
     return False
+
+
+def _handler_prevents_continuation(handler: ast.ExceptHandler) -> bool:
+    """True iff the handler has a TOP-LEVEL re-raise / return / unconditional
+    halt — i.e. no path falls through to the guarded write below the try.
+
+    A conditionally-nested raise/exit (``if x: raise``) does not count: the
+    handler can still swallow the error and fall through (Codex 2026-07-17)."""
+    return any(_stmt_terminates(s) for s in handler.body)
 
 
 def _find_neutered_guards(func: ast.AST) -> list[tuple[int, str]]:
     """Rule 2: guard_path() inside a try whose matching handler neuters it."""
     findings: list[tuple[int, str]] = []
-    for node in ast.walk(func):
+    for node in _iter_own_nodes(func):
         if not isinstance(node, ast.Try):
             continue
         guard_lines = [c.lineno for c in _stmt_calls(node.body) if _is_guard_call(c)]
@@ -199,7 +235,8 @@ def _find_neutered_guards(func: ast.AST) -> list[tuple[int, str]]:
         for handler in node.handlers:
             if _handler_catches_guard_error(handler) and not _handler_prevents_continuation(handler):
                 findings.extend(
-                    (line, "guard_path() neutered: except handler neither re-raises nor halts")
+                    (line, "guard_path() neutered: except handler neither re-raises nor "
+                           "halts on every path")
                     for line in guard_lines
                 )
     return findings
@@ -213,9 +250,11 @@ def _scan_source(source: str, filename: str) -> list[_Violation]:
         if not isinstance(func, (ast.FunctionDef, ast.AsyncFunctionDef)):
             continue
 
+        own_nodes = list(_iter_own_nodes(func))
+
         primitives = [
             (node.lineno, label)
-            for node in ast.walk(func)
+            for node in own_nodes
             if isinstance(node, ast.Call) and (label := _is_dangerous_primitive(node))
         ]
         if not primitives:
@@ -226,19 +265,31 @@ def _scan_source(source: str, filename: str) -> list[_Violation]:
         if _EXEMPT_DECORATOR_NAME in _decorator_names(func):
             continue
 
-        has_guard_call = any(
-            isinstance(node, ast.Call) and _is_guard_call(node) for node in ast.walk(func)
+        guard_linenos = sorted(
+            node.lineno
+            for node in own_nodes
+            if isinstance(node, ast.Call) and _is_guard_call(node)
         )
-        if not has_guard_call:
-            violations.extend(
-                _Violation(
-                    filename, lineno, func.name, primitive,
-                    "no guard_path() call and no @onedrive_write_exempt in this function",
-                )
-                for lineno, primitive in primitives
-            )
-            continue
 
+        # Rule 1 (dominance): each dangerous primitive must be preceded, in
+        # this function's OWN body, by a guard_path() call. A guard AFTER the
+        # write, or one inside a nested function, does not protect it (Codex
+        # 2026-07-17). Lexical precedence is the sound-for-the-named-cases
+        # heuristic; full every-path CFG dominance (a guard only in one branch
+        # of an if) remains an acknowledged ADR-27 limitation deferred to Codex
+        # review ("Conditional guard execution").
+        for lineno, primitive in primitives:
+            if not any(g < lineno for g in guard_linenos):
+                violations.append(
+                    _Violation(
+                        filename, lineno, func.name, primitive,
+                        "no guard_path() precedes this write in the same function "
+                        "(and no @onedrive_write_exempt)",
+                    )
+                )
+
+        # Rule 2 (silent neutering): a preceding guard is only real if its
+        # try/except does not swallow OneDriveSafetyError and fall through.
         violations.extend(
             _Violation(filename, lineno, func.name, "guard_path", note)
             for lineno, note in _find_neutered_guards(func)
@@ -302,6 +353,39 @@ def normalize(path_str):
     return path_str.replace("a", "b")
 """
 
+# Rule 1 dominance: a guard AFTER the write does not protect it.
+_FIXTURE_GUARD_AFTER_WRITE = """\
+from corp.safety.onedrive import guard_path
+
+def copy_then_guard(src, dst):
+    shutil.copy2(src, dst)
+    guard_path(dst, reason="too late -- write already happened")
+"""
+
+# Rule 1 own-scope: a guard inside a nested function does not protect the
+# outer write.
+_FIXTURE_GUARD_IN_NESTED_FUNC = """\
+from corp.safety.onedrive import guard_path
+
+def outer(src, dst):
+    def _unrelated():
+        guard_path(dst, reason="wrong scope")
+    shutil.copy2(src, dst)
+"""
+
+# Rule 2: a conditionally-nested re-raise does not guarantee termination.
+_FIXTURE_CONDITIONAL_RERAISE = """\
+from corp.safety.onedrive import guard_path, OneDriveSafetyError
+
+def copy_conditional_reraise(src, dst, debug):
+    try:
+        guard_path(dst, reason="handler only re-raises when debug")
+    except OneDriveSafetyError:
+        if debug:
+            raise
+    shutil.copy2(src, dst)
+"""
+
 
 def test_self_test_flags_unguarded_write() -> None:
     violations = _scan_source(_FIXTURE_UNGUARDED, "<fixture-unguarded>")
@@ -335,6 +419,27 @@ def test_self_test_ignores_str_replace() -> None:
     """str.replace (2 args) must not be mistaken for Path.replace (1 arg)."""
     violations = _scan_source(_FIXTURE_STR_REPLACE_NOT_FLAGGED, "<fixture-str-replace>")
     assert not violations, f"scanner false-positived on str.replace: {violations!r}"
+
+
+def test_self_test_flags_guard_after_write() -> None:
+    """Rule 1 dominance: a guard_path() AFTER the write must not satisfy the
+    scanner (Codex 2026-07-17)."""
+    violations = _scan_source(_FIXTURE_GUARD_AFTER_WRITE, "<fixture-guard-after-write>")
+    assert violations, "scanner accepted a guard placed AFTER the write -- dominance is broken"
+
+
+def test_self_test_flags_guard_in_nested_func() -> None:
+    """Rule 1 own-scope: a guard_path() inside a nested function must not
+    satisfy the outer function's write (Codex 2026-07-17)."""
+    violations = _scan_source(_FIXTURE_GUARD_IN_NESTED_FUNC, "<fixture-guard-nested>")
+    assert violations, "scanner accepted a guard in an unrelated nested function"
+
+
+def test_self_test_flags_conditional_reraise_handler() -> None:
+    """Rule 2: a handler that only re-raises inside `if debug:` can still fall
+    through to the write and must be flagged (Codex 2026-07-17)."""
+    violations = _scan_source(_FIXTURE_CONDITIONAL_RERAISE, "<fixture-conditional-reraise>")
+    assert violations, "scanner accepted a conditionally-nested re-raise as unconditional"
 
 
 def test_no_unguarded_writes_in_scoped_roots() -> None:

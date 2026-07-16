@@ -61,7 +61,26 @@ def _resolve_candidates(path: str | Path) -> list[str]:
     return [str(path), str(Path(path).resolve(strict=False))]
 
 
-def is_onedrive_path(path: str | Path) -> bool:
+def _matches_zone(candidates: list[str], *, strict: bool) -> bool:
+    """Whether any candidate string names the synced-tree exclusion zone.
+
+    ``strict=True`` (default) matches ONLY the canonical corporate zone
+    ``"OneDrive - Blue Yonder"`` — the policy-defined exclusion zone every
+    other guard site uses (``core-invariants.md``, the ``block-onedrive``
+    hook, ADR-27). ``strict=False`` ADDITIONALLY matches a case-insensitive
+    ``"onedrive"`` substring, preserving the broader net that
+    ``project/renderer.py`` applied before centralization (any personal
+    ``~/OneDrive`` too), so unifying the renderer onto this module does not
+    narrow its protection (Codex review 2026-07-17).
+    """
+    if any(_ONEDRIVE_BLOCKED in c for c in candidates):
+        return True
+    if not strict:
+        return any("onedrive" in c.lower() for c in candidates)
+    return False
+
+
+def is_onedrive_path(path: str | Path, *, strict: bool = True) -> bool:
     """Return True if ``path`` names or resolves into the OneDrive exclusion zone.
 
     Checks the original string form and the ``.resolve(strict=False)`` form
@@ -69,15 +88,20 @@ def is_onedrive_path(path: str | Path) -> bool:
     whose resolved target lands inside it cannot bypass the check. Fails
     closed: if resolution itself raises ``OSError``/``RuntimeError``, the
     path is treated as unverifiable and therefore unsafe (returns True).
+
+    ``strict`` (see :func:`_matches_zone`): ``True`` matches only the
+    canonical ``"OneDrive - Blue Yonder"`` zone; ``False`` also matches any
+    case-insensitive ``"onedrive"`` path (the renderer's pre-centralization
+    breadth).
     """
     try:
         candidates = _resolve_candidates(path)
     except (OSError, RuntimeError):
         return True
-    return any(_ONEDRIVE_BLOCKED in c for c in candidates)
+    return _matches_zone(candidates, strict=strict)
 
 
-def guard_path(path: str | Path, *, reason: str) -> None:
+def guard_path(path: str | Path, *, reason: str, strict: bool = True) -> None:
     """Refuse any write/delete that lands inside a synced tree.
 
     Checks both the original string form and the resolved form so a Windows
@@ -90,6 +114,11 @@ def guard_path(path: str | Path, *, reason: str) -> None:
         path: The path to check.
         reason: Short description of the operation being guarded, included
             in the raised error for auditability.
+        strict: ``True`` (default) refuses only the canonical
+            ``"OneDrive - Blue Yonder"`` zone; ``False`` also refuses any
+            case-insensitive ``"onedrive"`` path (used by
+            ``project/renderer.py`` to preserve its pre-centralization
+            breadth — see :func:`_matches_zone`).
 
     Raises:
         OneDriveSafetyError: If ``path`` is (or resolves to) a synced-tree
@@ -104,7 +133,7 @@ def guard_path(path: str | Path, *, reason: str) -> None:
             f"safety ({reason}): {exc}"
         ) from exc
 
-    if any(_ONEDRIVE_BLOCKED in c for c in candidates):
+    if _matches_zone(candidates, strict=strict):
         raise OneDriveSafetyError(
             f"BLOCKED: refusing to mutate synced path {path} "
             f"(resolved candidates: {candidates}); reason: {reason}. "

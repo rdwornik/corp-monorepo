@@ -138,3 +138,50 @@ class TestCopyToVaultGuards:
         assert result.exit_code == 0, result.output
         copied = inside_dest / project.name / "index.md"
         assert copied.exists()
+
+    def test_existing_destination_symlink_is_refused(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A pre-existing symlink at the destination is refused no-follow —
+        ``shutil.copy2`` would otherwise follow it out of the vault or into
+        OneDrive even when the link's own path text looks safe (Codex
+        2026-07-17). Real symlink creation needs privileges on Windows, so we
+        make the production guard's ``Path.is_symlink()`` report the dest dir
+        as a link (the same simulate-resolution technique as
+        ``tests/test_cleanup/test_onedrive_safety_symlink.py``)."""
+        vault_root = tmp_path / "vault_root"
+        monkeypatch.setenv("VAULT_PATH", str(vault_root))
+        project = tmp_path / "myproj_symlink"
+        project.mkdir()
+        _create_extraction(project)
+        dest = vault_root / "landing"
+
+        def fake_is_symlink(self: Path) -> bool:
+            # Only the copy-to-vault dest dir (name == project.name, under dest)
+            # reports as a symlink; nothing else in the tree is touched.
+            return self.name == project.name and str(self).startswith(str(dest))
+
+        monkeypatch.setattr(Path, "is_symlink", fake_is_symlink, raising=True)
+
+        runner = CliRunner()
+        result = runner.invoke(cli, ["render", str(project), "--copy-to-vault", str(dest)])
+
+        assert result.exit_code != 0, result.output
+        assert "symlink" in result.output.lower(), result.output
+        assert not (dest / project.name / "index.md").exists()
+
+
+def test_render_personal_onedrive_path_still_refused_broad(tmp_path: Path) -> None:
+    """Centralization must not narrow the renderer's protection (Codex
+    2026-07-17): a personal ``OneDrive`` path (no ``"- Blue Yonder"``) is still
+    refused, because ``render_project`` guards with ``strict=False``. A
+    ``strict=True`` guard would let this write through."""
+    # 'OneDrive' but NOT the canonical 'OneDrive - Blue Yonder' zone.
+    personal = tmp_path / "OneDrive" / "personal_proj"
+    personal.mkdir(parents=True)
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["render", str(personal)])
+
+    assert result.exit_code == 1, result.output
+    assert "OneDrive" in result.output or "synced" in result.output, result.output

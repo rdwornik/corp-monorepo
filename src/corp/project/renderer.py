@@ -37,7 +37,11 @@ def render_project(project_path: Path) -> dict:
             raises natively instead of wrapping as ``ValueError``;
             ``corp.project.cli.render`` catches it explicitly).
     """
-    guard_path(project_path, reason="cpe render target")
+    # strict=False preserves the renderer's pre-centralization breadth: it
+    # refused ANY case-insensitive "onedrive" path (incl. a personal
+    # ~/OneDrive), not only the canonical "OneDrive - Blue Yonder" zone.
+    # Centralizing on guard_path must not narrow that protection (Codex 2026-07-17).
+    guard_path(project_path, reason="cpe render target", strict=False)
 
     settings = get_settings()
     knowledge_dir = project_path / settings.knowledge_dir

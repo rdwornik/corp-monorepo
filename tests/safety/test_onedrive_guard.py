@@ -91,6 +91,33 @@ class TestIsOneDrivePath:
         assert is_onedrive_path(fake) is True  # no exception
 
 
+class TestStrictParam:
+    """strict=True (default) matches only the canonical 'OneDrive - Blue Yonder'
+    zone; strict=False also matches any case-insensitive 'onedrive' path,
+    preserving project/renderer.py's pre-centralization breadth (Codex
+    2026-07-17)."""
+
+    def test_personal_onedrive_matched_only_when_broad(self, tmp_path: Path) -> None:
+        # 'OneDrive' but NOT the canonical 'OneDrive - Blue Yonder' zone.
+        personal = tmp_path / "OneDrive" / "personal" / "notes.md"
+        assert is_onedrive_path(personal, strict=True) is False
+        assert is_onedrive_path(personal, strict=False) is True
+
+    def test_guard_path_strict_true_allows_personal_onedrive(self, tmp_path: Path) -> None:
+        personal = tmp_path / "OneDrive" / "notes.md"
+        guard_path(personal, reason="strict canonical only")  # default strict=True: no raise
+
+    def test_guard_path_strict_false_refuses_personal_onedrive(self, tmp_path: Path) -> None:
+        personal = tmp_path / "OneDrive" / "notes.md"
+        with pytest.raises(OneDriveSafetyError, match="synced|OneDrive"):
+            guard_path(personal, reason="broad", strict=False)
+
+    def test_canonical_zone_matched_under_both_modes(self, tmp_path: Path) -> None:
+        canonical = tmp_path / "OneDrive - Blue Yonder" / "file.txt"
+        assert is_onedrive_path(canonical, strict=True) is True
+        assert is_onedrive_path(canonical, strict=False) is True
+
+
 class TestGuardWithinRoot:
     def test_passes_for_inside_path(self, tmp_path: Path) -> None:
         root = tmp_path / "vault"
