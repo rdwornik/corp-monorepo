@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pytest
 
+from corp.index_builder import _SCHEMA
 from corp.retrieve.engine import (
     RetrievalFilter,
     RetrievalResult,
@@ -20,58 +21,10 @@ from corp.retrieve.engine import (
     retrieve,
 )
 
-# --- Schema for test index.db ---
-
-_TEST_SCHEMA = """\
-CREATE TABLE IF NOT EXISTS notes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    project_id TEXT NOT NULL,
-    client TEXT,
-    title TEXT NOT NULL,
-    type TEXT,
-    source_type TEXT,
-    layer TEXT,
-    source TEXT,
-    topics TEXT,
-    products TEXT,
-    domains TEXT,
-    people TEXT,
-    confidentiality TEXT,
-    quality TEXT,
-    language TEXT,
-    date TEXT,
-    valid_to TEXT,
-    model TEXT,
-    tokens_used INTEGER,
-    content_origin TEXT,
-    source_category TEXT,
-    source_locator TEXT,
-    routing_confidence REAL,
-    confidence TEXT,
-    note_path TEXT NOT NULL,
-    rfp_visible INTEGER NOT NULL DEFAULT 0
-);
-
-CREATE VIRTUAL TABLE IF NOT EXISTS notes_fts USING fts5(
-    title, topics, products, domains, client, project_id,
-    content=notes, content_rowid=id
-);
-
-CREATE TRIGGER IF NOT EXISTS notes_ai AFTER INSERT ON notes BEGIN
-    INSERT INTO notes_fts(rowid, title, topics, products, domains, client, project_id)
-    VALUES (new.id, new.title, new.topics, new.products, new.domains, new.client, new.project_id);
-END;
-
-CREATE TRIGGER IF NOT EXISTS notes_ad AFTER DELETE ON notes BEGIN
-    INSERT INTO notes_fts(
-        notes_fts, rowid, title, topics, products, domains, client, project_id
-    )
-    VALUES (
-        'delete', old.id, old.title, old.topics, old.products, old.domains,
-        old.client, old.project_id
-    );
-END;
-"""  # noqa: E501
+# Schema for test index.db: imported from corp.index_builder._SCHEMA (the canonical
+# DDL) rather than hand-copied, so this fixture cannot silently drift from the real
+# notes/notes_fts tables (ground-truth audit D-8). The full _SCHEMA also creates
+# projects/facts/facts_fts/meta -- unused here, harmless.
 
 
 @pytest.fixture()
@@ -79,7 +32,7 @@ def test_db(tmp_path: Path) -> Path:
     """Create a test index.db with sample notes."""
     db_path = tmp_path / "index.db"
     conn = sqlite3.connect(str(db_path))
-    conn.executescript(_TEST_SCHEMA)
+    conn.executescript(_SCHEMA)
 
     # Create vault notes on disk
     vault = tmp_path / "vault"
@@ -502,7 +455,7 @@ class TestRfpOnlyFilter:
         """Create index.db with notes having different rfp_visible values."""
         db_path = tmp_path / "index.db"
         conn = sqlite3.connect(str(db_path))
-        conn.executescript(_TEST_SCHEMA)
+        conn.executescript(_SCHEMA)
 
         vault = tmp_path / "vault"
         vault.mkdir()
@@ -610,7 +563,7 @@ class TestClientAliasResolution:
         """DB with one note tagged client='Jaguar Land Rover'."""
         db_path = tmp_path / "index.db"
         conn = sqlite3.connect(str(db_path))
-        conn.executescript(_TEST_SCHEMA)
+        conn.executescript(_SCHEMA)
 
         vault = tmp_path / "vault"
         vault.mkdir()
