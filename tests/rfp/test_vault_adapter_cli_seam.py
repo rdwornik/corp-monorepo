@@ -29,6 +29,8 @@ import json
 import os
 import shutil
 import sqlite3
+import subprocess
+import sys
 import sysconfig
 from pathlib import Path
 
@@ -106,6 +108,15 @@ def cli_seam_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     scripts_dir = sysconfig.get_path("scripts")
     monkeypatch.setenv("PATH", str(scripts_dir) + os.pathsep + os.environ.get("PATH", ""))
 
+    # Pin the child's corp PACKAGE (not just the launcher location) to THIS
+    # checkout's src/. Prior CLI-entry-point overwrites (CLAUDE.md gotcha: a
+    # `pip install` from an _archived_ repo overwrites the monorepo entry point)
+    # mean a launcher in this interpreter's scripts dir could still import a
+    # stale editable/global corp. Prepending src/ to PYTHONPATH forces `import
+    # corp` in the child to resolve to this checkout (Codex N2 r2).
+    repo_src = Path(__file__).resolve().parents[2] / "src"
+    monkeypatch.setenv("PYTHONPATH", str(repo_src) + os.pathsep + os.environ.get("PYTHONPATH", ""))
+
     return db_path
 
 
@@ -146,6 +157,23 @@ def test_retrieve_cli_seam_round_trip_unmocked(cli_seam_env: Path) -> None:
     assert os.path.samefile(Path(resolved_corp).parent, scripts_dir), (
         f"corp resolved to {resolved_corp!r}, not this interpreter's entry-point dir "
         f"{scripts_dir!r} -- refusing to pass against an unrelated/global corp"
+    )
+
+    # Verify the child actually imports THIS checkout's corp PACKAGE (not a stale
+    # global/editable one), under the PYTHONPATH the fixture set. The real `corp
+    # retrieve` child below inherits the same os.environ, so this probe reflects
+    # exactly which corp it imports (Codex N2 r2).
+    repo_src = Path(__file__).resolve().parents[2] / "src"
+    probe = subprocess.run(
+        [sys.executable, "-c", "import corp, sys; sys.stdout.write(corp.__file__)"],
+        capture_output=True,
+        text=True,
+    )
+    assert probe.returncode == 0, f"child could not import corp: {probe.stderr}"
+    child_corp = Path(probe.stdout.strip()).resolve()
+    assert repo_src.resolve() in child_corp.parents, (
+        f"child imports corp from {child_corp}, not this checkout's src {repo_src.resolve()} "
+        "-- a stale global/editable corp would falsely pass this seam test"
     )
 
     notes = _retrieve_via_cli(_QUERY, limit=5)
