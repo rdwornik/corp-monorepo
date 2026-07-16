@@ -17,6 +17,7 @@ from pathlib import Path
 import yaml
 
 from corp.project.config import get_settings
+from corp.safety.onedrive import guard_path
 
 logger = logging.getLogger(__name__)
 
@@ -29,27 +30,18 @@ def render_project(project_path: Path) -> dict:
 
     Returns:
         Summary dict with stats
-    """
-    # Check both the original and resolved string forms so a junction /
-    # symlink into the synced tree cannot bypass the guard (Codex review
-    # follow-up, 2026-04-21 — same bug class as H-C1 / H-C2). Fail-closed
-    # on resolve failure. Keeps raising ValueError because
-    # ``corp.project.cli.render`` catches (FileNotFoundError, ValueError).
-    candidates = [str(project_path)]
-    try:
-        candidates.append(str(project_path.resolve(strict=False)))
-    except (OSError, RuntimeError) as exc:
-        raise ValueError(
-            f"Cannot resolve {project_path!r} to verify synced-tree "
-            f"safety: {exc}"
-        ) from exc
 
-    if any("onedrive" in c.lower() for c in candidates):
-        raise ValueError(
-            f"Cannot write to synced (OneDrive) path: {project_path}. "
-            f"Resolved candidates: {candidates}. "
-            "Copy project to a local path first."
-        )
+    Raises:
+        OneDriveSafetyError: If ``project_path`` is (or resolves to) a
+            synced-tree path (ADR-27 Decision 1 centralized guard — this
+            raises natively instead of wrapping as ``ValueError``;
+            ``corp.project.cli.render`` catches it explicitly).
+    """
+    # strict=False preserves the renderer's pre-centralization breadth: it
+    # refused ANY case-insensitive "onedrive" path (incl. a personal
+    # ~/OneDrive), not only the canonical "OneDrive - Blue Yonder" zone.
+    # Centralizing on guard_path must not narrow that protection (Codex 2026-07-17).
+    guard_path(project_path, reason="cpe render target", strict=False)
 
     settings = get_settings()
     knowledge_dir = project_path / settings.knowledge_dir

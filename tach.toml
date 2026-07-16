@@ -47,6 +47,11 @@ utility = true
 path = "corp.extraction"
 layer = "foundation"
 
+[[modules]]
+path = "corp.safety"
+layer = "foundation"
+utility = true
+
 # CORE — imports from foundation only
 
 [[modules]]

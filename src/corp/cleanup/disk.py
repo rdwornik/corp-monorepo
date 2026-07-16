@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
-from corp.cleanup.errors import OneDriveSafetyError
+from corp.safety.onedrive import guard_path
 from corp.schema.folder_names import CORP_INFRA
 
 logger = logging.getLogger(__name__)
@@ -28,32 +28,13 @@ _DEFAULT_ONEDRIVE_MYWORK = Path.home() / _ONEDRIVE_BLOCKED / "MyWork_OneDrive"
 def _guard_onedrive(path: str | Path) -> None:
     """Refuse any write/delete that lands inside a synced tree.
 
-    Checks both the original string form and the resolved form so a
-    Windows junction, symlink, or configured alias cannot bypass the
-    substring check (Codex review H-C1, 2026-04-21). Fails closed if
-    ``Path.resolve`` itself raises — an unresolvable path is treated as
-    unverifiable, so refused.
-
-    Mirrors the sibling guards in ``cleanup/executor.py`` and
-    ``actions/_helpers.py`` so a future centralization (ADR-27) can
-    replace all three with one import.
+    Thin wrapper over :func:`corp.safety.onedrive.guard_path` (ADR-27
+    Decision 1 centralization). Kept as a named function so the existing
+    call site below and importers outside this module
+    (``scripts/_audit_core.py``, ``tests/test_cleanup/``) do not need to
+    change.
     """
-    original = str(path)
-    candidates = [original]
-    try:
-        candidates.append(str(Path(path).resolve(strict=False)))
-    except (OSError, RuntimeError) as exc:
-        raise OneDriveSafetyError(
-            f"BLOCKED: cannot resolve {original!r} to verify synced-tree "
-            f"safety: {exc}"
-        ) from exc
-
-    if any(_ONEDRIVE_BLOCKED in c for c in candidates):
-        raise OneDriveSafetyError(
-            f"BLOCKED: refusing to mutate synced path {path} "
-            f"(resolved candidates: {candidates}). "
-            "See INCIDENT 2026-03-14; centralization pending (ADR-27)."
-        )
+    guard_path(path, reason="cleanup/disk deletion")
 
 
 @dataclass

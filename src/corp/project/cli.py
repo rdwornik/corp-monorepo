@@ -15,6 +15,13 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from corp.safety.onedrive import (
+    OneDriveSafetyError,
+    PathTraversalError,
+    guard_path,
+    guard_within_root,
+)
+
 console = Console()
 
 # ── Category colour map (Rich markup colours) ────────────────────────────────
@@ -263,7 +270,7 @@ def render(ctx: click.Context, project_path: str, copy_to_vault: str | None) -> 
 
     try:
         stats = render_project(path)
-    except (FileNotFoundError, ValueError) as e:
+    except (FileNotFoundError, ValueError, OneDriveSafetyError) as e:
         console.print(f"[red]{e}[/red]")
         sys.exit(1)
 
@@ -284,10 +291,63 @@ def render(ctx: click.Context, project_path: str, copy_to_vault: str | None) -> 
     if copy_to_vault:
         import shutil
 
+        from corp.schema.pipeline_config import PipelineConfig
+
         vault_dir = Path(copy_to_vault) / path.name
+        dest_file = vault_dir / "index.md"
+        vault_root = PipelineConfig.production().vault_path
+
+        # D6 close: --copy-to-vault is an arbitrary, user-supplied destination.
+        # Guard it before touching disk (ADR-27 Decision 1):
+        #   1. Refuse a pre-existing symlink/reparse point at the dir OR the
+        #      target file — shutil.copy2 FOLLOWS symlinks, so an existing
+        #      dest symlink could redirect the write into OneDrive or outside
+        #      the vault even when the link's own path text looks safe (Codex
+        #      2026-07-17). No-follow rejection closes that bypass.
+        #   2. Refuse a synced (OneDrive) destination — checked on BOTH the dir
+        #      and the final file (each .resolve()s symlink targets too).
+        #   3. Refuse anything resolving outside the configured vault root.
+        try:
+            for candidate in (vault_dir, dest_file):
+                if candidate.is_symlink():
+                    raise PathTraversalError(
+                        f"refusing to write through an existing symlink at "
+                        f"{candidate} (cpe render --copy-to-vault)"
+                    )
+            for candidate in (vault_dir, dest_file):
+                guard_path(candidate, reason="cpe render --copy-to-vault destination")
+                guard_within_root(
+                    candidate,
+                    vault_root,
+                    reason="cpe render --copy-to-vault must land inside the configured vault root",
+                )
+        except (OneDriveSafetyError, PathTraversalError) as e:
+            console.print(f"[red]{e}[/red]")
+            sys.exit(1)
+
         vault_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(knowledge_dir / "index.md", vault_dir / "index.md")
-        console.print(f"\n  Copied to vault: [cyan]{vault_dir / 'index.md'}[/cyan]")
+
+        # Atomic, no-follow write (Codex 2026-07-17): copy into a freshly
+        # created temp file inside vault_dir, then os.replace() over dest_file.
+        # os.replace repoints the directory ENTRY — it does not open/truncate an
+        # existing target — so a pre-existing HARD LINK at dest_file to a synced
+        # file is left untouched (rejecting only symlinks above cannot catch a
+        # hard link), and the swap is atomic. Full directory-TOCTOU hardening
+        # (openat/O_NOFOLLOW handles) is out of scope for this local single-user
+        # CLI's threat model.
+        import os
+        import tempfile
+
+        fd, tmp_name = tempfile.mkstemp(dir=str(vault_dir), suffix=".index.md.tmp")
+        os.close(fd)
+        tmp_file = Path(tmp_name)
+        try:
+            shutil.copy2(knowledge_dir / "index.md", tmp_file)
+            os.replace(tmp_file, dest_file)
+        except BaseException:
+            tmp_file.unlink(missing_ok=True)
+            raise
+        console.print(f"\n  Copied to vault: [cyan]{dest_file}[/cyan]")
 
 
 # ── cpe show ──────────────────────────────────────────────────────────────────

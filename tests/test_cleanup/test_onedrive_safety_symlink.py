@@ -71,12 +71,13 @@ def test_executor_guard_catches_resolved_onedrive(tmp_path: Path) -> None:
 
 
 def test_renderer_guard_catches_resolved_onedrive(tmp_path: Path) -> None:
-    """project/renderer.py inline guard must resolve before checking.
+    """project/renderer.py guard must resolve before checking.
 
-    renderer.render_project raises ValueError for backward compatibility
-    with ``corp.project.cli`` which catches ``(FileNotFoundError, ValueError)``.
-    After the fix the guard still raises ValueError, just for a resolved
-    synced-tree path too.
+    ADR-27 Decision 1 unifies renderer.py on the centralized
+    ``corp.safety.onedrive.guard_path``, which raises ``OneDriveSafetyError``
+    natively instead of wrapping as ``ValueError`` (the prior transitional
+    behavior). ``corp.project.cli.render`` now catches ``OneDriveSafetyError``
+    explicitly alongside ``(FileNotFoundError, ValueError)``.
     """
     fake = tmp_path / "innocent_project_junction"
     fake.mkdir()
@@ -86,7 +87,7 @@ def test_renderer_guard_catches_resolved_onedrive(tmp_path: Path) -> None:
     )
 
     with patch.object(Path, "resolve", _mock_resolve_returns(resolved_into_onedrive)):
-        with pytest.raises(ValueError, match="synced|OneDrive"):
+        with pytest.raises(OneDriveSafetyError, match="synced|OneDrive"):
             render_project(fake)
 
 

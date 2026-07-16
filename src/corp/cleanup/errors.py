@@ -1,26 +1,19 @@
-"""Safety exceptions for cleanup and action mutations.
+"""Deprecated re-export shim for cleanup/action safety exceptions.
 
-Raised fail-closed when a write/delete operation targets a protected path.
+``OneDriveSafetyError`` and ``PathTraversalError`` moved to
+``corp.safety.onedrive`` as part of ADR-27 Decision 1 (OneDrive guard
+centralization). This module is kept for one release cycle (ADR-27
+"Neutral" consequence) so existing importers — ``corp.cleanup.disk``,
+``corp.cleanup.executor``, ``corp.actions._helpers``,
+``scripts/_audit_core.py``, and their tests — keep working unchanged. New
+code should import directly from ``corp.safety.onedrive``.
+
 See INCIDENT 2026-03-14 (OneDrive synced files deleted by cleanup) for the
 class of bug these exceptions prevent.
 """
 
 from __future__ import annotations
 
+from corp.safety.onedrive import OneDriveSafetyError, PathTraversalError  # noqa: F401
 
-class OneDriveSafetyError(RuntimeError):
-    """A write/delete was refused because it targeted a OneDrive-synced path.
-
-    OneDrive - Blue Yonder paths are treated as read-only by design: any
-    mutation there risks corrupting synced SharePoint copies and cannot be
-    undone locally. Callers must stage files outside OneDrive before writing.
-    """
-
-
-class PathTraversalError(RuntimeError):
-    """A path resolved outside its expected root directory.
-
-    Raised when an entry in moves.yaml (or equivalent untrusted source)
-    contains ``..`` segments, absolute paths, or otherwise escapes
-    ``mywork_root`` after resolution.
-    """
+__all__ = ["OneDriveSafetyError", "PathTraversalError"]
