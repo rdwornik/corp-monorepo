@@ -15,6 +15,15 @@
 
 ---
 
+### 2026-07-16 — fleet_parity ARC-B leg 3: DECLARE .vscode (fleet #328)
+- Did: Machine-declared corp's `.vscode/` divergence in `.methodology.yaml` (branch `chore/methodology-declare-vscode`, work commit `e344526`) — shared workspace editor settings (adopted 2026-07-12), not in the intake #12 fleet template, so the #328 root-sweep flagged it undeclared. Declared as a sanctioned local editor-config surface (register-e1 OPEN; short shelf-life 2026-08-13 to revisit fleet-template membership). Declaration ONLY — no behavioral change. Terra reviewed clean. Merged by CC-primary on the operator's GO (`--no-ff`).
+- Result: corp `.vscode` row now PASS-declared in `fleet_parity` (was WARN-undeclared). Full suite green (post-merge). `fleet_parity` vs the mains after ARC-B = 161 at-parity / 20 pass-declared / 1 warn-undeclared — the sole remaining warn is corp `precommit-hub-block`, the ARC-A leg-1 split ticketed as hub `[#336]`.
+- Changes: `.methodology.yaml` (+`.vscode` declare), `JOURNAL.md` (this entry). Work commit `e344526`.
+- Abandoned: none (ARC-A leg-1 hub-block split untouched — hub `[#336]`).
+- Next: leg-1 reconciliation via hub `[#336]` is the only remaining fleet_parity warn.
+
+---
+
 ### 2026-07-16 — fleet_parity ARC-A leg 2: declare+install pytest-xdist>=3.8 (fleet #332 bootstrap)
 - Did: Added `pytest-xdist>=3.8` to `[project.optional-dependencies] dev` in `pyproject.toml` + installed 3.8.0 into `.venv` (branch `chore/pytest-xdist-parity`, work commit `580df91`). Clears the #328 `fleet_parity` `dep-pytest-xdist` WARN — AT-PARITY needs BOTH declared+installed (install-alone reads "installed but UNDECLARED"). One-time manual bootstrap per the #332 charter; does NOT close [#332] (its Done-when P6 deploy-carrier / "ships-with-package" clause is unbuilt — bracket-only). Terra (gpt-5.6-terra) reviewed clean. Merged to main by CC-primary on the operator's GO (merge `c450a3b`, `--no-ff`; merge execution delegated, operator = authorization gate).
 - Result: full suite **2581 passed, 6 skipped** (post-merge, no regression). `fleet_parity` against the three mains = 161 at-parity / 4 warn-undeclared / 0 must-absent; corp's remaining WARNs are `precommit-hub-block` (the leg-1 v1.3.1-pin vs v1.2.0-corpus split, ticketed hub `[#336]`) + `.vscode` (ARC-B DECLARE).
