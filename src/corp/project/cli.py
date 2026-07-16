@@ -15,7 +15,12 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from corp.safety.onedrive import OneDriveSafetyError
+from corp.safety.onedrive import (
+    OneDriveSafetyError,
+    PathTraversalError,
+    guard_path,
+    guard_within_root,
+)
 
 console = Console()
 
@@ -286,7 +291,25 @@ def render(ctx: click.Context, project_path: str, copy_to_vault: str | None) -> 
     if copy_to_vault:
         import shutil
 
+        from corp.schema.pipeline_config import PipelineConfig
+
         vault_dir = Path(copy_to_vault) / path.name
+
+        # D6 close: --copy-to-vault is an arbitrary, user-supplied destination.
+        # Guard it before touching disk (ADR-27 Decision 1): refuse a synced
+        # (OneDrive) destination, then refuse anything outside the configured
+        # vault root (containment).
+        try:
+            guard_path(vault_dir, reason="cpe render --copy-to-vault destination")
+            guard_within_root(
+                vault_dir,
+                PipelineConfig.production().vault_path,
+                reason="cpe render --copy-to-vault must land inside the configured vault root",
+            )
+        except (OneDriveSafetyError, PathTraversalError) as e:
+            console.print(f"[red]{e}[/red]")
+            sys.exit(1)
+
         vault_dir.mkdir(parents=True, exist_ok=True)
         shutil.copy2(knowledge_dir / "index.md", vault_dir / "index.md")
         console.print(f"\n  Copied to vault: [cyan]{vault_dir / 'index.md'}[/cyan]")
