@@ -55,7 +55,7 @@ _SHUTIL_PRIMITIVES: frozenset[str] = frozenset(
     {"rmtree", "move", "copy", "copy2", "copytree"}
 )
 
-_OS_PRIMITIVES: frozenset[str] = frozenset({"remove", "rename", "unlink"})
+_OS_PRIMITIVES: frozenset[str] = frozenset({"remove", "rename", "unlink", "replace"})
 
 _OPEN_WRITE_MODES: frozenset[str] = frozenset({"w", "wb", "a", "ab", "x", "xb"})
 
@@ -112,6 +112,17 @@ def _is_dangerous_primitive(call: ast.Call) -> str:
     """
     func = call.func
     if isinstance(func, ast.Attribute):
+        # os.* mutations (incl. os.replace) are matched FIRST, before the
+        # generic .replace str/Path arg-count heuristic below -- otherwise the
+        # 2-arg os.replace(src, dst) is misread as a harmless str.replace and
+        # slips past the scanner (the atomic write at project/cli.py; Codex
+        # 2026-07-17 R3).
+        if (
+            isinstance(func.value, ast.Name)
+            and func.value.id == "os"
+            and func.attr in _OS_PRIMITIVES
+        ):
+            return f"os.{func.attr}"
         if func.attr == "replace":
             if len(call.args) == 1 and not call.keywords:
                 return "Path.replace"
@@ -124,12 +135,6 @@ def _is_dangerous_primitive(call: ast.Call) -> str:
             and func.attr in _SHUTIL_PRIMITIVES
         ):
             return f"shutil.{func.attr}"
-        if (
-            isinstance(func.value, ast.Name)
-            and func.value.id == "os"
-            and func.attr in _OS_PRIMITIVES
-        ):
-            return f"os.{func.attr}"
     if isinstance(func, ast.Name) and func.id == "open" and len(call.args) >= 2:
         mode = call.args[1]
         if (
@@ -413,6 +418,24 @@ def copy_logger_exit(src, dst, logger):
     shutil.copy2(src, dst)
 """
 
+# os.replace (2-arg) is a real atomic mutation and must NOT be mistaken for a
+# harmless 2-arg str.replace.
+_FIXTURE_UNGUARDED_OS_REPLACE = """\
+import os
+
+def atomic_write_no_guard(tmp, dst):
+    os.replace(tmp, dst)
+"""
+
+_FIXTURE_GUARDED_OS_REPLACE = """\
+import os
+from corp.safety.onedrive import guard_path
+
+def atomic_write_guarded(tmp, dst):
+    guard_path(dst, reason="guarded atomic write")
+    os.replace(tmp, dst)
+"""
+
 
 def test_self_test_flags_unguarded_write() -> None:
     violations = _scan_source(_FIXTURE_UNGUARDED, "<fixture-unguarded>")
@@ -474,6 +497,20 @@ def test_self_test_flags_unrelated_exit_method() -> None:
     and must not count as unconditional termination (Codex 2026-07-17)."""
     violations = _scan_source(_FIXTURE_UNRELATED_EXIT_METHOD, "<fixture-unrelated-exit>")
     assert violations, "scanner treated an unrelated .exit() method as unconditional termination"
+
+
+def test_self_test_flags_unguarded_os_replace() -> None:
+    """os.replace (2 args) is a real atomic mutation and must be scanned, not
+    mistaken for a harmless 2-arg str.replace (Codex 2026-07-17 R3)."""
+    violations = _scan_source(_FIXTURE_UNGUARDED_OS_REPLACE, "<fixture-os-replace>")
+    assert violations, "scanner missed an unguarded os.replace()"
+
+
+def test_self_test_passes_guarded_os_replace() -> None:
+    """A guarded os.replace must pass (the atomic-write pattern in
+    project/cli.py's copy-to-vault)."""
+    violations = _scan_source(_FIXTURE_GUARDED_OS_REPLACE, "<fixture-os-replace-guarded>")
+    assert not violations, f"scanner false-positived on a guarded os.replace: {violations!r}"
 
 
 def test_no_unguarded_writes_in_scoped_roots() -> None:
