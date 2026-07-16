@@ -70,9 +70,14 @@ _CATCHES_GUARD_ERROR_NAMES: frozenset[str] = frozenset(
     {"OneDriveSafetyError", "RuntimeError", "Exception", "BaseException"}
 )
 
-# Calls that unconditionally halt execution -- treated the same as a
-# re-raise for Rule 2 (see module docstring).
-_UNCONDITIONAL_HALT_CALLS: frozenset[str] = frozenset({"exit", "quit", "_exit"})
+# Calls that unconditionally halt execution -- treated the same as a re-raise
+# for Rule 2 (see module docstring). Matched EXACTLY on the receiver so an
+# unrelated method named exit/quit (logger.exit(), session.quit()) that may
+# return normally does NOT count as termination (Codex 2026-07-17):
+#   attribute form -> only sys.exit / os._exit
+#   bare-name form -> only the builtins exit() / quit()
+_HALT_ATTR_CALLS: frozenset[tuple[str, str]] = frozenset({("sys", "exit"), ("os", "_exit")})
+_HALT_NAME_CALLS: frozenset[str] = frozenset({"exit", "quit"})
 
 # (function name) allowlisted to skip Rule 1 entirely, distinct from the
 # @onedrive_write_exempt decorator mechanism. Empty for this batch's scope --
@@ -207,9 +212,13 @@ def _stmt_terminates(stmt: ast.stmt) -> bool:
         return True
     if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
         f = stmt.value.func
-        if isinstance(f, ast.Attribute) and f.attr in _UNCONDITIONAL_HALT_CALLS:
+        if (
+            isinstance(f, ast.Attribute)
+            and isinstance(f.value, ast.Name)
+            and (f.value.id, f.attr) in _HALT_ATTR_CALLS
+        ):
             return True
-        if isinstance(f, ast.Name) and f.id in _UNCONDITIONAL_HALT_CALLS:
+        if isinstance(f, ast.Name) and f.id in _HALT_NAME_CALLS:
             return True
     return False
 
@@ -271,13 +280,18 @@ def _scan_source(source: str, filename: str) -> list[_Violation]:
             if isinstance(node, ast.Call) and _is_guard_call(node)
         )
 
-        # Rule 1 (dominance): each dangerous primitive must be preceded, in
-        # this function's OWN body, by a guard_path() call. A guard AFTER the
-        # write, or one inside a nested function, does not protect it (Codex
-        # 2026-07-17). Lexical precedence is the sound-for-the-named-cases
-        # heuristic; full every-path CFG dominance (a guard only in one branch
-        # of an if) remains an acknowledged ADR-27 limitation deferred to Codex
-        # review ("Conditional guard execution").
+        # Rule 1: each dangerous primitive must be preceded, in this function's
+        # OWN body, by a guard_path() call. This MEETS ADR-27's specified Rule 1
+        # ("require guard_path(...) in the same function") and strengthens it
+        # with own-scope + lexical dominance, which closes the concrete
+        # after-the-write and nested-function bypasses (Codex 2026-07-17 R1).
+        # Two refinements remain intentionally BEYOND ADR-27's presence-based
+        # design and are deferred to Codex review per the ADR's own
+        # acknowledged limitations: (a) full every-path CFG dominance — a guard
+        # only in one branch of an if ("Conditional guard execution"); and
+        # (b) argument-association — matching the guard's argument to the
+        # write's destination. This is an intra-function AST heuristic, not a
+        # dataflow proof.
         for lineno, primitive in primitives:
             if not any(g < lineno for g in guard_linenos):
                 violations.append(
@@ -386,6 +400,19 @@ def copy_conditional_reraise(src, dst, debug):
     shutil.copy2(src, dst)
 """
 
+# Rule 2: an unrelated .exit()/.quit() method is not sys.exit -- it may return
+# normally, so it must NOT count as termination.
+_FIXTURE_UNRELATED_EXIT_METHOD = """\
+from corp.safety.onedrive import guard_path, OneDriveSafetyError
+
+def copy_logger_exit(src, dst, logger):
+    try:
+        guard_path(dst, reason="handler calls an unrelated .exit()")
+    except OneDriveSafetyError:
+        logger.exit()
+    shutil.copy2(src, dst)
+"""
+
 
 def test_self_test_flags_unguarded_write() -> None:
     violations = _scan_source(_FIXTURE_UNGUARDED, "<fixture-unguarded>")
@@ -440,6 +467,13 @@ def test_self_test_flags_conditional_reraise_handler() -> None:
     through to the write and must be flagged (Codex 2026-07-17)."""
     violations = _scan_source(_FIXTURE_CONDITIONAL_RERAISE, "<fixture-conditional-reraise>")
     assert violations, "scanner accepted a conditionally-nested re-raise as unconditional"
+
+
+def test_self_test_flags_unrelated_exit_method() -> None:
+    """Rule 2: an unrelated `logger.exit()` (not sys.exit) may return normally
+    and must not count as unconditional termination (Codex 2026-07-17)."""
+    violations = _scan_source(_FIXTURE_UNRELATED_EXIT_METHOD, "<fixture-unrelated-exit>")
+    assert violations, "scanner treated an unrelated .exit() method as unconditional termination"
 
 
 def test_no_unguarded_writes_in_scoped_roots() -> None:

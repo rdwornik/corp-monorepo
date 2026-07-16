@@ -326,7 +326,27 @@ def render(ctx: click.Context, project_path: str, copy_to_vault: str | None) -> 
             sys.exit(1)
 
         vault_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(knowledge_dir / "index.md", dest_file)
+
+        # Atomic, no-follow write (Codex 2026-07-17): copy into a freshly
+        # created temp file inside vault_dir, then os.replace() over dest_file.
+        # os.replace repoints the directory ENTRY — it does not open/truncate an
+        # existing target — so a pre-existing HARD LINK at dest_file to a synced
+        # file is left untouched (rejecting only symlinks above cannot catch a
+        # hard link), and the swap is atomic. Full directory-TOCTOU hardening
+        # (openat/O_NOFOLLOW handles) is out of scope for this local single-user
+        # CLI's threat model.
+        import os
+        import tempfile
+
+        fd, tmp_name = tempfile.mkstemp(dir=str(vault_dir), suffix=".index.md.tmp")
+        os.close(fd)
+        tmp_file = Path(tmp_name)
+        try:
+            shutil.copy2(knowledge_dir / "index.md", tmp_file)
+            os.replace(tmp_file, dest_file)
+        except BaseException:
+            tmp_file.unlink(missing_ok=True)
+            raise
         console.print(f"\n  Copied to vault: [cyan]{dest_file}[/cyan]")
 
 
