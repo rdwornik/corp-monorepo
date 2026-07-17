@@ -2,7 +2,7 @@
 # ADR-22: RFP KB Federation with Vault Search
 
 **Date:** 2026-03-28
-**Status:** Accepted
+**Status:** Superseded by ADR-33
 **Council debate:** `.ecosystem/council_transcripts/DECISION_22_rfp_federation.md`
 **Panelists:** claude-opus-4-6, gemini-3.1-pro-preview, deepseek-reasoner, grok-4.20-beta
 **Synthesizer:** openai (non-participant)

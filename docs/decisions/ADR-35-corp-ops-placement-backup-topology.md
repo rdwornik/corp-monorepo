@@ -1,6 +1,6 @@
 # ADR-35: corp-ops repo placement and dual-leg backup topology
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-07-17
 - **Decision tier:** Technical-architect intake triage (Path A), 2026-07-06 decision register DR-10 + DR-11
 - **Related:** DR-9 insurance actions — same intake register (`docs/audits/2026-07-06-technical-architect-intake.md` §5): vault git commit + X1 activation; ADR-27 (OneDrive-exclusion guard pattern this mechanism's Graph leg must respect)

@@ -1,6 +1,6 @@
 # ADR-36: Storage topology — estate roles
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-07-17
 - **Decision tier:** Technical-architect intake triage (Path A), 2026-07-06 decision register DR-12
 - **Related:** ADR-34 (vault as essence layer — this ADR names the vault's role in the topology by reference to ADR-34's decision); ADR-27 (safety invariants — OneDrive guard centralization; the mechanical enforcement of this topology's write boundaries); ADR-35 (backup topology for the precious subset of this estate)
