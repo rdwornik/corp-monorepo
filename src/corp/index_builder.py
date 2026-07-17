@@ -42,23 +42,6 @@ CREATE TABLE IF NOT EXISTS projects (
     updated_at TEXT
 );
 
-CREATE TABLE IF NOT EXISTS facts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    project_id TEXT NOT NULL,
-    fact TEXT NOT NULL,
-    source TEXT,
-    source_title TEXT,
-    topics TEXT,
-    domains TEXT,
-    products TEXT,
-    FOREIGN KEY (project_id) REFERENCES projects(project_id)
-);
-
-CREATE VIRTUAL TABLE IF NOT EXISTS facts_fts USING fts5(
-    fact, source_title, topics, project_id,
-    content=facts, content_rowid=id
-);
-
 CREATE TABLE IF NOT EXISTS meta (
     key TEXT PRIMARY KEY,
     value TEXT
@@ -127,17 +110,6 @@ CREATE TRIGGER IF NOT EXISTS notes_ad AFTER DELETE ON notes BEGIN
         'delete', old.id, old.title, old.topics, old.products,
         old.domains, old.people, old.client, old.project_id, old.doc_type);
 END;
-
--- Triggers to keep FTS in sync with facts table
-CREATE TRIGGER IF NOT EXISTS facts_ai AFTER INSERT ON facts BEGIN
-    INSERT INTO facts_fts(rowid, fact, source_title, topics, project_id)
-    VALUES (new.id, new.fact, new.source_title, new.topics, new.project_id);
-END;
-
-CREATE TRIGGER IF NOT EXISTS facts_ad AFTER DELETE ON facts BEGIN
-    INSERT INTO facts_fts(facts_fts, rowid, fact, source_title, topics, project_id)
-    VALUES ('delete', old.id, old.fact, old.source_title, old.topics, old.project_id);
-END;
 """
 
 
@@ -197,17 +169,6 @@ def rebuild_index(db_path: Path | None = None, config: PipelineConfig | None = N
             _insert_project(conn, pid, info)
             projects_count += 1
 
-            # Load facts
-            n = _load_and_insert_facts(conn, pid, info)
-            facts_count += n
-
-            # Update facts_count on the project row
-            if n > 0:
-                conn.execute(
-                    "UPDATE projects SET facts_count = ? WHERE project_id = ?",
-                    (n, pid),
-                )
-
         # Index CKE-generated notes from vault
         notes_count = _index_cke_notes(conn, config.vault_path)
 
@@ -224,8 +185,7 @@ def rebuild_index(db_path: Path | None = None, config: PipelineConfig | None = N
         deduped = _dedup_notes_by_hash(conn)
         notes_count -= deduped
 
-        # Rebuild FTS for both facts and notes
-        conn.execute("INSERT INTO facts_fts(facts_fts) VALUES('rebuild')")
+        # Rebuild FTS for notes
         conn.execute("INSERT INTO notes_fts(notes_fts) VALUES('rebuild')")
 
         # Update meta
@@ -286,7 +246,6 @@ def update_project(
         _ensure_schema(conn)
 
         # Remove old data for this project
-        conn.execute("DELETE FROM facts WHERE project_id = ?", (project_id,))
         conn.execute("DELETE FROM projects WHERE project_id = ?", (project_id,))
 
         project_dirs = _collect_project_dirs(config)
@@ -296,15 +255,6 @@ def update_project(
             return False
 
         _insert_project(conn, project_id, info)
-        n = _load_and_insert_facts(conn, project_id, info)
-        if n > 0:
-            conn.execute(
-                "UPDATE projects SET facts_count = ? WHERE project_id = ?",
-                (n, project_id),
-            )
-
-        # Rebuild FTS for consistency
-        conn.execute("INSERT INTO facts_fts(facts_fts) VALUES('rebuild')")
         conn.commit()
         return True
     finally:
@@ -468,76 +418,6 @@ def _insert_project(conn: sqlite3.Connection, pid: str, info: dict) -> None:
             datetime.now().isoformat(timespec="seconds"),
         ),
     )
-
-
-def _load_and_insert_facts(
-    conn: sqlite3.Connection,
-    pid: str,
-    info: dict,
-) -> int:
-    """Load facts.yaml for a project and insert into DB. Returns count."""
-    facts_paths = []
-
-    # Check vault first
-    if info.get("vault_path"):
-        vault_facts = Path(info["vault_path"]) / "facts.yaml"
-        if vault_facts.exists():
-            facts_paths.append(vault_facts)
-
-    # Fallback to OneDrive _knowledge/
-    if not facts_paths and info.get("onedrive_path"):
-        od_facts = Path(info["onedrive_path"]) / "_knowledge" / "facts.yaml"
-        if od_facts.exists():
-            facts_paths.append(od_facts)
-
-    if not facts_paths:
-        return 0
-
-    total = 0
-    for facts_path in facts_paths:
-        try:
-            with open(facts_path, encoding="utf-8") as f:
-                data = yaml.safe_load(f)
-        except (yaml.YAMLError, OSError) as e:
-            logger.debug("Failed to load facts from %s: %s", facts_path, e)
-            continue
-
-        if not isinstance(data, dict):
-            continue
-
-        facts_list = data.get("facts", [])
-        if not isinstance(facts_list, list):
-            continue
-
-        for fact_item in facts_list:
-            if not isinstance(fact_item, dict):
-                continue
-
-            fact_text = fact_item.get("fact", fact_item.get("text", ""))
-            if not fact_text:
-                continue
-
-            topics = fact_item.get("topics", [])
-            domains = fact_item.get("domains", [])
-            products = fact_item.get("products", [])
-
-            conn.execute(
-                """INSERT INTO facts
-                   (project_id, fact, source, source_title, topics, domains, products)
-                   VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    pid,
-                    fact_text,
-                    fact_item.get("source", ""),
-                    fact_item.get("source_title", ""),
-                    json.dumps(topics) if isinstance(topics, list) else str(topics),
-                    json.dumps(domains) if isinstance(domains, list) else str(domains),
-                    json.dumps(products) if isinstance(products, list) else str(products),
-                ),
-            )
-            total += 1
-
-    return total
 
 
 # ============================================================
