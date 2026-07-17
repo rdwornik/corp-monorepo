@@ -33,9 +33,6 @@ So that the vault-writer scanner covers the whole repo, the extraction path stop
 ## [E2] Engine hygiene (Arc B/C)
 > As a maintainer, I want the signed dead code cut and every stray responsibility given one canonical home, so the engine is lean and the layer graph is honest.
 
-### [S2] Execute the signed Arc-B kills (one revertable commit per batch)
-So that each signed KILL row lands as an independently-revertable commit per the signed manifest.
-
 ### [S3] Unify canonical homes and clear engine debt (Arc C)
 So that config/vocabulary/pricing/frontmatter/LLM-JSON/CKE-invoker each resolve to one home per R5, and the residual hygiene debt is cleared.
 - [#24] [P2][M] Move vocabulary → `schema` · Done when: vocabulary constants live under `schema` and importers are migrated, tach clean · refs R5
