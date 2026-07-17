@@ -15,6 +15,13 @@
 
 ---
 
+### 2026-07-17 — Arc-B terra gate: orphaned-workflow fix (Option A); merge pending
+- Did: terra codex-review on the Arc-B cumulative diff returned **1 HIGH** (`config/workflows.yaml` `my_tasks`/`add_task` workflows invoke the B4-deleted `list_tasks`/`add_task` actions), otherwise CLEAN. Senior ruled **Option A + AMD-3** (operator-authorized). Removed both orphaned workflow blocks as B4-cascade completion (dangling refs to actions killed under the signed row; the B4 caller-enumeration under-listed them) [`d846c0d`].
+- Result: fix committed [`d846c0d`] config-only (28 deletions); no test loads the real `config/workflows.yaml` (all use fixtures); collection 2600 unchanged. **AMD-3** stands PROPOSED (operator queue, non-gating): `intent_router:237` NL-routing cleanup — design decision about the intent surface, now degrades gracefully to the handled "Nieznany workflow" path. Codex-invocation gotcha fixed: `codex exec` hangs on stdin unless `< /dev/null` appended (luna+terra both hung first attempt; killed via TaskStop, relaunched, smoke-tested). luna AMD-1 evidence complete (31 consumer sites).
+- Changes: `config/workflows.yaml` (`my_tasks` + `add_task` removed) [`d846c0d`]; `JOURNAL.md` (this entry).
+- Abandoned: none.
+- Next: re-verify suite (running) → re-run terra CLEAN → `--no-ff` merge → push → `corp index rebuild` (D3, RUN) → close-out package (D1–D4 + CR-1..CR-6 dump + luna curated to docs/audits + `[S2]` cleanup + lane-prompt archival + JOURNAL) → report **MERGED+PUSHED**.
+
 ### 2026-07-17 — Arc-B COMPLETE (Batches 3-DROP / 4 / 5); terra + merge pending
 - Did: Completed the signed Arc-B execution. Batch 3 **DROPPED** (senior Option A — premise falsified; AMD-2) [`391d606`]. Batch 4 (N4 task-manager cascade KILL) on the recorded zero-use word — 9 files removed + 7 de-wired; the manifest under-listed `cli/__init__:106` + the consequential `test_built_in_actions` asserts (both handled); left `intent_router:237` + `workflows.yaml` add_task orphaned (outside signed scope, noted) [`8ffe8e5`]. Batch 5 (frames `tagger`/`extractor` limbs, 0 callers) [`9b7794a`].
 - Result: **All 5 Arc-B batches resolved** — B1 cost_tracker [`b8b958a`] · B2 facts-repoint [`5bcf899`] · B3 DROP [`391d606`] · B4 task-cascade [`8ffe8e5`] · B5 frames [`9b7794a`]. Net collection **2629→2600** (−2 −2 −0 −25 −0); every batch predicted==actual; suite green at each (final **2595p/6s/0f**). Two PROPOSED amendments queued (non-gating): **AMD-1** (facts_count removal; Codex luna evidence lane) + **AMD-2** (Batch-3 premise correction). BACKLOG #19–#23 all closed/dropped; #29 depends-on cleared; `[S2]` now empty (remove at close-out). Signed manifest left immutable throughout.
