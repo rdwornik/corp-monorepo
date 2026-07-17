@@ -100,3 +100,28 @@ Work happens locally in MyWork; the finished deliverable is uploaded MANUALLY vi
 ## 8. Suggested derivation order (dependency, not calendar)
 
 F0 substrate (DR-9 insurance → vault data-trust repair per FR-5 scope → registry v4 + zone renames) → R1 = FR-1 build (sequence inside the RFP audit's seed table; score-inversion fix first) → R2 = coverage gap-fill loop (FR-4) → deal loop (FR-6) → deck lane (FR-7). Write the four ADRs (DR-1, DR-2, DR-10/11, DR-12) before the backlog — they anchor everything. Every backlog item inherits the operator's rule: **a necessary condition ("done when"), testable, per item — no exceptions.**
+
+## 9. Addenda — FR-10…FR-19 (FA campaign 2026-07-07/08)
+
+> **Why this exists.** §3 above defines FR-1…FR-9 only. The FA (functional-architecture) campaign of 2026-07-07/08 added **ten more functional requirements — FR-10…FR-19 — across five architect briefs** in `docs/audits/`. Until now they were invisible from this canonical entry point (the FA-campaign self-review §5-4/§7 flagged this as "the single highest-leverage fix… one addenda pointer"). This section is that pointer: it does **not** restate the briefs — it routes to them. Each brief's own `## 6. FR-addendum candidates` is the source of the scope; each brief's `## 7. Success criteria (brief-level)` is the done-when. **No renumbering has been applied** (see note [3]).
+
+| FR | Scope (one line, from the brief's §6) | Owning brief (`docs/audits/`) | Done-when pointer |
+|----|----------------------------------------|-------------------------------|-------------------|
+| FR-10 | Golden-URL registry — record contract (§3.1), one-source-N-views generation (§3.2), schema validation as the enforcement seam | `2026-07-07_BRIEF_golden-url-registry-knowledge-flow.md` | that brief §7 |
+| FR-11 | Scout foraging loop — probe/forage/queue/promote cycle (§3.3) under P4 heartbeat; registry as sole target list; ratification-gated growth | `2026-07-07_BRIEF_golden-url-registry-knowledge-flow.md` | that brief §7 (amended by adopt-map §6: bandit-governed queue) |
+| FR-12 | Unified estate lifecycle — S0–S3 phase field spanning files and notes (§3.4); amends DR-2 upward to the whole estate | `2026-07-07_BRIEF_golden-url-registry-knowledge-flow.md` | that brief §7 |
+| FR-13 | Telemetry spine — §5 schema + emit points; the data prerequisite for the entire learning roadmap | `2026-07-07_BRIEF_algorithmic-adopt-map.md` | that brief §5 inline "Done when:" + §7 — **but see note [1]** |
+| FR-14 | Terrain-learning pipeline — §4 sample→extract→dedup→cluster→reconcile contract, three data paths | `2026-07-07_BRIEF_algorithmic-adopt-map.md` | that brief §7 (amended by ontology §6: Claims-with-provenance) |
+| FR-15 | Prep-view contract — Client-MOC dossier template + ROOT cockpit composition (§3.3), consuming FR-10 (registry dims) + FR-13 (reuse telemetry) | `2026-07-07_BRIEF_obsidian-operating-model-v2.md` | that brief §7 |
+| FR-16 | Synthesis production rule — triggers + quality bar (§3.6), consuming FR-13/FR-14 outputs | `2026-07-07_BRIEF_obsidian-operating-model-v2.md` | that brief §7 |
+| FR-17 | Ontology charter — object/link/action tables (§3.1–3.3) + shared-property contract as a versioned, validator-enforced docs contract | `2026-07-07_BRIEF_ontology-north-star.md` | that brief §7 |
+| FR-18 | Metadata charter — field-set classes (§3.2) + tri-axial tag taxonomy (§3.3/3.4) + vocabulary allowlists as versioned, validator-enforced contracts | `2026-07-08_BRIEF_metadata-charter-T1.md` | that brief §7 |
+| FR-19 | Deterministic auto-tagger — rules 1–10 (§3.5) as the ingest-time tagging seam (couples to FR-14 pipeline + DR-6 W1 restart) | `2026-07-08_BRIEF_metadata-charter-T1.md` | that brief §7 |
+
+**Notes:**
+
+[1] **FR-13 carries a semantic conflict, now resolved.** The adopt-map brief (owner) defines `event_type` as an *open* activity vocabulary; the ontology brief (§6) amends it to a *closed* four-value kinetic enum. These are incompatible definitions of the same field — the FA-campaign self-review §4-1/§7's only per-FR blocker. The ratified reconciliation (two-level `event_class × event_type`) is recorded in **`2026-07-17-fr13-event-schema-reconciliation.md`**; read it alongside FR-13, not the two briefs in isolation.
+
+[2] **obsidian-v2 §6 mislabel.** That brief's §6 amendment line reads "Amendment to FR/DR-2 (vault operating model)". This should read **FR-5 / DR-2** — FR-2 is *Ad-hoc Q&A* (§3 above); the vault operating model is **FR-5**. The correction is recorded here so the amendment is not mis-attributed; the brief itself is left unedited (immutability).
+
+[3] **No FR-number collisions.** Each new number FR-10…FR-19 is claimed as "new" by exactly one owning brief; the overlaps visible above (FR-10, FR-11, FR-13, FR-14, FR-17) are labeled "Amendment to…" cross-references, **not** competing ownership claims. The self-review audited only FR-10…17; FR-18/FR-19 were added later by `2026-07-08_BRIEF_metadata-charter-T1.md`, so the true current range is **FR-10…FR-19 (ten FRs)**.
