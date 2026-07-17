@@ -17,6 +17,8 @@ import sqlite3
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from corp.vault_io import read_frontmatter, read_note
+
 logger = logging.getLogger(__name__)
 
 
@@ -438,41 +440,23 @@ def _build_fts_query(query: str) -> str:
 def _load_note_content(note_path: Path) -> str:
     """Load full markdown content, stripping YAML frontmatter."""
     try:
-        text = note_path.read_text(encoding="utf-8", errors="replace")
+        _, body = read_note(note_path)
     except OSError as e:
         logger.debug("Failed to load note content %s: %s", note_path, e)
         return ""
 
-    if text.startswith("---"):
-        end = text.find("---", 3)
-        if end != -1:
-            return text[end + 3 :].strip()
-
-    return text.strip()
+    return body.strip()
 
 
 def _load_note_metadata(note_path: Path) -> dict:
     """Load frontmatter metadata including overlay data."""
     try:
-        text = note_path.read_text(encoding="utf-8", errors="replace")
+        fm = read_frontmatter(note_path)
     except OSError as e:
         logger.debug("Failed to load note metadata %s: %s", note_path, e)
         return {}
 
-    if not text.startswith("---"):
-        return {}
-    end = text.find("---", 3)
-    if end == -1:
-        return {}
-
-    try:
-        import yaml
-
-        fm = yaml.safe_load(text[3:end])
-        if not isinstance(fm, dict):
-            return {}
-    except Exception as e:  # yaml.YAMLError and subclasses
-        logger.debug("Failed to parse frontmatter %s: %s", note_path, e)
+    if not isinstance(fm, dict) or not fm:
         return {}
 
     overlay_data = {}

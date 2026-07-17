@@ -20,6 +20,7 @@ import yaml
 from corp.config import get_config
 from corp.models import IndexStats
 from corp.schema.pipeline_config import PipelineConfig
+from corp.vault_io import read_frontmatter
 
 logger = logging.getLogger(__name__)
 
@@ -510,7 +511,7 @@ def _index_cke_notes(conn: sqlite3.Connection, vault_root: Path) -> int:
         if not scan_dir.exists():
             continue
         for md_file in scan_dir.rglob("*.md"):
-            fm = _parse_frontmatter(md_file)
+            fm = read_frontmatter(md_file)
             if not fm:
                 continue
             # rfp_kb entries have "id" but no "title" — synthesize title

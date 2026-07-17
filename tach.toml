@@ -87,10 +87,12 @@ layer = "core"
 [[modules]]
 path = "corp.freshness_scanner"
 layer = "core"
+depends_on = ["corp.vault_io"]
 
 [[modules]]
 path = "corp.retrieve"
 layer = "core"
+depends_on = ["corp.vault_io"]
 
 [[modules]]
 path = "corp.cleanup"

@@ -110,13 +110,18 @@ def resolve_vault_path(
 def _parse_frontmatter(content: str) -> tuple[dict[str, Any], str]:
     """Split a note into (frontmatter_dict, body_str).
 
-    Returns empty dict if no frontmatter found.
+    Returns empty dict if no frontmatter found. A note that opens with ``---``
+    but has no closing delimiter is treated as having no frontmatter (returns
+    ``({}, content)``) rather than raising — matches the graceful behavior of
+    the former per-module parsers unified here (Arc-C #26).
     """
     if not content.startswith(FRONTMATTER_SEP):
         return {}, content
 
-    # Find the closing ---
-    end_idx = content.index("\n" + FRONTMATTER_SEP, len(FRONTMATTER_SEP))
+    # Find the closing --- (guarded: unclosed frontmatter is not an error)
+    end_idx = content.find("\n" + FRONTMATTER_SEP, len(FRONTMATTER_SEP))
+    if end_idx == -1:
+        return {}, content
     fm_text = content[len(FRONTMATTER_SEP) + 1 : end_idx]
     body = content[end_idx + len(FRONTMATTER_SEP) + 2 :]  # skip \n---\n
 
@@ -129,12 +134,30 @@ def _parse_frontmatter(content: str) -> tuple[dict[str, Any], str]:
     return fm, body
 
 
+def parse_frontmatter(content: str) -> tuple[dict[str, Any], str]:
+    """Split note *content* into (frontmatter_dict, body_str).
+
+    Public canonical entry point for string-based frontmatter parsing
+    (Arc-C #26). Path-based callers should use :func:`read_note` /
+    :func:`read_frontmatter` instead.
+    """
+    return _parse_frontmatter(content)
+
+
 def _render_note(frontmatter: dict[str, Any], body: str) -> str:
     """Render frontmatter + body into a full note string."""
     if frontmatter:
         fm_str = yaml.dump(frontmatter, default_flow_style=False, allow_unicode=True).strip()
         return f"{FRONTMATTER_SEP}\n{fm_str}\n{FRONTMATTER_SEP}\n{body}"
     return body
+
+
+def render_note(frontmatter: dict[str, Any], body: str) -> str:
+    """Render *frontmatter* + *body* into a full note string.
+
+    Public canonical entry point for note rendering (Arc-C #26).
+    """
+    return _render_note(frontmatter, body)
 
 
 # --- File IO with retry ---
@@ -167,8 +190,12 @@ def _conflict_path(original: Path) -> Path:
 
 
 def read_note(path: Path) -> tuple[dict[str, Any], str]:
-    """Read a note, returning (frontmatter_dict, body_str)."""
-    content = path.read_text(encoding="utf-8")
+    """Read a note, returning (frontmatter_dict, body_str).
+
+    Undecodable bytes are replaced (``errors="replace"``) rather than raising,
+    matching the tolerant per-module readers unified here (Arc-C #26).
+    """
+    content = path.read_text(encoding="utf-8", errors="replace")
     return _parse_frontmatter(content)
 
 
@@ -176,7 +203,7 @@ def read_frontmatter(path: Path) -> dict[str, Any]:
     """Read only the frontmatter dict from an existing note."""
     if not path.exists():
         return {}
-    content = path.read_text(encoding="utf-8")
+    content = path.read_text(encoding="utf-8", errors="replace")
     fm, _ = _parse_frontmatter(content)
     return fm
 

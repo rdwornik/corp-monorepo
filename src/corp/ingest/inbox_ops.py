@@ -16,6 +16,7 @@ from corp.ingest.classifier import Classification
 from corp.ingest.router import _SKIP_EXTENSIONS, _SKIP_NAMES, compute_file_hash
 from corp.ops.database import OpsDB
 from corp.schema.folder_names import INBOX
+from corp.vault_io import read_frontmatter
 
 logger = logging.getLogger(__name__)
 
@@ -217,8 +218,6 @@ def _read_model_from_vault_note(
     vault_root: Path,
 ) -> str | None:
     """Read model field from vault note frontmatter."""
-    import yaml
-
     note_dir = vault_root / vault_note_path.replace("/", "\\")
     # CKE output may be a directory with extract/*.md or a direct .md file
     search_dirs = [note_dir / "extract", note_dir]
@@ -227,13 +226,9 @@ def _read_model_from_vault_note(
             continue
         for md_file in search.glob("*.md"):
             try:
-                text = md_file.read_text(encoding="utf-8", errors="replace")
-                if text.startswith("---"):
-                    end = text.find("---", 3)
-                    if end > 0:
-                        fm = yaml.safe_load(text[3:end])
-                        if fm and "model" in fm:
-                            return fm["model"]
+                fm = read_frontmatter(md_file)
+                if fm and "model" in fm:
+                    return fm["model"]
             except Exception:
                 continue
     return None

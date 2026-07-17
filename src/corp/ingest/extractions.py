@@ -23,7 +23,7 @@ from pathlib import Path
 import yaml
 
 from corp.schema.folder_names import QUARANTINE
-from corp.vault_io import read_frontmatter, write_note
+from corp.vault_io import parse_frontmatter, read_frontmatter, render_note, write_note
 
 logger = logging.getLogger(__name__)
 
@@ -190,8 +190,7 @@ def _quarantine_note(
     note_fm["quarantine_reason"] = reason
     note_fm.setdefault("trust_level", "draft")
 
-    fm_str = yaml.dump(note_fm, default_flow_style=False, allow_unicode=True).strip()
-    content = f"---\n{fm_str}\n---\n{body}"
+    content = render_note(note_fm, body)
     dest = quarantine_dir / md_file.name
     dest.write_text(content, encoding="utf-8")
     logger.info("Quarantined: %s — %s", md_file.name, reason)
@@ -266,16 +265,7 @@ def ingest_extractions(
             # Read source content and write to vault
             try:
                 content = md_file.read_text(encoding="utf-8")
-                if content.startswith("---"):
-                    end = content.find("---", 3)
-                    if end != -1:
-                        fm_text = content[3:end]
-                        body = content[end + 4 :]
-                        note_fm = yaml.safe_load(fm_text) or {}
-                    else:
-                        note_fm, body = {}, content
-                else:
-                    note_fm, body = {}, content
+                note_fm, body = parse_frontmatter(content)
 
                 # Validation gate
                 valid, reason = _validate_note(note_fm)

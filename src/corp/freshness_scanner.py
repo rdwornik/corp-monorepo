@@ -19,6 +19,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
+from corp.vault_io import read_frontmatter
+
 logger = logging.getLogger(__name__)
 
 REVIEW_AGE_DAYS = 180  # 6 months
@@ -138,8 +140,8 @@ def scan_note_freshness(
     """
     note_str = str(note_path)
 
-    fm = parse_frontmatter(note_path)
-    if fm is None:
+    fm = read_frontmatter(note_path)
+    if not fm:
         return _make_result(
             note_str,
             None,
