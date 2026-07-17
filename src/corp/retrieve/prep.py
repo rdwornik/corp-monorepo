@@ -17,6 +17,7 @@ from corp.retrieve.engine import (
     RetrievedNote,
     retrieve,
 )
+from corp.schema.model_pricing import get_price
 
 logger = logging.getLogger(__name__)
 
@@ -257,10 +258,11 @@ def _call_llm(
         )
 
         text = response.text or ""
-        # Rough cost estimate for Flash
+        # Rough cost estimate for Flash (pricing from the canonical registry)
+        _flash = get_price("gemini-3-flash-preview") or {"input": 0.5, "output": 3.0}
         input_tokens = len(system_prompt + user_prompt) / 4
         output_tokens = len(text) / 4
-        cost = (input_tokens * 0.5 + output_tokens * 3.0) / 1_000_000
+        cost = (input_tokens * _flash["input"] + output_tokens * _flash["output"]) / 1_000_000
 
         return text, cost
 
