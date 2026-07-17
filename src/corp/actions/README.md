@@ -15,7 +15,6 @@ Provides a decorator-based action registry (`@register_action`) that maps action
 - `brief_actions` — project brief generation
 - `inbox_actions` — inbox routing trigger
 - `knowledge_actions` — knowledge extraction trigger
-- `task_actions` — task add/list/done actions
 
 ## Dependencies
 

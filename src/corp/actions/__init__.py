@@ -44,6 +44,5 @@ from corp.actions import (  # noqa: E402, F401
     index_actions,
     knowledge_actions,
     monitoring_actions,
-    task_actions,
     vault_actions,
 )

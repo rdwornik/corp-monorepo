@@ -35,7 +35,6 @@ So that the vault-writer scanner covers the whole repo, the extraction path stop
 
 ### [S2] Execute the signed Arc-B kills (one revertable commit per batch)
 So that each signed KILL row lands as an independently-revertable commit per the signed manifest.
-- [#22] [P2][M] Arc-B batch 4 — KILL the N4 task-manager cascade (`task_manager.py`, `cli/task.py`, `actions/task_actions.py`, Task models, chat wiring, tach, 25 tests) per the recorded operator zero-use word · Done when: the cascade is removed, tach/chat de-wired, suite green · refs signed manifest Batch 4 (gated → signed KILL) · R4
 - [#23] [P2][S] Arc-B batch 5 — KILL `extractor/frames/tagger.py` + `extractor/frames/extractor.py` (0 callers); `frames/` package stays · Done when: both modules removed, `frames/` package intact, suite green · refs signed manifest Batch 5 · R4
 
 ### [S3] Unify canonical homes and clear engine debt (Arc C)
@@ -45,7 +44,7 @@ So that config/vocabulary/pricing/frontmatter/LLM-JSON/CKE-invoker each resolve 
 - [#26] [P2][M] Move frontmatter → `vault_io` · Done when: frontmatter read/write lives in `vault_io` and importers are migrated, tach clean · refs R5
 - [#27] [P2][S] Move LLM-JSON helpers → `schema.utils` · Done when: LLM-JSON parsing lives in `schema.utils` and importers are migrated · refs R5
 - [#28] [P2][M] Merge the CKE invoker to ONE (`project/cke_invoker` + `overnight/cke_client`) with an explicit subprocess contract · Done when: a single corp-side invoker drives CKE and the old two are gone · refs R2, R5
-- [#29] [P2][L] Migrate `config` → the `PipelineConfig` family (migrate all `corp.config` importers) — the capstone unification · Done when: production config resolves through `PipelineConfig` and `corp.config` importers are migrated, tach clean · depends-on: #22, #23 · refs R5 (cut before unify)
+- [#29] [P2][L] Migrate `config` → the `PipelineConfig` family (migrate all `corp.config` importers) — the capstone unification · Done when: production config resolves through `PipelineConfig` and `corp.config` importers are migrated, tach clean · depends-on: #23 · refs R5 (cut before unify)
 - [#30] [P3][S] Un-exempt `src/corp/test_pipeline.py` from the tach layer exemptions · Done when: the tach exemption is removed and the layer check passes · refs R8
 - [#31] [P3][M] RC-14 broader dead-code sweep as its own future manifest · Done when: a signable RC-14 sweep manifest is produced (execution is a separate signed arc) · refs code-quality audit RC-14 (DEFER)
 - [#11] [P3][M] Remove verified dead code from the 2026-04-17 audit (re-confirmed live 2026-06-03): dead PDF helpers `extractor/extract.py:_try_pdf_multimodal`/`_try_pptx_pdf_multimodal` + zombie `tests/extractor/test_pdf_multimodal.py`; orphan `extractor/frames/extractor.py`/`tagger.py`; duplicate `_log_ingest_event`; unpackaged `extractor/scripts/{batch_compress,compress_video,preprocess_audio}.py` · Done when: each is deleted or wired and a re-run audit is clean · refs dead-code-audit 2026-04-17 (H1–H4, M1, M3)

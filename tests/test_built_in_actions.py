@@ -34,8 +34,6 @@ class TestActionRegistry:
         assert get_action("generate_project_brief") is not None
         assert get_action("archive_project") is not None
         assert get_action("scan_inbox") is not None
-        assert get_action("add_task") is not None
-        assert get_action("list_tasks") is not None
 
     def test_unknown_action(self) -> None:
         assert get_action("nonexistent") is None

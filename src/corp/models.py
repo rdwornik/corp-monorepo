@@ -196,40 +196,6 @@ class WorkflowResult:
     duration_seconds: float = 0.0
 
 
-# --- Task models ---
-
-
-class TaskStatus(StrEnum):
-    """Task lifecycle states."""
-
-    TODO = "todo"
-    IN_PROGRESS = "in_progress"
-    DONE = "done"
-    CANCELLED = "cancelled"
-
-
-class TaskPriority(StrEnum):
-    """Task priority levels."""
-
-    HIGH = "high"
-    MEDIUM = "medium"
-    LOW = "low"
-
-
-@dataclass
-class Task:
-    """A task stored as a vault note in 00_dashboards/tasks/."""
-
-    title: str
-    status: TaskStatus = TaskStatus.TODO
-    project: str | None = None
-    deadline: str | None = None
-    priority: TaskPriority = TaskPriority.MEDIUM
-    created: str = ""
-    completed: str | None = None
-    file_path: Path | None = None
-
-
 # --- Template models ---
 
 

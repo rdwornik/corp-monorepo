@@ -137,10 +137,6 @@ layer = "core"
 depends_on = ["corp.config"]
 
 [[modules]]
-path = "corp.task_manager"
-layer = "orchestration"
-
-[[modules]]
 path = "corp.template_manager"
 layer = "orchestration"
 
@@ -152,7 +148,7 @@ depends_on = ["corp.built_in_actions"]
 [[modules]]
 path = "corp.actions"
 layer = "orchestration"
-depends_on = ["corp.template_manager", "corp.task_manager", "corp.index_builder", "corp.query_engine"]
+depends_on = ["corp.template_manager", "corp.index_builder", "corp.query_engine"]
 
 [[modules]]
 path = "corp.built_in_actions"
