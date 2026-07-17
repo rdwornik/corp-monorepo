@@ -126,3 +126,24 @@ is not already in the §5 operator queue.
 ---
 *Codified 2026-07-17 · primary checkout · base HEAD `604fd80` · Layer-1 first-read record (no
 code change). Consolidates by pointer — the canonical docs in §2 are authoritative.*
+
+---
+
+## Addendum A — Arc-B prompt re-homed to the hub bundle (append-only, 2026-07-17)
+
+> Append-only per critical-rule 3 (audits are immutable; supersede by addendum, never an
+> in-place edit). The §4 body is left unchanged; this addendum resolves the pointer it carries.
+
+**§4 "first move 1 (Arc-B execution)" prompt reference.** The body (§4, move 1) names the prompt
+at `%USERPROFILE%\Downloads\2026-07-17_PROMPT_arc-b-execution.md`. That path is now **void as a doc
+reference** — the Downloads copy is the operator's convenience copy only.
+
+**Canonical resolution.** The Arc-B execution prompt is a cross-chat workflow artifact, homed in the
+v5 handoff bundle in the `.dev-knowledge` hub:
+
+- `docs/handoffs/2026-07-17-corp-monorepo-executor-product-execution/PROMPT_arc-b-execution.md`
+  (hub `.dev-knowledge`, ADR-36/42 — the hub is the handoff carrier; consumers hold no
+  `docs/handoffs/` surface).
+
+Every §4 reference to "the prompt in Downloads" resolves to that bundle path. The bundle's own
+`HANDOFF_BOOT.md` / `RESIDUAL.md` point at the same in-bundle file (hub merge `232a5237`).
