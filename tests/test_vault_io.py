@@ -45,6 +45,56 @@ class TestFrontmatterParsing:
         assert fm2["title"] == "Test"
         assert "Body text." in body2
 
+    # --- Arc-C #26 additive hardening (LA-R1: prove strictly additive) ---
+    # The unclosed-frontmatter case previously RAISED ValueError; it now returns
+    # ({}, content). These assert every currently-succeeding parse is unchanged.
+
+    def test_parse_empty_frontmatter_unchanged(self):
+        fm, body = _parse_frontmatter("---\n---\nbody")
+        assert fm == {}
+        assert body == "body"
+
+    def test_parse_crlf_frontmatter_unchanged(self):
+        fm, body = _parse_frontmatter("---\r\ntitle: X\r\n---\r\nbody")
+        assert fm["title"] == "X"
+
+    def test_parse_unclosed_frontmatter_graceful(self):
+        # Previously raised ValueError("substring not found"); now graceful.
+        fm, body = _parse_frontmatter("---\ntitle: X\nno closing delim")
+        assert fm == {}
+        assert body == "---\ntitle: X\nno closing delim"
+
+    # --- Arc-C #26 public API (string parse + render) ---
+
+    def test_public_parse_frontmatter_delegates(self):
+        from corp.vault_io import parse_frontmatter
+
+        content = "---\ntitle: Test\n---\nBody."
+        assert parse_frontmatter(content) == _parse_frontmatter(content)
+
+    def test_public_render_note_byte_identical_to_quarantine_format(self):
+        # LA-R2: proves render_note output is byte-identical to the hand-rolled
+        # f-string in ingest/extractions.py::_quarantine_note before repointing.
+        import yaml as _yaml
+
+        from corp.vault_io import render_note
+
+        fm = {"quarantine_reason": "bad", "trust_level": "draft", "title": "N"}
+        body = "Body text here.\nSecond line.\n"
+        fm_str = _yaml.dump(fm, default_flow_style=False, allow_unicode=True).strip()
+        hand_rolled = f"---\n{fm_str}\n---\n{body}"
+        assert render_note(fm, body) == hand_rolled
+
+    def test_read_note_tolerates_invalid_utf8(self, tmp_path):
+        # LA-R1 additive: the unified readers use errors="replace" so a note
+        # with undecodable bytes reads gracefully (former readers did too)
+        # instead of raising UnicodeDecodeError.
+        p = tmp_path / "bad.md"
+        p.write_bytes(b"---\ntitle: X\n---\nbody \xff\xfe end")
+        fm, body = read_note(p)
+        assert fm["title"] == "X"
+        assert "body" in body
+
 
 class TestResolveVaultPath:
     def test_zone_only(self, app_config):

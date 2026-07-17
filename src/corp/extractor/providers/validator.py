@@ -7,6 +7,7 @@ from corp.extractor.providers.base import (
     ExtractionRequest,
     ExtractionResponse,
 )
+from corp.schema.utils import parse_llm_json
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ def validate_and_retry(
         (valid_response, was_escalated) tuple
     """
     try:
-        parsed = _parse_json(response.text)
+        parsed = parse_llm_json(response.text)
         if _validate_structure(parsed):
             return response, False
     except (json.JSONDecodeError, ValueError):

@@ -33,6 +33,7 @@ from corp.extractor.text_extract import (
     TextExtractionResult,
     extract_source_date,
 )
+from corp.schema.model_pricing import blended_rate
 from corp.schema.utils import normalize_string_list, parse_llm_json
 
 log = logging.getLogger(__name__)
@@ -132,18 +133,19 @@ def _get_model(config: dict) -> str:
     return config.get("model_override") or config.get("gemini", {}).get("model", "gemini-3.1-flash-lite")
 
 
+# Legacy Gemini aliases absent from the canonical pricing registry, kept so
+# their blended estimates are unchanged (Arc-C #25: flash-lite is the only
+# intended price change).
+_LEGACY_GEMINI_RATES = {"gemini-3.1-flash": 0.50}
+
+
 def _estimate_gemini_cost(model: str, total_tokens: int) -> float:
     """Estimate cost for a Gemini call from total token count.
 
-    Uses a blended rate (input-heavy assumption: ~80% input, ~20% output).
+    Uses a blended rate (input-heavy assumption: ~80% input, ~20% output)
+    derived from the canonical pricing registry (corp.schema.model_pricing).
     """
-    rates = {
-        "gemini-3.1-flash-lite": 0.25,  # blended $/1M tokens
-        "gemini-3.1-flash": 0.50,
-        "gemini-3-flash-preview": 1.00,  # kept for backward compat
-        "gemini-3.1-pro-preview": 4.00,
-    }
-    rate = rates.get(model, 1.00)
+    rate = blended_rate(model, default=_LEGACY_GEMINI_RATES.get(model, 1.00))
     return round(total_tokens * rate / 1_000_000, 6)
 
 

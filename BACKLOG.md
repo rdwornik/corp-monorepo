@@ -36,9 +36,6 @@ So that the vault-writer scanner covers the whole repo, the extraction path stop
 ### [S3] Unify canonical homes and clear engine debt (Arc C)
 So that config/vocabulary/pricing/frontmatter/LLM-JSON/CKE-invoker each resolve to one home per R5, and the residual hygiene debt is cleared.
 - [#24] [P2][M] Move vocabulary → `schema` · Done when: vocabulary constants live under `schema` and importers are migrated, tach clean · refs R5
-- [#25] [P2][M] Build one models+pricing registry from the live per-provider dicts (`ANTHROPIC_PRICING`, `GEMINI_PRICING`) · Done when: a single registry is the source of truth and both providers read from it (no per-file dicts) · refs R5 (registry to be BUILT)
-- [#26] [P2][M] Move frontmatter → `vault_io` · Done when: frontmatter read/write lives in `vault_io` and importers are migrated, tach clean · refs R5
-- [#27] [P2][S] Move LLM-JSON helpers → `schema.utils` · Done when: LLM-JSON parsing lives in `schema.utils` and importers are migrated · refs R5
 - [#28] [P2][M] Merge the CKE invoker to ONE (`project/cke_invoker` + `overnight/cke_client`) with an explicit subprocess contract · Done when: a single corp-side invoker drives CKE and the old two are gone · refs R2, R5
 - [#29] [P2][L] Migrate `config` → the `PipelineConfig` family (migrate all `corp.config` importers) — the capstone unification · Done when: production config resolves through `PipelineConfig` and `corp.config` importers are migrated, tach clean · refs R5 (cut before unify)
 - [#30] [P3][S] Un-exempt `src/corp/test_pipeline.py` from the tach layer exemptions · Done when: the tach exemption is removed and the layer check passes · refs R8

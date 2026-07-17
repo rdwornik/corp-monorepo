@@ -10,6 +10,7 @@ from corp.cli._common import console
 from corp.config import get_config
 from corp.schema.folder_names import CORP_INFRA
 from corp.schema.pipeline_config import PipelineConfig
+from corp.vault_io import read_frontmatter
 
 
 @click.command()
@@ -131,16 +132,11 @@ def trust_status() -> None:
             conflicts += 1
             continue
         try:
-            text = md_file.read_text(encoding="utf-8")
-            if text.startswith("---"):
-                end = text.find("---", 3)
-                if end != -1:
-                    import yaml as _yaml
-
-                    fm = _yaml.safe_load(text[3:end])
-                    level = fm.get("trust_level", "none") if isinstance(fm, dict) else "none"
-                    counts[level] = counts.get(level, 0) + 1
-                    continue
+            fm = read_frontmatter(md_file)
+            if fm:
+                level = fm.get("trust_level", "none") if isinstance(fm, dict) else "none"
+                counts[level] = counts.get(level, 0) + 1
+                continue
         except (OSError, ValueError):
             pass
         counts["none"] = counts.get("none", 0) + 1

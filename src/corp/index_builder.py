@@ -20,6 +20,7 @@ import yaml
 from corp.config import get_config
 from corp.models import IndexStats
 from corp.schema.pipeline_config import PipelineConfig
+from corp.vault_io import read_frontmatter
 
 logger = logging.getLogger(__name__)
 
@@ -510,7 +511,13 @@ def _index_cke_notes(conn: sqlite3.Connection, vault_root: Path) -> int:
         if not scan_dir.exists():
             continue
         for md_file in scan_dir.rglob("*.md"):
-            fm = _parse_frontmatter(md_file)
+            try:
+                fm = read_frontmatter(md_file)
+            except OSError as e:
+                # A note unreadable or removed mid-scan must not abort the whole
+                # index rebuild — mirror the former parser's tolerant skip (#26).
+                logger.debug("Failed to read %s: %s", md_file, e)
+                continue
             if not fm:
                 continue
             # rfp_kb entries have "id" but no "title" — synthesize title

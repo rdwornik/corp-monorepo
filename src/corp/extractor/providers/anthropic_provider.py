@@ -8,14 +8,9 @@ from corp.extractor.providers.base import (
     ExtractionRequest,
     ExtractionResponse,
 )
+from corp.schema.model_pricing import ANTHROPIC_PRICING
 
 log = logging.getLogger(__name__)
-
-# Per-million-token pricing (USD)
-ANTHROPIC_PRICING = {
-    "claude-haiku-4-5-20251001": {"input": 1.00, "output": 5.00},
-    "claude-sonnet-4-6": {"input": 3.00, "output": 15.00},
-}
 
 
 class AnthropicProvider(ExtractionProvider):
