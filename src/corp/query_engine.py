@@ -28,7 +28,7 @@ def search_facts(
     limit: int = 20,
     db_path: Path | None = None,
 ) -> list[FactResult]:
-    """Full-text search across all facts using FTS5.
+    """Full-text search across vault notes using FTS5 (facts table retired, Batch 2).
 
     Args:
         query: Search terms (FTS5 syntax supported).
@@ -42,61 +42,18 @@ def search_facts(
     try:
         _ensure_schema(conn)
 
-        # Build FTS5 query — quote terms for safety
         fts_query = _sanitize_fts_query(query)
         if not fts_query:
             return []
 
-        if project_filter:
-            sql = """
-                SELECT f.project_id, p.client, f.fact, f.source_title,
-                       f.topics, rank
-                FROM facts_fts fts
-                JOIN facts f ON f.id = fts.rowid
-                JOIN projects p ON p.project_id = f.project_id
-                WHERE facts_fts MATCH ? AND f.project_id = ?
-                ORDER BY rank
-                LIMIT ?
-            """
-            rows = conn.execute(sql, (fts_query, project_filter.lower(), limit)).fetchall()
-        else:
-            sql = """
-                SELECT f.project_id, p.client, f.fact, f.source_title,
-                       f.topics, rank
-                FROM facts_fts fts
-                JOIN facts f ON f.id = fts.rowid
-                JOIN projects p ON p.project_id = f.project_id
-                WHERE facts_fts MATCH ?
-                ORDER BY rank
-                LIMIT ?
-            """
-            rows = conn.execute(sql, (fts_query, limit)).fetchall()
-
-        results = []
-        for row in rows:
-            topics = _parse_json_list(row[4])
-            results.append(
-                FactResult(
-                    project_id=row[0],
-                    client=row[1],
-                    fact=row[2],
-                    source_title=row[3] or "",
-                    topics=topics,
-                    relevance_score=abs(row[5]) if row[5] else 0.0,
-                )
-            )
-
-        # Also search notes_fts for matching vault notes
-        remaining = limit - len(results)
-        if remaining > 0:
-            try:
-                notes_results = _search_notes_fts(conn, fts_query, project_filter, remaining)
-                results.extend(notes_results)
-            except Exception:
-                # notes table may not exist in older indexes
-                logger.debug("notes_fts search skipped (table may not exist)")
-
-        return results
+        # Facts-table search was retired in Arc-B Batch 2 (the facts pipeline
+        # produced 0 rows); search the vault notes via notes_fts instead.
+        try:
+            return _search_notes_fts(conn, fts_query, project_filter, limit)
+        except Exception:
+            # notes table may not exist in older indexes
+            logger.debug("notes_fts search skipped (table may not exist)")
+            return []
     finally:
         conn.close()
 
@@ -170,15 +127,10 @@ def get_analytics(db_path: Path | None = None) -> AnalyticsReport:
 
         # Total counts
         total_projects = conn.execute("SELECT COUNT(*) FROM projects").fetchone()[0]
-        total_facts = conn.execute("SELECT COUNT(*) FROM facts").fetchone()[0]
-
-        # Aggregate topics from facts
-        topic_counter: Counter = Counter()
-        rows = conn.execute("SELECT topics FROM facts WHERE topics != '[]'").fetchall()
-        for (raw,) in rows:
-            for t in _parse_json_list(raw):
-                topic_counter[t] += 1
-        top_topics = topic_counter.most_common(15)
+        # Facts table retired in Arc-B Batch 2 (facts pipeline produced 0 rows);
+        # total_facts is fixed at 0 and topics are no longer aggregated from facts.
+        total_facts = 0
+        top_topics: list[tuple[str, int]] = []
 
         # Aggregate products from projects
         product_counter: Counter = Counter()

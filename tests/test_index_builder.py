@@ -98,7 +98,7 @@ class TestSchema:
         ).fetchall()
         table_names = [t[0] for t in tables]
         assert "projects" in table_names
-        assert "facts" in table_names
+        assert "facts" not in table_names, "facts table retired in Arc-B Batch 2"
         assert "notes" in table_names, "notes table missing — code was deleted"
         assert "meta" in table_names
         conn.close()
@@ -119,9 +119,10 @@ class TestRebuild:
         assert stats.projects_indexed >= 5  # from tmp_projects fixture
         assert stats.rebuild_duration >= 0
 
-    def test_indexes_facts(self, index_env, db_path: Path) -> None:
+    def test_facts_pipeline_retired(self, index_env, db_path: Path) -> None:
+        # Facts pipeline retired in Arc-B Batch 2 — facts_indexed is always 0.
         stats = rebuild_index(db_path)
-        assert stats.facts_indexed == 3  # Lenzing has 3 facts
+        assert stats.facts_indexed == 0
 
     def test_projects_without_facts(self, index_env, db_path: Path) -> None:
         """Projects without facts.yaml should still be indexed."""
@@ -154,7 +155,7 @@ class TestRebuild:
         assert "last_rebuild" in meta
         assert "total_projects" in meta
         assert "total_facts" in meta
-        assert meta["total_facts"] == "3"
+        assert meta["total_facts"] == "0"  # facts pipeline retired (Batch 2)
 
     def test_rebuild_is_idempotent(self, index_env, db_path: Path) -> None:
         stats1 = rebuild_index(db_path)
@@ -224,29 +225,6 @@ class TestUpdateProject:
         ).fetchone()
         conn.close()
         assert row is not None
-
-
-# --- Test: FTS triggers ---
-
-
-class TestFTS:
-    def test_fts_populated(self, index_env, db_path: Path) -> None:
-        rebuild_index(db_path)
-        conn = _connect(db_path)
-        rows = conn.execute(
-            "SELECT * FROM facts_fts WHERE facts_fts MATCH '\"SAP\"'",
-        ).fetchall()
-        conn.close()
-        assert len(rows) >= 1
-
-    def test_fts_returns_matching_facts(self, index_env, db_path: Path) -> None:
-        rebuild_index(db_path)
-        conn = _connect(db_path)
-        rows = conn.execute(
-            "SELECT fact FROM facts_fts WHERE facts_fts MATCH '\"demand\"'",
-        ).fetchall()
-        conn.close()
-        assert any("Demand" in r[0] for r in rows)
 
 
 # --- Test: Notes indexing (regression — never delete) ---

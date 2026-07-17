@@ -202,19 +202,11 @@ def _show_help(workflows: dict) -> None:
 def _show_status() -> None:
     """Show quick status summary."""
     try:
-        from corp.task_manager import list_tasks
         from corp.vault_io import list_projects
 
         projects = list_projects()
-        tasks = list_tasks(status_filter="todo")
 
         console.print(f"\n  Projekty: [cyan]{len(projects)}[/cyan]")
-        console.print(f"  Zadania (todo): [cyan]{len(tasks)}[/cyan]")
-
-        if tasks:
-            high = [t for t in tasks if t.priority.value == "high"]
-            if high:
-                console.print(f"  [red]Pilne: {len(high)}[/red]")
     except Exception as e:
         console.print(f"[yellow]Nie mogę pobrać statusu: {e}[/yellow]")
 

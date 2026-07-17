@@ -1,9 +1,0 @@
-Usage: corp task list [OPTIONS]
-
-  List tasks sorted by priority and deadline.
-
-Options:
-  -s, --status TEXT   Filter by status
-  -p, --project TEXT  Filter by project
-  --all               Show all statuses
-  --help              Show this message and exit.

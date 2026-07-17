@@ -1,9 +1,6 @@
 """Tests for the multi-provider extraction abstraction."""
 
-import json
 import os
-import tempfile
-from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -192,88 +189,6 @@ class TestValidator:
         plain = '{"title": "Test", "summary": "ok"}'
         parsed = _parse_json(plain)
         assert parsed["title"] == "Test"
-
-
-# ── Cost tracker tests ───────────────────────────────────────────
-
-
-class TestCostTracker:
-    """Test cost logging and monthly spend calculation."""
-
-    def test_log_and_read_cost(self):
-        """Costs logged to JSONL and monthly total computed."""
-        from corp.extractor.providers import cost_tracker
-
-        with tempfile.NamedTemporaryFile(suffix=".jsonl", delete=False, mode="w") as f:
-            tmp_path = Path(f.name)
-
-        # Patch COST_LOG to temp file
-        original = cost_tracker.COST_LOG
-        cost_tracker.COST_LOG = tmp_path
-
-        try:
-            # Clean start
-            if tmp_path.exists():
-                tmp_path.unlink()
-
-            assert cost_tracker.get_monthly_spend() == 0.0
-
-            cost_tracker.log_cost(
-                model="claude-haiku-4-5-20251001",
-                provider="anthropic",
-                input_tokens=1000,
-                output_tokens=500,
-                cost=0.0035,
-            )
-            cost_tracker.log_cost(
-                model="gemini-3-flash-preview",
-                provider="google",
-                input_tokens=2000,
-                output_tokens=1000,
-                cost=0.004,
-            )
-
-            total = cost_tracker.get_monthly_spend()
-            assert abs(total - 0.0075) < 0.0001
-
-            # Verify JSONL format
-            with open(tmp_path) as f:
-                lines = f.readlines()
-            assert len(lines) == 2
-            entry = json.loads(lines[0])
-            assert entry["model"] == "claude-haiku-4-5-20251001"
-            assert entry["provider"] == "anthropic"
-        finally:
-            cost_tracker.COST_LOG = original
-            if tmp_path.exists():
-                tmp_path.unlink()
-
-    def test_budget_check(self):
-        """Budget check returns False when exceeded."""
-        from corp.extractor.providers import cost_tracker
-
-        with tempfile.NamedTemporaryFile(suffix=".jsonl", delete=False, mode="w") as f:
-            tmp_path = Path(f.name)
-
-        original = cost_tracker.COST_LOG
-        cost_tracker.COST_LOG = tmp_path
-
-        try:
-            if tmp_path.exists():
-                tmp_path.unlink()
-
-            # Within budget
-            assert cost_tracker.check_budget(20.0) is True
-
-            # Log a huge cost
-            cost_tracker.log_cost("test", "test", 0, 0, 25.0)
-
-            # Over budget
-            assert cost_tracker.check_budget(20.0) is False
-        finally:
-            cost_tracker.COST_LOG = original
-            if tmp_path.exists():
-                tmp_path.unlink()
 
 
 # ── Model set tests ──────────────────────────────────────────────

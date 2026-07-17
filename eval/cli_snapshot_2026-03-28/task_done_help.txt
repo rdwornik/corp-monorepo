@@ -1,6 +1,0 @@
-Usage: corp task done [OPTIONS] TITLE
-
-  Mark a task as complete (fuzzy title match).
-
-Options:
-  --help  Show this message and exit.

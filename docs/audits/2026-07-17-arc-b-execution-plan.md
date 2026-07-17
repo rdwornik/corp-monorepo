@@ -144,3 +144,73 @@ Full-suite green/red is a separate, parallel gate.
 *Codified 2026-07-17 · primary checkout · base HEAD `5a3de94` · Layer-1-approved execution plan.
 Arc-0 is read-only and complete; Arc-B executes the SIGNED manifest
 (`docs/audits/2026-07-17-deletion-manifest-arc-b.md`, sign-off merge `1a014f0`) — A3-R4 defers to it.*
+
+---
+
+## Addendum B — Batch-2 Option-A deviation + PROPOSED `facts_count` amendment (append-only, 2026-07-17)
+
+> Append-only (audits immutable; the signed manifest is NOT touched). Records the senior-ruled
+> Batch-2 scope narrowing and files the deferred `facts_count`-column removal into the operator queue.
+
+**Deviation (senior ruling 2026-07-17, Option A).** Signed manifest row 2.1 marks
+`projects.facts_count` (the column) for KILL, but a fresh whole-repo re-grep found ~15 live
+consumers the manifest's Batch-2 caller analysis never enumerated, and the column is populated from
+**vault-note data** (`_insert_project`), independent of the dead facts loader (its `facts_count`
+UPDATE never fires — n≡0). Per "no deletion outside a signed row's real scope," row 2.1's authority
+does not reach the live column. **Batch 2 executed the narrowed, witnessed-dead scope only:** facts
+table + `facts_fts` + triggers + `_load_and_insert_facts` killed; `search_facts` repointed to
+`_search_notes_fts`; the two dead facts-table analytics queries (`get_analytics`) and the facts-table
+bookkeeping (`total_facts` meta, `IndexStats.facts_indexed`) neutralised to 0 (facts-table-derived,
+behaviour-preserving — facts was 0-rows in production); the residue-clearing `DROP TABLE IF EXISTS
+facts/facts_fts` kept so `corp index rebuild` clears existing DBs. **`projects.facts_count` and its
+~15 consumers were KEPT untouched.**
+
+**PROPOSED amendment — AMD-1 (not a signed KILL; enters the operator queue; does NOT gate Arc-B):**
+- **Target:** remove `projects.facts_count` (column) + the `facts_count` model fields
+  (`models.py:81,100,287`) + rewire/retire the ~15 consumers (`search_projects` ordering,
+  `ProjectResult`, `get_analytics` avg, briefs, monitoring, 2 CLIs, `vault_io`).
+- **Class:** live-field removal / behaviour change to `corp projects` + analytics + briefs — NOT
+  dead-code; a separate scoped change, own commit.
+- **Gate (both required before it can be signed):** (a) **verbatim consumer enumeration**
+  (file:line) — produced by the Codex **luna** read-only evidence lane, landing in `docs/audits/`
+  and referenced here; (b) **operator sign-off**.
+- **Status:** PROPOSED · not scheduled into Arc-B · surfaced to the operator queue 2026-07-17.
+  Distinct from the manifest DEFER field (a separate future *deletion* manifest).
+
+---
+
+## Addendum C — Batch-3 DROPPED + PROPOSED premise correction AMD-2 + revised ledger (append-only, 2026-07-17)
+
+> Append-only (signed manifest NOT touched). Records the senior-ruled Batch-3 drop and the
+> falsified premise, and restates the arc collection ledger.
+
+**Batch 3 — DROPPED (senior ruling 2026-07-17, Option A).** The boundary witness falsified signed
+row 3.1's "dead inbox lane" premise. deep-magistrala §Step 1 (the manifest's own cited evidence)
+states both lanes **share** `_run_extraction` (`router.py:720-810`) as the CKE handoff:
+`_run_extraction`/`_run_package_extraction` are the registered handlers behind **`corp ingest`**
+(Lane A; `cli/ingest.py:19`, registered `cli/__init__.py:128`) **and `corp ingest-inbox`** (Lane B;
+`inbox.py:_trigger_extraction:275` → `_run_extraction:304`, registered `cli/__init__.py:129`). The
+"never wrote" runtime observation = extraction gated on `is_available()` (**CKE not wired** in the
+pre-operational state), **not** dead code. **No cut made** — both functions KEEP.
+
+**PROPOSED premise correction — AMD-2 (records the falsification; enters the operator queue; does
+NOT gate Arc-B):**
+- **Finding:** signed manifest Batch-3 row 3.1 rests on a mischaracterisation of deep-magistrala
+  §Step 1; its KILL targets are **live, shared, core ingest→CKE→vault infrastructure**, not a dead
+  lane. This is an "audit say-so ≠ truth" catch (cf. the `BatchJobRunner` KEEP flip).
+- **Disposition:** `_run_extraction` + `_run_package_extraction` **KEEP**. Their fate **re-opens
+  only at the CKE-wiring decision (post-simulation)** — not in Arc-B.
+- **Status:** RECORDED · Batch 3 closed as DROP · signed manifest left immutable (correction by
+  this addendum, per critical-rule 3).
+
+**Revised arc collection ledger (senior-restated):**
+```
+2629 baseline
+ -2  Batch 1 (cost_tracker)        -> 2627   [landed b8b958a]
+ -2  Batch 2 (facts repoint)       -> 2625   [landed 5bcf899]
+ -0  Batch 3 (DROPPED — premise falsified)
+-25  Batch 4 (task-manager cascade)-> 2600   [pending]
+ -0  Batch 5 (frames limbs)        -> 2600   [pending]
+------------------------------------------------
+net predicted final collection = 2600
+```

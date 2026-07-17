@@ -80,7 +80,6 @@ from corp.cli.system import (
     routing_review,
     trust_status,
 )
-from corp.cli.task import task_group, tasks_shortcut
 from corp.cli.template import template_group
 from corp.cli.vault import vault
 from corp.cli.workflow import run_workflow
@@ -103,8 +102,6 @@ cli.add_command(vault)
 cli.add_command(template_group)
 cli.add_command(index_group)
 cli.add_command(rfp_group)
-cli.add_command(task_group)
-cli.add_command(tasks_shortcut)
 cli.add_command(doctor)
 cli.add_command(trust_status)
 cli.add_command(routing_review)

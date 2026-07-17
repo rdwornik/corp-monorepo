@@ -84,34 +84,6 @@ workflows:
     confirmation: true
     cost_estimate: "free"
 
-  add_task:
-    description: "Create a task with deadline"
-    trigger_phrases: ["dodaj task", "add task", "musze zrobic", "need to", "zaplanuj", "reminder"]
-    parameters:
-      title: {type: string, required: true}
-      project: {type: string, required: false}
-      deadline: {type: string, required: false}
-      priority: {type: string, required: false, default: "medium"}
-    steps:
-      - type: python
-        description: "Create task note in vault"
-        action: add_task
-    confirmation: false
-    cost_estimate: "free"
-
-  my_tasks:
-    description: "Show current tasks sorted by deadline and priority"
-    trigger_phrases: ["moje taski", "my tasks", "co mam zrobic", "what to do", "lista zadan"]
-    parameters:
-      status: {type: string, required: false, default: "todo"}
-      project: {type: string, required: false}
-    steps:
-      - type: python
-        description: "List tasks from vault"
-        action: list_tasks
-    confirmation: false
-    cost_estimate: "free"
-
   archive_project:
     description: "Archive completed opportunity — move to Archive, update metadata"
     trigger_phrases: ["archiwizuj", "archive", "zamknij projekt", "close project"]

@@ -136,6 +136,56 @@ def populated_index(app_config, tmp_vault: Path, tmp_projects: Path, tmp_path: P
         encoding="utf-8",
     )
 
+    # Vault notes in 02_sources — search_facts now searches notes_fts (the facts
+    # pipeline was retired in Arc-B Batch 2). These carry the searchable terms.
+    sources = tmp_vault / "02_sources"
+    sources.mkdir(parents=True, exist_ok=True)
+    (sources / "lenzing-sap.md").write_text(
+        """\
+---
+title: SAP Integration and Demand Planning
+project: lenzing_planning
+client: Lenzing
+type: extract
+source_type: internal
+topics:
+  - SAP Integration
+  - Demand Planning
+  - Security
+  - SOC2
+products:
+  - Planning
+  - Network
+---
+# SAP Integration and Demand Planning
+
+Discovery notes.
+""",
+        encoding="utf-8",
+    )
+    (sources / "honda-wms.md").write_text(
+        """\
+---
+title: WMS Migration and Demand Planning
+project: honda_planning
+client: Honda
+type: extract
+source_type: internal
+topics:
+  - WMS Migration
+  - SAP Integration
+  - Demand Planning
+products:
+  - Planning
+  - WMS
+---
+# WMS Migration and Demand Planning
+
+Migration notes.
+""",
+        encoding="utf-8",
+    )
+
     rebuild_index(db_path)
     return db_path
 
@@ -212,12 +262,12 @@ class TestAnalytics:
     def test_total_counts(self, populated_index: Path) -> None:
         report = get_analytics(populated_index)
         assert report.total_projects >= 5
-        assert report.total_facts == 7  # 5 Lenzing + 2 Honda
+        assert report.total_facts == 0  # facts pipeline retired (Arc-B Batch 2)
 
     def test_top_topics(self, populated_index: Path) -> None:
+        # Topics are no longer aggregated from the (retired) facts table.
         report = get_analytics(populated_index)
-        topic_names = [t for t, _ in report.top_topics]
-        assert "SAP Integration" in topic_names or "Demand Planning" in topic_names
+        assert report.top_topics == []
 
     def test_top_products(self, populated_index: Path) -> None:
         report = get_analytics(populated_index)
