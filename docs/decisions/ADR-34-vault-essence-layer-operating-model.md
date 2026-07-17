@@ -1,6 +1,6 @@
 # ADR-34: Vault kept as the essence layer under the amended operating model
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-07-17
 - **Decision tier:** Technical-architect intake triage (Path A), 2026-07-06 decision register DR-2
 - **Related:** `docs/audits/2026-07-07_BRIEF_obsidian-operating-model-v2.md` (the v2 amendment this ADR incorporates by reference)

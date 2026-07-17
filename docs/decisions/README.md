@@ -27,7 +27,7 @@ Max 20 lines each. Format: Context / Decision / Consequences.
 | [ADR-19](ADR-19-light-scan-architecture.md) | Light Scan Architecture | Accepted |
 | [ADR-20](ADR-20-vault-restructure.md) | Vault Rebuild Strategy | Accepted |
 | [ADR-21](ADR-21-ontology-approach.md) | Knowledge Ontology and Tagging Approach | Accepted |
-| [ADR-22](ADR-22-rfp-kb-federation.md) | RFP KB Federation with Vault Search | Accepted |
+| [ADR-22](ADR-22-rfp-kb-federation.md) | RFP KB Federation with Vault Search | Superseded by ADR-33 |
 | [ADR-23](ADR-23-monorepo-internal-architecture.md) | Monorepo Internal Architecture Refactoring | Accepted |
 | [ADR-24](ADR-24-mywork-knowledge-architecture.md) | MyWork Knowledge Architecture | Accepted |
 | [ADR-25](ADR-25-diagram-strategy.md) | Diagram Strategy | Accepted |
@@ -35,10 +35,10 @@ Max 20 lines each. Format: Context / Decision / Consequences.
 | [ADR-27](ADR-27-safety-invariants.md) | Safety Invariants — OneDrive Guard Centralization and Vault Writer Narrowing | Accepted |
 | [ADR-30](ADR-30-retire-changelog.md) | Retire CHANGELOG.md | Accepted |
 | [ADR-31](ADR-31-retire-single-file-handoff.md) | Retire single-file HANDOFF (docs/HANDOFF.md + scripts/update_handoff.py) | Accepted |
-| [ADR-33](ADR-33-rfp-kb-federation-index-extra-roots.md) | RFP KB Federation via INDEX_EXTRA_ROOTS (supersedes ADR-22) | Proposed |
-| [ADR-34](ADR-34-vault-essence-layer-operating-model.md) | Vault Essence Layer — Amended Operating Model (S0-S3, Link/View Spine) | Proposed |
-| [ADR-35](ADR-35-corp-ops-placement-backup-topology.md) | corp-ops Placement and Dual-Leg Backup Topology | Proposed |
-| [ADR-36](ADR-36-storage-topology-estate-roles.md) | Storage Topology — Estate Roles (Dev / MyWork / OneDrive / Vault) | Proposed |
+| [ADR-33](ADR-33-rfp-kb-federation-index-extra-roots.md) | RFP KB Federation via INDEX_EXTRA_ROOTS (supersedes ADR-22) | Accepted |
+| [ADR-34](ADR-34-vault-essence-layer-operating-model.md) | Vault Essence Layer — Amended Operating Model (S0-S3, Link/View Spine) | Accepted |
+| [ADR-35](ADR-35-corp-ops-placement-backup-topology.md) | corp-ops Placement and Dual-Leg Backup Topology | Accepted |
+| [ADR-36](ADR-36-storage-topology-estate-roles.md) | Storage Topology — Estate Roles (Dev / MyWork / OneDrive / Vault) | Accepted |
 
 > ADR-28 and ADR-29 are intentionally skipped — reserved for future
 > distillations of `DECISION_28_community_patterns_research` and

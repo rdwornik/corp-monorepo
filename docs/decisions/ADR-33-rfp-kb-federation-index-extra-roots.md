@@ -1,6 +1,6 @@
 # ADR-33: RFP KB federation via INDEX_EXTRA_ROOTS (supersedes ADR-22)
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-07-17
 - **Decision tier:** Technical-architect intake triage (Path A), 2026-07-06 decision register DR-1
 - **Supersedes:** ADR-22 (RFP KB Federation with Vault Search) — takes effect on ratification only; see Consequences.

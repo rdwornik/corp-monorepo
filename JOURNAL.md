@@ -15,6 +15,13 @@
 
 ---
 
+### 2026-07-17 — ADR pack RATIFIED (DR-1/2/10/11/12); night report pinned + pushed
+- Did: Operator sign-off on record (morning follow-up to the unattended night batch). Pinned the night-batch v2 closing report into `docs/audits/` (merge [f0592be]) and pushed `origin main` (`14a1b09..f0592be`; `block-ff-push` passed — merge-based history). Ratified the ADR pack: flipped ADR-33/34/35/36 Status Proposed→Accepted and ADR-22's status line to "Superseded by ADR-33" — **in-place status-line edits only** (ADR-94 / CLAUDE.md §5 rule 3); ADR decision bodies untouched. Synced the `docs/decisions/README.md` status column.
+- Result: DR-1 (ADR-33), DR-2 (ADR-34), DR-10+11 (ADR-35), DR-12 (ADR-36) are **Accepted** and anchor the backlog per intake §8; ADR-22 formally superseded by ADR-33.
+- Changes: `docs/decisions/ADR-33..36-*.md` + `ADR-22-rfp-kb-federation.md` (status lines); `docs/decisions/README.md` (status column); `docs/audits/2026-07-17-night-batch-v2-closing-report.md` (pinned, own prior commit); `JOURNAL.md` (this entry).
+- Abandoned: none.
+- Next: wire DR-1/2/10/11/12 into `BACKLOG.md` as epics (intake §8); execute ADR-33 (set `INDEX_EXTRA_ROOTS` + `corp index rebuild`) when scheduled.
+
 ### 2026-07-17 — Night-batch Arc N3: ADR pack (PROPOSED) for intake DR-1/2/10/11/12
 - Did: Drafted four Proposed ADRs anchoring the technical-architect intake decision register (`docs/audits/2026-07-06-technical-architect-intake.md` §5/§8) — fresh-context Sonnet worker + clause-by-clause verification. ADR-33 (DR-1 RFP↔KB federation via `INDEX_EXTRA_ROOTS`, supersedes ADR-22, honors ground-truth D-7 orphan JSON), ADR-34 (DR-2 vault essence layer + obsidian-v2 two-layer LINK/VIEW by reference), ADR-35 (DR-10+11 corp-ops separate repo+private remote + dual-leg upload-only backup + restore drill), ADR-36 (DR-12 storage topology, write boundaries enforced by ADR-27 guards).
 - Result: Merged [28345d0]. 4 ADRs + 4 README rows; all **Status: Proposed** (operator ratifies). ADR-22 status-line flip deferred to ratification (not edited). Doc-only, no codex gate. Worker independently re-verified `corp.safety.onedrive` exists (vs the stale 2026-07-16 audit snapshot) and scoped ADR-36's scanner-enforcement caveat honestly.
