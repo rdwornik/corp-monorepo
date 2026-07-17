@@ -35,6 +35,10 @@ Max 20 lines each. Format: Context / Decision / Consequences.
 | [ADR-27](ADR-27-safety-invariants.md) | Safety Invariants — OneDrive Guard Centralization and Vault Writer Narrowing | Accepted |
 | [ADR-30](ADR-30-retire-changelog.md) | Retire CHANGELOG.md | Accepted |
 | [ADR-31](ADR-31-retire-single-file-handoff.md) | Retire single-file HANDOFF (docs/HANDOFF.md + scripts/update_handoff.py) | Accepted |
+| [ADR-33](ADR-33-rfp-kb-federation-index-extra-roots.md) | RFP KB Federation via INDEX_EXTRA_ROOTS (supersedes ADR-22) | Proposed |
+| [ADR-34](ADR-34-vault-essence-layer-operating-model.md) | Vault Essence Layer — Amended Operating Model (S0-S3, Link/View Spine) | Proposed |
+| [ADR-35](ADR-35-corp-ops-placement-backup-topology.md) | corp-ops Placement and Dual-Leg Backup Topology | Proposed |
+| [ADR-36](ADR-36-storage-topology-estate-roles.md) | Storage Topology — Estate Roles (Dev / MyWork / OneDrive / Vault) | Proposed |
 
 > ADR-28 and ADR-29 are intentionally skipped — reserved for future
 > distillations of `DECISION_28_community_patterns_research` and
