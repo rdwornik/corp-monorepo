@@ -320,3 +320,19 @@ class TestScanVaultFreshness:
         scanned_names = [Path(r.note_path).name for r in summary.results]
         assert "synthesis.md" not in scanned_names
         assert "index.md" not in scanned_names
+
+
+def test_scan_survives_unreadable_note(tmp_path, monkeypatch):
+    """A note unreadable/removed mid-scan must not abort the scan but yield an
+    'error' result (Arc-C #26 repoint; terra P1 regression guard)."""
+    import corp.freshness_scanner as fs
+
+    note = tmp_path / "note.md"
+    note.write_text("---\ntitle: X\n---\nbody", encoding="utf-8")
+
+    def _raise_oserror(_path):
+        raise OSError("simulated read failure / file vanished")
+
+    monkeypatch.setattr(fs, "read_frontmatter", _raise_oserror)
+    result = fs.scan_note_freshness(note, tmp_path)
+    assert result.status == "error"

@@ -140,7 +140,12 @@ def scan_note_freshness(
     """
     note_str = str(note_path)
 
-    fm = read_frontmatter(note_path)
+    try:
+        fm = read_frontmatter(note_path)
+    except OSError:
+        # A note unreadable or removed between rglob() and here must not abort
+        # the whole scan — mirror the former parser's tolerant None (Arc-C #26).
+        fm = None
     if not fm:
         return _make_result(
             note_str,
