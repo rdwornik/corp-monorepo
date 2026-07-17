@@ -1,4 +1,4 @@
-# Arc-B Deletion Manifest (PROPOSED) — 2026-07-17
+# Arc-B Deletion Manifest (SIGNED) — 2026-07-17
 
 > **Purpose:** the operator-signable deletion contract for Arc B. This document is the
 > contract; **execution is a separate, operator-signed arc.** Zero deletions were performed
@@ -40,19 +40,27 @@
 ## Sign-off block
 
 ```
-Signed:      ____________________            (operator)
-Date:        ____________________
-Scope-hash:  ____________________            (sha256 of this manifest at sign-off)
+Signed:      Rob                             (operator)
+Date:        2026-07-17
+Scope-hash:  ba011e700d127536b02d97f7e31eeaa693db9777b8b86cf71ccd6508c91b6f4f  (sha256 of this manifest at sign-off; computed with this value left blank as ____)
 
 Per-batch rulings (operator flips PROPOSED-* → signed):
-  Batch 1  cost_tracker .................  [ ] KILL   [ ] DEFER   [ ] KEEP
-  Batch 2  facts pipeline (repoint) .....  [ ] KILL   [ ] DEFER   [ ] KEEP
-  Batch 3  inbox lane (router internals)   [ ] KILL   [ ] DEFER   [ ] KEEP
-  Batch 4  N4 task-manager cascade ......  [ ] KILL (requires explicit zero-use word)  [ ] DEFER  [ ] KEEP
-  Batch 5  zero-caller dead limbs .......  [ ] KILL   [ ] DEFER   [ ] KEEP
-  Exclusions (KEEP) confirmed ..........  [ ] yes
-  DEFER field acknowledged (not signable) [ ] yes
+  Batch 1  cost_tracker .................  [x] KILL   [ ] DEFER   [ ] KEEP
+  Batch 2  facts pipeline (repoint) .....  [x] KILL   [ ] DEFER   [ ] KEEP
+  Batch 3  inbox lane (router internals)   [x] KILL   [ ] DEFER   [ ] KEEP
+  Batch 4  N4 task-manager cascade ......  [x] KILL (requires explicit zero-use word)  [ ] DEFER  [ ] KEEP
+  Batch 5  zero-caller dead limbs .......  [x] KILL   [ ] DEFER   [ ] KEEP
+  Exclusions (KEEP) confirmed ..........  [x] yes
+  DEFER field acknowledged (not signable) [x] yes
 ```
+
+**Batch 4 zero-use confirmation** (operator's verbatim word, recorded at sign-off — his word is the evidence):
+
+> "Na razie nic nie używam — całe repozytorium wymaga połączenia, żeby zaczęło działać jako agent."
+
+Architect note for the record: the zero-use is **blanket** (the system is pre-operational; no
+feature is in use), so the usage gate is satisfied *a fortiori*. The design-intent authority for
+killing N4 specifically is the ratified DR-4 kill (intake decision register) carried into A3-R4.
 
 **Ruling legend:** `PROPOSED-KILL` = re-grep supports deletion, awaiting signature ·
 `PROPOSED-GATED` = deletion blocked until the operator's explicit confirmation (his word
