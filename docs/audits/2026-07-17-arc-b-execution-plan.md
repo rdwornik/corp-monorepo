@@ -176,3 +176,41 @@ facts/facts_fts` kept so `corp index rebuild` clears existing DBs. **`projects.f
   and referenced here; (b) **operator sign-off**.
 - **Status:** PROPOSED · not scheduled into Arc-B · surfaced to the operator queue 2026-07-17.
   Distinct from the manifest DEFER field (a separate future *deletion* manifest).
+
+---
+
+## Addendum C — Batch-3 DROPPED + PROPOSED premise correction AMD-2 + revised ledger (append-only, 2026-07-17)
+
+> Append-only (signed manifest NOT touched). Records the senior-ruled Batch-3 drop and the
+> falsified premise, and restates the arc collection ledger.
+
+**Batch 3 — DROPPED (senior ruling 2026-07-17, Option A).** The boundary witness falsified signed
+row 3.1's "dead inbox lane" premise. deep-magistrala §Step 1 (the manifest's own cited evidence)
+states both lanes **share** `_run_extraction` (`router.py:720-810`) as the CKE handoff:
+`_run_extraction`/`_run_package_extraction` are the registered handlers behind **`corp ingest`**
+(Lane A; `cli/ingest.py:19`, registered `cli/__init__.py:128`) **and `corp ingest-inbox`** (Lane B;
+`inbox.py:_trigger_extraction:275` → `_run_extraction:304`, registered `cli/__init__.py:129`). The
+"never wrote" runtime observation = extraction gated on `is_available()` (**CKE not wired** in the
+pre-operational state), **not** dead code. **No cut made** — both functions KEEP.
+
+**PROPOSED premise correction — AMD-2 (records the falsification; enters the operator queue; does
+NOT gate Arc-B):**
+- **Finding:** signed manifest Batch-3 row 3.1 rests on a mischaracterisation of deep-magistrala
+  §Step 1; its KILL targets are **live, shared, core ingest→CKE→vault infrastructure**, not a dead
+  lane. This is an "audit say-so ≠ truth" catch (cf. the `BatchJobRunner` KEEP flip).
+- **Disposition:** `_run_extraction` + `_run_package_extraction` **KEEP**. Their fate **re-opens
+  only at the CKE-wiring decision (post-simulation)** — not in Arc-B.
+- **Status:** RECORDED · Batch 3 closed as DROP · signed manifest left immutable (correction by
+  this addendum, per critical-rule 3).
+
+**Revised arc collection ledger (senior-restated):**
+```
+2629 baseline
+ -2  Batch 1 (cost_tracker)        -> 2627   [landed b8b958a]
+ -2  Batch 2 (facts repoint)       -> 2625   [landed 5bcf899]
+ -0  Batch 3 (DROPPED — premise falsified)
+-25  Batch 4 (task-manager cascade)-> 2600   [pending]
+ -0  Batch 5 (frames limbs)        -> 2600   [pending]
+------------------------------------------------
+net predicted final collection = 2600
+```
