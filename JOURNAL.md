@@ -15,6 +15,13 @@
 
 ---
 
+### 2026-07-17 — Arc-B MERGED+PUSHED; close-out package delivered
+- Did: Merged the completed Arc-B arc to `main` (`--no-ff`) after the terra re-run returned CLEAN, pushed, ran `corp index rebuild` (D3), and delivered the close-out package.
+- Result: **Arc-B MERGED+PUSHED** [merge `bf45d22`; `1d8192d..bf45d22`; block-ff-push passed]. `corp index rebuild`: 29 projects / **0 facts** / 488 notes → B2 facts residue cleared. Close-out docs: `docs/audits/2026-07-17-arc-b-closeout.md` (outcome + D1–D4 closure-audit inputs + CR-1..CR-6 R4 dump + AMD-1/2/3 status) + `docs/audits/2026-07-17-amd1-facts-count-consumers.md` (curated Codex-luna 31-site enumeration). BACKLOG: empty `[S2]` story removed. Net collection 2629→2600; final suite 2595p/6s/0f; terra CLEAN. **OneDrive safety:** verified the production paths (ObsidianVault / MyWork / AppData) are all LOCAL — not the excluded zone — before running the rebuild (the guard's block on the check command was a false positive on the `2>&1` token).
+- Changes: `docs/audits/2026-07-17-arc-b-closeout.md` (new), `docs/audits/2026-07-17-amd1-facts-count-consumers.md` (new), `BACKLOG.md` (`[S2]` removed); `JOURNAL.md` (this entry).
+- Abandoned: none. AMD-1/2/3 queued (operator, non-gating).
+- Next (operator): AMD-1 sign-off + AMD-2/3 ack; R4 green-light on CR-1..CR-6; lane-prompt archival to the hub carrier (awaits the operator's two prompts + bundle path); Codex sol E5-inputs lane. Product resumes at Arc-C wave 1 (#25/#26/#27) + the E5 registry foundation per plan §3.
+
 ### 2026-07-17 — Arc-B terra gate: orphaned-workflow fix (Option A); merge pending
 - Did: terra codex-review on the Arc-B cumulative diff returned **1 HIGH** (`config/workflows.yaml` `my_tasks`/`add_task` workflows invoke the B4-deleted `list_tasks`/`add_task` actions), otherwise CLEAN. Senior ruled **Option A + AMD-3** (operator-authorized). Removed both orphaned workflow blocks as B4-cascade completion (dangling refs to actions killed under the signed row; the B4 caller-enumeration under-listed them) [`d846c0d`].
 - Result: fix committed [`d846c0d`] config-only (28 deletions); no test loads the real `config/workflows.yaml` (all use fixtures); collection 2600 unchanged. **AMD-3** stands PROPOSED (operator queue, non-gating): `intent_router:237` NL-routing cleanup — design decision about the intent surface, now degrades gracefully to the handled "Nieznany workflow" path. Codex-invocation gotcha fixed: `codex exec` hangs on stdin unless `< /dev/null` appended (luna+terra both hung first attempt; killed via TaskStop, relaunched, smoke-tested). luna AMD-1 evidence complete (31 consumer sites).
