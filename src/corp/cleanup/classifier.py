@@ -12,6 +12,8 @@ import os
 from dataclasses import dataclass
 from typing import Any
 
+from corp.schema.utils import parse_llm_json
+
 from .scanner import FileInfo
 
 log = logging.getLogger(__name__)
@@ -123,7 +125,7 @@ def classify_file(
                 max_output_tokens=300,
             ),
         )
-        parsed = _parse_response(response.text)
+        parsed = parse_llm_json(response.text)
     except (ConnectionError, TimeoutError, ValueError, KeyError) as exc:
         log.warning("Classification failed for %s: %s", file_info.name, exc)
         return Classification(

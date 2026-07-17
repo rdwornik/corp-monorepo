@@ -16,6 +16,7 @@ from pathlib import Path
 
 from corp.models import Workflow
 from corp.routing_types import Intent
+from corp.schema.utils import parse_llm_json
 
 logger = logging.getLogger(__name__)
 
@@ -219,28 +220,15 @@ def classify_intent(
 
 def _parse_llm_response(text: str) -> Intent:
     """Parse structured JSON from LLM response into Intent."""
-    # Strip markdown code fences if present
-    cleaned = text.strip()
-    if cleaned.startswith("```"):
-        lines = cleaned.split("\n")
-        # Remove first and last lines (```json and ```)
-        lines = [line for line in lines if not line.strip().startswith("```")]
-        cleaned = "\n".join(lines)
-
     try:
-        data = json.loads(cleaned)
-    except json.JSONDecodeError:
-        # Try to extract JSON from within the text
-        json_match = _extract_json(cleaned)
-        if json_match:
-            data = json.loads(json_match)
-        else:
-            logger.warning("Failed to parse LLM JSON response: %s", text[:200])
-            return Intent(
-                source="llm",
-                confidence=0.0,
-                response_text=text[:300],
-            )
+        data = parse_llm_json(text)
+    except ValueError:
+        logger.warning("Failed to parse LLM JSON response: %s", text[:200])
+        return Intent(
+            source="llm",
+            confidence=0.0,
+            response_text=text[:300],
+        )
 
     # Build params dict, filtering out null values
     raw_params = data.get("parameters", {})

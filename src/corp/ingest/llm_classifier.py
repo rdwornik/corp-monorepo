@@ -29,6 +29,7 @@ from corp.schema.folder_names import (
     WF_WORKSHOP_KITS,
     WORKFLOWS,
 )
+from corp.schema.utils import parse_llm_json
 
 logger = logging.getLogger(__name__)
 
@@ -164,7 +165,10 @@ def classify_file_llm(
         logger.warning("LLM API call failed for %s: %s", filename, exc)
         return _no_match_classification(f"LLM API error: {exc}")
 
-    parsed = _parse_llm_json(raw_text)
+    try:
+        parsed = parse_llm_json(raw_text)
+    except ValueError:
+        parsed = None
 
     if not parsed:
         logger.warning("LLM classification failed to parse for %s", filename)

@@ -24,6 +24,7 @@ from corp.schema.folder_names import (
     SCAN_SKIP_FOLDERS,
     WORKFLOWS,
 )
+from corp.schema.utils import parse_llm_json
 
 logger = logging.getLogger(__name__)
 
@@ -304,7 +305,7 @@ def analyze_folder(
             ),
         )
         raw_text = response.text
-        parsed = _parse_gemini_json(raw_text)
+        parsed = parse_llm_json(raw_text)
         return {
             "folder": folder_name,
             "file_count": len(files),

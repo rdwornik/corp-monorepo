@@ -21,6 +21,8 @@ from typing import Optional
 
 import numpy as np
 
+from corp.schema.utils import parse_llm_json
+
 
 class NumpyEncoder(json.JSONEncoder):
     """JSON encoder that handles numpy types from embeddings."""
@@ -415,7 +417,10 @@ def llm_topic_check(q_existing: str, q_new: str, llm_call) -> dict:
     prompt = TOPIC_GUARD_PROMPT.format(q_existing=q_existing, q_new=q_new)
     try:
         text = llm_call(prompt)
-        result = _parse_llm_json_obj(text)
+        try:
+            result = parse_llm_json(text)
+        except ValueError:
+            result = {}
         return (
             result
             if result
@@ -438,7 +443,10 @@ def llm_judge(question: str, existing_answer: str, new_answer: str, llm_call) ->
     )
     try:
         text = llm_call(prompt)
-        result = _parse_llm_json_obj(text)
+        try:
+            result = parse_llm_json(text)
+        except ValueError:
+            result = {}
         if not result:
             return {
                 "winner": "A",
