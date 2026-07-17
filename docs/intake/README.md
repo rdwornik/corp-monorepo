@@ -35,3 +35,6 @@ Hand-maintained — no generator.
 - `2026-07-10-runbook-gap-notes.md` — Wave-1 **n=2** onboarding runbook gap-notes /
   NEEDS-RULING items (routes to `.dev-knowledge` for filing; a gap-notes deliverable,
   not an ADR-98 intake doc — carries no intake frontmatter).
+- `2026-07-17-tech-e5-registry-foundation-design.md` — **intake-id 16** · the E5 registry
+  foundation design (FR-10 URL/source registry + deterministic source-value scoring v1); the
+  spec the E5 build arc (#40/#35/#38/#36) executes from. `status: DRAFT`.
