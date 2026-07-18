@@ -48,6 +48,9 @@ class SourceObservationRepository:
         if liveness not in LIVENESS:
             raise ValueError(f"liveness {liveness!r} not in {LIVENESS}")
         vs = value_score
+        # Forward-slash normalization of stored paths (CLAUDE.md §5 rule 12; the
+        # EventRepository invariant) — recovery candidates may arrive Windows-style.
+        candidates = [c.replace("\\", "/") for c in (recovery_candidates or [])]
         cur = self.conn.execute(
             """INSERT INTO source_observations
                (source_id, liveness, last_verified, recovery_candidates,
@@ -57,7 +60,7 @@ class SourceObservationRepository:
                 source_id,
                 liveness,
                 last_verified,
-                json.dumps(recovery_candidates or []),
+                json.dumps(candidates),
                 vs.score if vs else None,
                 json.dumps(vs.components) if vs else None,
                 vs.weights_version if vs else None,

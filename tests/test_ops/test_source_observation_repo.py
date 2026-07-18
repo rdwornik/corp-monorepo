@@ -72,3 +72,15 @@ class TestAppend:
         repo.append("b", liveness="STALE")
         assert repo.latest("a")["liveness"] == "LIVE"
         assert len(repo.history("a")) == 1
+
+    def test_recovery_candidate_paths_normalized_to_forward_slash(self, repo) -> None:
+        # terra P1 (CLAUDE.md §5 rule 12): stored paths use forward slashes only.
+        repo.append(
+            "s",
+            liveness="MOVED-candidate",
+            recovery_candidates=[r"Sites\Platform\General", "Sites/Products/Docs"],
+        )
+        assert repo.latest("s")["recovery_candidates"] == [
+            "Sites/Platform/General",
+            "Sites/Products/Docs",
+        ]
