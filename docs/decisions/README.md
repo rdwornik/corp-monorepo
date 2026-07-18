@@ -40,6 +40,7 @@ Max 20 lines each. Format: Context / Decision / Consequences.
 | [ADR-35](ADR-35-corp-ops-placement-backup-topology.md) | corp-ops Placement and Dual-Leg Backup Topology | Accepted |
 | [ADR-36](ADR-36-storage-topology-estate-roles.md) | Storage Topology — Estate Roles (Dev / MyWork / OneDrive / Vault) | Accepted |
 | [ADR-37](ADR-37-metadata-canonical-layer-facts-disposition.md) | Metadata Canonical Layer (frontmatter) + Facts-Pipeline Disposition (F7 stay-dead + one projection) | Accepted |
+| [ADR-38](ADR-38-deletion-manifest-doctrine.md) | Deletion-Manifest Doctrine (three-leg method, ruling legend, amendments A/B) | Accepted |
 
 > ADR-28 and ADR-29 are intentionally skipped — reserved for future
 > distillations of `DECISION_28_community_patterns_research` and
