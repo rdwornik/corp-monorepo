@@ -15,6 +15,14 @@
 
 ---
 
+### 2026-07-19 — E5 lane #38: terra GREEN (pass 5) — story-return, merging to main
+- Did: terra pass 5 returned **CLEAN** — "No critical or high-severity defects; the new registry, scoring, and observation components align with the declared fail-closed and append-only contracts." The mandatory pre-merge gate is satisfied after a 4-pass fix-and-rereview loop (6 P1s total, all design-invariant/fail-closed gaps, each fixed + regression-tested). Architect accepted the #38 story-return → serial `--no-ff` merge of `epic/e5-registry` into main. **EPIC_RETURN.md bundle is GONE** (the hub cleaned the `2026-07-18-corp-monorepo-e5-registry-developer` bundle when the separate epic-lane chat was closed) — so this JOURNAL entry is the story-level §progress record; the worktree/branch are **preserved** (not torn down) to continue for #40.
+- Result: terra CLEAN (pass 5, 0 HIGH). #38 lane = **11 commits** on `epic/e5-registry` (6 build/step + 5 terra-fix/anchor pairs); test_ops **117→199**, full worktree suite green modulo the E4-dispositioned `test_cke_paths_resolve`. Merging to main with the `[#38]` token; #38 stays an open BACKLOG task (its "every record carries a value_score / queue consumes" done-when completes when #40 wires seeds + Graph snapshots — this lane delivered the scorer/schema/observation PRIMITIVES per the architect's scoped plan).
+- terra fix ledger (all P1): pass1 root-key + field-type validation (`a406b4c`); pass2 recovery-path forward-slash (`2c1ab27`); pass3 exclude hard-gate + dims-key allowlist (`363bdd4`); pass4 persist `ValueScore.gated` (`b28db4d`); pass5 clean.
+- Changes: `JOURNAL.md` (this entry). (Code changes are in the per-step/per-fix commits above.)
+- Abandoned: none. EPIC_RETURN.md §progress could not be written (bundle removed) — recorded here instead; flagged to the operator.
+- Next: `--no-ff` merge → push → epic branch continues from new main for #40; then the night consolidation batch (N1/N2/N3).
+
 ### 2026-07-19 — E5 lane #38: terra re-review #4 — persist gate status P1 fixed
 - Did: terra pass 4 P1 — the observation write dropped `ValueScore.gated`, so a hydrated excluded-zero was indistinguishable from a permitted-zero (the gate wouldn't survive persistence, re-admitting an excluded source to the permitted rank tier). Added a `gated` column to `source_observations` + store/hydrate it. Fixed + tested (+2), committed `b28db4d`, re-launched terra (pass 5).
 - Result: `b28db4d` [fix(ops) persist ValueScore.gated]; test_ops **199 passed**, ruff clean. terra pass 5 in-flight; no merge until clean of HIGHs.
