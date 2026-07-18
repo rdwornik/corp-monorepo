@@ -136,6 +136,12 @@ So that ARCHITECTURE/CLAUDE match the post-Arc-B/C tree, the skill-eval checkpoi
 - [#8] [P2][S] Run the 30-day skill-eval checkpoint against the locked stratified 80/20 split (ADR-16; baseline 2026-03-26, past due) · Done when: the checkpoint runs by 2026-07-31 and classifier/tag/product/people drift is reported · refs ADR-16
 - [#9] [P3][M] Evaluate Ollama for an offline/private extraction tier · Done when: a feasibility decision is recorded · refs HANDOFF Open Decisions #8
 
+### [S12] Enact the paper-only ADRs (enforcement leg or recorded deferral)
+So that each ADR that currently exists only on paper either gets its enforcement leg built or an explicit deferral recorded in the ADR naming the gap (census B-table 3).
+- [#63] [P2][M] ADR-34 — vault-essence S0–S3 lifecycle + 48h SLA: build the scheduler/enforcement leg OR record an explicit deferral in the ADR naming the gap · Done when: SLA enforcement witnessed in a sandbox OR a deferral recorded in ADR-34 with the gap named · refs ADR-34, census B-table 3
+- [#64] [P2][M] ADR-35 — corp-ops placement + dual-leg backup topology: build the enforcement leg OR record a deferral (the leg-2 backup amendment is operator-queue, see #18) · Done when: topology enforcement witnessed OR a deferral recorded in ADR-35 with the gap named · refs ADR-35, #18, census B-table 3
+- [#65] [P2][M] ADR-36 — storage-topology estate-roles: build the named-but-unbuilt scanner enforcement leg OR record a deferral · Done when: estate-role scanner enforcement witnessed OR a deferral recorded in ADR-36 with the gap named · refs ADR-36, census B-table 3
+
 ---
 
 **About this file** — ADR-66 story-map (Big Picture → Theme → User Story → Task). Stories are
