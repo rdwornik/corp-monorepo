@@ -25,7 +25,7 @@ essence layer ahead of the RFP rewrite, and finally ops/models/docs.
 ### [S1] Land the F0 substrate and pre-R1 fixes
 So that the vault-writer scanner covers the whole repo, the extraction path stops mis-scoring and silently dropping, and the backup topology is sanctioned.
 - [#16] [P1][M] Extend the ADR-27 PR-3 vault-writer scanner to full-repo coverage + run the exemption sweep · Done when: the scanner runs over the whole tree and every write outside the `01_Knowledge` writer / actions whitelist is either flagged or exempted with a recorded reason · refs ADR-27, R7
-- [#17] [P1][S] Fix the score-inversion bug + add the silent filter-drop retry in the extraction path · Done when: extraction scores rank the right way and a filtered-out candidate is retried (not silently dropped), covered by a regression test · refs code-quality audit (pre-R1)
+- [#17] [P1][S] Fix the score-inversion bug + add the silent filter-drop retry in the extraction path · Done when: extraction scores rank the right way and a filtered-out candidate is retried (not silently dropped), covered by a regression test · refs code-quality audit (pre-R1) + 2026-07-18 process audit (extraction-path evidence: F5 tier routing sends text to claude-sonnet-4-6, F21 inconsistent tiering across CKE entry points, F22 local-extractor emits schema-invalid type/quality)
 - [#18] [P2][M] ADR-35 amendment — backup leg-2 → personal OneDrive (operator's second account) replacing the auth-blocked Google-Drive leg; Google demoted to optional leg-3 · Done when: an amending/superseding ADR (or the sanctioned in-file append-only amendment marker) records leg-2→personal-OneDrive as Accepted, and the X1 build targets it — no free edit of the Accepted ADR body · refs ADR-35 · CLAUDE.md §5 rule 3 (ADR immutability — supersede via new/amending ADR, not in-place edit)
 
 ---
@@ -36,7 +36,7 @@ So that the vault-writer scanner covers the whole repo, the extraction path stop
 ### [S3] Unify canonical homes and clear engine debt (Arc C)
 So that config/vocabulary/pricing/frontmatter/LLM-JSON/CKE-invoker each resolve to one home per R5, and the residual hygiene debt is cleared.
 - [#24] [P2][M] Move vocabulary → `schema` · Done when: vocabulary constants live under `schema` and importers are migrated, tach clean · refs R5
-- [#28] [P2][M] Merge the CKE invoker to ONE (`project/cke_invoker` + `overnight/cke_client`) with an explicit subprocess contract · Done when: a single corp-side invoker drives CKE and the old two are gone · refs R2, R5
+- [#28] [P2][M] Merge the CKE invoker to ONE (`project/cke_invoker` + `overnight/cke_client`) with an explicit subprocess contract · Done when: a single corp-side invoker drives CKE and the old two are gone · refs R2, R5 + 2026-07-18 process audit (F24 corroborates: corp regex-scrapes the CKE `process-manifest` stdout summary — a fragile literal-line contract duplicated across `cke_client` + `cke_invoker`; `cke process` vs `process-manifest` emit different stdout, F23)
 - [#29] [P2][L] Migrate `config` → the `PipelineConfig` family (migrate all `corp.config` importers) — the capstone unification · Done when: production config resolves through `PipelineConfig` and `corp.config` importers are migrated, tach clean · refs R5 (cut before unify)
 - [#30] [P3][S] Un-exempt `src/corp/test_pipeline.py` from the tach layer exemptions · Done when: the tach exemption is removed and the layer check passes · refs R8
 - [#31] [P3][M] RC-14 broader dead-code sweep as its own future manifest · Done when: a signable RC-14 sweep manifest is produced (execution is a separate signed arc) · refs code-quality audit RC-14 (DEFER)
@@ -51,9 +51,10 @@ So that config/vocabulary/pricing/frontmatter/LLM-JSON/CKE-invoker each resolve 
 
 ### [S4] Contract-test the seams and stand up sandbox e2e
 So that the T6 seams have contract tests, CKE's summary-renderer is isolated and non-circular, and every process runs e2e in a sandbox.
+> **Day-arc pointer (2026-07-18 process audit):** `docs/audits/2026-07-18-process-audit.md` drove each process e2e in a sandbox and its **ranked SIM-1 gap list is the day-arc work-queue input**. SIM-1 (ingest → vault → cited retrieval + draft) is achieved at sandbox scale *except* its Content-Manifest entry; ranked blockers: **F1** ingest crashes without `<mywork>/.corp/content_registry.yaml`, **F6** retrieval is metadata/title-only (no body FTS), **F7** facts pipeline absent (no `facts` table), **F16/F9** project↔vault link + client propagation, **F8** one source → two indexed notes. Isolation caveat surfaced: AppConfig + `com` bypass the sandbox env (F18/F26).
 - [#32] [P2][M] Add T6 seam contract tests A/C/D/E · Done when: each of seams A/C/D/E has a contract test that fails on a boundary violation · refs T6 brief (N2)
 - [#33] [P2][M] Isolate the CKE summary-renderer + add a non-circular producer test · Done when: the renderer is a separate unit and a test proves the producer→renderer path is non-circular · refs R2 follow-up, T6
-- [#34] [P2][M] Stand up sandbox end-to-end runs per process · Done when: each process (ingest, extract, retrieve, rfp) has a green sandbox e2e run · refs P2 pillar
+- [#34] [P2][M] Stand up sandbox end-to-end runs per process · Done when: each process (ingest, extract, retrieve, rfp) has a green sandbox e2e run · refs P2 pillar + 2026-07-18 process audit = recon evidence (all 4 processes driven e2e in a verified sandbox; runs are NOT all green — ingest crashes F1, find/retrieve partial F6/F7; rfp works F-UC3). NOT closed — witnessing ≠ a standing green e2e harness
 
 ---
 
@@ -88,7 +89,7 @@ So that the vault has a generated spine + prep-view, a synthesis rule, an enforc
 - [#42] [P2][M] Synthesis production rule (FR-16) · Done when: the synthesis rule produces a synthesized note from its source set on a real example · refs FR-16
 - [#43] [P2][M] Metadata-charter enforcement (FR-18) + deterministic auto-tagger (FR-19) · Done when: the charter is enforced at write time and the auto-tagger tags deterministically · refs FR-18/FR-19
 - [#44] [P2][M] Ontology day-1 slice (FR-17) · Done when: a first ontology slice is canonicalized at the index-build seam · refs FR-17
-- [#45] [P1][M] FR-13 telemetry spine per the reconciliation doc · Done when: one `event_class`-discriminated write path validates a kinetic-action AND an observation event · refs FR-13 reconciliation (`docs/audits/2026-07-17-fr13-event-schema-reconciliation.md`)
+- [#45] [P1][M] FR-13 telemetry spine per the reconciliation doc · Done when: one `event_class`-discriminated write path validates a kinetic-action AND an observation event · refs FR-13 reconciliation (`docs/audits/2026-07-17-fr13-event-schema-reconciliation.md`) + 2026-07-18 process audit (adjacent, not a direct FR-13 test: F13/F23/F31 — the LLM CLIs print a $ cost but no token counts, and cost history isn't written to ops.db `extractions`; an observability gap the telemetry spine could close)
 - [#46] [P2][S] FR-18 source-record metadata class — fields `value_score`, `location`, `modified`, `last-verified` · Done when: source records carry the four fields and the charter validates them · refs FR-18
 - [#47] [P3][S] FR-20 Content Manifest — CANDIDATE row (P3: candidate; unratified, originates here not in the intake) · Done when: FR-20 is ratified or explicitly dropped by an operator ruling · refs A3 ruling doc (candidate)
 
