@@ -142,10 +142,6 @@ So that each ADR that currently exists only on paper either gets its enforcement
 - [#64] [P2][M] ADR-35 — corp-ops placement + dual-leg backup topology: build the enforcement leg OR record a deferral (the leg-2 backup amendment is operator-queue, see #18) · Done when: topology enforcement witnessed OR a deferral recorded in ADR-35 with the gap named · refs ADR-35, #18, census B-table 3
 - [#65] [P2][M] ADR-36 — storage-topology estate-roles: build the named-but-unbuilt scanner enforcement leg OR record a deferral · Done when: estate-role scanner enforcement witnessed OR a deferral recorded in ADR-36 with the gap named · refs ADR-36, census B-table 3
 
-### [S13] Archival sweep of consumed doc artifacts (manifest SIGNED 2026-07-19; execution pending in a separate ADR-38 session)
-So that consumed and superseded doc artifacts are cleared under the signed ADR-38 manifest + the ratified #68 relocation policy; execution runs as a separate session (nothing deleted/moved until then).
-- [#67] [P2][S] Execute the SIGNED S13 archival manifest (separate session per ADR-38): G1 .html render-twins KILL (gated on the inventory.json/brief citation check), G2 19 conformance digests KILL, G4 8 zero-ref old audits RELOCATE→docs/archive/; G3 technical-architect-intake DEFER · Done when: the signed KILLs/RELOCATEs are merged and the JOURNAL is anchored · refs ADR-38, docs/audits/2026-07-19-deletion-manifest-s13-archival.md
-
 ---
 
 **About this file** — ADR-66 story-map (Big Picture → Theme → User Story → Task). Stories are
