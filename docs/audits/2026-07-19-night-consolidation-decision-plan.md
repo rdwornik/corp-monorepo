@@ -280,7 +280,48 @@ Doc-only, no code: **(a)** remove the 4 phantom `cli→{extractor,project,opport
 
 ## §8 — COMPREHENSION PROBE (Wave 4)
 
-*(Pending — cold-reader probe runs next; results and any gap-closures land in the second commit.)*
+**Cold reader:** `gpt-5.6-sol` in a fresh process — no chat context, no other summaries; instructed to
+read **only** this document and answer from it alone (marking anything the doc failed to make clear as
+PARTIAL / UNANSWERABLE-FROM-DOC rather than filling the gap from the codebase).
+
+**Result: 4/4 ANSWERED. No PARTIAL, no UNANSWERABLE-FROM-DOC → no comprehension gap; nothing to close.**
+
+| Question | Verdict |
+|---|---|
+| Q1 — trace a file from the inbox to where it ends up | **ANSWERED** |
+| Q2 — which modules are NOT connected, and what breaks | **ANSWERED** |
+| Q3 — what must happen next, and why | **ANSWERED** |
+| Q4 — three decisions in force, and what each forbids | **ANSWERED** |
+
+**Raw answers (logged as evidence):**
+
+- **Q1 (ANSWERED):** "`00_Inbox/` filesystem drop → inbox/routing scans it and applies registry/naming
+  rules → router emits a manifest and invokes CKE by subprocess → CKE writes extracted package
+  directories → router calls `move_to_vault` in-process, which moves files onto disk in `01_Knowledge/`
+  → inbox calls `rebuild_index()` in-process → index/retrieval scans vault frontmatter into shared
+  SQLite `index.db`, consumed by `retrieve.engine`, RFP, and demo-prep. The secondary classify→finalize
+  route stops before CKE, so it produces no knowledge note." *(cited §5.2 modules 1–5; §5.3.5)*
+- **Q2 (ANSWERED):** enumerated all nine unwired/partial seams with their practical cost — source
+  registry/scout (no forage/score/rank), body-FTS missing (zero body-phrased hits), project↔vault
+  unlinked, `com` config-stalled, classify→finalize not reaching CKE, synthesize→vault absent,
+  Content-Manifest→deck unbuilt (template-only), the `copy_to_vault` invariant bypass, and ingest
+  cold-start crash. *(cited §5.3.1–9)*
+- **Q3 (ANSWERED):** reproduced the ordered plan (FF E5 → #40 seed/resolve/score → #36 deterministic
+  scout → #55 Content-Manifest → S10 KE → S11 RFP intake gated on the absent terrain-recon return →
+  S12 paper-ADRs → #69 archival) with each step's rationale. *(cited §3-EXT.1–8; N1 §3.6)*
+- **Q4 (ANSWERED):** named ADR-37 (forbids dual-write / facts-revival / speculative `key_facts` index /
+  non-source-derived truth), ADR-38 (forbids a KILL on a module grep alone / blanket runtime-claim
+  delete / editing a signed manifest), and intake-16 (forbids derived state in the hand-edited registry /
+  a yield score overriding `exclude`/consent/OneDrive gates). *(cited §1-EXT Decisions register)*
+
+The document is comprehensible to a cold reader on all four axes the operator specified; the archived
+process is now statable from the repo alone.
+
+---
+
+*Wave 4 comprehension probe: green (4/4 ANSWERED, doc-only cold read). This completes the lane's
+frozen acceptance contract — §5 witnessed, §5.1 adjudication present, §6 options sized & NOT-bounded,
+§7 validator + ARCHITECTURE drift with ARCHITECTURE.md untouched, §8 cold-reader verdicts logged.*
 
 ---
 
