@@ -894,7 +894,7 @@ def ingest_inbox(
 
     cfg = PipelineConfig.production()
     ops = OpsDB()
-    registry = get_content_registry()
+    registry = get_content_registry(bootstrap=not dry_run)
 
     # Undo mode
     if undo is not None:

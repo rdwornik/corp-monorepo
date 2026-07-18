@@ -366,6 +366,24 @@ class TestFreshEnvFallbackAndBootstrap:
         assert registry.data == {}
         assert registry.match_file("x.pdf", ".pdf").matched is False
 
+    def test_data_invalid_utf8_returns_empty(self, tmp_path: Path) -> None:
+        """A non-UTF-8 / binary registry floors to {} (UnicodeDecodeError, not OSError)."""
+        binary = tmp_path / "binary.yaml"
+        binary.write_bytes(b"\xff\xfe\x00\x01 not valid utf-8 \x80\x81")
+        registry = ContentRegistry(binary)
+        assert registry.data == {}
+        assert registry.match_file("x.pdf", ".pdf").matched is False
+
+    def test_bootstrap_refuses_onedrive_target(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Fail-closed: bootstrap never seeds into the OneDrive exclusion zone."""
+        target = tmp_path / ".corp" / "content_registry.yaml"
+        # Force the guard to treat the target as inside the zone.
+        monkeypatch.setattr("corp.safety.onedrive.is_onedrive_path", lambda _p: True)
+        assert bootstrap_content_registry(target) is False
+        assert not target.exists()  # refused — nothing written
+
     def test_bootstrap_seeds_from_repo_config(self, tmp_path: Path) -> None:
         """Bootstrap copies the repo-shipped config into a fresh .corp/ target."""
         target = tmp_path / ".corp" / "content_registry.yaml"

@@ -6,6 +6,7 @@ against known series, destination rules, and client patterns.
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import os
 import re
@@ -61,13 +62,14 @@ class ContentRegistry:
             try:
                 with open(self.registry_path, encoding="utf-8") as f:
                     self._data = yaml.safe_load(f)
-            except (OSError, yaml.YAMLError) as exc:
-                # No-crash floor (F1): a missing, unreadable, or malformed
-                # registry yields no routing rules rather than aborting ingest.
-                # Content falls through to the unmatched destination. Bootstrap
-                # (below) normally seeds a real registry first; this covers
-                # seeding failure and a partially-written or corrupt file
-                # (FileNotFoundError is a subclass of OSError).
+            except (OSError, UnicodeDecodeError, yaml.YAMLError) as exc:
+                # No-crash floor (F1): a missing, unreadable, malformed, or
+                # non-UTF-8 registry yields no routing rules rather than
+                # aborting ingest. Content falls through to the unmatched
+                # destination. Bootstrap (below) normally seeds a real registry
+                # first; this covers seeding failure and a partially-written,
+                # corrupt, or binary file (FileNotFoundError is an OSError;
+                # invalid encoding raises UnicodeDecodeError, not OSError).
                 logger.warning(
                     "content_registry unreadable at %s (%s); using empty fallback",
                     self.registry_path,
@@ -257,9 +259,20 @@ def bootstrap_content_registry(target: Path | None = None) -> bool:
     empty dict (the no-crash floor), so ingest still completes (F1).
     """
     from corp.config import get_config
+    from corp.safety.onedrive import is_onedrive_path
 
     target = target or get_content_registry_path()
     if target.exists():
+        return False
+    # Fail-closed OneDrive guard (core-invariant #1): never seed into the
+    # exclusion zone, even if MYWORK_ROOT is misconfigured under it. Refuse the
+    # write and let the {} floor cover ingest rather than crashing.
+    if is_onedrive_path(target):
+        logger.warning(
+            "content_registry target is inside the OneDrive exclusion zone (%s); "
+            "refusing to seed, using empty fallback",
+            target,
+        )
         return False
     source = get_config().repo_path / "config" / "content_registry.yaml"
     if not source.exists():
@@ -273,13 +286,18 @@ def bootstrap_content_registry(target: Path | None = None) -> bool:
         target.parent.mkdir(parents=True, exist_ok=True)
         # Atomic seed: copy to a temp sibling then os.replace, so a partial
         # write never surfaces as the target and a concurrent seed cannot be
-        # observed half-written. os.replace is atomic on the same filesystem;
-        # a race-loser overwrites with byte-identical content (same source).
+        # observed half-written. os.replace is atomic on the same filesystem.
         shutil.copyfile(source, tmp)
+        if target.exists():
+            # A concurrent process won the seed race; keep its file (the source
+            # is identical) rather than clobbering, and drop our temp.
+            with contextlib.suppress(OSError):
+                tmp.unlink(missing_ok=True)
+            return False
         os.replace(tmp, target)
     except OSError as exc:
-        if tmp.exists():
-            tmp.unlink()
+        with contextlib.suppress(OSError):
+            tmp.unlink(missing_ok=True)
         logger.warning(
             "content_registry bootstrap failed (%s); using empty fallback", exc
         )
