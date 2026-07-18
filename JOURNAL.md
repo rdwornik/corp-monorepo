@@ -15,6 +15,13 @@
 
 ---
 
+### 2026-07-19 — E5 lane #38: terra re-review #4 — persist gate status P1 fixed
+- Did: terra pass 4 P1 — the observation write dropped `ValueScore.gated`, so a hydrated excluded-zero was indistinguishable from a permitted-zero (the gate wouldn't survive persistence, re-admitting an excluded source to the permitted rank tier). Added a `gated` column to `source_observations` + store/hydrate it. Fixed + tested (+2), committed `b28db4d`, re-launched terra (pass 5).
+- Result: `b28db4d` [fix(ops) persist ValueScore.gated]; test_ops **199 passed**, ruff clean. terra pass 5 in-flight; no merge until clean of HIGHs.
+- Changes: `src/corp/ops/database.py` (gated column), `src/corp/ops/source_observation_repo.py` (store/hydrate), `tests/test_ops/test_source_observation_repo.py` (+2); `JOURNAL.md` (this entry).
+- Abandoned: none.
+- Next: terra pass-5 verdict → merge on green (or fix-and-rereview).
+
 ### 2026-07-19 — E5 lane #38: terra re-review #3 — exclude hard-gate + dims-key P1s fixed
 - Did: terra pass 3 surfaced two design-invariant P1s (both intake-16 §2.2): (1) `operator_prior=exclude` still produced a high, rankable score — the design's safety gate must not be outvoted by arithmetic; added `ValueScore.gated`, force score→0 in `score_record` for exclude, and tiered `rank_by_value_score` (permitted > gated > unscored). (2) unknown `dims` keys (`industy:` typo) were accepted then silently dropped by the scorer → mis-rank; now rejected (fail-closed). Fixed + tested (+3), committed `363bdd4`, re-launched terra (pass 4).
 - Result: `363bdd4` [fix(ops) exclude hard-gate + reject unknown dims keys]; test_ops **197 passed**, ruff clean. terra pass 4 in-flight; no merge until terra is clean of HIGHs. (One stray shell-backgrounded terra from a mis-launch was killed; re-run captured.)
