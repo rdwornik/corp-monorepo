@@ -1,5 +1,7 @@
 # Metadata Charter — Complete Tri-Axial Taxonomy (T1)
 
+> **Consumed by:** BACKLOG #43, #46 (FR-18 metadata charter / FR-19 auto-tagger; ADR at phase opening) — via `docs/audits/2026-07-06-technical-architect-intake.md`. Phase-gated (T1).
+
 **Repo:** corp-monorepo (charter) · vault + registry + index (enforcement surfaces) · **Audience:** functional intake / technical architect
 **Status:** brainstorm-phase blueprint (audit-space per DR-14); the canonical-field-set + tag-taxonomy deliverable the operator called *"kluczowe"*
 **Date:** 2026-07-08 · **Session:** functional-architect sitting #5 (T1)

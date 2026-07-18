@@ -1,5 +1,7 @@
 # Estate Recon Snapshot — 2026-07-05
 
+> **Consumed by:** ADR-35, ADR-36 (backup topology / estate roles) + `docs/audits/2026-07-06-technical-architect-intake.md`.
+
 > Read-only point-in-time snapshot. Part 1 (Wave-2 merge closure) + Part 2 (four-root reconnaissance). No fixes, no cleanup — metadata only. Produced on branch `docs/estate-recon`.
 
 ---

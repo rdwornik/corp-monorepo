@@ -1,5 +1,7 @@
 # Deep Audit B — Magistrala / Capture (Wave 2)
 
+> **Consumed by:** `docs/audits/2026-07-06-technical-architect-intake.md` (DR register) + intake-16 (`docs/intake/2026-07-17-tech-e5-registry-foundation-design.md`) — magistrala capture; BACKLOG #35/#37 (FR-3).
+
 **Date:** 2026-07-05 · **Branch:** `docs/deep-magistrala` · **Baseline:** Phase-1 functional audit (`docs/audits/2026-07-05-functional-*.md`, merged at `2753601`)
 **Method:** read-only — static code trace, `mode=ro` SQLite, metadata-only inbox scan, dry replication of registry matching (no pipeline execution, no moves, no config edits). No OneDrive path touched.
 

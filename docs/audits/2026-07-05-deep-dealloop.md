@@ -1,5 +1,7 @@
 # Deep Audit E — Deal Loop (Wave 2)
 
+> **Consumed by:** `docs/audits/2026-07-06-technical-architect-intake.md` (DR register — deal-loop evidence).
+
 **Date:** 2026-07-05 · **Branch:** `docs/deep-dealloop` · **Baseline HEAD:** `2753601` (Phase-1 functional audit merged)
 **Scope:** D1 intake and D5 close-out, post-Phase-1. Operator ruling in scope: `com` is **unfinished, not unwanted — verdict FIX**.
 **Method:** read-only. No `com`/`cpe`/action execution; `Project_Codes.xlsm` opened `read_only=True` (openpyxl); no OneDrive path traversed; MyWork/vault inspected by directory listing only. Every claim carries file:line or command-level evidence.

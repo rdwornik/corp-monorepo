@@ -1,5 +1,7 @@
 # Deep Audit D — Vault + Metadata Chain (Wave 2)
 
+> **Consumed by:** ADR-33, ADR-34 (vault essence layer) + `docs/audits/2026-07-06-technical-architect-intake.md`.
+
 **Date:** 2026-07-05 · **Branch:** `docs/deep-vault` · **Base:** `2753601` (main, post Phase-1 merge)
 **Method:** read-only. All SQLite access via `sqlite3.connect("file:...?mode=ro", uri=True)`. No OneDrive path read or traversed (excluded-zone `source_path` values classified by string prefix only, never touched). No vault write, no index rebuild, no Obsidian app launch or CLI execution — Obsidian feasibility is file/version-metadata reads only. Census computed by a scratchpad script importing `corp.schema.validate` from this repo's source (validation logic exercised in-memory against on-disk frontmatter; nothing written).
 

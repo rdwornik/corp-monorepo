@@ -1,5 +1,7 @@
 # EVIDENCE — Blue Yonder Product-Documentation Tree: Harvest + Structural Analysis
 
+> **Consumed by:** BACKLOG #40 (registry day-1 seed — BY Product Documentation golden-source evidence).
+
 - **Date:** 2026-07-07
 - **Source library:** `C:\Users\1028120\OneDrive - Blue Yonder\Blue Yonder Products - Product Documentation`
 - **Method:** T0 names/metadata enumeration ONLY (`Get-ChildItem` / `Measure-Object` / `Group-Object`). **No file content was opened, read, hashed, copied, or hydrated at any point.** Every zone command was scrutinized and appended to `~/.claude/logs/onedrive-guard.log` as `T0-ALLOW` (this run: 2026-07-07T23:33–23:47, log lines 5–44).

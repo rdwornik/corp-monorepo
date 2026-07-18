@@ -1,5 +1,7 @@
 # Golden-URL Registry & Knowledge-Flow — Architect Brief (T4+)
 
+> **Consumed by:** `docs/audits/2026-07-06-technical-architect-intake.md` + intake-16 (FR-10 record contract) → BACKLOG #38, #40, #36 (E5 registry).
+
 **Repo:** corp-monorepo (registry + scout) · vault (human view) · **Audience:** functional intake / technical architect
 **Status:** brainstorm-phase blueprint (nothing implemented; audit-space artifact per DR-14)
 **Date:** 2026-07-07 · **Session:** functional-architect sitting #1 (backlog T4, expanded per operator vision)

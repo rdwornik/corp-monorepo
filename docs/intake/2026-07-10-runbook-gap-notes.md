@@ -1,5 +1,7 @@
 # Runbook gap-notes — corp-monorepo (Wave-1 **n=2**)
 
+> **Consumed by:** `.dev-knowledge` repo-onboarding runbook — Wave-1 n=2 gap-notes (G10+), hub-filed. No corp ADR/BACKLOG consumer (cross-repo methodology deliverable).
+
 > **Routing:** text artifact for the operator to file into `.dev-knowledge` — **no hub write was
 > made from this consumer chat.** Every gap hit while EXECUTING
 > `.dev-knowledge/docs/runbooks/repo-onboarding.md` (the #131 install sequence + the #215

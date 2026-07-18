@@ -1,5 +1,7 @@
 # Technical Architect Intake — Functional Handover Entry Point
 
+> **Consumed by:** ADR-33, ADR-34, ADR-35, ADR-36 (DR-2/10/11/12) + `docs/audits/2026-07-17-a3-target-architecture-ruling.md` → BACKLOG E5/E6 (FR-10–20). Fully consumed + superseded → archival candidate (S13 / #66).
+
 > **Date:** 2026-07-06 · **Authored by:** functional architect (content) + Claude Code (path verification, evidence cross-references) · **Status:** ratified handover — this is the FIRST document the technical architect reads.
 >
 > All Reading-Map paths verified against `main` on 2026-07-06. Evidence pointers (`Evidence:` lines) were added by opening the cited audit files, not guessed. Anything not yet existing is marked `[pending]`.

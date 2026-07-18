@@ -1,5 +1,7 @@
 # FR-13 event-schema reconciliation (ratified)
 
+> **Consumed by:** BACKLOG #45 (FR-13 telemetry spine).
+
 > **Status:** Ratified (Layer-1 ruling). **Date:** 2026-07-17.
 > **Scope:** resolves the FR-13 `event_type` conflict named by the FA-campaign self-review (`2026-07-08_AUDIT_fa-campaign-self-review.md` §4-1 / §7 — "the only per-FR blocker"). Doc-lane only; supersedes specific lines of two briefs by quote-and-point (the briefs themselves are immutable and left unedited, per critical-rule 3).
 

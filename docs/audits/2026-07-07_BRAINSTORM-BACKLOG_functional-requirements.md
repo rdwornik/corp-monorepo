@@ -1,5 +1,7 @@
 # BRAINSTORM BACKLOG — Unexhausted Topics (Functional Requirements)
 
+> **Consumed by:** `docs/audits/2026-07-06-technical-architect-intake.md` §9 (FR-10–20 map) → BACKLOG E5/E6 (#35–#47, #55).
+
 **Date:** 2026-07-07 · **For:** the next functional-architect chat (Fable) · **Companion:** `2026-07-07_HANDOFF_functional-architect.md`
 **How to run:** one topic per sitting; output = an architect brief in the June-brief format (problem → evidence → converged recommendation → open decisions → success criteria), ending with **FR-addendum candidates** and a **done-when** per recommendation. Sequence below is by dependency, not calendar; the operator picks.
 

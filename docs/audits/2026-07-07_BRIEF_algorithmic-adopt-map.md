@@ -1,5 +1,7 @@
 # Algorithmic Adopt-Map — Formalizing the Chaos Problem (T5 × T2/T4+ core)
 
+> **Consumed by:** `docs/audits/2026-07-06-technical-architect-intake.md` + intake-16 (§2 scoring) → BACKLOG #38, #39 (FR-11/FR-14).
+
 **Repo:** corp-monorepo · **Audience:** functional intake / technical architect
 **Status:** brainstorm-phase blueprint (audit-space per DR-14; nothing implemented)
 **Date:** 2026-07-07 · **Session:** functional-architect sitting #2 · **Companion:** `2026-07-07_BRIEF_golden-url-registry-knowledge-flow.md`

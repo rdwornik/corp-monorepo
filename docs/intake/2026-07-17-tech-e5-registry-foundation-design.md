@@ -2,7 +2,7 @@
 intake-id: 16
 status: READY-FOR-TECHNICAL
 origin: 2026-07-17 · Lane B e5-registry-design worktree · executor-architect (robdwornik)
-consumed-by: E5 registry developer lane (epic/e5-registry)
+consumed-by: BACKLOG #38, #40, #36, #55 (E5 registry epic; ADR at phase opening) — E5 developer lane epic/e5-registry
 ratified: 2026-07-18 · operator picks D1=A · D3=A · D4=A · D5=A (see §8.1)
 ---
 

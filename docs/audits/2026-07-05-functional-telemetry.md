@@ -1,5 +1,7 @@
 # Functional Audit — Telemetry Base (Phase 1)
 
+> **Consumed by:** `docs/audits/2026-07-06-technical-architect-intake.md` (DR register) → FR-13 → BACKLOG #45.
+
 **Date:** 2026-07-05
 **Branch:** `docs/2026-07-05-functional-audit`
 **HEAD at audit start:** `fb9b2dd` (after `git pull --ff-only` from `b13c163`; the 2 pulled commits are nightly conformance digests only)

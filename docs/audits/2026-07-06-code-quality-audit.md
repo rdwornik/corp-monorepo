@@ -1,5 +1,7 @@
 # Code Quality Audit — `src/corp/` (for the technical architect)
 
+> **Consumed by:** `docs/audits/2026-07-17-a3-target-architecture-ruling.md` (R-series) → BACKLOG E2 engine hygiene (#11/#12/#13/#30/#31).
+
 > **Date:** 2026-07-06 · **Scope:** read-only code-quality assessment of `src/corp/` (193 files, 41,715 LOC) · **Method:** tool metrics (radon 6.0.1, vulture 2.16, ruff 0.15.8 `--select ALL` report-only) + whole-module deep reads of the R1-critical set + cross-cutting inventories · **Baseline proof:** `pytest -x -q` on the untouched tree = **2,564 passed, 6 skipped** (160s).
 >
 > Companion to the functional handover (`2026-07-06-technical-architect-intake.md`): the intake says WHAT to build; this says WHAT THE CODE UNDERNEATH IS LIKE. Functional findings (seams, dead processes) are cited from the six `2026-07-05-deep-*.md` audits, not re-litigated. Analysis tools were installed into the venv for this session only — nothing added to `pyproject.toml`.
