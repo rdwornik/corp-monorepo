@@ -65,10 +65,22 @@ where = ["src"]
 "corp.extractor" = ["data/*.yaml", "data/*.json"]
 
 [tool.pytest.ini_options]
+# === UNIVERSAL (fleet methodology — ARC 4 leg 1, 2026-07-18; RULING-S split) ===
+minversion = "9.0"   # declared fleet pytest floor (ARC 4 D2)
+# === REPO-PERSONAL (this repo's pytest config — may differ) ====================
 testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = "-v"
 
+[tool.ruff]
+# === UNIVERSAL (fleet methodology — ARC 4 leg 1, 2026-07-18) ==================
+# Equalized fleet ruff SHAPE (RULING-S split; RULING-PY target). Do not diverge
+# without a `.methodology.yaml` declaration. Canonical: hub templates/ruff-config-block.toml.
+required-version = ">=0.15.5"   # floor == pinned pre-commit ruff rev (v0.15.5)
+target-version = "py311"        # RULING-PY baseline; "always newest Python" lift = #351
+line-length = 120               # agreed fleet line-length (ARC 4 D1)
+
+# === REPO-PERSONAL (this repo's lint posture — declared divergence) ===========
 [tool.ruff.lint]
 # Start lenient, tighten over time
 select = ["E", "F", "I"]  # errors, pyflakes, imports only
