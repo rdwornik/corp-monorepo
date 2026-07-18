@@ -75,6 +75,7 @@ _ENUMS = {
 _KNOWN_FIELDS = frozenset(f.name for f in fields(SourceDeclaration))
 _STR_FIELDS = ("path_hint", "web_url", "local_hint", "what_it_holds", "owner_team")
 _ALLOWED_ROOT = frozenset({"sources", "version"})
+_DIMS_KEYS = frozenset({"industry", "software"})  # the two T1-bridge business dimensions
 
 
 def _is_str_list(value: object) -> bool:
@@ -97,7 +98,14 @@ def _check_field_types(rid: str, raw: dict) -> None:
         dims = raw["dims"]
         if not isinstance(dims, dict):
             raise SourceRegistryError(f"record {rid!r}: dims must be a mapping")
-        for dk in ("industry", "software"):
+        unknown_dims = set(dims) - _DIMS_KEYS
+        if unknown_dims:
+            # a typo like `industy:` would be silently dropped by the scorer (mis-rank) —
+            # reject it so the fail-closed contract holds for dims too.
+            raise SourceRegistryError(
+                f"record {rid!r}: unknown dims key(s) {sorted(unknown_dims)}; expected {sorted(_DIMS_KEYS)}"
+            )
+        for dk in _DIMS_KEYS:
             if dk in dims and not _is_str_list(dims[dk]):
                 raise SourceRegistryError(f"record {rid!r}: dims.{dk} must be a list of strings")
 

@@ -14,7 +14,7 @@ are unified into ``weights_version``).
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
 from decimal import ROUND_HALF_UP, Decimal
 
@@ -168,10 +168,11 @@ class ValueScore:
     snapshot instant the score was computed against.
     """
 
-    score: int  # 0..100, round-half-up (ruling F2)
+    score: int  # 0..100, round-half-up (ruling F2); forced to 0 when gated
     components: dict
     weights_version: str
     score_as_of: str
+    gated: bool = False  # a hard policy gate (e.g. operator_prior=exclude) fired (§2.2)
 
 
 def round_half_up(value: float) -> int:
@@ -232,7 +233,13 @@ def score_record(
         dims, topics, curation_level, operator_prior, snapshot,
         score_as_of=score_as_of, duplicate_rate=duplicate_rate,
     )
-    return compose_score(components, neighbour, score_as_of=score_as_of)
+    vs = compose_score(components, neighbour, score_as_of=score_as_of)
+    if operator_prior == "exclude":
+        # HARD policy gate (§2.2, sol §7 D5): `exclude` cannot be outvoted by a high
+        # numeric score — force the score to 0 and mark it gated so ranking drops it
+        # below every permitted source, regardless of its metadata/neighbourhood.
+        return replace(vs, score=0, gated=True)
+    return vs
 
 
 # --- single-pass neighbour prior (intake-16 §2.3 — NOT PageRank) -------------
@@ -312,12 +319,17 @@ class ScoredSource:
 def rank_by_value_score(records: list[ScoredSource]) -> list[ScoredSource]:
     """Order sources by ``value_score`` descending; ties broken by stable ``id`` ascending.
 
-    Unscored records (``value_score is None``) sort last. Pure and stable — this is the
-    deterministic day-1 queue the scout (#36) consumes, until the cycle-3+ Thompson bandit
-    upgrade replaces it (§2.4). The ``id`` tiebreak makes the order fully reproducible.
+    Three ordered tiers so a hard gate (§2.2) is never outvoted by arithmetic:
+    permitted-scored first (by score desc), then **gated** sources (e.g.
+    ``operator_prior=exclude``), then unscored — each tier id-sorted for reproducibility.
+    Pure and stable — the deterministic day-1 queue the scout (#36) consumes until the
+    cycle-3+ Thompson bandit upgrade replaces it (§2.4).
     """
 
-    def _key(r: ScoredSource) -> tuple[int, str]:
-        return (-(r.value_score.score if r.value_score is not None else -1), r.id)
+    def _key(r: ScoredSource) -> tuple[int, int, str]:
+        vs = r.value_score
+        if vs is None:
+            return (2, 0, r.id)  # unscored -> last tier
+        return (1 if vs.gated else 0, -vs.score, r.id)
 
     return sorted(records, key=_key)

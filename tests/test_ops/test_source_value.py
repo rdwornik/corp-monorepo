@@ -229,13 +229,16 @@ class TestComposeAndScore:
             snapshot=_golden_snapshot(), **_GOLDEN_KW
         )
 
-    def test_exclude_operator_prior_lowers_score(self) -> None:
-        base = score_record(snapshot=_golden_snapshot(), **_GOLDEN_KW)
-        excluded = score_record(
-            snapshot=_golden_snapshot(), **{**_GOLDEN_KW, "operator_prior": "exclude"}
+    def test_exclude_is_hard_gated(self) -> None:
+        # §2.2 hard gate: exclude cannot be outvoted by strong metadata/neighbour.
+        gated = score_record(
+            snapshot=_golden_snapshot(),
+            **{**_GOLDEN_KW, "operator_prior": "exclude"},
+            neighbour=1.0,
         )
-        assert excluded.score < base.score
-        assert excluded.components["O"] == 0.0
+        assert gated.gated is True
+        assert gated.score == 0
+        assert gated.components["O"] == 0.0  # breakdown still explains why
 
     def test_neighbour_shifts_final(self) -> None:
         comps = compute_components(snapshot=_golden_snapshot(), **_GOLDEN_KW)
@@ -310,11 +313,13 @@ class TestNeighbourPriorIsSinglePass:
         assert base - shifted == pytest.approx(0.70 * (0.8 - 0.4))
 
 
-def _scored(sid: str, score: int | None) -> ScoredSource:
+def _scored(sid: str, score: int | None, gated: bool = False) -> ScoredSource:
     vs = (
         None
         if score is None
-        else ValueScore(score=score, components={}, weights_version="v1", score_as_of="t")
+        else ValueScore(
+            score=score, components={}, weights_version="v1", score_as_of="t", gated=gated
+        )
     )
     return ScoredSource(id=sid, value_score=vs)
 
@@ -333,6 +338,19 @@ class TestRankByValueScore:
     def test_unscored_sort_last(self) -> None:
         ranked = rank_by_value_score([_scored("a", None), _scored("b", 10), _scored("c", None)])
         assert [r.id for r in ranked] == ["b", "a", "c"]
+
+    def test_gated_sources_rank_below_all_permitted(self) -> None:
+        # a gated (excluded) source with a numerically high score still ranks last
+        ranked = rank_by_value_score(
+            [_scored("excluded", 90, gated=True), _scored("low", 5), _scored("mid", 50)]
+        )
+        assert [r.id for r in ranked] == ["mid", "low", "excluded"]
+
+    def test_tier_order_permitted_gated_unscored(self) -> None:
+        ranked = rank_by_value_score(
+            [_scored("g", 0, gated=True), _scored("u", None), _scored("p", 1)]
+        )
+        assert [r.id for r in ranked] == ["p", "g", "u"]
 
     def test_reproducible(self) -> None:
         recs = [_scored("a", 40), _scored("b", 80), _scored("c", 40)]

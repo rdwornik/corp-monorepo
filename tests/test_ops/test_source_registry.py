@@ -100,6 +100,11 @@ class TestValidateDeclaration:
         with pytest.raises(SourceRegistryError, match="industry"):
             validate_declaration(_valid_raw(dims={"industry": "retail"}))
 
+    def test_unknown_dims_key_fails_closed(self) -> None:
+        # terra P1: `industy` typo would be silently dropped by the scorer -> mis-rank
+        with pytest.raises(SourceRegistryError, match="unknown dims key"):
+            validate_declaration(_valid_raw(dims={"industy": ["retail"]}))
+
     @pytest.mark.parametrize("bad", [42, "planning", [1, 2]])
     def test_topics_not_list_of_strings_fails_closed(self, bad) -> None:
         with pytest.raises(SourceRegistryError, match="topics"):
