@@ -117,6 +117,13 @@ So that federation lands, `rfp/` is a composition target with salvaged mechanics
 - [#1] [P2][M] Define the canonical product map that resolves the semantic product-grouping queries (Q4/Q5/Q7/Q8) · Done when: the 4 ontology-blocked benchmark queries answer · refs HANDOFF Open Decisions #5
 - [#2] [P2][M] Implement `corp rfp-index` + the `rfp_entries` FTS5 table + grouped `corp retrieve --source all` · Done when: RFP KB (1,325 entries) and vault (~488 notes) retrieve through one path · refs ADR-22 (superseded by ADR-33 — fold into #48)
 
+### [S11] Harden the RFP agent (body-FTS + cost/token observability)
+So that RFP retrieval grounds on note bodies (not just titles/metadata) and every run surfaces its cost/token spend.
+> **Priority note:** elevated to current focus per the operator's 2026-07-18 focus-modules ruling; execution order is lane-scheduled by the architect, not theme-position.
+> **Design-input note:** design inputs pending the architect's historical-chat retrospection (RFP-KB provenance, federate-vs-merge, com/deal-loop status); the tasks are buildable, but the epic's G-B contract waits for those answers.
+- [#61] [P1][M] Body-FTS retrieval (F6) — a body-term query (not just title/metadata) returns the matching note · Done when: SIM condition C2 witnessed in a sandbox e2e run · refs SIM-acceptance C2, 2026-07-18 process audit F6
+- [#62] [P2][M] Cost/token observability (F2/F13/F23/F31) — the LLM CLIs surface token counts + cost, persisted to ops.db per run (not just printed) · Done when: every extraction/answer run surfaces its token+cost, written to ops.db · refs 2026-07-18 process audit F13/F23/F31, FR-13
+
 ---
 
 ## [E7] Ops, models & docs
