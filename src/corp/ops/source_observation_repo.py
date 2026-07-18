@@ -54,8 +54,8 @@ class SourceObservationRepository:
         cur = self.conn.execute(
             """INSERT INTO source_observations
                (source_id, liveness, last_verified, recovery_candidates,
-                score, components, weights_version, score_as_of, created_at)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                score, components, weights_version, score_as_of, gated, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 source_id,
                 liveness,
@@ -65,6 +65,9 @@ class SourceObservationRepository:
                 json.dumps(vs.components) if vs else None,
                 vs.weights_version if vs else None,
                 vs.score_as_of if vs else None,
+                # persist the hard-gate flag so a hydrated excluded-zero is never
+                # mistaken for a permitted-zero when reconstructing for the queue.
+                1 if (vs and vs.gated) else 0,
                 self._now(),
             ),
         )
@@ -93,4 +96,5 @@ class SourceObservationRepository:
         d = dict(row)
         d["recovery_candidates"] = json.loads(d["recovery_candidates"]) if d["recovery_candidates"] else []
         d["components"] = json.loads(d["components"]) if d["components"] else None
+        d["gated"] = bool(d["gated"])
         return d

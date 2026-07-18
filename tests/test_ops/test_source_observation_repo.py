@@ -73,6 +73,20 @@ class TestAppend:
         assert repo.latest("a")["liveness"] == "LIVE"
         assert len(repo.history("a")) == 1
 
+    def test_gate_status_survives_round_trip(self, repo) -> None:
+        # terra P1: a hard-gated (exclude) zero must not hydrate as a permitted zero.
+        gated = ValueScore(
+            score=0, components={}, weights_version="v1", score_as_of="t", gated=True
+        )
+        repo.append("excluded", liveness="LIVE", value_score=gated)
+        repo.append("permitted", liveness="LIVE", value_score=_vs())
+        assert repo.latest("excluded")["gated"] is True
+        assert repo.latest("permitted")["gated"] is False
+
+    def test_scoreless_observation_is_not_gated(self, repo) -> None:
+        repo.append("s", liveness="LOST")
+        assert repo.latest("s")["gated"] is False
+
     def test_recovery_candidate_paths_normalized_to_forward_slash(self, repo) -> None:
         # terra P1 (CLAUDE.md §5 rule 12): stored paths use forward slashes only.
         repo.append(
