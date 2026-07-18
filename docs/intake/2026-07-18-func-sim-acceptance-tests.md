@@ -1,5 +1,7 @@
 # 2026-07-18-func-sim-acceptance-tests.md — knowledge-module phase acceptance conditions
 
+> **Consumed by:** BACKLOG #34, #56, #57, #58, #61, #62 (SIM-2 acceptance conditions C1–C6; ADR at phase opening). LIVE spec — archives at deck-phase closure, not before.
+
 > **Status: RATIFIED (as reconstructed) — 2026-07-18.**
 > This file was reconstructed 2026-07-18 from the in-repo ruling record (the 2026-07-18 JOURNAL
 > entry on the operator's SIM-2 ruling + the `docs/audits/2026-07-18-process-audit.md` F-findings)

@@ -1,5 +1,7 @@
 # Functional Audit — Artifact & Storage Lifecycle (Phase 4)
 
+> **Consumed by:** ADR-35, ADR-36 (estate roles / artifact lifecycle).
+
 **Date:** 2026-07-05 · **Branch:** `docs/2026-07-05-functional-audit` · **HEAD:** `fb9b2dd` (+3 audit commits)
 **Method:** read-only; sizes from Phase-1 local scans; OneDrive estate figures cited from `docs/audits/2026-06-16-current-state-architecture-audit.md` (present on main) — the mirror was NOT traversed in this audit.
 

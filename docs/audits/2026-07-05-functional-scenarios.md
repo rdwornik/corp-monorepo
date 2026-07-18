@@ -1,5 +1,7 @@
 # Functional Audit — Scenario Walkthroughs (Phase 2)
 
+> **Consumed by:** `docs/audits/2026-07-06-technical-architect-intake.md` (functional-campaign scenarios; superseded by the DR register).
+
 **Date:** 2026-07-05 · **Branch:** `docs/2026-07-05-functional-audit` · **HEAD:** `fb9b2dd` (+1 audit commit)
 **Method:** static code trace (read-only) by three parallel subagents + one gated sandbox execution (§3.4, the only execution in this audit). Status vocabulary: ALIVE / DORMANT / EXISTS-UNTESTED / BROKEN / PHANTOM / MISSING. Code-level findings are merged with Phase-1 telemetry (`2026-07-05-functional-telemetry.md`) to produce final statuses.
 

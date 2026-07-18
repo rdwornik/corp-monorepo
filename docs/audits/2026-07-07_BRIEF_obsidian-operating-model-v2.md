@@ -1,5 +1,7 @@
 # Obsidian Operating Model v2 — Second Brain as Pre-Sales Cockpit (T3)
 
+> **Consumed by:** ADR-34 (vault essence layer — v2 amendment incorporated by reference) + `docs/audits/2026-07-06-technical-architect-intake.md` → BACKLOG #41, #42 (FR-15/16).
+
 **Repo:** corp-monorepo / ObsidianVault · **Audience:** functional intake / technical architect
 **Status:** brainstorm-phase blueprint (audit-space per DR-14) · **Date:** 2026-07-07 · **Session:** functional-architect sitting #3
 **Supersedes-in-part:** June operating-model brief (S0–S3, MOC spine) — v2 folds in the deep-vault audit's AMEND rulings and adds the creative layer the operator asked for. The consolidation closure metric is UNCHANGED.

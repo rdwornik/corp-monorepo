@@ -1,5 +1,7 @@
 # Ontology North Star — Architecture-First Draft (T2)
 
+> **Consumed by:** `docs/audits/2026-07-06-technical-architect-intake.md` → BACKLOG #44 (FR-17 ontology).
+
 **Repo:** cross-cutting (vault · registry · index · telemetry) · **Audience:** functional intake / technical architect
 **Status:** brainstorm-phase blueprint, ARCHITECTURE-FIRST — evidence reconciliation pending (P2 tree → Product axis; P4/Path-A topics → Topic vocabulary)
 **Date:** 2026-07-07 · **Session:** functional-architect sitting #4 · **Named north star:** Palantir Foundry Ontology (operator's explicit reference)

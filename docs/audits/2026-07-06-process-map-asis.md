@@ -1,5 +1,7 @@
 # As-Is Process Map — Audit Snapshot
 
+> **Consumed by:** `docs/audits/2026-07-06-technical-architect-intake.md` (as-is process baseline).
+
 **Status:** operator-ratified as-is snapshot (2026-07-06). Not canonical — not `ARCHITECTURE.md`, not an ADR.
 **Open inputs:** 5 operator inputs remain undecided, marked `[?n]` inline and listed below.
 **Supersedes:** nothing.

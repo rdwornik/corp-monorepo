@@ -1,5 +1,7 @@
 # Functional Audit — Process Inventory vs Hypothesis (Phase 3)
 
+> **Consumed by:** `docs/audits/2026-07-06-technical-architect-intake.md` (functional-campaign process inventory; superseded by the DR register).
+
 **Date:** 2026-07-05 · **Branch:** `docs/2026-07-05-functional-audit` · **HEAD:** `fb9b2dd` (+2 audit commits)
 **Inputs:** `2026-07-05-functional-telemetry.md` (Phase 1), `2026-07-05-functional-scenarios.md` (Phase 2). Status words per the audit vocabulary; each card triangulates Capability (code) / Intent (docs) / Use (telemetry).
 

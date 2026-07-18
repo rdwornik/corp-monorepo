@@ -1,5 +1,7 @@
 # Functional Audit — Synthesis for the Architect (Phase 5)
 
+> **Consumed by:** `docs/audits/2026-07-06-technical-architect-intake.md` (functional-campaign synthesis; fully absorbed/superseded by the DR register) — archival candidate (S13).
+
 **Date:** 2026-07-05 · **Branch:** `docs/2026-07-05-functional-audit` · **HEAD at audit start:** `fb9b2dd`
 **Deliverables in this audit** (one commit each, in order):
 1. `docs/audits/2026-07-05-functional-telemetry.md` (`c03b53d`)

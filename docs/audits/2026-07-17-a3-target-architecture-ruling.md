@@ -1,5 +1,7 @@
 # A3 target-architecture ruling (ratified)
 
+> **Consumed by:** BACKLOG.md (product-axis rebuild — themes E1–E7, R1–R10; the whole backlog derives from this ruling).
+
 > **Status:** Ratified (Layer-1 operator ruling, en bloc). **Date:** 2026-07-17.
 > **Scope:** first in-repo codification of the A3 target-architecture ruling (R1–R10),
 > previously ratified off-repo. Resolves the "repo codification pending in the primary

@@ -1,5 +1,7 @@
 # Deep Audit F — MyWork Estate & Naming (Wave 2)
 
+> **Consumed by:** ADR-36 (storage-topology estate roles, DR-12) + `docs/audits/2026-07-06-technical-architect-intake.md`.
+
 **Date:** 2026-07-05 · **Branch:** `docs/deep-mywork` · **Mode:** read-only measurement
 **Method:** metadata scan (names, sizes, mtimes, extensions) of local `C:/Users/1028120/Documents/MyWork` (`config/paths.toml:7`); file contents opened ONLY for Step-3 sampling (2 files in `15_Extra_Inititives`) plus one SHA-256 pair-hash for the Step-5 divergence check. **No OneDrive path traversed**; mirror figures cited from `docs/audits/2026-06-16-current-state-architecture-audit.md`. Nothing renamed, moved, deleted, or written outside `docs/audits/`.
 **Baselines:** 2026-07-05 functional audit (Phases 1–5, merged `2753601`), 2026-06-16 current-state audit, 2026-06-21 foundation review. Authoritative vocabularies: `src/corp/schema/folder_names.py` (7 zones + `.corp`), `config/naming_config.yaml` (22 type codes, 32 client aliases), ADR-14, ADR-24.

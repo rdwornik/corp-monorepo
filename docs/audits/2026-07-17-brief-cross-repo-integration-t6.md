@@ -1,5 +1,7 @@
 # T6 · Cross-repo integration brief — the four surfaces as one system
 
+> **Consumed by:** intake-16 (§4/§5 seams) + BACKLOG #32, #33, #34, #51 (T6 seam contracts; ADR at phase opening). Phase-gated (T6).
+
 > **Format:** June-brief (problem → evidence → converged recommendation → open decisions → success criteria → FR-addendum candidates → NOT-list), each recommendation carrying a done-when.
 > **Date:** 2026-07-17. **Type:** architect brief (design). **Sizing law:** solo operator, ~3 RFPs/month — governs all ambition.
 > **This is the T6 deliverable** the demo-prep recon (`2026-07-07_AUDIT_demo-prep-recon.md`) was the precursor to (BRAINSTORM-BACKLOG T6, "demo-prep recon report + an integration brief defining the shared contracts").

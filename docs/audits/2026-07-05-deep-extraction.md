@@ -1,5 +1,7 @@
 # Deep Audit C — Knowledge Extraction (Wave 2)
 
+> **Consumed by:** `docs/audits/2026-07-06-technical-architect-intake.md` (DR register — extraction-path evidence).
+
 **Date:** 2026-07-05 · **Branch:** `docs/deep-extraction` (worktree `cm-deep-extraction`) · **Base:** `2753601` (main, Phase-1 audit merged)
 **Method:** read-only. Code reading + `data/_outputs/v3` sampling (203 notes + 203 sidecars, reads only) + `overnight_state.db` via `mode=ro`. No extraction runs, no LLM calls, no OneDrive traversal. Baseline: `docs/audits/2026-07-05-functional-*.md`.
 **Scope:** settle the 2026-06-21 brainstorm verify-first triad; establish the emit-side output→vault contract (Audit D owns the consume side); produce R2 gap-fill backlog seeds.
