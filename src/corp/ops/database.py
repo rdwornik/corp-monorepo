@@ -167,6 +167,25 @@ CREATE TABLE IF NOT EXISTS registry_suggestions (
     created_at TEXT NOT NULL,
     reviewed_at TEXT
 );
+
+-- FR-10 source-value observations: append-only DERIVED state joined by source_id
+-- (intake-16 §1.3 / D1 split — the hand-edited declaration lives in config YAML, never
+-- here; the scout may only append observation rows, never mutate a declaration).
+CREATE TABLE IF NOT EXISTS source_observations (
+    observation_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_id           TEXT NOT NULL,
+    liveness            TEXT NOT NULL,
+    last_verified       TEXT,
+    recovery_candidates TEXT,
+    score               INTEGER,
+    components          TEXT,
+    weights_version     TEXT,
+    score_as_of         TEXT,
+    created_at          TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_source_obs_source ON source_observations(source_id);
+CREATE INDEX IF NOT EXISTS idx_source_obs_created ON source_observations(created_at);
 """
 
 

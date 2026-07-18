@@ -296,3 +296,28 @@ def neighbour_priors(nodes: list[NeighbourNode]) -> dict[str, float]:
             kids = [c.intrinsic for c in children_of.get(n.id, [])]
             result[n.id] = _top3_mean(kids) if kids else _NEUTRAL
     return result
+
+
+# --- deterministic day-1 scout queue (§2.4 — bandit is the cycle-3+ upgrade) --
+
+
+@dataclass(frozen=True)
+class ScoredSource:
+    """A registry source paired with its latest value score, for ranking."""
+
+    id: str
+    value_score: ValueScore | None = None
+
+
+def rank_by_value_score(records: list[ScoredSource]) -> list[ScoredSource]:
+    """Order sources by ``value_score`` descending; ties broken by stable ``id`` ascending.
+
+    Unscored records (``value_score is None``) sort last. Pure and stable — this is the
+    deterministic day-1 queue the scout (#36) consumes, until the cycle-3+ Thompson bandit
+    upgrade replaces it (§2.4). The ``id`` tiebreak makes the order fully reproducible.
+    """
+
+    def _key(r: ScoredSource) -> tuple[int, str]:
+        return (-(r.value_score.score if r.value_score is not None else -1), r.id)
+
+    return sorted(records, key=_key)

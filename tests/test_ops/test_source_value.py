@@ -16,6 +16,7 @@ from corp.ops.source_value import (
     ChildItem,
     MetadataSnapshot,
     NeighbourNode,
+    ScoredSource,
     ValueScore,
     component_curation,
     component_density,
@@ -27,6 +28,7 @@ from corp.ops.source_value import (
     compose_score,
     compute_components,
     neighbour_priors,
+    rank_by_value_score,
     round_half_up,
     score_record,
 )
@@ -306,3 +308,32 @@ class TestNeighbourPriorIsSinglePass:
             [NeighbourNode("p", 0.4, drive_id="d"), NeighbourNode("c", 0.5, parent_id="p", drive_id="d")]
         )["c"]
         assert base - shifted == pytest.approx(0.70 * (0.8 - 0.4))
+
+
+def _scored(sid: str, score: int | None) -> ScoredSource:
+    vs = (
+        None
+        if score is None
+        else ValueScore(score=score, components={}, weights_version="v1", score_as_of="t")
+    )
+    return ScoredSource(id=sid, value_score=vs)
+
+
+class TestRankByValueScore:
+    """Deterministic day-1 scout queue (#36 consumes it) — score desc, id tiebreak."""
+
+    def test_orders_by_score_descending(self) -> None:
+        ranked = rank_by_value_score([_scored("a", 40), _scored("b", 80), _scored("c", 60)])
+        assert [r.id for r in ranked] == ["b", "c", "a"]
+
+    def test_ties_broken_by_stable_id(self) -> None:
+        ranked = rank_by_value_score([_scored("z", 50), _scored("a", 50), _scored("m", 50)])
+        assert [r.id for r in ranked] == ["a", "m", "z"]
+
+    def test_unscored_sort_last(self) -> None:
+        ranked = rank_by_value_score([_scored("a", None), _scored("b", 10), _scored("c", None)])
+        assert [r.id for r in ranked] == ["b", "a", "c"]
+
+    def test_reproducible(self) -> None:
+        recs = [_scored("a", 40), _scored("b", 80), _scored("c", 40)]
+        assert rank_by_value_score(recs) == rank_by_value_score(recs)
