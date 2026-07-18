@@ -889,12 +889,12 @@ def ingest_inbox(
     Processes one file at a time with Rich UI: classify, confirm
     destination, rename, move, then trigger CKE extraction.
     """
-    from corp.ops.registry import get_content_registry_path
+    from corp.ops.registry import get_content_registry
     from corp.schema.pipeline_config import PipelineConfig
 
     cfg = PipelineConfig.production()
     ops = OpsDB()
-    registry = ContentRegistry(get_content_registry_path())
+    registry = get_content_registry()
 
     # Undo mode
     if undo is not None:

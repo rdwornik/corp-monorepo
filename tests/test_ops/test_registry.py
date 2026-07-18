@@ -3,11 +3,16 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
 
-from corp.ops.registry import ContentRegistry
+from corp.ops.registry import (
+    ContentRegistry,
+    bootstrap_content_registry,
+    get_content_registry,
+)
 from corp.schema.folder_names import (
     INBOX,
     PROJECTS,
@@ -329,3 +334,75 @@ class TestAccessors:
 
         registry.reload()
         assert "new_series" in registry.get_all_series()
+
+
+class TestFreshEnvFallbackAndBootstrap:
+    """#35 F1 — ingest must not crash on a missing content_registry.yaml.
+
+    Bootstrap-primary (P1): a fresh env is seeded from the repo config; the {}
+    fallback is the no-crash floor if seeding fails. Both paths are covered.
+    """
+
+    def test_data_missing_registry_returns_empty_fallback(self, tmp_path: Path) -> None:
+        """No-crash floor: a missing registry file yields {} instead of raising."""
+        registry = ContentRegistry(tmp_path / "absent.yaml")
+        assert registry.data == {}
+        # matching must complete (no FileNotFoundError) and return no match
+        result = registry.match_file("whatever.pdf", ".pdf")
+        assert result.matched is False
+
+    def test_data_malformed_registry_returns_empty(self, tmp_path: Path) -> None:
+        """A non-dict YAML body coerces to {} rather than crashing later reads."""
+        bad = tmp_path / "bad.yaml"
+        bad.write_text("- just\n- a\n- list\n", encoding="utf-8")
+        registry = ContentRegistry(bad)
+        assert registry.data == {}
+
+    def test_bootstrap_seeds_from_repo_config(self, tmp_path: Path) -> None:
+        """Bootstrap copies the repo-shipped config into a fresh .corp/ target."""
+        target = tmp_path / ".corp" / "content_registry.yaml"
+        assert bootstrap_content_registry(target) is True
+        assert target.exists()
+        seeded = yaml.safe_load(target.read_text(encoding="utf-8"))
+        assert isinstance(seeded, dict) and "series" in seeded
+
+    def test_bootstrap_is_noop_when_present(self, tmp_path: Path) -> None:
+        """Bootstrap never overwrites an existing registry (idempotent)."""
+        target = tmp_path / "content_registry.yaml"
+        target.write_text("version: '1.0'\n", encoding="utf-8")
+        assert bootstrap_content_registry(target) is False
+        assert target.read_text(encoding="utf-8") == "version: '1.0'\n"
+
+    def test_factory_seeds_fresh_env_then_routes(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """C1 shape: fresh env (no .corp/) → factory bootstraps, matching works, no crash."""
+        target = tmp_path / ".corp" / "content_registry.yaml"
+        monkeypatch.setattr("corp.ops.registry.get_content_registry_path", lambda: target)
+        assert not target.exists()
+
+        registry = get_content_registry()  # bootstrap-primary
+
+        assert target.exists()  # seeded from the repo config
+        assert "series" in registry.data  # real rules loaded
+        # a known series filename routes through the seeded registry (no exception)
+        result = registry.match_file("Cognitive_Friday_S1.mp4", ".mp4")
+        assert result.matched is True
+
+    def test_factory_fallback_floor_when_seed_source_missing(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """If seeding can't proceed (no source), the factory still returns a working {} floor."""
+        target = tmp_path / ".corp" / "content_registry.yaml"
+        monkeypatch.setattr("corp.ops.registry.get_content_registry_path", lambda: target)
+        # point repo_path at a dir with no config/content_registry.yaml → seeding fails
+        monkeypatch.setattr(
+            "corp.config.get_config",
+            lambda: SimpleNamespace(repo_path=tmp_path, mywork_root=tmp_path),
+        )
+
+        registry = get_content_registry()
+
+        assert not target.exists()  # seeding failed (no source)
+        assert registry.data == {}  # no-crash floor
+        assert registry.match_file("x.pdf", ".pdf").matched is False

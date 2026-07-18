@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import re
+import shutil
 from dataclasses import dataclass, field
 from fnmatch import fnmatch
 from pathlib import Path
@@ -56,8 +57,19 @@ class ContentRegistry:
     @property
     def data(self) -> dict:
         if self._data is None:
-            with open(self.registry_path, encoding="utf-8") as f:
-                self._data = yaml.safe_load(f)
+            try:
+                with open(self.registry_path, encoding="utf-8") as f:
+                    self._data = yaml.safe_load(f)
+            except FileNotFoundError:
+                # No-crash floor (F1): a missing registry yields no routing
+                # rules rather than aborting ingest. Content falls through to
+                # the unmatched destination. Bootstrap (below) normally seeds a
+                # real registry first; this covers the case where seeding failed.
+                logger.warning(
+                    "content_registry not found at %s; using empty fallback",
+                    self.registry_path,
+                )
+                self._data = {}
             if not isinstance(self._data, dict):
                 self._data = {}
         return self._data
@@ -227,3 +239,49 @@ class ContentRegistry:
             )
 
         return RegistryMatch(matched=False, destination=None)
+
+
+def bootstrap_content_registry(target: Path | None = None) -> bool:
+    """Seed ``<mywork>/.corp/content_registry.yaml`` from the repo config if absent.
+
+    Bootstrap-primary (P1, #35): a fresh environment gets a *real* registry
+    copied from the repo-shipped ``config/content_registry.yaml`` on ingest
+    entry, so routing works on first run. Returns ``True`` if a file was
+    written, ``False`` if one already existed or seeding could not proceed.
+
+    Seeding failure is non-fatal: :attr:`ContentRegistry.data` falls back to an
+    empty dict (the no-crash floor), so ingest still completes (F1).
+    """
+    from corp.config import get_config
+
+    target = target or get_content_registry_path()
+    if target.exists():
+        return False
+    source = get_config().repo_path / "config" / "content_registry.yaml"
+    if not source.exists():
+        logger.warning(
+            "content_registry bootstrap source missing (%s); using empty fallback",
+            source,
+        )
+        return False
+    try:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, target)
+    except OSError as exc:
+        logger.warning(
+            "content_registry bootstrap failed (%s); using empty fallback", exc
+        )
+        return False
+    logger.info("Bootstrapped content_registry: %s -> %s", source, target)
+    return True
+
+
+def get_content_registry() -> ContentRegistry:
+    """Ingest-entry factory: bootstrap-primary, then construct.
+
+    Seeds the mywork ``content_registry.yaml`` if absent (bootstrap-primary),
+    then returns a :class:`ContentRegistry` over the resolved path. Fresh
+    environments no longer crash on a missing registry (F1).
+    """
+    bootstrap_content_registry()
+    return ContentRegistry(get_content_registry_path())
