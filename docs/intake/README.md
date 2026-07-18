@@ -38,3 +38,9 @@ Hand-maintained — no generator.
 - `2026-07-17-tech-e5-registry-foundation-design.md` — **intake-id 16** · the E5 registry
   foundation design (FR-10 URL/source registry + deterministic source-value scoring v1); the
   spec the E5 build arc (#40/#35/#38/#36) executes from. `status: DRAFT`.
+- `2026-07-18-func-sim-acceptance-tests.md` — knowledge-module phase **acceptance conditions**
+  (SIM-2 bar: C1–C4/C6 required, C5 deck-phase deferred; 7 witnessed sandbox e2e steps +
+  same-note invariant). **RATIFIED** (as reconstructed) 2026-07-18; relocated from `docs/`
+  root 2026-07-18 as a taxonomy correction (forward-looking acceptance artifact → intake
+  bucket). Carries **no ADR-98 intake frontmatter** — an acceptance-spec deliverable, like
+  the gap-notes above.

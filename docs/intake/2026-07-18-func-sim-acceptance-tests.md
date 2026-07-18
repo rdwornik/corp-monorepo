@@ -1,4 +1,4 @@
-# SIM-ACCEPTANCE-TESTS.md — knowledge-module phase acceptance conditions
+# 2026-07-18-func-sim-acceptance-tests.md — knowledge-module phase acceptance conditions
 
 > **Status: RATIFIED (as reconstructed) — 2026-07-18.**
 > This file was reconstructed 2026-07-18 from the in-repo ruling record (the 2026-07-18 JOURNAL
