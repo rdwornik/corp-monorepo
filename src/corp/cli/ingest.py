@@ -40,7 +40,7 @@ def ingest_command(
     config = (obj or {}).get("config") or PipelineConfig.production()
     cfg = get_config()
     ops = OpsDB(config=config)
-    registry = get_content_registry()
+    registry = get_content_registry(bootstrap=not dry_run)
 
     extract = not no_extract
 
@@ -255,7 +255,7 @@ def ingest_inbox_command(
         ops.close()
         return
 
-    registry = get_content_registry()
+    registry = get_content_registry(bootstrap=not dry_run)
 
     if dry_run:
         console.print("[yellow]Dry run — no files will be moved or extracted.[/yellow]\n")
@@ -390,7 +390,7 @@ def classify_command(obj: dict, model: str, budget: float, dry_run: bool) -> Non
     config = (obj or {}).get("config") or PipelineConfig.production()
     cfg = get_config()
     ops = OpsDB(config=config)
-    registry = get_content_registry()
+    registry = get_content_registry(bootstrap=not dry_run)
 
     if dry_run:
         console.print("[yellow]Dry run — classifying without moving files.[/yellow]")

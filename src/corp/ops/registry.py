@@ -7,6 +7,7 @@ against known series, destination rules, and client patterns.
 from __future__ import annotations
 
 import logging
+import os
 import re
 import shutil
 from dataclasses import dataclass, field
@@ -60,14 +61,17 @@ class ContentRegistry:
             try:
                 with open(self.registry_path, encoding="utf-8") as f:
                     self._data = yaml.safe_load(f)
-            except FileNotFoundError:
-                # No-crash floor (F1): a missing registry yields no routing
-                # rules rather than aborting ingest. Content falls through to
-                # the unmatched destination. Bootstrap (below) normally seeds a
-                # real registry first; this covers the case where seeding failed.
+            except (OSError, yaml.YAMLError) as exc:
+                # No-crash floor (F1): a missing, unreadable, or malformed
+                # registry yields no routing rules rather than aborting ingest.
+                # Content falls through to the unmatched destination. Bootstrap
+                # (below) normally seeds a real registry first; this covers
+                # seeding failure and a partially-written or corrupt file
+                # (FileNotFoundError is a subclass of OSError).
                 logger.warning(
-                    "content_registry not found at %s; using empty fallback",
+                    "content_registry unreadable at %s (%s); using empty fallback",
                     self.registry_path,
+                    exc,
                 )
                 self._data = {}
             if not isinstance(self._data, dict):
@@ -264,10 +268,18 @@ def bootstrap_content_registry(target: Path | None = None) -> bool:
             source,
         )
         return False
+    tmp = target.with_name(f"{target.name}.{os.getpid()}.tmp")
     try:
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(source, target)
+        # Atomic seed: copy to a temp sibling then os.replace, so a partial
+        # write never surfaces as the target and a concurrent seed cannot be
+        # observed half-written. os.replace is atomic on the same filesystem;
+        # a race-loser overwrites with byte-identical content (same source).
+        shutil.copyfile(source, tmp)
+        os.replace(tmp, target)
     except OSError as exc:
+        if tmp.exists():
+            tmp.unlink()
         logger.warning(
             "content_registry bootstrap failed (%s); using empty fallback", exc
         )
@@ -276,12 +288,15 @@ def bootstrap_content_registry(target: Path | None = None) -> bool:
     return True
 
 
-def get_content_registry() -> ContentRegistry:
+def get_content_registry(*, bootstrap: bool = True) -> ContentRegistry:
     """Ingest-entry factory: bootstrap-primary, then construct.
 
     Seeds the mywork ``content_registry.yaml`` if absent (bootstrap-primary),
-    then returns a :class:`ContentRegistry` over the resolved path. Fresh
-    environments no longer crash on a missing registry (F1).
+    then returns a :class:`ContentRegistry` over the resolved path. Pass
+    ``bootstrap=False`` for read-only/preview paths (e.g. ``--dry-run``) that
+    must not persist config; the ``{}`` fallback floor then covers a missing
+    registry. Either way, fresh environments no longer crash (F1).
     """
-    bootstrap_content_registry()
+    if bootstrap:
+        bootstrap_content_registry()
     return ContentRegistry(get_content_registry_path())

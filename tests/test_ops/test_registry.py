@@ -358,6 +358,14 @@ class TestFreshEnvFallbackAndBootstrap:
         registry = ContentRegistry(bad)
         assert registry.data == {}
 
+    def test_data_corrupt_yaml_returns_empty(self, tmp_path: Path) -> None:
+        """Unparseable YAML (partial/corrupt write) floors to {} instead of raising."""
+        corrupt = tmp_path / "corrupt.yaml"
+        corrupt.write_text("series: [unterminated\n  bad: : :\n", encoding="utf-8")
+        registry = ContentRegistry(corrupt)
+        assert registry.data == {}
+        assert registry.match_file("x.pdf", ".pdf").matched is False
+
     def test_bootstrap_seeds_from_repo_config(self, tmp_path: Path) -> None:
         """Bootstrap copies the repo-shipped config into a fresh .corp/ target."""
         target = tmp_path / ".corp" / "content_registry.yaml"
@@ -404,5 +412,18 @@ class TestFreshEnvFallbackAndBootstrap:
         registry = get_content_registry()
 
         assert not target.exists()  # seeding failed (no source)
+        assert registry.data == {}  # no-crash floor
+        assert registry.match_file("x.pdf", ".pdf").matched is False
+
+    def test_factory_no_bootstrap_does_not_persist(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Dry-run path (bootstrap=False): fresh env is NOT seeded; floor still works."""
+        target = tmp_path / ".corp" / "content_registry.yaml"
+        monkeypatch.setattr("corp.ops.registry.get_content_registry_path", lambda: target)
+
+        registry = get_content_registry(bootstrap=False)
+
+        assert not target.exists()  # dry-run must not persist config
         assert registry.data == {}  # no-crash floor
         assert registry.match_file("x.pdf", ".pdf").matched is False
