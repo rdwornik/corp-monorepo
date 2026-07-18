@@ -30,7 +30,11 @@ def test_cke_paths_resolve():
 
     assert (REPO_ROOT / "pyproject.toml").exists()
     assert CONFIG_DIR.exists()
-    assert REPO_ROOT.name == "corp-monorepo"
+    # Identify the repo by its pyproject project name, NOT the checkout dir basename:
+    # REPO_ROOT.name is "corp-monorepo" in the primary checkout but the worktree slug in
+    # a git worktree (`.claude/worktrees/<slug>`), so a basename assertion is worktree-
+    # hostile. The project name is stable across both. (N2, worktree-compat fix.)
+    assert 'name = "corp"' in (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8")
     assert CONFIG_DIR.name == "extractor"
 
 
