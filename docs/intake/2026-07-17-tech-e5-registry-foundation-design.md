@@ -1,8 +1,9 @@
 ---
 intake-id: 16
-status: DRAFT
+status: READY-FOR-TECHNICAL
 origin: 2026-07-17 · Lane B e5-registry-design worktree · executor-architect (robdwornik)
-consumed-by:
+consumed-by: E5 registry developer lane (epic/e5-registry)
+ratified: 2026-07-18 · operator picks D1=A · D3=A · D4=A · D5=A (see §8.1)
 ---
 
 # E5 Registry foundation — FR-10 URL/source registry + deterministic source-value scoring (design)
@@ -14,8 +15,8 @@ consumed-by:
 > contracts (as skeletons), the phase-acceptance bar, and the build order. **Design-lane only — no
 > `src/`/`tests/` change; skeletons are named on paper, not implemented.**
 >
-> **Audience:** the E5 executor-architect chat · **Status:** DRAFT (operator flips to
-> READY-FOR-TECHNICAL on ratification) · **Date:** 2026-07-17.
+> **Audience:** the E5 executor-architect chat · **Status:** READY-FOR-TECHNICAL
+> (operator-ratified 2026-07-18; picks recorded in §8.1) · **Date:** 2026-07-17.
 
 ---
 
@@ -417,6 +418,21 @@ scoring are consent-free; only *resolving names to live IDs* waits on the operat
 
 None of these blocks writing the records, the schema, or the scoring; they gate specific downstream
 steps as marked in §6.
+
+### 8.1 Operator ratification — 2026-07-18
+
+Operator-ratified picks (decision → chosen option → date). **Philosophy on record:** *manual first,
+automate later; deploy the system first, improve it iteratively.*
+
+| # | Decision | Ratified pick | Note |
+|---|---|---|---|
+| D1 | Registry YAML home | **A** — corp-monorepo `config/` area; exact file **`config/source_registry.yaml`** | Convention-derived: `config/*.yaml` snake_case, precedent `config/content_registry.yaml`; §1.3 names the artifact "`source_registry` YAML". Existing folder — **no new path**. |
+| D3 | Ratification interface | **A** — cycle-report paste-back (day-1) | Option **B** (vault-card checkbox) is recorded as the ratified **FUTURE** direction — adopt after the system runs (manual-first philosophy). |
+| D4 | Archive trigger | **A** — explicit operator-pick day-1 | Policy-from-telemetry deferred to a later phase. |
+| D5 | Yield/score weights | **A** — equal weights day-1 | `weights_version` is the seam for later tuning; every score records its `weights_version` (§2.2). |
+
+D2 (auth shape), G (Graph consent), and Z (final zone names) remain **operator-pending** as marked
+in §8 / §6 — they are not part of this ratification.
 
 ---
 
