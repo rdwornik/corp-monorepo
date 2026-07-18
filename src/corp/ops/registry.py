@@ -6,8 +6,11 @@ against known series, destination rules, and client patterns.
 
 from __future__ import annotations
 
+import contextlib
 import logging
+import os
 import re
+import shutil
 from dataclasses import dataclass, field
 from fnmatch import fnmatch
 from pathlib import Path
@@ -56,8 +59,23 @@ class ContentRegistry:
     @property
     def data(self) -> dict:
         if self._data is None:
-            with open(self.registry_path, encoding="utf-8") as f:
-                self._data = yaml.safe_load(f)
+            try:
+                with open(self.registry_path, encoding="utf-8") as f:
+                    self._data = yaml.safe_load(f)
+            except (OSError, UnicodeDecodeError, yaml.YAMLError) as exc:
+                # No-crash floor (F1): a missing, unreadable, malformed, or
+                # non-UTF-8 registry yields no routing rules rather than
+                # aborting ingest. Content falls through to the unmatched
+                # destination. Bootstrap (below) normally seeds a real registry
+                # first; this covers seeding failure and a partially-written,
+                # corrupt, or binary file (FileNotFoundError is an OSError;
+                # invalid encoding raises UnicodeDecodeError, not OSError).
+                logger.warning(
+                    "content_registry unreadable at %s (%s); using empty fallback",
+                    self.registry_path,
+                    exc,
+                )
+                self._data = {}
             if not isinstance(self._data, dict):
                 self._data = {}
         return self._data
@@ -227,3 +245,76 @@ class ContentRegistry:
             )
 
         return RegistryMatch(matched=False, destination=None)
+
+
+def bootstrap_content_registry(target: Path | None = None) -> bool:
+    """Seed ``<mywork>/.corp/content_registry.yaml`` from the repo config if absent.
+
+    Bootstrap-primary (P1, #35): a fresh environment gets a *real* registry
+    copied from the repo-shipped ``config/content_registry.yaml`` on ingest
+    entry, so routing works on first run. Returns ``True`` if a file was
+    written, ``False`` if one already existed or seeding could not proceed.
+
+    Seeding failure is non-fatal: :attr:`ContentRegistry.data` falls back to an
+    empty dict (the no-crash floor), so ingest still completes (F1).
+    """
+    from corp.config import get_config
+    from corp.safety.onedrive import is_onedrive_path
+
+    target = target or get_content_registry_path()
+    if target.exists():
+        return False
+    # Fail-closed OneDrive guard (core-invariant #1): never seed into the
+    # exclusion zone, even if MYWORK_ROOT is misconfigured under it. Refuse the
+    # write and let the {} floor cover ingest rather than crashing.
+    if is_onedrive_path(target):
+        logger.warning(
+            "content_registry target is inside the OneDrive exclusion zone (%s); "
+            "refusing to seed, using empty fallback",
+            target,
+        )
+        return False
+    source = get_config().repo_path / "config" / "content_registry.yaml"
+    if not source.exists():
+        logger.warning(
+            "content_registry bootstrap source missing (%s); using empty fallback",
+            source,
+        )
+        return False
+    tmp = target.with_name(f"{target.name}.{os.getpid()}.tmp")
+    try:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        # Atomic seed: copy to a temp sibling then os.replace, so a partial
+        # write never surfaces as the target and a concurrent seed cannot be
+        # observed half-written. os.replace is atomic on the same filesystem.
+        shutil.copyfile(source, tmp)
+        if target.exists():
+            # A concurrent process won the seed race; keep its file (the source
+            # is identical) rather than clobbering, and drop our temp.
+            with contextlib.suppress(OSError):
+                tmp.unlink(missing_ok=True)
+            return False
+        os.replace(tmp, target)
+    except OSError as exc:
+        with contextlib.suppress(OSError):
+            tmp.unlink(missing_ok=True)
+        logger.warning(
+            "content_registry bootstrap failed (%s); using empty fallback", exc
+        )
+        return False
+    logger.info("Bootstrapped content_registry: %s -> %s", source, target)
+    return True
+
+
+def get_content_registry(*, bootstrap: bool = True) -> ContentRegistry:
+    """Ingest-entry factory: bootstrap-primary, then construct.
+
+    Seeds the mywork ``content_registry.yaml`` if absent (bootstrap-primary),
+    then returns a :class:`ContentRegistry` over the resolved path. Pass
+    ``bootstrap=False`` for read-only/preview paths (e.g. ``--dry-run``) that
+    must not persist config; the ``{}`` fallback floor then covers a missing
+    registry. Either way, fresh environments no longer crash (F1).
+    """
+    if bootstrap:
+        bootstrap_content_registry()
+    return ContentRegistry(get_content_registry_path())

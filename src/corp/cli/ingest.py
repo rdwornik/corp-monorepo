@@ -35,12 +35,12 @@ def ingest_command(
         ingest_folder,
     )
     from corp.ops.database import OpsDB
-    from corp.ops.registry import ContentRegistry, get_content_registry_path
+    from corp.ops.registry import get_content_registry
 
     config = (obj or {}).get("config") or PipelineConfig.production()
     cfg = get_config()
     ops = OpsDB(config=config)
-    registry = ContentRegistry(get_content_registry_path())
+    registry = get_content_registry(bootstrap=not dry_run)
 
     extract = not no_extract
 
@@ -237,7 +237,7 @@ def ingest_inbox_command(
         process_file,
     )
     from corp.ops.database import OpsDB
-    from corp.ops.registry import ContentRegistry, get_content_registry_path
+    from corp.ops.registry import get_content_registry
 
     config = (obj or {}).get("config") or PipelineConfig.production()
     cfg = get_config()
@@ -255,7 +255,7 @@ def ingest_inbox_command(
         ops.close()
         return
 
-    registry = ContentRegistry(get_content_registry_path())
+    registry = get_content_registry(bootstrap=not dry_run)
 
     if dry_run:
         console.print("[yellow]Dry run — no files will be moved or extracted.[/yellow]\n")
@@ -385,12 +385,12 @@ def classify_command(obj: dict, model: str, budget: float, dry_run: bool) -> Non
     """
     from corp.ingest.llm_classifier import classify_quarantined_batch
     from corp.ops.database import OpsDB
-    from corp.ops.registry import ContentRegistry, get_content_registry_path
+    from corp.ops.registry import get_content_registry
 
     config = (obj or {}).get("config") or PipelineConfig.production()
     cfg = get_config()
     ops = OpsDB(config=config)
-    registry = ContentRegistry(get_content_registry_path())
+    registry = get_content_registry(bootstrap=not dry_run)
 
     if dry_run:
         console.print("[yellow]Dry run — classifying without moving files.[/yellow]")
