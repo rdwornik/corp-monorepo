@@ -56,6 +56,14 @@ So that the T6 seams have contract tests, CKE's summary-renderer is isolated and
 - [#33] [P2][M] Isolate the CKE summary-renderer + add a non-circular producer test · Done when: the renderer is a separate unit and a test proves the producer→renderer path is non-circular · refs R2 follow-up, T6
 - [#34] [P2][M] Stand up sandbox end-to-end runs per process · Done when: each process (ingest, extract, retrieve, rfp) has a green sandbox e2e run · refs P2 pillar + 2026-07-18 process audit = recon evidence (all 4 processes driven e2e in a verified sandbox; runs are NOT all green — ingest crashes F1, find/retrieve partial F6/F7; rfp works F-UC3). NOT closed — witnessing ≠ a standing green e2e harness
 
+### [S10] Harden the knowledge-extraction path (SIM-1 acceptance gaps)
+So that the extraction/index path meets the SIM acceptance conditions C3/C4/C6 under the ADR-37 frontmatter-canonical model, closing the ranked SIM-1 blockers from the 2026-07-18 process audit.
+- [#56] [P1][M] Project ↔ vault link + client propagation (F16/F9) — an indexed note resolves to its project and the client field propagates · Done when: SIM condition C3 witnessed in a sandbox e2e run · refs SIM-acceptance C3, 2026-07-18 process audit F16/F9
+- [#57] [P1][M] Index hygiene (F8) under ADR-37 frontmatter-canonical — one source file yields exactly one indexed note (no duplicate/phantom rows) · Done when: SIM condition C4 witnessed in a sandbox e2e run · refs SIM-acceptance C4, 2026-07-18 process audit F8, ADR-37
+- [#58] [P1][M] Single path/config resolution (C6) — F18 AppConfig honors MYWORK_ROOT + F26 com lane resolves via config so every lane resolves through one sandbox-honoring config · Done when: SIM condition C6 witnessed via the sandbox recipe with zero real-asset reads · refs SIM-acceptance C6, 2026-07-18 process audit F18/F26
+- [#59] [P2][M] ADR-37 facts_count projection leg — post-scan UPDATE + key_facts guards per the ADR (facts_count := Σ len(key_facts)) · Done when: the 29 facts_count consumer sites read non-zero truthful values after a sandbox index rebuild · refs ADR-37, AMD-1 (29 consumers)
+- [#60] [P2][M] CKE tier/model unification across entry points (F21, fix) + F22 local-extractor schema drift (LOG-only — propose, do not fix, unless witnessed cheap) · Done when: tier/model routing is consistent across all CKE entry points and F22 is recorded (proposal only) · refs 2026-07-18 process audit F21/F22, #17
+
 ---
 
 ## [E5] Knowledge loop (W1 restart / R2 — ELEVATED per R10)
@@ -77,6 +85,7 @@ So that every registry record carries a value score, the scout consumes it, and 
 - [#38] [P2][M] Source-value scoring v1 — a deterministic per-record score (type/recency/curation/operator-priors) with a neighbor-propagation prior · Done when: every registry record carries a `value_score` and the scout's bandit queue consumes it · refs FR-11/FR-14
 - [#39] [P2][M] Terrain analytics — a heatmap/report over the FR-13 observation events · Done when: one report answers "where do valuable files live" · refs FR-13
 - [#40] [P1][S] Registry day-1 seed — three operator golden sources (Cognitive Fridays · BY Product Documentation · BY Platform, under the BY OneDrive) entered with max priors · Done when: the three seeds resolve via Graph METADATA listing only; the scout NEVER filesystem-traverses the synced "OneDrive - Blue Yonder" tree (hydration invariant) · refs FR-10, core-invariant #1
+- [#55] [P2][S] Content-Manifest producer — emit a DRAFT-schema manifest entry (FR-20 unratified → mark draft); the E5 registry epic's tail, the phase's only deck-facing artifact · Done when: the producer emits a draft manifest entry for one sandbox note, witnessed · refs FR-20 (candidate — intake-16 §5, A3 ruling), #47
 
 ---
 
@@ -108,6 +117,13 @@ So that federation lands, `rfp/` is a composition target with salvaged mechanics
 - [#1] [P2][M] Define the canonical product map that resolves the semantic product-grouping queries (Q4/Q5/Q7/Q8) · Done when: the 4 ontology-blocked benchmark queries answer · refs HANDOFF Open Decisions #5
 - [#2] [P2][M] Implement `corp rfp-index` + the `rfp_entries` FTS5 table + grouped `corp retrieve --source all` · Done when: RFP KB (1,325 entries) and vault (~488 notes) retrieve through one path · refs ADR-22 (superseded by ADR-33 — fold into #48)
 
+### [S11] Harden the RFP agent (body-FTS + cost/token observability)
+So that RFP retrieval grounds on note bodies (not just titles/metadata) and every run surfaces its cost/token spend.
+> **Priority note:** elevated to current focus per the operator's 2026-07-18 focus-modules ruling; execution order is lane-scheduled by the architect, not theme-position.
+> **Design-input note:** design inputs pending the architect's historical-chat retrospection (RFP-KB provenance, federate-vs-merge, com/deal-loop status); the tasks are buildable, but the epic's G-B contract waits for those answers.
+- [#61] [P1][M] Body-FTS retrieval (F6) — a body-term query (not just title/metadata) returns the matching note · Done when: SIM condition C2 witnessed in a sandbox e2e run · refs SIM-acceptance C2, 2026-07-18 process audit F6
+- [#62] [P2][M] Cost/token observability (F2/F13/F23/F31) — the LLM CLIs surface token counts + cost, persisted to ops.db per run (not just printed) · Done when: every extraction/answer run surfaces its token+cost, written to ops.db · refs 2026-07-18 process audit F13/F23/F31, FR-13
+
 ---
 
 ## [E7] Ops, models & docs
@@ -119,6 +135,18 @@ So that ARCHITECTURE/CLAUDE match the post-Arc-B/C tree, the skill-eval checkpoi
 - [#54] [P3][S] Add the ADR-32 README row · Done when: the README reflects ADR-32 · refs ADR-32
 - [#8] [P2][S] Run the 30-day skill-eval checkpoint against the locked stratified 80/20 split (ADR-16; baseline 2026-03-26, past due) · Done when: the checkpoint runs by 2026-07-31 and classifier/tag/product/people drift is reported · refs ADR-16
 - [#9] [P3][M] Evaluate Ollama for an offline/private extraction tier · Done when: a feasibility decision is recorded · refs HANDOFF Open Decisions #8
+
+### [S12] Enact the paper-only ADRs (enforcement leg or recorded deferral)
+So that each ADR that currently exists only on paper either gets its enforcement leg built or an explicit deferral recorded in the ADR naming the gap (census B-table 3).
+- [#63] [P2][M] ADR-34 — vault-essence S0–S3 lifecycle + 48h SLA: build the scheduler/enforcement leg OR record an explicit deferral in the ADR naming the gap · Done when: SLA enforcement witnessed in a sandbox OR a deferral recorded in ADR-34 with the gap named · refs ADR-34, census B-table 3
+- [#64] [P2][M] ADR-35 — corp-ops placement + dual-leg backup topology: build the enforcement leg OR record a deferral (the leg-2 backup amendment is operator-queue, see #18) · Done when: topology enforcement witnessed OR a deferral recorded in ADR-35 with the gap named · refs ADR-35, #18, census B-table 3
+- [#65] [P2][M] ADR-36 — storage-topology estate-roles: build the named-but-unbuilt scanner enforcement leg OR record a deferral · Done when: estate-role scanner enforcement witnessed OR a deferral recorded in ADR-36 with the gap named · refs ADR-36, census B-table 3
+
+### [S13] Archival sweep of consumed doc artifacts (proposal-only — no deletion/relocation executes here)
+So that consumed and superseded doc artifacts are cleared from the working folders under a signed ADR-38 manifest and a relocation policy, with nothing deleted or moved before the operator signs/rules.
+- [#66] [P2][M] Draft a signed deletion manifest under ADR-38 doctrine — the 17 conformance-nightly digests + the 3 individually-unconsumed old audits + the render-twin .html files; three-leg evidence per row; PROPOSED until the operator signs · Done when: the manifest is delivered inline for operator signature · refs ADR-38
+- [#67] [P2][S] Execute the signed deletion manifest post-signature (nothing deletes before signature) · Done when: the signed deletions are merged and the JOURNAL is anchored · depends-on: #66 · refs ADR-38
+- [#68] [P2][M] Archival-relocation policy for consumed artifacts — move consumed+superseded July intake/audit/decision artifacts into the EXISTING docs/archive/ (no new path); proposal only, nothing relocates before the ruling · Done when: a policy proposal is delivered inline for architect+operator ruling covering (i) what qualifies (consumed + superseded only), (ii) reference-integrity handling (ADR/JOURNAL citations; JOURNAL never edited), (iii) the relocation manifest format under ADR-38 doctrine · refs ADR-38, docs/archive/
 
 ---
 
