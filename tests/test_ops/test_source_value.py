@@ -15,6 +15,7 @@ from corp.ops.source_value import (
     WEIGHTS_VERSION,
     ChildItem,
     MetadataSnapshot,
+    NeighbourNode,
     ValueScore,
     component_curation,
     component_density,
@@ -25,6 +26,7 @@ from corp.ops.source_value import (
     component_uniqueness,
     compose_score,
     compute_components,
+    neighbour_priors,
     round_half_up,
     score_record,
 )
@@ -238,3 +240,69 @@ class TestComposeAndScore:
         low = compose_score(comps, 0.0, score_as_of=_AS_OF).score
         high = compose_score(comps, 1.0, score_as_of=_AS_OF).score
         assert high > low
+
+
+class TestNeighbourPriorIsSinglePass:
+    """Seam H — one-hop N from intrinsic I, single snapshot / single pass (§2.3)."""
+
+    def test_child_uses_parent_and_top3_siblings(self) -> None:
+        nodes = [
+            NeighbourNode("p", 0.8, drive_id="d"),
+            NeighbourNode("c1", 0.6, parent_id="p", drive_id="d"),
+            NeighbourNode("c2", 0.4, parent_id="p", drive_id="d"),
+            NeighbourNode("c3", 0.2, parent_id="p", drive_id="d"),
+        ]
+        n = neighbour_priors(nodes)
+        # N(c1) = 0.70*I(p) + 0.30*mean(top-3 siblings {c2,c3})
+        assert n["c1"] == pytest.approx(0.70 * 0.8 + 0.30 * ((0.4 + 0.2) / 2))
+        # N(root p) = mean(top-3 children)
+        assert n["p"] == pytest.approx((0.6 + 0.4 + 0.2) / 3)
+
+    def test_top3_siblings_only(self) -> None:
+        nodes = [NeighbourNode("p", 0.5, drive_id="d")] + [
+            NeighbourNode(f"c{i}", v, parent_id="p", drive_id="d")
+            for i, v in enumerate([0.9, 0.7, 0.5, 0.3, 0.1])
+        ]
+        n = neighbour_priors(nodes)
+        # root uses only the top-3 children by I
+        assert n["p"] == pytest.approx((0.9 + 0.7 + 0.5) / 3)
+
+    def test_lone_node_is_neutral(self) -> None:
+        assert neighbour_priors([NeighbourNode("solo", 0.9, drive_id="d")]) == {"solo": 0.50}
+
+    def test_child_without_siblings_gets_neutral_sibling_term(self) -> None:
+        nodes = [
+            NeighbourNode("p", 0.8, drive_id="d"),
+            NeighbourNode("c", 0.3, parent_id="p", drive_id="d"),
+        ]
+        n = neighbour_priors(nodes)
+        assert n["c"] == pytest.approx(0.70 * 0.8 + 0.30 * 0.50)
+
+    def test_cross_drive_parent_link_ignored(self) -> None:
+        nodes = [
+            NeighbourNode("p", 0.8, drive_id="drive-A"),
+            NeighbourNode("c", 0.3, parent_id="p", drive_id="drive-B"),
+        ]
+        # parent is in a different drive -> not a neighbour -> c is a childless root -> neutral
+        assert neighbour_priors(nodes)["c"] == 0.50
+
+    def test_single_pass_is_idempotent(self) -> None:
+        nodes = [
+            NeighbourNode("p", 0.8, drive_id="d"),
+            NeighbourNode("c", 0.6, parent_id="p", drive_id="d"),
+        ]
+        assert neighbour_priors(nodes) == neighbour_priors(nodes)
+
+    def test_n_reads_intrinsic_not_final(self) -> None:
+        """A final score offered as a neighbourhood input would change N — it must not.
+
+        The node carries only ``intrinsic``; N tracks it exactly. Shifting intrinsic
+        shifts N proportionally, proving N is computed from I (never a final score).
+        """
+        base = neighbour_priors(
+            [NeighbourNode("p", 0.8, drive_id="d"), NeighbourNode("c", 0.5, parent_id="p", drive_id="d")]
+        )["c"]
+        shifted = neighbour_priors(
+            [NeighbourNode("p", 0.4, drive_id="d"), NeighbourNode("c", 0.5, parent_id="p", drive_id="d")]
+        )["c"]
+        assert base - shifted == pytest.approx(0.70 * (0.8 - 0.4))

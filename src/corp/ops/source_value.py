@@ -233,3 +233,66 @@ def score_record(
         score_as_of=score_as_of, duplicate_rate=duplicate_rate,
     )
     return compose_score(components, neighbour, score_as_of=score_as_of)
+
+
+# --- single-pass neighbour prior (intake-16 §2.3 — NOT PageRank) -------------
+
+_NEIGHBOUR_PARENT, _NEIGHBOUR_SIBLINGS = 0.70, 0.30
+
+
+@dataclass(frozen=True)
+class NeighbourNode:
+    """One node in the one-hop neighbourhood: its INTRINSIC ``I`` + parentReference.
+
+    ``intrinsic`` is the §2.2 intrinsic score ``I`` — **never** the final ``value_score``
+    (§2.3, the determinism fix that removed cross-cycle coupling; seam H). ``parent_id`` is
+    the one-hop Graph ``parentReference``; a link is honoured only within the same
+    ``drive_id``.
+    """
+
+    id: str
+    intrinsic: float
+    parent_id: str | None = None
+    drive_id: str = ""
+
+
+def _top3_mean(values: list[float]) -> float:
+    """Mean of the top-3 values; neutral ``0.50`` on missing evidence (empty)."""
+    if not values:
+        return _NEUTRAL
+    top = sorted(values, reverse=True)[:3]
+    return sum(top) / len(top)
+
+
+def neighbour_priors(nodes: list[NeighbourNode]) -> dict[str, float]:
+    """One-hop neighbour prior ``N`` per node, from intrinsic ``I`` only (§2.3).
+
+    ``N(child) = 0.70·I(parent) + 0.30·mean(top-3 siblings by I)``;
+    ``N(root)  = mean(top-3 direct children by I)``; a node with no parent-or-child
+    neighbourhood gets the neutral ``0.50``. **Single snapshot, single pass** — every
+    ``N`` is computed once from the same intrinsic snapshot, so there is no recursion,
+    no eigenvector, and no dependence on any previous cycle (guards seam H). Links are
+    honoured only within the same ``drive_id``.
+    """
+    by_id = {n.id: n for n in nodes}
+
+    def _parent(n: NeighbourNode) -> NeighbourNode | None:
+        p = by_id.get(n.parent_id) if n.parent_id else None
+        return p if (p is not None and p.drive_id == n.drive_id) else None
+
+    children_of: dict[str, list[NeighbourNode]] = {}
+    for n in nodes:
+        p = _parent(n)
+        if p is not None:
+            children_of.setdefault(p.id, []).append(n)
+
+    result: dict[str, float] = {}
+    for n in nodes:
+        p = _parent(n)
+        if p is not None:
+            siblings = [s.intrinsic for s in children_of[p.id] if s.id != n.id]
+            result[n.id] = _NEIGHBOUR_PARENT * p.intrinsic + _NEIGHBOUR_SIBLINGS * _top3_mean(siblings)
+        else:
+            kids = [c.intrinsic for c in children_of.get(n.id, [])]
+            result[n.id] = _top3_mean(kids) if kids else _NEUTRAL
+    return result
