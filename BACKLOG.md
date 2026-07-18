@@ -56,6 +56,14 @@ So that the T6 seams have contract tests, CKE's summary-renderer is isolated and
 - [#33] [P2][M] Isolate the CKE summary-renderer + add a non-circular producer test · Done when: the renderer is a separate unit and a test proves the producer→renderer path is non-circular · refs R2 follow-up, T6
 - [#34] [P2][M] Stand up sandbox end-to-end runs per process · Done when: each process (ingest, extract, retrieve, rfp) has a green sandbox e2e run · refs P2 pillar + 2026-07-18 process audit = recon evidence (all 4 processes driven e2e in a verified sandbox; runs are NOT all green — ingest crashes F1, find/retrieve partial F6/F7; rfp works F-UC3). NOT closed — witnessing ≠ a standing green e2e harness
 
+### [S10] Harden the knowledge-extraction path (SIM-1 acceptance gaps)
+So that the extraction/index path meets the SIM acceptance conditions C3/C4/C6 under the ADR-37 frontmatter-canonical model, closing the ranked SIM-1 blockers from the 2026-07-18 process audit.
+- [#56] [P1][M] Project ↔ vault link + client propagation (F16/F9) — an indexed note resolves to its project and the client field propagates · Done when: SIM condition C3 witnessed in a sandbox e2e run · refs SIM-acceptance C3, 2026-07-18 process audit F16/F9
+- [#57] [P1][M] Index hygiene (F8) under ADR-37 frontmatter-canonical — one source file yields exactly one indexed note (no duplicate/phantom rows) · Done when: SIM condition C4 witnessed in a sandbox e2e run · refs SIM-acceptance C4, 2026-07-18 process audit F8, ADR-37
+- [#58] [P1][M] Single path/config resolution (C6) — F18 AppConfig honors MYWORK_ROOT + F26 com lane resolves via config so every lane resolves through one sandbox-honoring config · Done when: SIM condition C6 witnessed via the sandbox recipe with zero real-asset reads · refs SIM-acceptance C6, 2026-07-18 process audit F18/F26
+- [#59] [P2][M] ADR-37 facts_count projection leg — post-scan UPDATE + key_facts guards per the ADR (facts_count := Σ len(key_facts)) · Done when: the 29 facts_count consumer sites read non-zero truthful values after a sandbox index rebuild · refs ADR-37, AMD-1 (29 consumers)
+- [#60] [P2][M] CKE tier/model unification across entry points (F21, fix) + F22 local-extractor schema drift (LOG-only — propose, do not fix, unless witnessed cheap) · Done when: tier/model routing is consistent across all CKE entry points and F22 is recorded (proposal only) · refs 2026-07-18 process audit F21/F22, #17
+
 ---
 
 ## [E5] Knowledge loop (W1 restart / R2 — ELEVATED per R10)
