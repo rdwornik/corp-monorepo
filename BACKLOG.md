@@ -77,6 +77,7 @@ So that every registry record carries a value score, the scout consumes it, and 
 - [#38] [P2][M] Source-value scoring v1 — a deterministic per-record score (type/recency/curation/operator-priors) with a neighbor-propagation prior · Done when: every registry record carries a `value_score` and the scout's bandit queue consumes it · refs FR-11/FR-14
 - [#39] [P2][M] Terrain analytics — a heatmap/report over the FR-13 observation events · Done when: one report answers "where do valuable files live" · refs FR-13
 - [#40] [P1][S] Registry day-1 seed — three operator golden sources (Cognitive Fridays · BY Product Documentation · BY Platform, under the BY OneDrive) entered with max priors · Done when: the three seeds resolve via Graph METADATA listing only; the scout NEVER filesystem-traverses the synced "OneDrive - Blue Yonder" tree (hydration invariant) · refs FR-10, core-invariant #1
+- [#55] [P2][S] Content-Manifest producer — emit a DRAFT-schema manifest entry (FR-20 unratified → mark draft); the E5 registry epic's tail, the phase's only deck-facing artifact · Done when: the producer emits a draft manifest entry for one sandbox note, witnessed · refs FR-20 (candidate — intake-16 §5, A3 ruling), #47
 
 ---
 
