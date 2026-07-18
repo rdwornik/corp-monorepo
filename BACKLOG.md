@@ -135,6 +135,7 @@ So that ARCHITECTURE/CLAUDE match the post-Arc-B/C tree, the skill-eval checkpoi
 - [#54] [P3][S] Add the ADR-32 README row · Done when: the README reflects ADR-32 · refs ADR-32
 - [#8] [P2][S] Run the 30-day skill-eval checkpoint against the locked stratified 80/20 split (ADR-16; baseline 2026-03-26, past due) · Done when: the checkpoint runs by 2026-07-31 and classifier/tag/product/people drift is reported · refs ADR-16
 - [#9] [P3][M] Evaluate Ollama for an offline/private extraction tier · Done when: a feasibility decision is recorded · refs HANDOFF Open Decisions #8
+- [#69] [P3][S] ADR-archival — relocate the consumed+superseded `2026-07-06-technical-architect-intake` (S13 manifest G3, DEFERRED — its 4 immutable-ADR citers block a clean move) into `docs/archive/` via a forwarding-marker amendment arc · Done when: ADR-33/34/35/36 carry forwarding-marker amendments to the new path and the intake is relocated with ref-integrity per the ADR-38 / #68 policy · refs docs/audits/2026-07-19-deletion-manifest-s13-archival.md (G3), ADR-38
 
 ### [S12] Enact the paper-only ADRs (enforcement leg or recorded deferral)
 So that each ADR that currently exists only on paper either gets its enforcement leg built or an explicit deferral recorded in the ADR naming the gap (census B-table 3).
