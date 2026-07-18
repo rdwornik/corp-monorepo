@@ -218,7 +218,7 @@ If `tach check` fails for your changes, options in order of preference:
 
 ### Known baseline violations (Phase 1)
 
-The six Phase 1 baseline violations were resolved in Phase 2 — `tach check` now passes with **zero violations** (verified 2026-05-27). Original baseline tracked in `docs/audits/2026-04-15-tach-baseline-violations.md`.
+The six Phase 1 baseline violations were resolved in Phase 2 — `tach check` now passes with **zero violations** (verified 2026-05-27). Original baseline tracked in `docs/archive/2026-04-15-tach-baseline-violations.md`.
 
 Do not add new violations without architectural justification.
 
