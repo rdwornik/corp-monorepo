@@ -41,10 +41,10 @@ slides = ["comtypes; sys_platform == 'win32'", "PyMuPDF>=1.20.0"]
 dedup = ["datasketch>=1.6"]
 graph = ["msal>=1.24"]
 dev = [
-    "pytest>=8.0",
+    "pytest>=9.0",         # fleet floor == [tool.pytest] minversion (ARC-4 D2)
     "pytest-cov>=4.1",
     "pytest-xdist>=3.8",
-    "ruff>=0.8",
+    "ruff>=0.15.5",        # fleet floor == [tool.ruff] required-version (ARC-4 leg 1)
     "hypothesis",
     "pre-commit>=4.0",
     "tach>=0.35",
