@@ -16,9 +16,14 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from datetime import datetime
+from decimal import ROUND_HALF_UP, Decimal
 
 # --- v1 weight-set (intake-16 §2.2; equal yield weights, D5 pick) ------------
 WEIGHTS_VERSION = "v1"
+
+# v1 composition constants (§2.2 two-level mixing; recalibration bumps WEIGHTS_VERSION)
+_I_YIELD, _I_CURATION, _I_OPERATOR = 0.60, 0.20, 0.20  # intrinsic mix
+_FINAL_INTRINSIC, _FINAL_NEIGHBOUR = 0.85, 0.15  # final mix
 
 _TYPE_WEIGHTS = {
     # recording / audio / video -> 1.00
@@ -151,3 +156,80 @@ def compute_components(
         "C": component_curation(curation_level),
         "O": component_operator_prior(operator_prior),
     }
+
+
+@dataclass(frozen=True)
+class ValueScore:
+    """The deterministic §2.2 score struct — always explainable and reproducible.
+
+    ``components`` carries the full breakdown ({D,R,T,M,U,C,O} + derived Y/I/N).
+    ``weights_version`` is the SINGLE version field (ruling F1 — the design body's
+    "score_version" is the same concept, unified here). ``score_as_of`` is the ISO
+    snapshot instant the score was computed against.
+    """
+
+    score: int  # 0..100, round-half-up (ruling F2)
+    components: dict
+    weights_version: str
+    score_as_of: str
+
+
+def round_half_up(value: float) -> int:
+    """Round to the nearest integer, halves UP (ruling F2 — NOT banker's rounding).
+
+    Implemented via ``Decimal`` with ``ROUND_HALF_UP`` for reproducibility: Python's
+    built-in ``round`` is round-half-to-even, so ``round(2.5) == 2`` — rejected here.
+    ``Decimal(str(value))`` uses the float's deterministic shortest repr, so identical
+    inputs always yield an identical integer (guards the seam-G golden vector).
+    """
+    return int(Decimal(str(value)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+
+
+def compose_score(
+    components: dict[str, float],
+    neighbour: float,
+    *,
+    score_as_of: datetime,
+) -> ValueScore:
+    """Compose the two-level §2.2 score: yield -> intrinsic -> neighbour-adjusted final.
+
+    ``Y = mean(D,R,T,M,U)`` (equal weights) -> ``I = 0.60Y + 0.20C + 0.20O`` ->
+    ``value_score = round-half-up(100 * (0.85I + 0.15N))``. ``neighbour`` (N) is supplied
+    by the single-pass neighbour pass (§2.3); a lone record uses the neutral ``0.50``.
+    """
+    yield_ = (
+        components["D"] + components["R"] + components["T"]
+        + components["M"] + components["U"]
+    ) / 5.0
+    intrinsic = _I_YIELD * yield_ + _I_CURATION * components["C"] + _I_OPERATOR * components["O"]
+    final = 100.0 * (_FINAL_INTRINSIC * intrinsic + _FINAL_NEIGHBOUR * neighbour)
+    breakdown = {**components, "Y": yield_, "I": intrinsic, "N": neighbour}
+    return ValueScore(
+        score=round_half_up(final),
+        components=breakdown,
+        weights_version=WEIGHTS_VERSION,
+        score_as_of=score_as_of.isoformat(timespec="seconds"),
+    )
+
+
+def score_record(
+    dims: dict,
+    topics: list,
+    curation_level: str,
+    operator_prior: str,
+    snapshot: MetadataSnapshot,
+    *,
+    score_as_of: datetime,
+    neighbour: float = _NEUTRAL,
+    duplicate_rate: float | None = None,
+) -> ValueScore:
+    """Pure end-to-end score for one record: components (§2.2) then composition.
+
+    ``neighbour`` defaults to the neutral prior; the caller's single-pass neighbour
+    computation (§2.3, ``rank``/neighbour helpers) overrides it. No I/O, no hydration.
+    """
+    components = compute_components(
+        dims, topics, curation_level, operator_prior, snapshot,
+        score_as_of=score_as_of, duplicate_rate=duplicate_rate,
+    )
+    return compose_score(components, neighbour, score_as_of=score_as_of)

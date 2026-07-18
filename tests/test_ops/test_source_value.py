@@ -12,8 +12,10 @@ from datetime import datetime, timedelta
 import pytest
 
 from corp.ops.source_value import (
+    WEIGHTS_VERSION,
     ChildItem,
     MetadataSnapshot,
+    ValueScore,
     component_curation,
     component_density,
     component_match,
@@ -21,7 +23,10 @@ from corp.ops.source_value import (
     component_recency,
     component_type_value,
     component_uniqueness,
+    compose_score,
     compute_components,
+    round_half_up,
+    score_record,
 )
 
 _AS_OF = datetime(2026, 7, 1, 12, 0, 0)
@@ -157,3 +162,79 @@ class TestComputeComponents:
             snapshot=snapshot, score_as_of=_AS_OF,
         )
         assert compute_components(**kw) == compute_components(**kw)
+
+
+class TestRoundHalfUp:
+    """Ruling F2 — round-half-UP, never banker's (round-half-to-even)."""
+
+    @pytest.mark.parametrize(
+        ("value", "expected"),
+        [(0.5, 1), (1.5, 2), (2.5, 3), (42.5, 43), (99.5, 100), (42.4, 42), (42.49, 42)],
+    )
+    def test_halves_round_up(self, value: float, expected: int) -> None:
+        assert round_half_up(value) == expected
+
+    def test_differs_from_bankers_rounding(self) -> None:
+        # round(2.5) == 2 and round(0.5) == 0 under banker's; F2 must give 3 and 1.
+        assert round_half_up(2.5) == 3 != round(2.5)
+        assert round_half_up(0.5) == 1 != round(0.5)
+
+
+def _golden_snapshot() -> MetadataSnapshot:
+    return MetadataSnapshot(
+        location_name="Retail Luminate Planning",
+        children=(
+            ChildItem("session.mp4", extension=".mp4", last_modified=_AS_OF),
+            ChildItem("deck.pptx", extension=".pptx", last_modified=_AS_OF - timedelta(days=180)),
+            ChildItem("old", is_folder=True),
+        ),
+    )
+
+
+_GOLDEN_KW = dict(
+    dims={"industry": ["retail"], "software": ["luminate"]},
+    topics=["planning"],
+    curation_level="golden",
+    operator_prior="max",
+    score_as_of=_AS_OF,
+)
+
+
+class TestComposeAndScore:
+    def test_golden_vector(self) -> None:
+        """Seam G — frozen record + fixture -> exact integer score + component vector."""
+        vs = score_record(snapshot=_golden_snapshot(), **_GOLDEN_KW)
+        assert isinstance(vs, ValueScore)
+        assert vs.score == 76  # 100 * (0.85*I + 0.15*0.50), round-half-up
+        assert vs.weights_version == WEIGHTS_VERSION == "v1"
+        assert vs.score_as_of == "2026-07-01T12:00:00"
+        c = vs.components
+        # exactly-representable components
+        assert (c["U"], c["C"], c["O"], c["N"]) == (0.50, 1.0, 1.0, 0.50)
+        # components carrying a non-exact float (0.9 -> T) via approx
+        assert c["R"] == pytest.approx(0.75)
+        assert c["T"] == pytest.approx(0.95)
+        assert c["M"] == pytest.approx(1.0)
+        assert c["D"] == pytest.approx(0.1761069, abs=1e-6)
+        # internal consistency of the two-level composition
+        assert c["Y"] == pytest.approx((c["D"] + c["R"] + c["T"] + c["M"] + c["U"]) / 5)
+        assert c["I"] == pytest.approx(0.60 * c["Y"] + 0.20 * c["C"] + 0.20 * c["O"])
+
+    def test_score_is_reproducible(self) -> None:
+        assert score_record(snapshot=_golden_snapshot(), **_GOLDEN_KW) == score_record(
+            snapshot=_golden_snapshot(), **_GOLDEN_KW
+        )
+
+    def test_exclude_operator_prior_lowers_score(self) -> None:
+        base = score_record(snapshot=_golden_snapshot(), **_GOLDEN_KW)
+        excluded = score_record(
+            snapshot=_golden_snapshot(), **{**_GOLDEN_KW, "operator_prior": "exclude"}
+        )
+        assert excluded.score < base.score
+        assert excluded.components["O"] == 0.0
+
+    def test_neighbour_shifts_final(self) -> None:
+        comps = compute_components(snapshot=_golden_snapshot(), **_GOLDEN_KW)
+        low = compose_score(comps, 0.0, score_as_of=_AS_OF).score
+        high = compose_score(comps, 1.0, score_as_of=_AS_OF).score
+        assert high > low
