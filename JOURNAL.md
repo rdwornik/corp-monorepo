@@ -15,6 +15,13 @@
 
 ---
 
+### 2026-07-19 — E5 lane #38: terra re-review #2 — path-normalization P1 fixed
+- Did: terra re-review (pass 2) confirmed the first two P1s resolved and surfaced one new P1 — `SourceObservationRepository.append` persisted Windows-style `recovery_candidates` verbatim, breaking the forward-slash stored-path invariant (CLAUDE.md §5 rule 12). Normalized each candidate before `json.dumps` (+1 regression test), committed `2c1ab27`, re-launched terra (pass 3).
+- Result: `2c1ab27` [fix(ops) normalize recovery-candidate paths]; test_ops **194 passed**, ruff clean. terra pass 3 in-flight; no merge until terra is clean of HIGHs.
+- Changes: `src/corp/ops/source_observation_repo.py`, `tests/test_ops/test_source_observation_repo.py` (+1); `JOURNAL.md` (this entry).
+- Abandoned: none.
+- Next: terra pass-3 verdict → merge on green (or fix-and-rereview).
+
 ### 2026-07-19 — E5 lane #38: terra pre-merge review — 2 P1s fixed, re-review in-flight
 - Did: Ran the mandatory pre-merge **terra** codex review (`codex exec review --base main -m gpt-5.6-terra`) on the `epic/e5-registry` #38 diff. terra returned **2 P1 (HIGH)**, both genuine fail-closed gaps in `source_registry.py`: (1) a misspelled registry root key (`source:` vs `sources:`) loaded as a silently-empty registry — now rejects unknown root keys + requires `sources` for non-empty files; (2) structured/optional field types (`dims: []`, `topics: 42`) passed the validator (dataclasses don't enforce annotations at runtime) and would corrupt scoring — now type-checked (dims mapping, topics/`dims.*` list-of-str, string fields, archive_pointer str|null). Fixed + regression-tested (+12), then re-launched terra on the updated diff.
 - Result: fix committed `a406b4c` [fix(ops) FR-10 fail-closed hardening]; test_ops **181→193 passed**, ruff clean. terra **re-review in-flight** — on green the lane proceeds to the RETURN merge (EPIC_RETURN §progress + serial `--no-ff` merge with `[#38]`). commit-and-STOP holds until then; no merge yet.
