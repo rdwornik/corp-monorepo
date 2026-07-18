@@ -15,6 +15,13 @@
 
 ---
 
+### 2026-07-19 — E5 lane #38: terra re-review #3 — exclude hard-gate + dims-key P1s fixed
+- Did: terra pass 3 surfaced two design-invariant P1s (both intake-16 §2.2): (1) `operator_prior=exclude` still produced a high, rankable score — the design's safety gate must not be outvoted by arithmetic; added `ValueScore.gated`, force score→0 in `score_record` for exclude, and tiered `rank_by_value_score` (permitted > gated > unscored). (2) unknown `dims` keys (`industy:` typo) were accepted then silently dropped by the scorer → mis-rank; now rejected (fail-closed). Fixed + tested (+3), committed `363bdd4`, re-launched terra (pass 4).
+- Result: `363bdd4` [fix(ops) exclude hard-gate + reject unknown dims keys]; test_ops **197 passed**, ruff clean. terra pass 4 in-flight; no merge until terra is clean of HIGHs. (One stray shell-backgrounded terra from a mis-launch was killed; re-run captured.)
+- Changes: `src/corp/ops/source_value.py` (gated + tiered rank), `src/corp/ops/source_registry.py` (dims-key allowlist), `tests/test_ops/{test_source_value,test_source_registry}.py` (+3); `JOURNAL.md` (this entry).
+- Abandoned: none.
+- Next: terra pass-4 verdict → merge on green (or fix-and-rereview).
+
 ### 2026-07-19 — E5 lane #38: terra re-review #2 — path-normalization P1 fixed
 - Did: terra re-review (pass 2) confirmed the first two P1s resolved and surfaced one new P1 — `SourceObservationRepository.append` persisted Windows-style `recovery_candidates` verbatim, breaking the forward-slash stored-path invariant (CLAUDE.md §5 rule 12). Normalized each candidate before `json.dumps` (+1 regression test), committed `2c1ab27`, re-launched terra (pass 3).
 - Result: `2c1ab27` [fix(ops) normalize recovery-candidate paths]; test_ops **194 passed**, ruff clean. terra pass 3 in-flight; no merge until terra is clean of HIGHs.
