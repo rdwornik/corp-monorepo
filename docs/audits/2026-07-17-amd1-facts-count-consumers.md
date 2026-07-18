@@ -68,6 +68,9 @@ tests/test_index_builder.py:132  "SELECT facts_count FROM projects WHERE project
 
 **Total: 31 consumer sites.**
 
+<!-- AMENDMENT 2026-07-18 (ADR-37, in-file marker per CLAUDE.md §5 rule 3 — original preserved): the "31" summary label over-counts this document's own verbatim enumeration, which lists **29** sites; live re-witness (26 src + 3 tests) and an independent sol recount both confirm **29**. The 29 are textual references (DDL, model declarations, defaults, bookkeeping, a message literal, fixtures), not all read-consumers. Corrected count: **29**. -->
+
+
 ## Disposition notes for the operator (AMD-1 sign-off)
 
 - **Population is vault-data-sourced, loader-independent.** `index_builder.py:389/:414` populate
