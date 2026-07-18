@@ -164,6 +164,8 @@ corp prep Lenzing    -> retrieve client=Lenzing results=0 -> broader results=0 -
 
 **6. Missing pieces / findings.**
 - **F14 (facts_count = 0 across all consumer sites):** analytics "0 facts indexed", project `Facts=-`, brief would show "Facts Extracted: 0" — the 31 `facts_count` consumers render empty because the facts table is never populated (F7).
+  <!-- AMENDMENT 2026-07-18 (ADR-37, in-file marker per CLAUDE.md §5 rule 3 — original preserved): the "31" here propagates the AMD-1 summary over-count; the witnessed live count is **29** (26 src + 3 tests; sol-recount confirmed). Corrected count: **29**. -->
+
 - **F15:** `analytics recent` = "No dated notes found" though the note has `date: 2026-07-17` — note dates not wired into the recent-notes analytic.
 - **F16 (project↔vault link broken):** ingest produces a `01_Knowledge` package but **no `project-info.yaml`**, so `project show` finds nothing in vault and `project list` shows `Vault=-`. The project and its own knowledge note are not linked.
 - **F17 (cpe is a disjoint pipeline):** `cpe show/scan/render` operate on their own `_knowledge/manifest.yaml`; corp-ingest output is invisible to cpe. Two non-integrated project pipelines.
