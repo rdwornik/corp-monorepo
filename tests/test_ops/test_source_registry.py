@@ -91,6 +91,31 @@ class TestValidateDeclaration:
         with pytest.raises(SourceRegistryError):
             validate_declaration(["not", "a", "mapping"])  # type: ignore[arg-type]
 
+    # terra P1: structured/optional field types (dataclasses don't enforce at runtime)
+    def test_dims_not_mapping_fails_closed(self) -> None:
+        with pytest.raises(SourceRegistryError, match="dims"):
+            validate_declaration(_valid_raw(dims=[]))
+
+    def test_dims_industry_not_list_fails_closed(self) -> None:
+        with pytest.raises(SourceRegistryError, match="industry"):
+            validate_declaration(_valid_raw(dims={"industry": "retail"}))
+
+    @pytest.mark.parametrize("bad", [42, "planning", [1, 2]])
+    def test_topics_not_list_of_strings_fails_closed(self, bad) -> None:
+        with pytest.raises(SourceRegistryError, match="topics"):
+            validate_declaration(_valid_raw(topics=bad))
+
+    def test_string_field_wrong_type_fails_closed(self) -> None:
+        with pytest.raises(SourceRegistryError, match="what_it_holds"):
+            validate_declaration(_valid_raw(what_it_holds=5))
+
+    def test_archive_pointer_wrong_type_fails_closed(self) -> None:
+        with pytest.raises(SourceRegistryError, match="archive_pointer"):
+            validate_declaration(_valid_raw(archive_pointer=123))
+
+    def test_archive_pointer_null_ok(self) -> None:
+        assert validate_declaration(_valid_raw(archive_pointer=None)).archive_pointer is None
+
 
 class TestRoundTrip:
     def test_declaration_round_trips_through_canonical_dict(self) -> None:
@@ -151,3 +176,29 @@ class TestLoadSourceRegistry:
         p.write_text("- just\n- a\n- list\n", encoding="utf-8")
         with pytest.raises(SourceRegistryError):
             load_source_registry(p)
+
+    def test_misspelled_root_key_fails_closed(self, tmp_path: Path) -> None:
+        # terra P1: `source:` (typo) must NOT silently load an empty registry
+        p = tmp_path / "typo.yaml"
+        p.write_text("source:\n  - {id: a, name: A, site_id: s, drive_id: d}\n", encoding="utf-8")
+        with pytest.raises(SourceRegistryError, match="root key"):
+            load_source_registry(p)
+
+    def test_nonempty_without_sources_fails_closed(self, tmp_path: Path) -> None:
+        p = tmp_path / "veronly.yaml"
+        p.write_text('version: "1.0"\n', encoding="utf-8")
+        with pytest.raises(SourceRegistryError, match="sources"):
+            load_source_registry(p)
+
+    def test_version_plus_sources_ok(self, tmp_path: Path) -> None:
+        p = tmp_path / "ok.yaml"
+        p.write_text(
+            'version: "1.0"\nsources:\n  - {id: a, name: A, site_id: s, drive_id: d}\n',
+            encoding="utf-8",
+        )
+        assert [r.id for r in load_source_registry(p)] == ["a"]
+
+    def test_empty_file_is_empty_registry(self, tmp_path: Path) -> None:
+        p = tmp_path / "empty.yaml"
+        p.write_text("", encoding="utf-8")
+        assert load_source_registry(p) == []

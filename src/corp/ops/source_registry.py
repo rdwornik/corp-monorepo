@@ -73,6 +73,33 @@ _ENUMS = {
     "added_by": ADDED_BY,
 }
 _KNOWN_FIELDS = frozenset(f.name for f in fields(SourceDeclaration))
+_STR_FIELDS = ("path_hint", "web_url", "local_hint", "what_it_holds", "owner_team")
+_ALLOWED_ROOT = frozenset({"sources", "version"})
+
+
+def _is_str_list(value: object) -> bool:
+    return isinstance(value, list) and all(isinstance(x, str) for x in value)
+
+
+def _check_field_types(rid: str, raw: dict) -> None:
+    """Enforce structured/optional field types — dataclasses do NOT at runtime, so a
+    ``dims: []`` or ``topics: 42`` would otherwise pass and later corrupt scoring (seam F).
+    """
+    for key in _STR_FIELDS:
+        if key in raw and not isinstance(raw[key], str):
+            raise SourceRegistryError(f"record {rid!r}: {key} must be a string")
+    ap = raw.get("archive_pointer")
+    if "archive_pointer" in raw and ap is not None and not isinstance(ap, str):
+        raise SourceRegistryError(f"record {rid!r}: archive_pointer must be a string or null")
+    if "topics" in raw and not _is_str_list(raw["topics"]):
+        raise SourceRegistryError(f"record {rid!r}: topics must be a list of strings")
+    if "dims" in raw:
+        dims = raw["dims"]
+        if not isinstance(dims, dict):
+            raise SourceRegistryError(f"record {rid!r}: dims must be a mapping")
+        for dk in ("industry", "software"):
+            if dk in dims and not _is_str_list(dims[dk]):
+                raise SourceRegistryError(f"record {rid!r}: dims.{dk} must be a list of strings")
 
 
 def validate_declaration(raw: dict) -> SourceDeclaration:
@@ -96,6 +123,7 @@ def validate_declaration(raw: dict) -> SourceDeclaration:
     unknown = set(raw) - _KNOWN_FIELDS
     if unknown:
         raise SourceRegistryError(f"record {rid!r}: unknown field(s) {sorted(unknown)}")
+    _check_field_types(rid, raw)
     return SourceDeclaration(**raw)
 
 
@@ -117,6 +145,12 @@ def load_source_registry(path: Path) -> list[SourceDeclaration]:
         data = yaml.safe_load(f) or {}
     if not isinstance(data, dict):
         raise SourceRegistryError("source registry root must be a mapping with a 'sources' list")
+    unknown_root = set(data) - _ALLOWED_ROOT
+    if unknown_root:
+        # a misspelled `source:` must NOT silently load an empty registry (fail-closed)
+        raise SourceRegistryError(f"unknown registry root key(s) {sorted(unknown_root)}; expected 'sources'")
+    if data and "sources" not in data:
+        raise SourceRegistryError("a non-empty registry must define a 'sources' list")
     raw_sources = data.get("sources", [])
     if not isinstance(raw_sources, list):
         raise SourceRegistryError("'sources' must be a list")
