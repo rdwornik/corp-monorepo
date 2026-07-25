@@ -17,5 +17,12 @@ consumer; the ADR-36 read-only contract holds).
 
 This is the "marked/local" half of #314's hub-pointer-vs-local split: the folder
 a reader lands in first now states, in-band, that it is intentionally
-domain-scoped and carries no methodology-protocol copies. Full genre wording
-lands with #327.
+domain-scoped and carries no methodology-protocol copies.
+
+**Genre (hub BACKLOG #327 — resolved by reference).** `protocols/` is the fleet's
+**interface genre**: *what other repos/agents must know to interact with THIS
+repo*, with the universal methodology-vs-project boundary applied INSIDE it. That
+wording is defined **once**, at the hub — `../.dev-knowledge/protocols/README.md`
+— and is deliberately not restated here, so the two cannot drift. What this repo
+owns is the *local* half of the boundary, described above; `CORP_INTERFACE.md` is
+its interface doc under the genre.

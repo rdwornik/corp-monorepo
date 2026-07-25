@@ -5,7 +5,11 @@
 
 > Project-local, corp-domain interface doc (#314). **Thin index** — the
 > authoritative structural detail lives in `ARCHITECTURE.md`; this file is a
-> pointer, not a duplicate. Full genre wording deferred to #327.
+> pointer, not a duplicate. **Genre (hub BACKLOG #327 — resolved by reference):**
+> `protocols/` is the fleet's interface genre — *what other repos/agents must know
+> to interact with THIS repo*. That wording is defined once at the hub
+> (`../.dev-knowledge/protocols/README.md`) and is not restated here; this file is
+> corp's interface doc under it.
 
 ## The five CLIs
 
