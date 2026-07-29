@@ -16,6 +16,9 @@ env/
 .vscode/*
 # tracked: hub files.watcherExclude for .claude/worktrees (PLAYBOOK §8)
 !.vscode/settings.json
+# tracked: the vscode-boundary-decoration extension recommendation (hub ruling 2026-07-29,
+# leg 1) -- the decoration is inert without it; ai-council tracks both files likewise
+!.vscode/extensions.json
 .idea/
 
 # OS
