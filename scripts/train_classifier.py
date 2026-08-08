@@ -157,7 +157,11 @@ def main() -> None:
     print(f"\nModel saved: {model_path} ({size_kb:.0f} KB)")
     print("Serialization: JSON (no pickle)")
 
-    # Also copy to CKE data dir for packaging
+    # Also copy to CKE data dir for packaging. The two copies are byte-identical BY DESIGN, not by
+    # accident: models/ is the training artifact (scored by eval_classifier.py against the locked
+    # held-out split), while this copy is shipped package data (pyproject.toml `corp.extractor` ->
+    # data/*.json) and is what hybrid_loader._DEFAULT_MODEL_PATH loads at runtime -- models/ does not
+    # exist inside an installed wheel. Do not "de-dup" these; see models/README.md.
     cke_data = MONOREPO / "src/corp/extractor/data"
     dest = cke_data / "hybrid_classifier.json"
     dest.write_text(json.dumps(model_data, indent=2), encoding="utf-8")
